@@ -1,44 +1,93 @@
 # Development Process
 
-This document tracks the development process of Server Toolkit.
+This document describes how Server Toolkit is developed.
 
-## Workflow
+---
 
-1. Create a GitHub issue
-2. Create a feature branch
-3. Implement the feature
-4. Commit with a conventional commit message
-5. Push the branch
-6. Create a pull request
-7. Review and merge into main
+## Development Workflow
+
+Every feature follows this workflow.
+
+1. Create GitHub Issue
+2. Create Feature Branch
+3. Implement Feature
+4. Commit using Conventional Commits
+5. Push Branch
+6. Create Pull Request
+7. Code Review
+8. Merge into main
+
+---
 
 ## Branch Naming
 
-- feature/navigation
-- feature/home-screen
-- feature/add-server
-- fix/bug-name
-- docs/document-name
+feature/<feature-name>
+
+Examples
+
+feature/navigation
+
+feature/home-screen
+
+feature/add-server
+
+fix/login
+
+docs/readme
+
+---
 
 ## Commit Convention
 
-- feat: add new feature
-- fix: fix a bug
-- docs: update documentation
-- refactor: improve code structure
-- chore: project maintenance
+feat:
+
+New feature
+
+fix:
+
+Bug fix
+
+docs:
+
+Documentation
+
+refactor:
+
+Internal code improvement
+
+style:
+
+Formatting
+
+test:
+
+Tests
+
+chore:
+
+Maintenance
+
+---
+
+## Coding Rules
+
+- Small classes
+- Single Responsibility Principle
+- Meaningful names
+- English only
+- Self-documenting code
+- Comments only when necessary
+
+---
 
 ## Current Sprint
 
-Sprint 1: Dashboard and Navigation
+Sprint 1
 
-### Goal
+Goal
 
-Create the initial navigation structure and dashboard screen.
+Build the project infrastructure.
 
-### Planned Screens
+Status
 
-- Home
-- Add Server
-- Server Details
-- Settings
+In Progress

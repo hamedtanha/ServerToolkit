@@ -1,35 +1,62 @@
 # Server Toolkit
 
-Server Toolkit is an Android application for managing Linux servers from a mobile device.
+Server Toolkit is a modern Android application for managing Linux servers from a mobile device.
 
-The project is built with Kotlin and Jetpack Compose.
+The application is designed for system administrators, DevOps engineers, and infrastructure engineers who need quick access to their servers.
 
-## Planned Features
+---
+
+## Features (Planned)
 
 - Server inventory
-- Server details
-- Ping test
 - SSH connection
-- Predefined server commands
+- Ping & latency test
+- Server status monitoring
+- Favorite servers
 - Xray service management
-- x-ui service management
-- Certbot renewal helper
+- x-ui management
+- Let's Encrypt helper
 - System logs viewer
+- Command execution
+- Dashboard
+- Search servers
+
+---
 
 ## Tech Stack
 
 - Kotlin
 - Jetpack Compose
-- Android Studio
-- Gradle
-- Git / GitHub
+- MVVM
+- Navigation Compose
+- Room Database
+- Coroutines
+- Flow
+- Material 3
+
+---
 
 ## Project Status
 
-Version: 0.1.0
+Current Version:
 
-Status: Early development
+```
+v0.1.0 (Development)
+```
 
-## Author
+---
 
-Hamed Tanha
+## Documentation
+
+Project documentation can be found inside the **docs** directory.
+
+- DEVELOPMENT.md
+- ARCHITECTURE.md
+- ROADMAP.md
+- CHANGELOG.md
+
+---
+
+## License
+
+MIT License
