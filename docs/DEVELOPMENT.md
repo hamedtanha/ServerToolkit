@@ -91,3 +91,5 @@ Build the project infrastructure.
 Status
 
 In Progress
+
+No architecture document should describe a decision that has not yet been made.
