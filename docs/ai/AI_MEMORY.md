@@ -113,3 +113,21 @@ over rapid implementation.
 # Future Notes
 
 Add new lessons whenever important engineering knowledge is gained.
+
+# Lesson 009
+
+The project transitions from documentation-first planning to implementation-driven development after the architecture baseline is established.
+
+Documentation should evolve together with implementation instead of preceding it.
+
+New documents should only be created when they provide measurable engineering value.
+
+---
+
+# Lesson 010
+
+The initial application skeleton validates the architectural baseline before feature implementation begins.
+
+The skeleton intentionally contains only the minimum executable structure required to support future development.
+
+Feature-specific architecture decisions should be documented only when implementation requires them.
