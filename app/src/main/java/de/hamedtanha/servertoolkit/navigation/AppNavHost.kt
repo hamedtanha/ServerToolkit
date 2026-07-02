@@ -1,5 +1,5 @@
 package de.hamedtanha.servertoolkit.navigation
-
+import de.hamedtanha.servertoolkit.feature.dashboard.presentation.screen.DashboardScreen
 import androidx.compose.runtime.Composable
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
@@ -14,7 +14,8 @@ fun AppNavHost() {
         startDestination = DashboardDestination.route,
     ) {
         composable(route = DashboardDestination.route) {
-            // Dashboard screen will be added in the next step.
+            DashboardScreen()
+
         }
     }
 }
