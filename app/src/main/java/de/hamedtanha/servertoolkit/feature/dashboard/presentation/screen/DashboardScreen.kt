@@ -1,9 +1,9 @@
-package de.hamedtanha.servertoolkit.ui.screens
+package de.hamedtanha.servertoolkit.feature.dashboard.presentation.screen
 
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 
 @Composable
-fun HomeScreen() {
+fun DashboardScreen() {
     Text("Server Toolkit")
 }

@@ -1,4 +1,5 @@
-package de.hamedtanha.servertoolkit.model
+package de.hamedtanha.servertoolkit.feature.servers.domain.model
+
 data class Server(
     val id: String,
     val name: String,

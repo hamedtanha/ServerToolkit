@@ -3,7 +3,7 @@ package de.hamedtanha.servertoolkit
 import android.os.Bundle
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
-import de.hamedtanha.servertoolkit.ui.screens.HomeScreen
+import de.hamedtanha.servertoolkit.feature.dashboard.presentation.screen.DashboardScreen
 import de.hamedtanha.servertoolkit.ui.theme.ServerToolkitTheme
 
 class MainActivity : ComponentActivity() {
@@ -13,7 +13,7 @@ class MainActivity : ComponentActivity() {
 
         setContent {
             ServerToolkitTheme {
-                HomeScreen()
+                DashboardScreen()
             }
         }
     }
