@@ -3,10 +3,9 @@
 ### Added
 
 - Initial Android application skeleton.
-- Initial `HomeScreen` composable.
-- Initial package structure for the application.
+- Initial HomeScreen composable.
+- Initial application package structure.
 
 ### Changed
 
-- Simplified `MainActivity` by removing the default Android Studio template.
-- Updated the application entry point to render `HomeScreen`.
+- Updated MainActivity to use HomeScreen instead of the default Android Studio template.
