@@ -4,9 +4,9 @@
 
 **Version:** 0.1.0
 
-**Status:** Active
+**Status:** Frozen
 
-**Last Updated:** 2026-07-01
+**Last Updated:** 2026-07-02
 
 ---
 
@@ -389,15 +389,15 @@ Every milestone may produce a tagged release.
 Current release roadmap
 
 ```
-v0.1.0  Foundation
+v0.1.0  Project Foundation
 
 v0.2.0  Navigation
 
 v0.3.0  Dashboard
 
-v0.4.0  Server Management
+v0.4.0  Server Inventory
 
-v0.5.0  Local Database
+v0.5.0  Local Storage
 
 v0.6.0  SSH Connectivity
 
@@ -405,7 +405,7 @@ v0.7.0  Monitoring
 
 v0.8.0  Xray Integration
 
-v0.9.0  Beta
+v0.9.0  Beta Stabilization
 
 v1.0.0  First Stable Release
 ```
@@ -537,6 +537,94 @@ The project should continuously improve through:
 - Better developer experience
 
 Continuous improvement is preferred over large-scale rewrites.
+
+
+---
+
+# Documentation Governance
+
+Project documentation is divided into three governance levels.
+
+## Level A — Foundational Documents
+
+These documents define stable project rules and should rarely change:
+
+- PRODUCT_VISION.md
+- ARCHITECTURE.md
+- DEVELOPMENT.md
+- SECURITY.md
+- CONTRIBUTING.md
+- RELEASES.md
+
+Status:
+
+```text
+Frozen
+```
+
+Changes to foundational documents require at least one of the following:
+
+- Accepted Architecture Decision Record
+- Major product scope change
+- Security requirement
+- Release process correction
+- Documented inconsistency that would mislead development
+
+Cosmetic edits should be avoided unless they improve clarity without changing meaning.
+
+## Level B — Planning Documents
+
+Planning documents may change when milestones, priorities, or sequencing change:
+
+- ROADMAP.md
+
+Roadmap changes should remain consistent with PRODUCT_VISION.md and PROJECT_STATE.md.
+
+## Level C — Operational Documents
+
+Operational documents are expected to change frequently:
+
+- PROJECT_STATE.md
+- CHANGELOG.md
+
+These documents track current work, completed work, release notes, and short-term project state.
+
+---
+
+# Documentation Freeze Rule
+
+Foundational documents are frozen after version `0.1.0`.
+
+A frozen document must not be edited casually during normal feature development.
+
+Before changing a frozen document, verify:
+
+- The change is necessary.
+- The reason is documented.
+- Related documents remain consistent.
+- The change does not describe functionality that does not exist.
+- The Last Updated field is updated.
+
+---
+
+# Current Milestone Model
+
+The project uses versioned milestones:
+
+```text
+v0.1.0  Project Foundation
+v0.2.0  Navigation
+v0.3.0  Dashboard
+v0.4.0  Server Inventory
+v0.5.0  Local Storage
+v0.6.0  SSH Connectivity
+v0.7.0  Monitoring
+v0.8.0  Xray Integration
+v0.9.0  Beta Stabilization
+v1.0.0  First Stable Release
+```
+
+This model is the single reference for milestone sequencing. ROADMAP.md and PROJECT_STATE.md must remain consistent with it.
 
 ---
 

@@ -1,12 +1,9 @@
 # Roadmap
 
-**Project:** Server Toolkit
-
-**Version:** 0.1.0
-
-**Status:** Active
-
-**Last Updated:** 2026-07-01
+**Project:** Server Toolkit  
+**Version:** 0.1.0  
+**Status:** Active  
+**Last Updated:** 2026-07-02
 
 ---
 
@@ -14,54 +11,143 @@
 
 This roadmap describes the planned evolution of Server Toolkit.
 
-The roadmap is intended to provide direction rather than fixed deadlines.
-
-Features and priorities may change as the project evolves.
+The roadmap provides direction and milestone order. It does not define fixed delivery dates.
 
 ---
 
-# Project Status
+# Roadmap Policy
 
-Current Phase
+The roadmap is a planning document.
 
-Project Foundation
+It may change when product priorities, technical constraints, or implementation realities change.
 
-Progress
-
-🟢 In Progress
+Major roadmap changes must be documented through an Architecture Decision Record when they affect architecture, security, release strategy, or product scope.
 
 ---
 
-# Phase 1 — Foundation
+# Current Project Status
 
-Goal
+Current stable checkpoint:
+
+```text
+v0.1.0 — Project Foundation
+```
+
+Current development milestone:
+
+```text
+v0.2.0 — Navigation
+```
+
+Progress:
+
+```text
+Navigation: Not Started
+```
+
+---
+
+# Milestone Roadmap
+
+| Version | Milestone | Goal | Status |
+|---|---|---|---|
+| v0.1.0 | Project Foundation | Establish project structure, documentation, architecture baseline, and development workflow. | Completed |
+| v0.2.0 | Navigation | Add application navigation foundation. | Not Started |
+| v0.3.0 | Dashboard | Add initial home dashboard and basic UI structure. | Planned |
+| v0.4.0 | Server Inventory | Manage server information locally in memory or temporary state. | Planned |
+| v0.5.0 | Local Storage | Persist server data using a local database. | Planned |
+| v0.6.0 | SSH Connectivity | Establish secure SSH connectivity and connection validation. | Planned |
+| v0.7.0 | Monitoring | Add basic server availability and latency monitoring. | Planned |
+| v0.8.0 | Xray Integration | Add Xray and x-ui operational workflows. | Planned |
+| v0.9.0 | Beta Stabilization | Improve reliability, testing, security, and user experience before stable release. | Future |
+| v1.0.0 | First Stable Release | Prepare the application for public distribution. | Future |
+
+---
+
+# v0.1.0 — Project Foundation
+
+Goal:
 
 Build a stable, maintainable, and scalable project foundation.
 
-Tasks
+Completed work:
 
-- Android Studio project
-- GitHub repository
-- Documentation
-- MVVM architecture
-- Navigation
-- Dashboard
-- Home Screen
-- Basic UI components
+- Android Studio project initialized
+- Git repository configured
+- GitHub repository created
+- Documentation foundation created
+- MVVM package structure established
+- Initial Server model created
+- Development workflow defined
+- Architecture baseline documented
+- ADR process created
+- Initial release tag created
 
-Status
+Status:
 
-🟢 In Progress
+```text
+Completed
+```
 
 ---
 
-# Phase 2 — Server Inventory
+# v0.2.0 — Navigation
 
-Goal
+Goal:
+
+Create the application navigation foundation.
+
+Scope:
+
+- Define screen routes
+- Add navigation graph
+- Add initial app navigation host
+- Prepare navigation for Home, Add Server, Server Details, and Settings screens
+
+Expected implementation targets:
+
+```text
+navigation/Screen.kt
+navigation/AppNavigation.kt
+```
+
+Status:
+
+```text
+Not Started
+```
+
+---
+
+# v0.3.0 — Dashboard
+
+Goal:
+
+Create the first useful landing experience for the application.
+
+Planned features:
+
+- Home screen
+- Dashboard layout
+- Basic server summary placeholders
+- Empty state
+- Navigation entry points
+
+Status:
+
+```text
+Planned
+```
+
+---
+
+# v0.4.0 — Server Inventory
+
+Goal:
 
 Manage server information.
 
-Features
+Planned features:
 
 - Add server
 - Edit server
@@ -69,103 +155,90 @@ Features
 - Favorite server
 - Search servers
 - Categories
-- Validation
+- Input validation
 
-Status
+Status:
 
-⚪ Planned
+```text
+Planned
+```
 
 ---
 
-# Phase 3 — Local Storage
+# v0.5.0 — Local Storage
 
-Goal
+Goal:
 
-Persist application data.
+Persist application data securely and reliably.
 
-Features
+Planned features:
 
-- Room Database
+- Room database
 - Repository implementation
-- Data migration
+- Data migration strategy
 - Import
 - Export
 
-Status
+Status:
 
-⚪ Planned
+```text
+Planned
+```
 
 ---
 
-# Phase 4 — Connectivity
+# v0.6.0 — SSH Connectivity
 
-Goal
+Goal:
 
-Communicate with remote servers.
+Communicate with remote servers securely.
 
-Features
+Planned features:
 
 - SSH connection
 - Connection validation
 - Saved connections
-- Fingerprint verification
+- Host fingerprint verification
 - Multiple authentication methods
 
-Status
+Status:
 
-⚪ Planned
+```text
+Planned
+```
 
 ---
 
-# Phase 5 — Monitoring
+# v0.7.0 — Monitoring
 
-Goal
+Goal:
 
-Provide operational visibility.
+Provide basic operational visibility.
 
-Features
+Planned features:
 
 - Ping
 - Latency
 - Online status
 - Last seen
-- Server information
+- Basic server information
 - Dashboard statistics
 
-Status
+Status:
 
-⚪ Planned
-
----
-
-# Phase 6 — Server Operations
-
-Goal
-
-Execute common maintenance tasks.
-
-Features
-
-- Execute predefined commands
-- Custom commands
-- Command history
-- Service restart
-- Journal viewer
-- Log viewer
-
-Status
-
-⚪ Planned
+```text
+Planned
+```
 
 ---
 
-# Phase 7 — Xray Integration
+# v0.8.0 — Xray Integration
 
-Goal
+Goal:
 
-Manage Xray infrastructure.
+Manage Xray-related operational workflows.
 
-Features
+Planned features:
 
 - Xray status
 - Restart service
@@ -173,75 +246,64 @@ Features
 - Configuration overview
 - x-ui integration
 
-Status
+Status:
 
-⚪ Planned
-
----
-
-# Phase 8 — Security
-
-Goal
-
-Protect sensitive information.
-
-Features
-
-- Android Keystore
-- Encrypted storage
-- Biometric authentication
-- Secure backup
-
-Status
-
-⚪ Planned
+```text
+Planned
+```
 
 ---
 
-# Phase 9 — Cloud Features
+# v0.9.0 — Beta Stabilization
 
-Goal
+Goal:
 
-Synchronize multiple devices.
+Prepare the project for stable release quality.
 
-Possible Features
+Planned work:
 
-- Cloud backup
-- Google Drive
-- Encrypted synchronization
-- Shared server lists
+- Reliability improvements
+- Security review
+- UI polish
+- Performance review
+- Accessibility review
+- Testing improvements
+- Documentation review
 
-Status
+Status:
 
-⚪ Future
+```text
+Future
+```
 
 ---
 
-# Phase 10 — Release
+# v1.0.0 — First Stable Release
 
-Goal
+Goal:
 
 Prepare the application for public distribution.
 
-Tasks
+Planned work:
 
-- UI polishing
-- Performance optimization
-- Accessibility
-- Testing
 - Release build
 - GitHub Release
-- Google Play preparation
+- APK distribution
+- Release notes
+- Final documentation review
+- Optional Google Play preparation
 
-Status
+Status:
 
-⚪ Future
+```text
+Future
+```
 
 ---
 
-# Long-Term Vision
+# Long-Term Candidate Modules
 
-Possible future modules
+The following modules are intentionally outside the current 1.0 roadmap unless explicitly promoted later:
 
 - Docker
 - Docker Compose
@@ -252,27 +314,17 @@ Possible future modules
 - Proxmox
 - VMware
 - Hyper-V
-- Cloud providers
+- Cloud provider integrations
 - Notifications
 - Background monitoring
-
-These features are intentionally outside the scope of version 1.0.
-
----
-
-# Roadmap Policy
-
-The roadmap is a living document.
-
-Items may be added, removed, reordered, or postponed as new requirements emerge.
-
-Major roadmap changes should be documented in Architecture Decision Records (ADR).
+- Cloud synchronization
 
 ---
 
 # Related Documents
 
 - PRODUCT_VISION.md
+- PROJECT_STATE.md
 - DEVELOPMENT.md
 - ARCHITECTURE.md
 - CHANGELOG.md

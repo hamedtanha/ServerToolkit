@@ -1,43 +1,41 @@
 # Security Policy
 
-**Project:** Server Toolkit
-
-**Version:** 0.1.0
-
-**Status:** Active
-
-**Last Updated:** 2026-07-01
+**Project:** Server Toolkit  
+**Version:** 0.1.0  
+**Status:** Frozen  
+**Last Updated:** 2026-07-02
 
 ---
 
 # Purpose
 
-This document defines the security principles followed throughout the development of the Server Toolkit project.
+This document defines the security principles followed throughout the development of Server Toolkit.
 
-Security is considered a fundamental requirement rather than an optional feature.
+Security is a fundamental project requirement and must be considered during architecture, implementation, testing, and release preparation.
 
 ---
 
 # Security Objectives
 
-The application is designed to:
+Server Toolkit is designed to:
 
-- Protect sensitive user data.
-- Secure server credentials.
-- Prevent accidental information disclosure.
-- Minimize attack surfaces.
-- Follow Android security best practices.
+- Protect sensitive user data
+- Protect server credentials
+- Prevent accidental information disclosure
+- Minimize attack surface
+- Follow Android security best practices
+- Fail safely when security-sensitive operations cannot be completed
 
 ---
 
 # Security Principles
 
-The project follows these principles.
+The project follows these principles:
 
 - Least Privilege
 - Defense in Depth
 - Secure by Default
-- Principle of Minimal Exposure
+- Minimal Exposure
 - Fail Securely
 
 ---
@@ -49,13 +47,15 @@ Sensitive information must never be committed to Git.
 Examples include:
 
 - Passwords
-- Private Keys
-- SSH Keys
-- API Tokens
-- Access Tokens
-- Client Secrets
+- Private keys
+- SSH keys
+- API tokens
+- Access tokens
+- Client secrets
 - Certificates
-- Database Dumps
+- Database dumps
+- Real server credentials
+- Real production server inventories
 
 ---
 
@@ -63,40 +63,52 @@ Examples include:
 
 Credentials must never be stored as plain text.
 
-Planned secure storage:
+Planned secure storage mechanisms include:
 
 - Android Keystore
 - EncryptedSharedPreferences
-- AES encryption (where appropriate)
+- Encrypted file storage where appropriate
 
-Architecture decisions will be documented in ADRs.
+Credential storage architecture must be documented in an ADR before implementation.
 
 ---
 
 # Network Security
 
-All network communication should use encrypted protocols whenever possible.
+All remote communication should use encrypted protocols whenever possible.
 
-Examples:
+Expected protocols include:
 
 - SSH
 - HTTPS
 - TLS
 
-Unencrypted communication should be avoided.
+Unencrypted communication should be avoided unless explicitly justified and documented.
+
+---
+
+# SSH Security
+
+SSH-related functionality must be designed with strict security boundaries.
+
+Required principles:
+
+- Verify host fingerprints before trusting a server.
+- Avoid silently accepting unknown hosts.
+- Avoid exposing private keys to logs, UI previews, or crash reports.
+- Prefer encrypted private key handling.
+- Keep authentication logic outside the UI layer.
 
 ---
 
 # Authentication
 
-The application will support secure authentication methods.
+The application may support:
 
-Planned support:
+- Password authentication
+- Public key authentication
 
-- Password Authentication
-- Public Key Authentication
-
-Private keys should remain encrypted whenever possible.
+Authentication methods must be implemented only after the secure storage strategy is defined.
 
 ---
 
@@ -106,11 +118,12 @@ Logs must never contain:
 
 - Passwords
 - Tokens
-- Private Keys
+- Private keys
 - Session IDs
-- Sensitive User Data
+- Sensitive user data
+- Full credential-bearing connection strings
 
-Log messages should contain only information useful for debugging.
+Log messages should contain only information required for debugging and operational diagnosis.
 
 ---
 
@@ -118,11 +131,12 @@ Log messages should contain only information useful for debugging.
 
 The application should minimize local storage of sensitive information.
 
-Whenever possible:
+Rules:
 
-- Encrypt data
-- Avoid caching secrets
-- Remove temporary files
+- Encrypt sensitive data.
+- Avoid caching secrets.
+- Remove temporary files when they are no longer needed.
+- Keep test data separate from real user data.
 
 ---
 
@@ -132,18 +146,19 @@ Only actively maintained libraries should be used.
 
 Libraries should:
 
-- Have an active community
 - Receive security updates
-- Be widely adopted
+- Have an active community
+- Be widely adopted or technically justified
 - Have a compatible license
+- Avoid unnecessary permissions or excessive transitive dependencies
 
 ---
 
 # Security Updates
 
-Dependencies should be updated regularly.
-
 Known vulnerabilities should be fixed as soon as practical.
+
+Dependency updates should be reviewed regularly, especially before release milestones.
 
 ---
 
@@ -157,14 +172,14 @@ Until a public disclosure process exists, security concerns should be communicat
 
 # Future Security Features
 
-Planned improvements include:
+The following features are planned candidates and are not guaranteed to exist until implemented:
 
-- Biometric Authentication
-- Certificate Pinning
-- Secure Backup
-- Encrypted Export
-- Automatic Session Lock
-- Root Detection (optional)
+- Biometric authentication
+- Certificate pinning
+- Secure backup
+- Encrypted export
+- Automatic session lock
+- Optional root detection
 
 ---
 
@@ -173,10 +188,25 @@ Planned improvements include:
 Before every release verify:
 
 - No secrets committed
-- Dependencies updated
+- Dependencies reviewed
 - Build succeeds
 - Sensitive logs removed
 - Release configuration verified
+- Debug-only behavior disabled in release builds
+- Documentation reflects actual security behavior
+
+---
+
+# Document Governance
+
+This document is foundational and frozen.
+
+Changes are allowed only when:
+
+- A new security requirement is accepted.
+- A vulnerability or risk requires policy correction.
+- Android security guidance materially changes.
+- An ADR changes credential, storage, SSH, or network security architecture.
 
 ---
 
@@ -186,3 +216,4 @@ Before every release verify:
 - ARCHITECTURE.md
 - RELEASES.md
 - CHANGELOG.md
+- PROJECT_STATE.md

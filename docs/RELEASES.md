@@ -1,18 +1,15 @@
 # Release Process
 
-**Project:** Server Toolkit
-
-**Version:** 0.1.0
-
-**Status:** Active
-
-**Last Updated:** 2026-07-01
+**Project:** Server Toolkit  
+**Version:** 0.1.0  
+**Status:** Frozen  
+**Last Updated:** 2026-07-02
 
 ---
 
 # Purpose
 
-This document defines how application releases are prepared, reviewed, versioned, and published.
+This document defines how Server Toolkit releases are prepared, reviewed, versioned, tagged, and distributed.
 
 The objective is to make every release reproducible, traceable, and reliable.
 
@@ -22,13 +19,13 @@ The objective is to make every release reproducible, traceable, and reliable.
 
 Server Toolkit follows Semantic Versioning.
 
-```
+```text
 MAJOR.MINOR.PATCH
 ```
 
-Example
+Examples:
 
-```
+```text
 1.0.0
 1.1.0
 1.1.1
@@ -41,17 +38,17 @@ Example
 
 ## Major Release
 
-Breaking changes.
+Used for breaking changes.
 
-Examples
+Examples:
 
 - Architecture redesign
-- Database migration
+- Database migration with breaking compatibility
 - Major UI redesign
 
-Example
+Example:
 
-```
+```text
 2.0.0
 ```
 
@@ -59,17 +56,18 @@ Example
 
 ## Minor Release
 
-New features without breaking compatibility.
+Used for new features without breaking compatibility.
 
-Examples
+Examples:
 
+- Navigation
 - SSH support
 - Dashboard improvements
 - Monitoring
 
-Example
+Example:
 
-```
+```text
 1.3.0
 ```
 
@@ -77,59 +75,65 @@ Example
 
 ## Patch Release
 
-Bug fixes.
+Used for fixes and safe improvements.
 
-Examples
+Examples:
 
 - Crash fixes
 - UI corrections
 - Security fixes
+- Documentation corrections
 
-Example
+Example:
 
-```
+```text
 1.3.2
+```
+
+---
+
+# Milestone Versioning
+
+Current milestone model:
+
+```text
+v0.1.0  Project Foundation
+v0.2.0  Navigation
+v0.3.0  Dashboard
+v0.4.0  Server Inventory
+v0.5.0  Local Storage
+v0.6.0  SSH Connectivity
+v0.7.0  Monitoring
+v0.8.0  Xray Integration
+v0.9.0  Beta Stabilization
+v1.0.0  First Stable Release
 ```
 
 ---
 
 # Release Workflow
 
-Every release follows the same process.
+Every release follows this process:
 
-```
+```text
 Feature Complete
-
 ↓
-
 Testing
-
 ↓
-
 Documentation Review
-
 ↓
-
 Update CHANGELOG
-
 ↓
-
+Update PROJECT_STATE
+↓
 Version Update
-
 ↓
-
 Git Tag
-
 ↓
-
 GitHub Release
-
 ↓
-
 APK Build
-
 ↓
-
 Distribution
 ```
 
@@ -139,15 +143,17 @@ Distribution
 
 Before creating a release verify:
 
-- All features completed
-- Project builds successfully
-- No compiler warnings
-- Documentation updated
-- CHANGELOG updated
-- Version updated
-- Tests completed
-- Sensitive data removed
-- Release notes prepared
+- All milestone tasks are complete.
+- Project builds successfully.
+- No critical compiler warnings remain.
+- Relevant tests are completed.
+- Documentation is updated.
+- CHANGELOG.md is updated.
+- PROJECT_STATE.md is updated.
+- Version is updated where applicable.
+- Sensitive data is removed.
+- Release notes are prepared.
+- The main branch is releasable.
 
 ---
 
@@ -155,15 +161,15 @@ Before creating a release verify:
 
 Every release must be tagged.
 
-Examples
+Examples:
 
-```
+```text
 v0.1.0
-
 v0.2.0
-
 v1.0.0
 ```
+
+Tags should be created only from a releasable state of `main`.
 
 ---
 
@@ -174,6 +180,7 @@ Every release should include:
 - New features
 - Improvements
 - Bug fixes
+- Security changes
 - Breaking changes
 - Known limitations
 
@@ -181,15 +188,15 @@ Every release should include:
 
 # APK Naming
 
-Recommended naming format
+Recommended stable build naming format:
 
-```
+```text
 ServerToolkit-v1.0.0.apk
 ```
 
-Debug builds
+Recommended debug build naming format:
 
-```
+```text
 ServerToolkit-debug.apk
 ```
 
@@ -199,36 +206,57 @@ ServerToolkit-debug.apk
 
 Each stable release should create a GitHub Release.
 
-Assets
+Recommended assets:
 
 - APK
-- Release Notes
-- Source Code
+- Release notes
+- Source code archive
 
 ---
 
-# Version History
+# Current Release State
 
-Current Version
+Current stable checkpoint:
 
+```text
+v0.1.0 — Project Foundation
 ```
-0.1.0
+
+Current development milestone:
+
+```text
+v0.2.0 — Navigation
 ```
 
-Status
+Project status:
 
+```text
 Development
+```
 
 ---
 
-# Future Distribution
+# Future Distribution Channels
 
-Planned distribution channels
+Planned distribution channels:
 
 - GitHub Releases
+- Internal testing
+- Closed beta
 - Google Play Store
-- Internal Testing
-- Closed Beta
+
+---
+
+# Document Governance
+
+This document is foundational and frozen.
+
+Changes are allowed only when:
+
+- The release process changes.
+- The milestone versioning model changes.
+- Distribution strategy changes.
+- An ADR or release decision requires an update.
 
 ---
 
@@ -237,3 +265,4 @@ Planned distribution channels
 - CHANGELOG.md
 - DEVELOPMENT.md
 - ROADMAP.md
+- PROJECT_STATE.md

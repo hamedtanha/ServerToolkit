@@ -1,50 +1,86 @@
 # Project State
 
-**Project:** Server Toolkit
-
-**Version:** 0.1.0
-
-**Status:** Foundation Complete
-
-**Last Updated:** 2026-07-01
+**Project:** Server Toolkit  
+**Version:** 0.1.0  
+**Status:** Active  
+**Last Updated:** 2026-07-02
 
 ---
 
-# Current Phase
+# Purpose
 
-✅ Phase 0 — Foundation
+This document records the current operational state of the Server Toolkit project.
 
+It is the primary resume point before starting a new development session.
+
+Unlike foundational documents, this document is expected to change frequently.
+
+---
+
+# Current Stable Checkpoint
+
+```text
+v0.1.0 — Project Foundation
+```
+
+Status:
+
+```text
 Completed
+```
+
+---
+
+# Current Development Milestone
+
+```text
+v0.2.0 — Navigation
+```
+
+Status:
+
+```text
+Not Started
+```
 
 ---
 
 # Current Sprint
 
+Sprint:
+
+```text
 Sprint 1
+```
 
-Title
+Title:
 
-Navigation & Dashboard
+```text
+Navigation
+```
 
-Status
+Status:
 
+```text
 Not Started
+```
 
 ---
 
 # Overall Progress
 
-| Phase | Status |
-|---------|--------|
-| Foundation | ✅ Completed |
-| Navigation | ⏳ Pending |
-| Dashboard | ⏳ Pending |
-| Server Management | ⏳ Pending |
-| Database | ⏳ Pending |
-| SSH | ⏳ Pending |
-| Monitoring | ⏳ Pending |
-| Xray Integration | ⏳ Pending |
-| Release | ⏳ Pending |
+| Milestone | Status |
+|---|---|
+| Project Foundation | Completed |
+| Navigation | Not Started |
+| Dashboard | Pending |
+| Server Inventory | Pending |
+| Local Storage | Pending |
+| SSH Connectivity | Pending |
+| Monitoring | Pending |
+| Xray Integration | Pending |
+| Beta Stabilization | Future |
+| Stable Release | Future |
 
 ---
 
@@ -59,13 +95,11 @@ Not Started
 - SSH authentication configured
 - Git workflow established
 - Semantic Versioning adopted
-- Initial Git tag (v0.1.0)
-
----
+- Initial Git tag created: `v0.1.0`
 
 ## Project Structure
 
-Created packages
+Created packages:
 
 - data
 - model
@@ -74,11 +108,9 @@ Created packages
 - utils
 - viewmodel
 
----
-
 ## Documentation
 
-Completed
+Completed documentation foundation:
 
 - Product Vision
 - Architecture
@@ -91,118 +123,136 @@ Completed
 - ADR Process
 - ADR-001
 
----
-
 ## Initial Model
 
-Created
+Created:
 
+```text
 Server.kt
-
----
-
-# Current Architecture
-
-MVVM
-
-Single Activity
-
-Jetpack Compose
-
-Repository Pattern
-
-Architecture Status
-
-Stable
-
----
-
-# Current Git Status
-
-Main branch
-
 ```
+
+---
+
+# Current Architecture Baseline
+
+- MVVM
+- Single Activity
+- Jetpack Compose
+- Repository Pattern
+- Documentation-Driven Agile Development
+- GitHub Flow
+- Conventional Commits
+- Semantic Versioning
+- ADR for significant architectural decisions
+
+Architecture status:
+
+```text
+Stable
+```
+
+---
+
+# Current Git State
+
+Main branch:
+
+```text
 main
 ```
 
-Feature development
+Feature branch convention:
 
-```
+```text
 feature/*
 ```
 
-Current Tag
+Current tag:
 
-```
+```text
 v0.1.0
 ```
 
----
+Expected next branch:
 
-# Current Documentation Status
-
-Documentation Foundation
-
-✅ Complete
+```text
+feature/navigation
+```
 
 ---
 
-# Current Development Rules
+# Current Documentation State
 
-- MVVM
-- Conventional Commits
-- Feature Branches
-- ADR for architectural decisions
-- Documentation-first approach
-- English documentation
-- English code comments
-- Google Android recommendations
+Documentation foundation:
+
+```text
+Completed
+```
+
+Frozen foundational documents:
+
+- PRODUCT_VISION.md
+- ARCHITECTURE.md
+- DEVELOPMENT.md
+- SECURITY.md
+- CONTRIBUTING.md
+- RELEASES.md
+
+Mutable planning and operational documents:
+
+- ROADMAP.md
+- PROJECT_STATE.md
+- CHANGELOG.md
 
 ---
 
 # Current Objective
 
-Build the application navigation.
+Build the application navigation foundation.
 
 ---
 
 # Next Task
 
-Create
+Create:
 
+```text
+navigation/Screen.kt
+navigation/AppNavigation.kt
 ```
-navigation/
-    Screen.kt
-    AppNavigation.kt
-```
+
+---
+
+# Definition of Done for v0.2.0
+
+Navigation is complete only when:
+
+- Screen routes are defined.
+- App navigation graph is implemented.
+- Navigation compiles successfully.
+- Documentation is updated where necessary.
+- CHANGELOG.md is updated.
+- PROJECT_STATE.md reflects the completed milestone.
+- Changes are committed using Conventional Commits.
+- The project remains releasable.
 
 ---
 
 # Blockers
 
+```text
 None
+```
 
 ---
 
 # Technical Debt
 
-None
-
-The project is still in the foundation stage.
-
----
-
-# Future Milestone
-
-Version
-
-```
-v0.2.0
+```text
+None known
 ```
 
-Goal
-
-Navigation completed.
+The project is still early. Technical debt should be recorded here as soon as it appears.
 
 ---
 
@@ -210,9 +260,9 @@ Navigation completed.
 
 The project foundation has been completed successfully.
 
-From this point onward the primary focus shifts from infrastructure and documentation to feature development.
+From this point onward, the primary focus shifts from project setup and documentation foundation to feature development.
 
-Major architectural changes should be avoided unless a significant technical reason exists.
+Major architectural changes should be avoided unless there is a significant technical reason and an ADR is created.
 
 ---
 
@@ -221,6 +271,7 @@ Major architectural changes should be avoided unless a significant technical rea
 Before starting a new session:
 
 - Read PROJECT_STATE.md
-- Review current Sprint
-- Review current Git branch
+- Confirm the current branch
+- Review the current milestone
+- Review the current sprint
 - Continue from the Next Task section

@@ -1,22 +1,17 @@
 # Contributing Guide
 
-**Project:** Server Toolkit
-
-**Version:** 0.1.0
-
-**Status:** Active
-
-**Last Updated:** 2026-07-01
+**Project:** Server Toolkit  
+**Version:** 0.1.0  
+**Status:** Frozen  
+**Last Updated:** 2026-07-02
 
 ---
 
-# Welcome
+# Purpose
 
-Thank you for your interest in contributing to Server Toolkit.
+This document defines contribution rules, development expectations, and review standards for Server Toolkit.
 
-This document describes the development workflow, coding standards, and contribution guidelines for the project.
-
-Our goal is to maintain a clean, consistent, and professional codebase.
+The goal is to keep the codebase clean, consistent, maintainable, secure, and professionally documented.
 
 ---
 
@@ -31,102 +26,82 @@ Every contribution should improve at least one of the following:
 - Security
 - Documentation
 
-Quality is always preferred over speed.
+Quality is preferred over speed.
 
 ---
 
 # Before You Start
 
-Please read the following documents first.
+Read the following documents before contributing:
 
 - PRODUCT_VISION.md
 - ARCHITECTURE.md
 - DEVELOPMENT.md
 - ROADMAP.md
+- SECURITY.md
+- PROJECT_STATE.md
 
 ---
 
 # Workflow
 
-Every contribution should follow this workflow.
+Every contribution should follow this workflow:
 
-```
-
+```text
 Issue
-
 ↓
-
 Discussion
-
 ↓
-
 Feature Branch
-
 ↓
-
 Implementation
-
 ↓
-
 Documentation
-
 ↓
-
 Testing
-
 ↓
-
 Commit
-
 ↓
-
 Pull Request
-
 ↓
-
 Review
-
 ↓
-
 Merge
-
 ```
 
 ---
 
 # Branch Naming
 
-Feature
+Feature branches:
 
-```
-
-feature/home-dashboard
-
+```text
 feature/navigation
-
-feature/ssh
-
+feature/dashboard
+feature/server-inventory
+feature/ssh-connectivity
 ```
 
-Fix
+Fix branches:
 
+```text
+fix/navigation-crash
+fix/database-migration
 ```
 
-fix/login-crash
+Documentation branches:
 
-fix/database
-
-```
-
-Documentation
-
-```
-
+```text
 docs/readme
-
 docs/architecture
-
+docs/project-state
 ```
+
+Rules:
+
+- Do not commit directly to `main`.
+- Start feature branches from `main`.
+- Keep branch names short and descriptive.
 
 ---
 
@@ -134,142 +109,164 @@ docs/architecture
 
 The project follows Conventional Commits.
 
-Examples
+Examples:
 
-```
-
-feat: add server dashboard
-
-fix: resolve ssh timeout
-
-docs: update roadmap
-
-refactor: simplify repository
-
-style: reformat compose code
-
-test: add repository tests
-
+```text
+feat: add app navigation graph
+fix: resolve server form validation
+refactor: simplify repository contract
+docs: update project state
+test: add navigation route tests
 chore: update dependencies
-
 ```
+
+Commit messages must be written in English.
 
 ---
 
 # Coding Style
 
-General rules
+General rules:
 
 - Write readable code.
-- Prefer simplicity.
+- Prefer simple solutions.
 - Keep functions small.
 - Keep classes focused.
 - Avoid duplicated code.
 - Prefer immutable data.
 - Use meaningful names.
+- Avoid clever code that reduces maintainability.
 
 ---
 
 # Kotlin Guidelines
 
-Use
+Use the following constructs when appropriate:
 
 - data class
 - sealed class
 - enum class
 - object
 
-when appropriate.
+Avoid unnecessary abstraction.
 
-Avoid unnecessary complexity.
+Abstractions must solve a real maintainability or testability problem.
 
 ---
 
-# Jetpack Compose
+# Jetpack Compose Guidelines
 
 Compose UI should remain declarative.
 
-Business logic must never be placed inside composables.
+Rules:
 
-Composable functions should be as small as possible.
+- Do not put business logic inside composables.
+- Keep composables small.
+- Hoist state where appropriate.
+- Prefer immutable UI state.
+- Keep navigation concerns separated from screen rendering logic.
 
 ---
 
-# Documentation
+# Documentation Requirements
 
 Documentation is part of the implementation.
 
-Every significant feature should update:
+Every significant feature should update relevant documents, including:
 
+- PROJECT_STATE.md
 - CHANGELOG.md
-- ROADMAP.md
-- ADRs (when necessary)
+- ROADMAP.md when milestone status changes
+- ADRs when an architectural decision is accepted
+
+Foundational documents are frozen and must not be edited casually.
 
 ---
 
-# Comments
+# Comment Guidelines
 
-Comments should explain
+Comments should explain why, not what.
 
-- Why
-
-not
-
-- What
-
-Good
+Good:
 
 ```kotlin
 // Retry only for temporary network failures.
 ```
 
-Bad
+Bad:
 
 ```kotlin
-// Increment i
+// Increment i.
 i++
 ```
 
+All code comments must be written in English.
+
 ---
 
-# Security
+# Security Rules
 
-Never commit
+Never commit:
 
 - Passwords
 - Private keys
 - API tokens
 - Certificates
 - Sensitive server information
+- Real production credentials
+
+Security-sensitive code must follow SECURITY.md.
 
 ---
 
-# Pull Requests
+# Pull Request Requirements
 
-A pull request should
+A pull request should:
 
 - Build successfully
-- Pass tests
+- Pass relevant tests
+- Follow architecture rules
 - Update documentation
-- Follow project standards
+- Avoid unrelated changes
+- Keep the project releasable
 
 ---
 
-# Code Review
+# Code Review Criteria
 
-During review we evaluate
+During review, changes are evaluated for:
 
 - Architecture
 - Readability
 - Maintainability
 - Security
 - Performance
-- Documentation
+- Testability
+- Documentation accuracy
+
+A change should not be merged only because it works.
+
+It should also fit the long-term architecture of the project.
 
 ---
 
-# Thank You
+# Document Governance
 
-Every contribution helps improve the project.
+This document is foundational and frozen.
 
-Thank you for making Server Toolkit better.
+Changes are allowed only when:
+
+- The development workflow changes.
+- The contribution process changes.
+- A new mandatory quality rule is accepted.
+- An ADR requires an update.
+
+---
+
+# Related Documents
+
+- PRODUCT_VISION.md
+- ARCHITECTURE.md
+- DEVELOPMENT.md
+- SECURITY.md
+- PROJECT_STATE.md
