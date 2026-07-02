@@ -7,324 +7,272 @@
 
 ---
 
-# Overview
+# Purpose
 
-This roadmap describes the planned evolution of Server Toolkit.
+This roadmap describes the planned evolution of the Server Toolkit project.
 
-The roadmap provides direction and milestone order. It does not define fixed delivery dates.
+It provides a high-level view of project milestones and major engineering objectives.
 
----
+The roadmap is intentionally milestone-based rather than feature-based.
 
-# Roadmap Policy
-
-The roadmap is a planning document.
-
-It may change when product priorities, technical constraints, or implementation realities change.
-
-Major roadmap changes must be documented through an Architecture Decision Record when they affect architecture, security, release strategy, or product scope.
+Implementation order may change when architectural or engineering priorities require it.
 
 ---
 
-# Current Project Status
+# Guiding Principles
 
-Current stable checkpoint:
+Development follows these principles:
 
-```text
-v0.1.0 — Project Foundation
-```
-
-Current development milestone:
-
-```text
-v0.2.0 — Navigation
-```
-
-Progress:
-
-```text
-Navigation: Not Started
-```
+- Documentation before implementation
+- Architecture before features
+- Incremental delivery
+- Production-quality engineering
+- Living documentation
 
 ---
 
-# Milestone Roadmap
+# Milestones
 
-| Version | Milestone | Goal | Status |
-|---|---|---|---|
-| v0.1.0 | Project Foundation | Establish project structure, documentation, architecture baseline, and development workflow. | Completed |
-| v0.2.0 | Navigation | Add application navigation foundation. | Not Started |
-| v0.3.0 | Dashboard | Add initial home dashboard and basic UI structure. | Planned |
-| v0.4.0 | Server Inventory | Manage server information locally in memory or temporary state. | Planned |
-| v0.5.0 | Local Storage | Persist server data using a local database. | Planned |
-| v0.6.0 | SSH Connectivity | Establish secure SSH connectivity and connection validation. | Planned |
-| v0.7.0 | Monitoring | Add basic server availability and latency monitoring. | Planned |
-| v0.8.0 | Xray Integration | Add Xray and x-ui operational workflows. | Planned |
-| v0.9.0 | Beta Stabilization | Improve reliability, testing, security, and user experience before stable release. | Future |
-| v1.0.0 | First Stable Release | Prepare the application for public distribution. | Future |
+## v0.1.0 — Foundation ✅
 
----
+Objective:
 
-# v0.1.0 — Project Foundation
+Establish the engineering foundation of the project.
 
-Goal:
+Completed:
 
-Build a stable, maintainable, and scalable project foundation.
-
-Completed work:
-
-- Android Studio project initialized
+- Android project initialized
 - Git repository configured
-- GitHub repository created
-- Documentation foundation created
-- MVVM package structure established
-- Initial Server model created
-- Development workflow defined
-- Architecture baseline documented
-- ADR process created
-- Initial release tag created
+- GitHub integration
+- Documentation structure
+- AI collaboration rules
+- ADR process
+- Project vision
+- Initial project documentation
 
 Status:
 
-```text
 Completed
-```
 
 ---
 
-# v0.2.0 — Navigation
+## v0.2.0 — Architecture
 
-Goal:
+Objective:
 
-Create the application navigation foundation.
+Define the technical foundation before implementation begins.
 
-Scope:
+Deliverables:
 
-- Define screen routes
-- Add navigation graph
-- Add initial app navigation host
-- Prepare navigation for Home, Add Server, Server Details, and Settings screens
-
-Expected implementation targets:
-
-```text
-navigation/Screen.kt
-navigation/AppNavigation.kt
-```
+- Architecture documentation
+- Project state
+- Feature catalog
+- UX flow
+- Initial technical ADRs
+- Security strategy
+- Navigation strategy
 
 Status:
 
-```text
-Not Started
-```
+In Progress
 
 ---
 
-# v0.3.0 — Dashboard
+## v0.3.0 — Project Skeleton
 
-Goal:
+Objective:
 
-Create the first useful landing experience for the application.
+Create the production-ready application structure.
 
-Planned features:
+Expected work:
 
-- Home screen
-- Dashboard layout
-- Basic server summary placeholders
-- Empty state
-- Navigation entry points
+- Package structure
+- Navigation framework
+- Dependency injection
+- Theme
+- Design system
+- Room integration
+- DataStore integration
+- Logging foundation
 
 Status:
 
-```text
 Planned
-```
 
 ---
 
-# v0.4.0 — Server Inventory
+## v0.4.0 — Core Infrastructure
 
-Goal:
+Objective:
 
-Manage server information.
+Implement the application's core capabilities.
 
-Planned features:
+Expected work:
 
-- Add server
-- Edit server
-- Delete server
-- Favorite server
-- Search servers
-- Categories
-- Input validation
+- Server inventory
+- Local persistence
+- SSH foundation
+- Secure credential storage
+- Basic dashboard
 
 Status:
 
-```text
 Planned
-```
 
 ---
 
-# v0.5.0 — Local Storage
+## v0.5.0 — Operational Workflows
 
-Goal:
+Objective:
 
-Persist application data securely and reliably.
+Provide practical server-management workflows.
 
-Planned features:
+Expected work:
 
-- Room database
-- Repository implementation
-- Data migration strategy
-- Import
-- Export
+- Saved commands
+- Command execution
+- Server grouping
+- Favorites
+- Recent servers
 
 Status:
 
-```text
 Planned
-```
 
 ---
 
-# v0.6.0 — SSH Connectivity
+## v0.6.0 — Monitoring
 
-Goal:
+Objective:
 
-Communicate with remote servers securely.
+Introduce lightweight infrastructure monitoring.
 
-Planned features:
+Expected work:
 
-- SSH connection
-- Connection validation
-- Saved connections
-- Host fingerprint verification
-- Multiple authentication methods
+- Availability checks
+- Resource overview
+- Dashboard improvements
+- Background refresh
 
 Status:
 
-```text
 Planned
-```
 
 ---
 
-# v0.7.0 — Monitoring
+## v0.7.0 — Service Management
 
-Goal:
+Objective:
 
-Provide basic operational visibility.
+Support common infrastructure services.
 
-Planned features:
+Expected work:
 
-- Ping
-- Latency
-- Online status
-- Last seen
-- Basic server information
-- Dashboard statistics
+- Xray helpers
+- x-ui helpers
+- Certificate helpers
+- Service actions
 
 Status:
 
-```text
 Planned
-```
 
 ---
 
-# v0.8.0 — Xray Integration
+## v0.8.0 — Polish
 
-Goal:
+Objective:
 
-Manage Xray-related operational workflows.
+Improve usability and engineering quality.
 
-Planned features:
+Expected work:
 
-- Xray status
-- Restart service
-- View logs
-- Configuration overview
-- x-ui integration
-
-Status:
-
-```text
-Planned
-```
-
----
-
-# v0.9.0 — Beta Stabilization
-
-Goal:
-
-Prepare the project for stable release quality.
-
-Planned work:
-
-- Reliability improvements
-- Security review
-- UI polish
-- Performance review
-- Accessibility review
-- Testing improvements
+- UI refinement
+- Performance optimization
+- Accessibility
+- Error handling
+- Testing
 - Documentation review
 
 Status:
 
-```text
-Future
-```
+Planned
 
 ---
 
-# v1.0.0 — First Stable Release
+## v0.9.0 — Release Candidate
 
-Goal:
+Objective:
 
-Prepare the application for public distribution.
+Prepare the project for the first stable release.
 
-Planned work:
+Expected work:
 
-- Release build
-- GitHub Release
-- APK distribution
-- Release notes
+- Bug fixing
 - Final documentation review
-- Optional Google Play preparation
+- Security review
+- Release validation
 
 Status:
 
-```text
+Planned
+
+---
+
+## v1.0.0 — Initial Stable Release
+
+Objective:
+
+Deliver the first production-ready version of Server Toolkit.
+
+Expected outcomes:
+
+- Stable architecture
+- Core infrastructure management
+- Reliable SSH workflows
+- Complete documentation
+- Portfolio-quality codebase
+
+Status:
+
 Future
-```
 
 ---
 
-# Long-Term Candidate Modules
+# Beyond Version 1.0
 
-The following modules are intentionally outside the current 1.0 roadmap unless explicitly promoted later:
+Possible future directions include:
 
-- Docker
-- Docker Compose
-- Podman
-- Kubernetes
-- WireGuard
-- Tailscale
-- Proxmox
-- VMware
-- Hyper-V
-- Cloud provider integrations
-- Notifications
+- Docker management
+- WireGuard integration
+- Tailscale integration
+- Kubernetes support
+- Cloud provider integration
 - Background monitoring
-- Cloud synchronization
+- Notifications
+- Secure synchronization
+- Plugin architecture
+
+These capabilities are intentionally outside the scope of version 1.0.
 
 ---
 
-# Related Documents
+# Roadmap Maintenance
 
-- PRODUCT_VISION.md
+The roadmap should evolve with the project.
+
+Major milestone changes should be reflected in:
+
 - PROJECT_STATE.md
-- DEVELOPMENT.md
+- PRODUCT_VISION.md
+- Relevant ADRs
+
+---
+
+# References
+
+- PROJECT_STATE.md
+- PRODUCT_VISION.md
 - ARCHITECTURE.md
-- CHANGELOG.md
+- FEATURE_CATALOG.md
+- ADR-001-project-vision.md
