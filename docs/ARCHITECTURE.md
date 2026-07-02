@@ -2,7 +2,7 @@
 
 **Project:** Server Toolkit  
 **Version:** 0.1.0  
-**Status:** Frozen  
+**Status:** Architecture Baseline  
 **Last Updated:** 2026-07-02
 
 ---
@@ -11,70 +11,81 @@
 
 This document defines the high-level software architecture of the Server Toolkit Android application.
 
-The goal of this architecture is to keep the application maintainable, scalable, testable, secure, and aligned with modern Android development practices.
+Its purpose is to establish a stable architectural foundation that supports long-term maintainability, scalability, security, and testability while remaining aligned with modern Android development practices.
+
+This document describes the overall architecture. Individual technology selections are documented separately through Architecture Decision Records (ADRs).
 
 ---
 
 # Architecture Status
 
-The architecture baseline is stable for the current development stage.
+The architecture baseline has been established for the current stage of the project.
 
 Status:
 
 ```text
-Frozen
+Architecture Baseline
 ```
 
-Architectural changes require a clear technical reason and must be documented through an Architecture Decision Record.
+This document defines the architectural direction of the project.
+
+Major architectural changes require an accepted ADR.
+
+Minor clarifications may be made during implementation as long as they remain consistent with accepted architectural decisions.
 
 ---
 
-# Design Goals
+# Architecture Goals
 
-The architecture is designed to support:
+The architecture is designed to prioritize:
 
 - Maintainability
-- Scalability
 - Readability
+- Scalability
 - Testability
 - Security
-- Performance
+- Simplicity
+- Clear separation of concerns
+- Incremental evolution
 
-Every significant architectural decision should support at least one of these goals.
+Architectural decisions should favor long-term maintainability over short-term convenience.
 
 ---
 
-# Architecture Pattern
+# Architectural Style
 
 Server Toolkit follows Google's recommended Android application architecture.
 
-The application uses MVVM as the primary presentation architecture.
-
-```text
-UI
-│
-▼
-ViewModel
-│
-▼
-Repository
-│
-├── Local Data Source
-└── Remote Data Source
-```
-
----
-
-# Application Style
-
-Server Toolkit uses:
+The application is based on:
 
 - Kotlin
 - Jetpack Compose
 - Single Activity architecture
 - MVVM
 - Repository Pattern
-- Unidirectional Data Flow
+- Unidirectional Data Flow (UDF)
+
+The Domain layer is optional and will only be introduced when justified by implementation complexity.
+
+---
+
+# High-Level Architecture
+
+```text
+                 UI
+                  │
+                  ▼
+             ViewModel
+                  │
+                  ▼
+             Repository
+          ┌──────────────┐
+          │              │
+          ▼              ▼
+   Local Data      Remote Services
+```
+
+The Repository layer separates presentation logic from implementation details.
 
 ---
 
@@ -82,85 +93,80 @@ Server Toolkit uses:
 
 ## UI Layer
 
-Responsible for rendering the user interface.
+Responsibilities:
 
-Contains:
-
-- Compose screens
-- Reusable UI components
-- Navigation
-- Theme
+- Render Compose UI
+- Collect UI state
+- Send user actions
+- Handle navigation
 
 Rules:
 
-- The UI layer must remain declarative.
-- The UI layer must not contain business logic.
-- The UI layer must not communicate directly with databases, SSH clients, or network services.
+- Declarative only
+- No business logic
+- No direct database access
+- No direct SSH access
+- No networking
 
 ---
 
 ## Presentation Layer
 
-Responsible for presentation logic.
-
-Contains:
-
-- ViewModels
-- UI state models
-- User action handling
-
 Responsibilities:
 
-- Prepare UI state
-- Handle user interactions
-- Call repositories
-- Expose observable state to the UI
-- Coordinate screen-level behavior
+- ViewModels
+- Screen state
+- User interaction handling
+- Coordination between UI and repositories
+
+Rules:
+
+- Expose immutable UI state
+- Keep presentation logic independent from implementation details
 
 ---
 
-## Domain Layer
+## Domain Layer (Optional)
 
-The domain layer is not implemented in version `0.1.0`.
+The Domain layer is not part of the initial implementation.
 
-It may be introduced later if business logic becomes complex enough to justify it.
+It may be introduced later if business logic becomes sufficiently complex.
 
-Possible future responsibilities:
+Possible responsibilities include:
 
 - Use cases
 - Business rules
-- Validation rules
-- Cross-feature orchestration
+- Validation
+- Cross-feature coordination
 
-Rule:
-
-The domain layer must not be introduced only for theoretical purity. It must solve a real complexity problem.
+The Domain layer must solve a real engineering problem rather than satisfy architectural purity.
 
 ---
 
 ## Data Layer
 
-Responsible for providing data to the rest of the application.
+Responsibilities:
 
-Contains:
-
-- Repositories
+- Repository implementations
 - Local data sources
 - Remote data sources
-- Persistence adapters
 - External service adapters
+- Persistence abstraction
 
 Rules:
 
-- The data layer hides implementation details from ViewModels.
-- ViewModels must depend on repository contracts, not database or network implementation details.
-- Credentials and sensitive data must be handled according to SECURITY.md.
+- Hide implementation details
+- Expose stable interfaces
+- Centralize data access
+- Protect sensitive information
 
 ---
 
 # Package Structure
 
-Current baseline package structure:
+The initial project uses a single Android application module.
+
+Package organization:
 
 ```text
 de.hamedtanha.servertoolkit
@@ -184,142 +190,160 @@ de.hamedtanha.servertoolkit
 └── viewmodel
 ```
 
-Package changes should be incremental and justified by real implementation needs.
+Packages should evolve gradually based on implementation needs.
 
 ---
 
-# Navigation
+# Module Strategy
 
-The application follows Single Activity architecture.
+Version 1.x uses a single application module.
 
-Navigation is implemented using Jetpack Compose Navigation.
+The package structure is intentionally designed to support future modularization without major refactoring.
 
-Initial planned screens:
-
-- Home
-- Add Server
-- Server Details
-- Settings
-
-Navigation implementation is part of milestone:
-
-```text
-v0.2.0 — Navigation
-```
+Multi-module architecture is deferred until justified by project size or build complexity.
 
 ---
 
 # Data Flow
 
-Application data follows one-way flow.
+Application data follows unidirectional flow.
 
 ```text
 User
-  │
-  ▼
+ │
+ ▼
 Compose UI
-  │
-  ▼
+ │
+ ▼
 ViewModel
-  │
-  ▼
+ │
+ ▼
 Repository
-  │
-  ├── Local Data Source
-  └── Remote Data Source
+ │
+ ├── Local Data
+ └── Remote Services
 ```
 
-This avoids tight coupling between layers and keeps state changes easier to reason about.
+State changes should always move in one direction.
 
 ---
 
 # Dependency Rules
 
-Allowed direction:
+Allowed dependency direction:
 
 ```text
-UI → ViewModel → Repository → Data Sources
+UI
+    ↓
+ViewModel
+    ↓
+Repository
+    ↓
+Data Sources
 ```
 
 Rules:
 
-- Higher-level components must not depend on lower-level implementation details.
-- Composables must not directly access repositories, databases, SSH clients, or storage APIs.
-- Repository implementations may depend on data sources.
-- Public contracts should remain stable once consumed by higher layers.
+- UI never accesses repositories directly.
+- UI never communicates with databases.
+- UI never communicates with SSH libraries.
+- ViewModels communicate only with repositories.
+- Repository implementations own data access.
+- Lower layers must not depend on higher layers.
+
+---
+
+# Security Principles
+
+Architecture must support secure handling of:
+
+- Credentials
+- Private keys
+- SSH sessions
+- Server metadata
+- Sensitive configuration
+
+Security implementation details are defined separately in SECURITY.md and related ADRs.
+
+---
+
+# Future Architecture Decisions
+
+The following technologies have not yet been selected:
+
+- Dependency Injection framework
+- Local persistence technology
+- Secure storage implementation
+- SSH library
+- Background work strategy
+- HTTP networking framework
+
+Each of these requires an individual ADR before adoption.
 
 ---
 
 # Design Principles
 
-The project follows:
+Server Toolkit follows:
 
 - SOLID
 - Separation of Concerns
 - Single Responsibility Principle
-- Dependency Inversion
+- Dependency Inversion Principle
 - Single Source of Truth
 - Unidirectional Data Flow
+- Explicit Architecture Decisions
+- Incremental Development
 
 ---
 
-# Future Architecture Candidates
+# Architecture Evolution
 
-The following components may be introduced when required by implementation needs:
+Architecture should evolve conservatively.
 
-- Hilt for dependency injection
-- Room for local persistence
-- SSH client library
-- Secure storage abstraction
-- WorkManager for background tasks
-- Retrofit or another HTTP client when HTTP APIs are required
-- Background synchronization
+Changes are justified only when:
 
-These are candidates, not accepted architecture decisions.
+- An accepted ADR supersedes an earlier decision.
+- Implementation exposes architectural limitations.
+- Platform recommendations materially change.
+- Security requirements demand architectural changes.
 
-Accepted decisions must be documented through ADRs.
+Frequent redesign should be avoided.
 
 ---
 
-# Architecture Decision Records
+# Related ADRs
 
-Significant architecture decisions are documented in:
+Current:
 
-```text
-docs/adr/
-```
+- ADR-001 — Project Vision
 
-ADR examples:
+Planned:
 
-- Navigation framework
-- Database technology
-- SSH library
-- Secure storage strategy
-- Dependency injection strategy
-- Background work strategy
-
-ADRs document accepted decisions, not casual ideas.
-
----
-
-# Document Governance
-
-This document is foundational and frozen.
-
-Changes are allowed only when:
-
-- A new ADR changes architecture.
-- An implementation reveals a serious architectural flaw.
-- Android platform recommendations materially change.
-- A security requirement forces an architectural update.
+- ADR-002 — Navigation Strategy
+- ADR-003 — Dependency Injection
+- ADR-004 — Persistence Strategy
+- ADR-005 — SSH Integration
+- ADR-006 — Project Structure
 
 ---
 
 # Related Documents
 
+- README.md
 - PRODUCT_VISION.md
-- DEVELOPMENT.md
-- ROADMAP.md
 - PROJECT_STATE.md
+- ROADMAP.md
+- DEVELOPMENT.md
 - SECURITY.md
 - docs/adr/README.md
+
+---
+
+# Notes
+
+This document describes the architectural baseline of the project.
+
+It should remain stable throughout implementation.
+
+Detailed technology selections belong in ADRs rather than this document.
