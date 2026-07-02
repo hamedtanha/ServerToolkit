@@ -1,4 +1,4 @@
-package de.hamedtanha.servertoolkit.ui.screens
+package de.hamedtanha.servertoolkit
 
 import android.os.Bundle
 import androidx.activity.ComponentActivity
