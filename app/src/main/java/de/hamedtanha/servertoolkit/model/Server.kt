@@ -1,4 +1,5 @@
 package de.hamedtanha.servertoolkit.model
+
 data class Server(
     val id: String,
     val name: String,
@@ -9,3 +10,8 @@ data class Server(
     val favorite: Boolean = false,
     val enabled: Boolean = true
 )
+
+enum class AuthenticationMethod {
+    PASSWORD,
+    PRIVATE_KEY
+}
