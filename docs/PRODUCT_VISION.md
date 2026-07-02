@@ -2,149 +2,205 @@
 
 **Project:** Server Toolkit  
 **Version:** 0.1.0  
-**Status:** Frozen  
-**Last Updated:** 2026-07-02
+**Status:** Active  
+**Last Updated:** 2026-07-01
 
 ---
 
-# Purpose
+## Purpose
 
-Server Toolkit is a modern Android application for Linux system administrators, DevOps engineers, infrastructure engineers, network engineers, and advanced users who manage one or more remote servers.
+Server Toolkit is a modern Android application for Linux server administration and infrastructure management.
 
-The primary goal is to simplify common infrastructure administration workflows from a mobile device.
+The product is designed to help system administrators manage frequently used servers, execute operational workflows, and access server-related tools from a mobile device without relying only on a traditional SSH terminal.
 
-Unlike traditional SSH clients, Server Toolkit is focused on operational workflows rather than terminal access alone.
-
----
-
-# Problem Statement
-
-Most Android SSH applications provide a terminal emulator and leave operational workflows to the user.
-
-Administrators often need multiple tools to complete routine tasks such as:
-
-- Managing server inventory
-- Checking server availability
-- Viewing basic system status
-- Executing predefined maintenance commands
-- Managing Xray and x-ui services
-- Renewing certificates
-- Separating production and test environments
-
-Server Toolkit aims to combine these common workflows into a single Android application with a clean and secure user experience.
+Server Toolkit is not intended to be just another SSH client. SSH is one capability of the product, not the product itself.
 
 ---
 
-# Vision
+## Problem Statement
 
-Server Toolkit should become a reliable mobile companion for Linux server administration.
+Managing Linux servers from a mobile device is often inefficient.
 
-The application should help administrators perform frequent maintenance and inspection tasks quickly, securely, and with less friction than using a generic terminal-only SSH client.
+Existing mobile tools usually focus on terminal access, but real infrastructure work often requires more than opening an SSH session.
 
----
+Administrators frequently need to:
 
-# Target Audience
+- Find the right server quickly
+- Check server status
+- Execute repeated maintenance commands
+- Organize production and test environments
+- Access Xray or x-ui related workflows
+- Track certificates and renewal tasks
+- Reduce manual repetition during routine operations
 
-- Linux System Administrators
-- DevOps Engineers
-- Network Engineers
-- Infrastructure Engineers
-- Cloud Engineers
-- Homelab Enthusiasts
-- Security Professionals
-
----
-
-# Product Principles
-
-- Simplicity
-- Reliability
-- Security
-- Performance
-- Maintainability
-- Scalability
+Using multiple disconnected tools increases operational friction and the risk of mistakes.
 
 ---
 
-# Planned Capability Areas
+## Product Vision
 
-The following capability areas define the long-term product direction. They do not imply that all capabilities currently exist.
+Server Toolkit aims to become a practical infrastructure management companion for Android.
 
-- Server inventory management
-- Dashboard and server overview
-- SSH-based server operations
-- Ping and latency monitoring
-- Server health overview
-- Favorite servers
-- Command library
-- Xray management
-- x-ui management
-- Certificate management
-- Backup and restore
-- Encrypted export and import
-- Optional cloud synchronization
+The application should provide a structured, reliable, and secure way to manage Linux servers and common operational workflows from a mobile device.
+
+The long-term vision is to provide a focused management interface for administrators who need fast access to server inventory, SSH operations, monitoring, command execution, and selected service-management workflows.
 
 ---
 
-# Explicit Non-Goals
+## Target Users
 
-Server Toolkit is not intended to replace:
+The primary users are:
 
-- Desktop SSH clients
-- Full monitoring platforms
-- Configuration management systems
-- Kubernetes dashboards
-- Enterprise SIEM or observability platforms
+- Linux system administrators
+- Network and infrastructure engineers
+- DevOps engineers
+- Homelab users
+- Operators managing VPS or dedicated servers
+- Technical users who frequently manage remote Linux systems
 
-Server Toolkit complements existing infrastructure tools instead of replacing them.
-
----
-
-# Success Criteria
-
-The project is successful when administrators can complete their most common mobile maintenance and inspection tasks in less than one minute while keeping credentials and sensitive server data secure.
+The product is designed for users who understand server administration concepts and need efficiency, not beginner tutorials.
 
 ---
 
-# Current Product Stage
+## Core Value Proposition
 
-The product foundation has been established in version `0.1.0`.
+Server Toolkit provides value by combining server access, operational context, and repeatable workflows in one Android application.
 
-Current development focus:
+The product should help users:
 
-```text
-v0.2.0 — Navigation
-```
-
-The product is still in early development and is not ready for production use.
-
----
-
-# Document Governance
-
-This document is a foundational product document.
-
-Status:
-
-```text
-Frozen
-```
-
-Changes are allowed only when one of the following applies:
-
-- The product vision changes materially.
-- The target audience changes materially.
-- A major scope decision is accepted.
-- An Architecture Decision Record requires an update.
-
-Minor wording changes should be avoided unless they improve clarity without changing meaning.
+- Work faster
+- Reduce repetitive terminal work
+- Avoid switching between multiple tools
+- Keep server information organized
+- Execute common operations consistently
+- Maintain better control over mobile infrastructure management
 
 ---
 
-# Related Documents
+## Product Principles
 
+Server Toolkit follows these product principles:
+
+- Infrastructure management first
+- SSH as a capability, not the whole product
+- Mobile-first operational workflow
+- Secure handling of sensitive data
+- Clear separation between production and test environments
+- Simple and predictable user experience
+- Maintainable architecture from the beginning
+- Documentation synchronized with implementation
+
+---
+
+## Initial Product Scope
+
+The initial product scope focuses on building a stable foundation for future infrastructure-management features.
+
+Planned early capabilities include:
+
+- Server inventory
+- Server grouping
+- Server detail view
+- SSH connection support
+- Predefined command execution
+- Dashboard overview
+- Basic monitoring indicators
+- Xray and x-ui helper workflows
+- Certificate helper workflows
+- Local application settings
+
+---
+
+## Version 1.0 Scope
+
+Version 1.0 should focus on a reliable, focused, and maintainable core product.
+
+The intended v1.0 scope includes:
+
+- Add, edit, and remove server profiles
+- Organize servers by environment or group
+- View essential server details
+- Connect to servers through SSH
+- Execute saved commands
+- Display basic server availability status
+- Provide a dashboard for quick operational access
+- Store local configuration securely
+- Maintain complete documentation for implemented functionality
+
+Version 1.0 should not attempt to become a complete cloud-management platform.
+
+---
+
+## Out of Scope for Version 1.0
+
+The following capabilities are intentionally out of scope for version 1.0:
+
+- Kubernetes management
+- Docker orchestration
+- Cloud provider integration
+- Multi-device synchronization
+- Team collaboration
+- Role-based access control
+- Advanced notification system
+- Full monitoring platform functionality
+- Complex automation engine
+- Public plugin system
+
+These features may be reconsidered after the core product is stable.
+
+---
+
+## Long-Term Direction
+
+Future versions may include:
+
+- Docker management
+- WireGuard management
+- Tailscale integration
+- Kubernetes support
+- Cloud provider integrations
+- Background monitoring
+- Notifications
+- Encrypted synchronization
+- Backup workflows
+- Advanced command templates
+- Infrastructure health reports
+
+These features must be added incrementally and only after architectural decisions are documented.
+
+---
+
+## Success Criteria
+
+Server Toolkit is successful if it becomes:
+
+- Useful for real server-administration workflows
+- Reliable enough for repeated operational use
+- Secure in handling credentials and server data
+- Easy to understand and maintain
+- Professionally documented
+- Suitable as a portfolio-quality Android engineering project
+
+---
+
+## Non-Goals
+
+Server Toolkit does not aim to be:
+
+- A generic SSH terminal clone
+- A beginner Linux training application
+- A full replacement for desktop administration tools
+- A complete monitoring system
+- A cloud provider control panel
+- A quick prototype
+- A tutorial project
+
+---
+
+## References
+
+- README.md
 - ARCHITECTURE.md
-- DEVELOPMENT.md
 - ROADMAP.md
 - PROJECT_STATE.md
-- docs/adr/ADR-001-project-vision.md
+- ADR-001-project-vision.md
