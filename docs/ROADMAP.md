@@ -113,10 +113,9 @@ Completed:
 - In-memory Server repository implementation.
 - Server Inventory repository dependency injection binding.
 - Server Inventory ViewModel repository observation.
+- Basic Server Inventory list rendering.
 
 Planned:
-
-- Server list rendering.
 - Room-backed Add Server persistence workflow.
 - Edit server workflow.
 - Local persistence with Room.

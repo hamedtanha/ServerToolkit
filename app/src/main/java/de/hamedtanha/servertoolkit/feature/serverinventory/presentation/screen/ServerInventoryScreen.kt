@@ -4,9 +4,13 @@ import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.lazy.LazyColumn
+import androidx.compose.foundation.lazy.items
 import androidx.compose.material3.Button
+import androidx.compose.material3.Card
 import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
@@ -18,6 +22,7 @@ import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.hilt.lifecycle.viewmodel.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
+import de.hamedtanha.servertoolkit.feature.serverinventory.domain.model.Server
 import de.hamedtanha.servertoolkit.feature.serverinventory.presentation.state.ServerInventoryUiState
 import de.hamedtanha.servertoolkit.feature.serverinventory.presentation.viewmodel.ServerInventoryViewModel
 
@@ -54,7 +59,8 @@ fun ServerInventoryScreen(
         )
         uiState.isFilterResultEmpty -> ServerInventoryEmptyFilterContent(modifier = modifier)
         uiState.hasVisibleServers -> ServerInventoryLoadedContent(
-            serverCount = uiState.servers.size,
+            servers = uiState.servers,
+            onAddServerClick = onAddServerClick,
             modifier = modifier,
         )
     }
@@ -114,14 +120,98 @@ private fun ServerInventoryErrorContent(
 
 @Composable
 private fun ServerInventoryLoadedContent(
-    serverCount: Int,
+    servers: List<Server>,
+    onAddServerClick: () -> Unit,
     modifier: Modifier = Modifier,
 ) {
-    ServerInventoryMessageContent(
-        title = "$serverCount servers",
-        message = "Server list rendering will be implemented in a later step.",
-        modifier = modifier,
-    )
+    Column(
+        modifier = modifier
+            .fillMaxSize()
+            .padding(24.dp),
+    ) {
+        Text(
+            text = "Servers",
+            style = MaterialTheme.typography.titleLarge,
+        )
+
+        Spacer(modifier = Modifier.height(8.dp))
+
+        Text(
+            text = "${servers.size} servers configured.",
+            style = MaterialTheme.typography.bodyMedium,
+            color = MaterialTheme.colorScheme.onSurfaceVariant,
+        )
+
+        Spacer(modifier = Modifier.height(16.dp))
+
+        Button(
+            onClick = onAddServerClick,
+            modifier = Modifier.fillMaxWidth(),
+        ) {
+            Text(text = "Add server")
+        }
+
+        Spacer(modifier = Modifier.height(16.dp))
+
+        LazyColumn(
+            modifier = Modifier.fillMaxSize(),
+            verticalArrangement = Arrangement.spacedBy(12.dp),
+        ) {
+            items(
+                items = servers,
+                key = { server -> server.id },
+            ) { server ->
+                ServerInventoryListItem(server = server)
+            }
+        }
+    }
+}
+
+@Composable
+private fun ServerInventoryListItem(
+    server: Server,
+    modifier: Modifier = Modifier,
+) {
+    Card(
+        modifier = modifier.fillMaxWidth(),
+    ) {
+        Column(
+            modifier = Modifier.padding(16.dp),
+        ) {
+            Text(
+                text = server.name,
+                style = MaterialTheme.typography.titleMedium,
+            )
+
+            Spacer(modifier = Modifier.height(4.dp))
+
+            Text(
+                text = "${server.host}:${server.sshPort}",
+                style = MaterialTheme.typography.bodyMedium,
+                color = MaterialTheme.colorScheme.onSurfaceVariant,
+            )
+
+            server.sshUsername?.takeIf { username ->
+                username.isNotBlank()
+            }?.let { username ->
+                Spacer(modifier = Modifier.height(4.dp))
+
+                Text(
+                    text = "User: $username",
+                    style = MaterialTheme.typography.bodySmall,
+                    color = MaterialTheme.colorScheme.onSurfaceVariant,
+                )
+            }
+
+            Spacer(modifier = Modifier.height(4.dp))
+
+            Text(
+                text = "Environment: ${server.environment}",
+                style = MaterialTheme.typography.bodySmall,
+                color = MaterialTheme.colorScheme.onSurfaceVariant,
+            )
+        }
+    }
 }
 
 @Composable
@@ -175,4 +265,3 @@ private fun ServerInventoryCenteredContent(
         content()
     }
 }
-

@@ -58,6 +58,7 @@ The following application-level items are implemented:
 - In-memory Server repository implementation.
 - Server Inventory repository dependency injection binding.
 - Server Inventory ViewModel repository observation.
+- Basic Server Inventory list rendering.
 - Package structure cleanup from `feature/servers` to `feature/serverinventory`.
 - App-level package structure alignment with the current source tree.
 
@@ -72,7 +73,6 @@ The following items are intentionally not implemented yet:
 - Server DAO.
 - Room-backed Add Server persistence workflow.
 - Edit server screen.
-- Server list rendering.
 - SSH connection workflow.
 - Monitoring workflow.
 - Command execution workflow.
@@ -96,9 +96,9 @@ The current implementation area is:
 The next safe development steps are:
 
 1. Keep documentation synchronized with the current implementation.
-2. Review the Add Server repository-backed in-memory save flow.
-3. Prepare basic server list rendering.
-4. Defer Room, SSH, and credential handling until the in-memory repository flow is reviewed.
+2. Review the in-memory Server Inventory flow before introducing persistence.
+3. Define the Room persistence boundary and required data-layer components.
+4. Defer SSH and credential handling until Room persistence is designed.
 
 ---
 
@@ -112,4 +112,4 @@ feature/android-project
 
 ## Current Engineering Rule
 
-No database, SSH, or credential handling should be introduced until the in-memory repository flow is reviewed.
+No SSH or credential handling should be introduced until Room persistence is designed and reviewed.

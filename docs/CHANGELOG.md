@@ -37,6 +37,7 @@ The project follows Conventional Commits and Semantic Versioning principles.
 - Added Server repository contract.
 - Added in-memory Server repository implementation.
 - Added Server Inventory repository dependency injection binding.
+- Added basic Server Inventory list rendering.
 - Added Dashboard navigation action to open Server Inventory.
 
 ### Changed
