@@ -107,6 +107,8 @@ Completed:
 - Real Add Server form.
 - Add Server validation.
 - Add Server validation-only save behavior.
+- Add Server repository-backed in-memory save behavior.
+- Add Server automatic return after successful save.
 - Server repository contract.
 - In-memory Server repository implementation.
 - Server Inventory repository dependency injection binding.
@@ -115,7 +117,7 @@ Completed:
 Planned:
 
 - Server list rendering.
-- Add Server persistence-backed save workflow.
+- Room-backed Add Server persistence workflow.
 - Edit server workflow.
 - Local persistence with Room.
 - Server entity.

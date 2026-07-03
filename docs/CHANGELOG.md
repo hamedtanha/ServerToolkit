@@ -32,6 +32,8 @@ The project follows Conventional Commits and Semantic Versioning principles.
 - Added Add Server form fields.
 - Added Add Server validation state.
 - Added Add Server validation-only save behavior.
+- Added Add Server repository-backed in-memory save behavior.
+- Added Add Server automatic return after successful save.
 - Added Server repository contract.
 - Added in-memory Server repository implementation.
 - Added Server Inventory repository dependency injection binding.
@@ -48,6 +50,7 @@ The project follows Conventional Commits and Semantic Versioning principles.
 - Clarified Server Inventory UI state semantics for inventory-empty and filter-empty states.
 - Connected Server Inventory empty-state action to the Add Server placeholder route.
 - Connected Server Inventory ViewModel to the Server repository.
+- Connected Add Server save behavior to the Server repository.
 
 ### Removed
 
@@ -62,7 +65,7 @@ The following items are intentionally not implemented yet:
 - Room persistence.
 - Server entity.
 - Server DAO.
-- Add Server persistence-backed save workflow.
+- Room-backed Add Server persistence workflow.
 - Edit server workflow.
 - SSH workflow.
 - Credential storage.

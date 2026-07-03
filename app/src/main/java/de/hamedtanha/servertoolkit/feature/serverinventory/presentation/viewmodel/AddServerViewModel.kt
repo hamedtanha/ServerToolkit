@@ -1,16 +1,23 @@
 package de.hamedtanha.servertoolkit.feature.serverinventory.presentation.viewmodel
 
 import androidx.lifecycle.ViewModel
+import androidx.lifecycle.viewModelScope
 import dagger.hilt.android.lifecycle.HiltViewModel
+import de.hamedtanha.servertoolkit.feature.serverinventory.domain.model.Server
+import de.hamedtanha.servertoolkit.feature.serverinventory.domain.repository.ServerRepository
 import de.hamedtanha.servertoolkit.feature.serverinventory.presentation.state.AddServerUiState
+import java.util.UUID
 import javax.inject.Inject
+import kotlinx.coroutines.launch
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.update
 
 @HiltViewModel
-class AddServerViewModel @Inject constructor() : ViewModel() {
+class AddServerViewModel @Inject constructor(
+    private val serverRepository: ServerRepository,
+) : ViewModel() {
 
     private val _uiState = MutableStateFlow(AddServerUiState())
     val uiState: StateFlow<AddServerUiState> = _uiState.asStateFlow()
@@ -24,6 +31,7 @@ class AddServerViewModel @Inject constructor() : ViewModel() {
                     fieldName = "Server name",
                 ),
                 formMessage = null,
+                isSaved = false,
             )
         }
     }
@@ -37,6 +45,7 @@ class AddServerViewModel @Inject constructor() : ViewModel() {
                     fieldName = "Host",
                 ),
                 formMessage = null,
+                isSaved = false,
             )
         }
     }
@@ -47,6 +56,7 @@ class AddServerViewModel @Inject constructor() : ViewModel() {
                 port = port,
                 portError = validatePort(port),
                 formMessage = null,
+                isSaved = false,
             )
         }
     }
@@ -60,6 +70,7 @@ class AddServerViewModel @Inject constructor() : ViewModel() {
                     fieldName = "Username",
                 ),
                 formMessage = null,
+                isSaved = false,
             )
         }
     }
@@ -67,14 +78,38 @@ class AddServerViewModel @Inject constructor() : ViewModel() {
     fun onSaveClicked() {
         val validatedState = validateState(_uiState.value)
 
-        _uiState.value = if (validatedState.canSave) {
-            validatedState.copy(
-                formMessage = "Server persistence is not implemented yet.",
-            )
-        } else {
-            validatedState.copy(
+        if (!validatedState.canSave) {
+            _uiState.value = validatedState.copy(
                 formMessage = "Please fix the highlighted fields.",
             )
+            return
+        }
+
+        viewModelScope.launch {
+            _uiState.value = validatedState.copy(
+                isSaving = true,
+                formMessage = null,
+            )
+
+            runCatching {
+                serverRepository.saveServer(validatedState.toServer())
+            }.onSuccess {
+                _uiState.update { currentState ->
+                    currentState.copy(
+                        isSaving = false,
+                        isSaved = true,
+                        formMessage = null,
+                    )
+                }
+            }.onFailure { throwable ->
+                _uiState.update { currentState ->
+                    currentState.copy(
+                        isSaving = false,
+                        isSaved = false,
+                        formMessage = throwable.message ?: "Server could not be saved.",
+                    )
+                }
+            }
         }
     }
 
@@ -117,5 +152,15 @@ class AddServerViewModel @Inject constructor() : ViewModel() {
                 "Port must be between ${AddServerUiState.MIN_PORT} and ${AddServerUiState.MAX_PORT}."
             else -> null
         }
+    }
+
+    private fun AddServerUiState.toServer(): Server {
+        return Server(
+            id = UUID.randomUUID().toString(),
+            name = name.trim(),
+            host = host.trim(),
+            sshPort = requireNotNull(port.toIntOrNull()),
+            sshUsername = username.trim(),
+        )
     }
 }

@@ -12,9 +12,12 @@ data class AddServerUiState(
     val portError: String? = null,
     val usernameError: String? = null,
     val formMessage: String? = null,
+    val isSaving: Boolean = false,
+    val isSaved: Boolean = false,
 ) {
     val canSave: Boolean
-        get() = name.isNotBlank() &&
+        get() = !isSaving &&
+            name.isNotBlank() &&
             host.isNotBlank() &&
             username.isNotBlank() &&
             port.toIntOrNull()?.let { it in MIN_PORT..MAX_PORT } == true &&

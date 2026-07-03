@@ -13,6 +13,7 @@ import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -30,6 +31,12 @@ fun AddServerRoute(
     viewModel: AddServerViewModel = hiltViewModel(),
 ) {
     val uiState by viewModel.uiState.collectAsStateWithLifecycle()
+
+    LaunchedEffect(uiState.isSaved) {
+        if (uiState.isSaved) {
+            onNavigateBack()
+        }
+    }
 
     AddServerScreen(
         uiState = uiState,
@@ -157,7 +164,13 @@ fun AddServerScreen(
             modifier = Modifier.fillMaxWidth(),
             enabled = uiState.canSave,
         ) {
-            Text(text = "Save server")
+            Text(
+                text = if (uiState.isSaving) {
+                    "Saving..."
+                } else {
+                    "Save server"
+                },
+            )
         }
 
         Spacer(modifier = Modifier.height(12.dp))

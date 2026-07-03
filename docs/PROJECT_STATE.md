@@ -52,6 +52,8 @@ The following application-level items are implemented:
 - Add Server form fields.
 - Add Server validation state.
 - Add Server validation-only save action.
+- Add Server repository-backed in-memory save flow.
+- Add Server automatic return after successful save.
 - Server repository contract.
 - In-memory Server repository implementation.
 - Server Inventory repository dependency injection binding.
@@ -68,7 +70,7 @@ The following items are intentionally not implemented yet:
 - Room database integration.
 - Server entity.
 - Server DAO.
-- Add Server persistence-backed save action.
+- Room-backed Add Server persistence workflow.
 - Edit server screen.
 - Server list rendering.
 - SSH connection workflow.
@@ -84,8 +86,8 @@ The following items are intentionally not implemented yet:
 The current implementation area is:
 
 - Server Inventory feature scaffolding.
-- Add Server form documentation alignment.
-- Preparation for persistence-backed server inventory management.
+- Add Server repository-backed save documentation alignment.
+- Preparation for Room-backed server inventory persistence.
 
 ---
 
@@ -94,8 +96,8 @@ The current implementation area is:
 The next safe development steps are:
 
 1. Keep documentation synchronized with the current implementation.
-2. Review the Add Server form and validation behavior.
-3. Connect Add Server validation flow to the repository-backed save path.
+2. Review the Add Server repository-backed in-memory save flow.
+3. Prepare basic server list rendering.
 4. Defer Room, SSH, and credential handling until the in-memory repository flow is reviewed.
 
 ---
