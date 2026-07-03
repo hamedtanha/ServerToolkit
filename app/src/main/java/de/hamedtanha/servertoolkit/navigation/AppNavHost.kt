@@ -16,7 +16,13 @@ fun AppNavHost() {
         startDestination = DashboardDestination.route,
     ) {
         composable(route = DashboardDestination.route) {
-            DashboardRoute()
+            DashboardRoute(
+                onOpenServerInventory = {
+                    navController.navigate(ServerInventoryDestination.route) {
+                        launchSingleTop = true
+                    }
+                },
+            )
         }
 
         composable(route = ServerInventoryDestination.route) {

@@ -6,6 +6,7 @@ import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
+import androidx.compose.material3.Button
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
@@ -21,18 +22,21 @@ import de.hamedtanha.servertoolkit.feature.dashboard.presentation.viewmodel.Dash
 
 @Composable
 fun DashboardRoute(
+    onOpenServerInventory: () -> Unit,
     viewModel: DashboardViewModel = hiltViewModel(),
 ) {
     val uiState by viewModel.uiState.collectAsStateWithLifecycle()
 
     DashboardScreen(
         uiState = uiState,
+        onOpenServerInventory = onOpenServerInventory,
     )
 }
 
 @Composable
 fun DashboardScreen(
     uiState: DashboardUiState,
+    onOpenServerInventory: () -> Unit,
     modifier: Modifier = Modifier,
 ) {
     Column(
@@ -59,9 +63,17 @@ fun DashboardScreen(
         Spacer(modifier = Modifier.height(8.dp))
 
         Text(
-            text = "Add your first server to start managing your infrastructure.",
+            text = "Open your server inventory to start organizing infrastructure targets.",
             style = MaterialTheme.typography.bodyMedium,
             textAlign = TextAlign.Center,
         )
+
+        Spacer(modifier = Modifier.height(24.dp))
+
+        Button(
+            onClick = onOpenServerInventory,
+        ) {
+            Text(text = "Open server inventory")
+        }
     }
 }
