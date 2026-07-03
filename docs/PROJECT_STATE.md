@@ -53,6 +53,8 @@ The following application-level items are implemented:
 - Add Server validation state.
 - Add Server validation-only save action.
 - Server repository contract.
+- In-memory Server repository implementation.
+- Server Inventory repository dependency injection binding.
 - Package structure cleanup from `feature/servers` to `feature/serverinventory`.
 - App-level package structure alignment with the current source tree.
 
@@ -62,7 +64,6 @@ The following application-level items are implemented:
 
 The following items are intentionally not implemented yet:
 
-- Server repository implementation.
 - Room database integration.
 - Server entity.
 - Server DAO.
@@ -93,8 +94,9 @@ The next safe development steps are:
 
 1. Keep documentation synchronized with the current implementation.
 2. Review the Add Server form and validation behavior.
-3. Introduce the server repository implementation boundary.
-4. Defer Room, SSH, and credential handling until the repository implementation boundary is reviewed.
+3. Connect Server Inventory ViewModel to the repository.
+4. Connect Add Server validation flow to the repository-backed save path.
+5. Defer Room, SSH, and credential handling until the in-memory repository flow is reviewed.
 
 ---
 
@@ -108,4 +110,4 @@ feature/android-project
 
 ## Current Engineering Rule
 
-No database, SSH, or credential handling should be introduced until the server repository implementation boundary is reviewed.
+No database, SSH, or credential handling should be introduced until the in-memory repository flow is reviewed.

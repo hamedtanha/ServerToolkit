@@ -108,10 +108,11 @@ Completed:
 - Add Server validation.
 - Add Server validation-only save behavior.
 - Server repository contract.
+- In-memory Server repository implementation.
+- Server Inventory repository dependency injection binding.
 
 Planned:
 
-- Server repository implementation.
 - Server list rendering.
 - Add Server persistence-backed save workflow.
 - Edit server workflow.
