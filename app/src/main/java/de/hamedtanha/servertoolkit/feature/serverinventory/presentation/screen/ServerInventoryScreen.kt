@@ -44,8 +44,9 @@ fun ServerInventoryScreen(
             message = uiState.errorMessage,
             modifier = modifier,
         )
-        uiState.isEmpty -> ServerInventoryEmptyContent(modifier = modifier)
-        else -> ServerInventoryLoadedContent(
+        uiState.isInventoryEmpty -> ServerInventoryEmptyContent(modifier = modifier)
+        uiState.isFilterResultEmpty -> ServerInventoryEmptyFilterContent(modifier = modifier)
+        uiState.hasVisibleServers -> ServerInventoryLoadedContent(
             serverCount = uiState.servers.size,
             modifier = modifier,
         )
@@ -62,6 +63,18 @@ private fun ServerInventoryEmptyContent(
         modifier = modifier,
     )
 }
+
+@Composable
+private fun ServerInventoryEmptyFilterContent(
+    modifier: Modifier = Modifier,
+) {
+    ServerInventoryMessageContent(
+        title = "No matching servers",
+        message = "Try changing the current search or filter criteria.",
+        modifier = modifier,
+    )
+}
+
 
 @Composable
 private fun ServerInventoryLoadingContent(
