@@ -40,3 +40,42 @@ The primary objectives are:
 Every change must improve the overall quality of the project or preserve the existing quality level.
 
 No implementation should intentionally introduce architectural inconsistencies.
+
+---
+
+# Development Workflow
+
+Development in ServerToolkit follows a small-step, reviewable workflow.
+
+The goal is to keep the project buildable, understandable, and easy to review after every change.
+
+Every development task should follow this sequence:
+
+1. Understand the scope of the change.
+2. Verify the current Git status.
+3. Make the smallest meaningful change.
+4. Build the project.
+5. Review the diff.
+6. Commit with a clear Conventional Commit message.
+7. Re-check the working tree.
+8. Update related documentation when required.
+
+Large changes must be split into smaller commits whenever possible.
+
+A single commit should represent one clear engineering step.
+
+Examples of acceptable commit scopes include:
+
+- Adding a dependency.
+- Creating an application bootstrap class.
+- Adding a navigation destination.
+- Creating a feature skeleton.
+- Adding a UI state model.
+- Connecting a screen to the navigation graph.
+- Updating one documentation section.
+
+Avoid commits that mix unrelated changes such as code, formatting, documentation, and architecture changes together.
+
+The main branch must remain releasable at all times.
+
+Feature work must happen on short-lived branches according to GitHub Flow.
