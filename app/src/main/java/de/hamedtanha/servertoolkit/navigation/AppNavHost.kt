@@ -26,7 +26,12 @@ fun AppNavHost() {
         }
 
         composable(route = ServerInventoryDestination.route) {
-            ServerInventoryRoute()
+            ServerInventoryRoute(
+                onAddServerClick = {
+                    // Add Server navigation will be connected when the Add Server destination exists.
+                },
+            )
         }
     }
 }
+

@@ -6,6 +6,7 @@ import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
+import androidx.compose.material3.Button
 import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
@@ -22,6 +23,7 @@ import de.hamedtanha.servertoolkit.feature.serverinventory.presentation.viewmode
 
 @Composable
 fun ServerInventoryRoute(
+    onAddServerClick: () -> Unit,
     modifier: Modifier = Modifier,
     viewModel: ServerInventoryViewModel = hiltViewModel(),
 ) {
@@ -29,6 +31,7 @@ fun ServerInventoryRoute(
 
     ServerInventoryScreen(
         uiState = uiState,
+        onAddServerClick = onAddServerClick,
         modifier = modifier,
     )
 }
@@ -36,6 +39,7 @@ fun ServerInventoryRoute(
 @Composable
 fun ServerInventoryScreen(
     uiState: ServerInventoryUiState,
+    onAddServerClick: () -> Unit,
     modifier: Modifier = Modifier,
 ) {
     when {
@@ -44,7 +48,10 @@ fun ServerInventoryScreen(
             message = uiState.errorMessage,
             modifier = modifier,
         )
-        uiState.isInventoryEmpty -> ServerInventoryEmptyContent(modifier = modifier)
+        uiState.isInventoryEmpty -> ServerInventoryEmptyContent(
+            onAddServerClick = onAddServerClick,
+            modifier = modifier,
+        )
         uiState.isFilterResultEmpty -> ServerInventoryEmptyFilterContent(modifier = modifier)
         uiState.hasVisibleServers -> ServerInventoryLoadedContent(
             serverCount = uiState.servers.size,
@@ -55,12 +62,20 @@ fun ServerInventoryScreen(
 
 @Composable
 private fun ServerInventoryEmptyContent(
+    onAddServerClick: () -> Unit,
     modifier: Modifier = Modifier,
 ) {
     ServerInventoryMessageContent(
         title = "No servers yet",
-        message = "Your server inventory will appear here after servers are added.",
+        message = "Add your first server to start building your infrastructure inventory.",
         modifier = modifier,
+        action = {
+            Button(
+                onClick = onAddServerClick,
+            ) {
+                Text(text = "Add server")
+            }
+        },
     )
 }
 
@@ -74,7 +89,6 @@ private fun ServerInventoryEmptyFilterContent(
         modifier = modifier,
     )
 }
-
 
 @Composable
 private fun ServerInventoryLoadingContent(
@@ -116,6 +130,7 @@ private fun ServerInventoryMessageContent(
     message: String,
     modifier: Modifier = Modifier,
     isError: Boolean = false,
+    action: @Composable (() -> Unit)? = null,
 ) {
     ServerInventoryCenteredContent(modifier = modifier) {
         Text(
@@ -137,6 +152,11 @@ private fun ServerInventoryMessageContent(
             textAlign = TextAlign.Center,
             color = MaterialTheme.colorScheme.onSurfaceVariant,
         )
+
+        if (action != null) {
+            Spacer(modifier = Modifier.height(24.dp))
+            action()
+        }
     }
 }
 
@@ -155,3 +175,4 @@ private fun ServerInventoryCenteredContent(
         content()
     }
 }
+
