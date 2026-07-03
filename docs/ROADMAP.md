@@ -107,14 +107,14 @@ Completed:
 - Real Add Server form.
 - Add Server validation.
 - Add Server validation-only save behavior.
+- Server repository contract.
 
 Planned:
 
+- Server repository implementation.
 - Server list rendering.
 - Add Server persistence-backed save workflow.
 - Edit server workflow.
-- Server repository contract.
-- Server repository implementation.
 - Local persistence with Room.
 - Server entity.
 - Server DAO.

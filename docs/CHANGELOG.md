@@ -32,6 +32,7 @@ The project follows Conventional Commits and Semantic Versioning principles.
 - Added Add Server form fields.
 - Added Add Server validation state.
 - Added Add Server validation-only save behavior.
+- Added Server repository contract.
 - Added Dashboard navigation action to open Server Inventory.
 
 ### Changed
@@ -55,7 +56,7 @@ The project follows Conventional Commits and Semantic Versioning principles.
 
 The following items are intentionally not implemented yet:
 
-- Server repository.
+- Server repository implementation.
 - Room persistence.
 - Server entity.
 - Server DAO.
