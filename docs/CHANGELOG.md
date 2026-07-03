@@ -23,6 +23,10 @@ The project follows Conventional Commits and Semantic Versioning principles.
 - Added Server Inventory UI state.
 - Added Server Inventory ViewModel.
 - Added Server Inventory empty screen.
+- Added Server Inventory empty-state action.
+- Added Add Server navigation destination.
+- Added Add Server placeholder route.
+- Added Add Server placeholder screen.
 - Added Dashboard navigation action to open Server Inventory.
 
 ### Changed
@@ -32,6 +36,9 @@ The project follows Conventional Commits and Semantic Versioning principles.
 - Removed obsolete placeholder navigation packages.
 - Updated package structure documentation to reflect app-level navigation.
 - Updated Dashboard empty-state copy to point users toward Server Inventory.
+- Improved Server Inventory screen structure by extracting shared centered content and message content.
+- Clarified Server Inventory UI state semantics for inventory-empty and filter-empty states.
+- Connected Server Inventory empty-state action to the Add Server placeholder route.
 
 ### Removed
 
@@ -47,7 +54,9 @@ The following items are intentionally not implemented yet:
 - Room persistence.
 - Server entity.
 - Server DAO.
-- Add server workflow.
+- Real Add Server form.
+- Add Server validation.
+- Add Server save workflow.
 - Edit server workflow.
 - SSH workflow.
 - Credential storage.

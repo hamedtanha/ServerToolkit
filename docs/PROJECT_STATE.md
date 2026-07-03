@@ -44,6 +44,9 @@ The following application-level items are implemented:
 - Server Inventory UI state.
 - Server Inventory ViewModel.
 - Server Inventory empty screen.
+- Server Inventory empty-state action.
+- Add Server navigation destination.
+- Add Server placeholder screen.
 - Package structure cleanup from `feature/servers` to `feature/serverinventory`.
 - App-level package structure alignment with the current source tree.
 
@@ -58,7 +61,9 @@ The following items are intentionally not implemented yet:
 - Room database integration.
 - Server entity.
 - Server DAO.
-- Add server screen.
+- Real Add Server form.
+- Add Server validation.
+- Add Server save action.
 - Edit server screen.
 - Server list rendering.
 - SSH connection workflow.
@@ -74,8 +79,8 @@ The following items are intentionally not implemented yet:
 The current implementation area is:
 
 - Server Inventory feature scaffolding.
-- Documentation alignment with the current codebase.
-- Review of the first Dashboard-to-Server-Inventory navigation flow.
+- Add Server placeholder documentation alignment.
+- Preparation for real Add Server form design.
 
 ---
 

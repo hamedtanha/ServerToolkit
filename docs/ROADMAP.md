@@ -66,7 +66,9 @@ Completed:
 - App-level Navigation Compose infrastructure.
 - Dashboard route.
 - Server Inventory route.
+- Add Server route.
 - Dashboard-to-Server-Inventory navigation action.
+- Add Server placeholder navigation.
 - Package structure cleanup.
 - Removal of obsolete package placeholders.
 
@@ -96,11 +98,17 @@ Completed:
 - Server Inventory UI state.
 - Server Inventory ViewModel.
 - Server Inventory empty screen.
+- Server Inventory screen structure refinement.
+- Server Inventory UI state semantic clarification.
+- Server Inventory empty-state action.
+- Add Server placeholder screen.
 
 Planned:
 
 - Server list rendering.
-- Add server workflow.
+- Real Add Server form.
+- Add Server validation.
+- Add Server save workflow.
 - Edit server workflow.
 - Server repository contract.
 - Server repository implementation.
