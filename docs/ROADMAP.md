@@ -1,35 +1,36 @@
 # Roadmap
 
 **Project:** Server Toolkit  
-**Version:** 0.1.0  
+**Version:** 0.2.0-alpha  
 **Status:** Active  
-**Last Updated:** 2026-07-01
+**Last Updated:** 2026-07-03
 
 ---
 
-# Purpose
+## Purpose
 
 This roadmap describes the planned evolution of the Server Toolkit project.
 
-It provides a high-level view of development milestones without specifying implementation details.
+It provides a high-level view of development milestones without specifying low-level implementation details.
 
 Roadmap items may evolve over time, but each milestone should have a clear engineering objective.
 
 ---
 
-# Guiding Principles
+## Guiding Principles
 
 Development follows these principles:
 
 - Build incrementally.
-- Complete one major feature at a time.
+- Complete one major feature area at a time.
 - Preserve architectural consistency.
 - Avoid unnecessary scope expansion.
 - Keep the application releasable.
+- Keep documentation synchronized with implementation.
 
 ---
 
-# Version 0.1.0 — Foundation ✅
+## Version 0.1.0 — Foundation ✅
 
 Objective:
 
@@ -37,64 +38,88 @@ Establish the engineering foundation.
 
 Completed:
 
-- Repository initialization
-- Development workflow
-- Documentation structure
-- ADR process
-- Project vision
-- Engineering guidelines
-- Initial architecture documentation
+- Repository initialization.
+- Development workflow.
+- Documentation structure.
+- ADR process.
+- Project vision.
+- Engineering guidelines.
+- Initial architecture documentation.
+- Initial Android application skeleton.
 
 Status:
 
-Completed
+Completed.
 
 ---
 
-# Version 0.2.0 — Architecture
+## Version 0.2.0 — Android Architecture and Navigation
 
 Objective:
 
-Define the technical architecture before feature implementation.
+Establish the Android application architecture and the first navigable application flow.
 
-Planned:
+Completed:
 
-- Navigation strategy
-- Project structure
-- Package organization
-- Data layer definition
-- Dependency strategy
-- Persistence strategy
-- Security strategy
+- Single Activity structure.
+- Hilt application setup.
+- App-level Navigation Compose infrastructure.
+- Dashboard route.
+- Server Inventory route.
+- Dashboard-to-Server-Inventory navigation action.
+- Package structure cleanup.
+- Removal of obsolete package placeholders.
 
-Deliverable:
+Remaining:
 
-A stable Android project skeleton with documented architectural decisions.
+- Documentation alignment.
+- Navigation flow review.
+- Basic UI stabilization.
+
+Status:
+
+In Progress.
 
 ---
 
-# Version 0.3.0 — Server Management
+## Version 0.3.0 — Server Inventory Foundation
 
 Objective:
 
-Implement the foundation for server administration.
+Implement the foundation for local server inventory management.
+
+Completed:
+
+- Server domain model.
+- Server environment model.
+- Server Inventory filter state.
+- Server Inventory UI state.
+- Server Inventory ViewModel.
+- Server Inventory empty screen.
 
 Planned:
 
-- Server model
-- Local server storage
-- Server CRUD
-- Server grouping
-- Server details
-- Search and filtering
+- Server list rendering.
+- Add server workflow.
+- Edit server workflow.
+- Server repository contract.
+- Server repository implementation.
+- Local persistence with Room.
+- Server entity.
+- Server DAO.
+- Search and filtering behavior.
 
 Deliverable:
 
-Working server inventory.
+Working local server inventory.
+
+Status:
+
+In Progress.
 
 ---
 
-# Version 0.4.0 — SSH
+## Version 0.4.0 — SSH
 
 Objective:
 
@@ -102,19 +127,23 @@ Introduce secure SSH connectivity.
 
 Planned:
 
-- SSH client integration
-- Authentication
-- Host key verification
-- Session management
-- Connection history
+- SSH client integration.
+- Authentication.
+- Host key verification.
+- Session management.
+- Connection history.
 
 Deliverable:
 
 Reliable SSH connections to managed servers.
 
+Status:
+
+Planned.
+
 ---
 
-# Version 0.5.0 — Operations
+## Version 0.5.0 — Operations
 
 Objective:
 
@@ -122,39 +151,47 @@ Improve operational efficiency.
 
 Planned:
 
-- Saved commands
-- Command categories
-- Favorites
-- Execution history
-- Quick actions
+- Saved commands.
+- Command categories.
+- Favorites.
+- Execution history.
+- Quick actions.
 
 Deliverable:
 
 Repeatable operational workflows.
 
+Status:
+
+Planned.
+
 ---
 
-# Version 0.6.0 — Dashboard
+## Version 0.6.0 — Dashboard Evolution
 
 Objective:
 
-Provide an operational overview.
+Evolve the Dashboard from a simple entry screen into an operational overview.
 
 Planned:
 
-- Dashboard
-- Recent servers
-- Favorite servers
-- Connection status
-- Quick statistics
+- Recent servers.
+- Favorite servers.
+- Connection status.
+- Quick statistics.
+- Server Inventory summary.
 
 Deliverable:
 
 Operational home screen.
 
+Status:
+
+Planned.
+
 ---
 
-# Version 0.7.0 — Monitoring
+## Version 0.7.0 — Monitoring
 
 Objective:
 
@@ -162,18 +199,22 @@ Provide lightweight server monitoring.
 
 Planned:
 
-- Basic availability checks
-- Resource indicators
-- Service status
-- Refresh support
+- Basic availability checks.
+- Resource indicators.
+- Service status.
+- Refresh support.
 
 Deliverable:
 
 Basic monitoring capabilities.
 
+Status:
+
+Planned.
+
 ---
 
-# Version 0.8.0 — Infrastructure Helpers
+## Version 0.8.0 — Infrastructure Helpers
 
 Objective:
 
@@ -181,18 +222,22 @@ Support common administration workflows.
 
 Planned:
 
-- Xray helper
-- x-ui helper
-- Certificate helper
-- Maintenance utilities
+- Xray helper.
+- x-ui helper.
+- Certificate helper.
+- Maintenance utilities.
 
 Deliverable:
 
 Integrated infrastructure tools.
 
+Status:
+
+Planned.
+
 ---
 
-# Version 0.9.0 — Stabilization
+## Version 0.9.0 — Stabilization
 
 Objective:
 
@@ -200,61 +245,36 @@ Prepare for production release.
 
 Planned:
 
-- UI refinement
-- Performance improvements
-- Bug fixing
-- Documentation review
-- Test coverage improvements
+- UI refinement.
+- Performance improvements.
+- Bug fixing.
+- Documentation review.
+- Test coverage improvements.
 
 Deliverable:
 
 Release candidate.
 
+Status:
+
+Planned.
+
 ---
 
-# Version 1.0.0 — Initial Release
+## Version 1.0.0 — Initial Release
 
 Objective:
 
 Deliver the first stable public release.
 
-Requirements:
+Planned:
 
-- Stable architecture
-- Complete documentation
-- Reliable SSH support
-- Server inventory
-- Dashboard
-- Command execution
-- Infrastructure helper workflows
+- Stable Server Inventory.
+- Stable SSH workflow.
+- Stable operational workflows.
+- Updated documentation.
+- Release-ready build.
 
-Deliverable:
+Status:
 
-Production-ready release.
-
----
-
-# Future
-
-Possible future directions include:
-
-- Docker management
-- WireGuard
-- Tailscale
-- Kubernetes
-- Cloud integrations
-- Notifications
-- Synchronization
-- Plugin architecture
-
-These items are intentionally outside the current roadmap.
-
----
-
-# Roadmap Maintenance
-
-The roadmap should evolve gradually.
-
-Completed milestones should never be rewritten.
-
-New milestones should preserve the project's long-term architectural vision.
+Planned.

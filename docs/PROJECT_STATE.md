@@ -1,17 +1,17 @@
 # Project State
 
 **Project:** Server Toolkit  
-**Version:** 0.1.0  
-**Status:**  Implementation
-**Last Updated:** 2026-07-01
+**Version:** 0.2.0-alpha  
+**Status:** Active Implementation  
+**Last Updated:** 2026-07-03
 
 ---
 
 ## Purpose
 
-This document is the single source of truth for the current state of the Server Toolkit project.
+This document is the single source of truth for the current implementation state of the Server Toolkit project.
 
-It summarizes where the project is now, what has been completed, what is in progress, and what should happen next.
+It summarizes what is implemented, what is intentionally not implemented yet, and what should happen next.
 
 This document must stay short, current, and factual.
 
@@ -19,55 +19,85 @@ This document must stay short, current, and factual.
 
 ## Current Phase
 
-The project is currently in the foundation phase.
+The project is in early Android feature implementation.
 
-The main focus is establishing the engineering baseline before feature implementation.
-
-No production application feature has been implemented yet.
+The current focus is building the initial Dashboard and Server Inventory scaffolding while preserving architectural consistency and documentation accuracy.
 
 ---
 
-## Completed
+## Implemented
 
-The following foundation items have been completed:
+The following application-level items are implemented:
 
-- Project repository created
-- Initial Android project structure created
-- Documentation structure created
-- Project vision defined
-- ADR process introduced
-- AI collaboration rules defined
-- Engineering memory document created
-- Development workflow documented
-- Initial roadmap created
-- Initial architecture document created
-- Android application skeleton
-- Initial MainActivity
-- Initial HomeScreen
-- Initial package structure
+- Single Activity application entry point.
+- Hilt-enabled application setup.
+- App-level Navigation Compose infrastructure.
+- Dashboard navigation destination.
+- Dashboard ViewModel.
+- Dashboard UI state.
+- Dashboard empty-state screen.
+- Dashboard navigation action to Server Inventory.
+- Server Inventory navigation destination.
+- Server Inventory domain model.
+- Server Inventory environment model.
+- Server Inventory filter state.
+- Server Inventory UI state.
+- Server Inventory ViewModel.
+- Server Inventory empty screen.
+- Package structure cleanup from `feature/servers` to `feature/serverinventory`.
+- App-level package structure alignment with the current source tree.
+
+---
+
+## Not Implemented Yet
+
+The following items are intentionally not implemented yet:
+
+- Server repository contract.
+- Server repository implementation.
+- Room database integration.
+- Server entity.
+- Server DAO.
+- Add server screen.
+- Edit server screen.
+- Server list rendering.
+- SSH connection workflow.
+- Monitoring workflow.
+- Command execution workflow.
+- Xray or x-ui management workflow.
+- Secure credential storage.
 
 ---
 
 ## In Progress
 
-The following items are currently in progress:
+The current implementation area is:
 
-- Documentation consistency review
-- Server domain model
-- Initial feature implementation
-- Feature scope clarification
-- Preparation for Android project skeleton stabilization
- 
+- Server Inventory feature scaffolding.
+- Documentation alignment with the current codebase.
+- Review of the first Dashboard-to-Server-Inventory navigation flow.
+
 ---
 
 ## Next Planned Work
 
-The next milestone is:
-1. Define the Server domain model.
-2. Evaluate persistence requirements.
-3. Implement local storage.
-4. Begin Server Inventory feature.
-Server Domain Model
+The next safe development steps are:
+
+1. Keep documentation synchronized with the current implementation.
+2. Review whether an implementation note is needed for the current Server Inventory scaffold.
+3. Stabilize the Server Inventory UI foundation.
+4. Defer persistence, repository, add/edit server workflows, SSH, and credential handling until the current scaffold is reviewed.
+
+---
+
+## Current Git Branch
 
 ```text
-v0.2.0 -Server Domain Model
+feature/android-project
+```
+
+---
+
+## Current Engineering Rule
+
+No database, repository, SSH, credential handling, or add/edit server workflow should be introduced until the Server Inventory scaffold is reviewed and documented.
