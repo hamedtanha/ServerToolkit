@@ -1,9 +1,10 @@
 package de.hamedtanha.servertoolkit.navigation
-import de.hamedtanha.servertoolkit.feature.dashboard.presentation.screen.DashboardScreen
+
 import androidx.compose.runtime.Composable
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
+import de.hamedtanha.servertoolkit.feature.dashboard.presentation.screen.DashboardRoute
 
 @Composable
 fun AppNavHost() {
@@ -14,8 +15,7 @@ fun AppNavHost() {
         startDestination = DashboardDestination.route,
     ) {
         composable(route = DashboardDestination.route) {
-            DashboardScreen()
-
+            DashboardRoute()
         }
     }
 }
