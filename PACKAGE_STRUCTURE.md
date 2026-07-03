@@ -439,47 +439,53 @@ Rules:
 
 ---
 
-## servers
+## serverinventory
 
-The servers feature owns server inventory behavior.
+The server inventory feature owns server inventory behavior.
+
+Current implementation:
 
 ```text
-feature/servers/
-    data/
-        local/
-            dao/
-            entity/
+feature/serverinventory/
     domain/
         model/
-        repository/
-    navigation/
     presentation/
-        component/
-        event/
         screen/
         state/
         viewmodel/
 ```
 
-Examples:
+Implemented files:
 
-- server model
-- server environment model
-- server repository contract
-- server repository implementation when feature-local
-- server list screen
-- add server screen
-- edit server screen
-- server form validation
+```text
+feature/serverinventory/domain/model/Server.kt
+feature/serverinventory/domain/model/ServerEnvironment.kt
+feature/serverinventory/presentation/screen/ServerInventoryScreen.kt
+feature/serverinventory/presentation/state/ServerInventoryFilter.kt
+feature/serverinventory/presentation/state/ServerInventoryUiState.kt
+feature/serverinventory/presentation/viewmodel/ServerInventoryViewModel.kt
+```
 
 Rules:
 
-- Server inventory models initially belong to `feature/servers/domain/model`.
-- Server repository contracts initially belong to `feature/servers/domain/repository`.
-- Server-specific persistence logic belongs to `feature/servers/data` unless it becomes shared infrastructure.
+- Server inventory models belong to `feature/serverinventory/domain/model`.
+- Server inventory presentation state belongs to `feature/serverinventory/presentation/state`.
+- Server inventory screens belong to `feature/serverinventory/presentation/screen`.
+- Server inventory ViewModels belong to `feature/serverinventory/presentation/viewmodel`.
+- Repository contracts, persistence classes, DAO classes, entity classes, edit events, feature-local navigation classes, and list item components must not be added until the related behavior is implemented.
 - Do not place server-specific classes in global `model`, `viewmodel`, or `ui/screens` packages.
 
----
+Future packages may be added only when required by implementation:
+
+```text
+feature/serverinventory/data/
+feature/serverinventory/data/local/dao/
+feature/serverinventory/data/local/entity/
+feature/serverinventory/domain/repository/
+feature/serverinventory/navigation/
+feature/serverinventory/presentation/component/
+feature/serverinventory/presentation/event/
+```
 
 ## settings
 
@@ -611,7 +617,7 @@ Append `ViewModel`.
 Examples:
 
 ```text
-ServerListViewModel
+ServerInventoryViewModel
 ServerEditViewModel
 ```
 
@@ -622,7 +628,7 @@ Append `UiState`.
 Examples:
 
 ```text
-ServerListUiState
+ServerInventoryUiState
 ServerEditUiState
 ```
 
@@ -643,7 +649,7 @@ Append `Screen`.
 Examples:
 
 ```text
-ServerListScreen
+ServerInventoryScreen
 ServerEditScreen
 DashboardScreen
 SettingsScreen
@@ -657,7 +663,7 @@ Examples:
 
 ```text
 ServerCard
-EmptyServerList
+ServerInventoryEmptyContent
 EnvironmentChip
 ```
 
@@ -685,7 +691,7 @@ feature/<feature-name>/presentation/screen/
 Example:
 
 ```text
-feature/servers/presentation/screen/ServerListScreen.kt
+feature/serverinventory/presentation/screen/ServerInventoryScreen.kt
 ```
 
 Do not use a global `ui/screens` package.
@@ -701,7 +707,7 @@ feature/<feature-name>/presentation/component/
 Example:
 
 ```text
-feature/servers/presentation/component/ServerCard.kt
+feature/serverinventory/presentation/component/ServerCard.kt
 ```
 
 Only move components to shared UI packages after reuse is proven.
@@ -717,7 +723,7 @@ feature/<feature-name>/presentation/state/
 Example:
 
 ```text
-feature/servers/presentation/state/ServerListUiState.kt
+feature/serverinventory/presentation/state/ServerInventoryUiState.kt
 ```
 
 ## UI Events
@@ -731,7 +737,7 @@ feature/<feature-name>/presentation/event/
 Example:
 
 ```text
-feature/servers/presentation/event/ServerEditUiEvent.kt
+feature/serverinventory/presentation/event/ServerEditUiEvent.kt
 ```
 
 This package is optional and should be used only when explicit event modeling improves clarity.
@@ -747,7 +753,7 @@ feature/<feature-name>/presentation/viewmodel/
 Example:
 
 ```text
-feature/servers/presentation/viewmodel/ServerListViewModel.kt
+feature/serverinventory/presentation/viewmodel/ServerInventoryViewModel.kt
 ```
 
 Do not use a global `viewmodel` package.
@@ -763,7 +769,7 @@ feature/<feature-name>/domain/model/
 Example:
 
 ```text
-feature/servers/domain/model/Server.kt
+feature/serverinventory/domain/model/Server.kt
 ```
 
 ## Shared Domain Models
@@ -787,7 +793,7 @@ feature/<feature-name>/domain/repository/
 Example:
 
 ```text
-feature/servers/domain/repository/ServerRepository.kt
+feature/serverinventory/domain/repository/ServerRepository.kt
 ```
 
 Place shared repository contracts under:
@@ -807,7 +813,7 @@ feature/<feature-name>/data/
 Example:
 
 ```text
-feature/servers/data/DefaultServerRepository.kt
+feature/serverinventory/data/DefaultServerRepository.kt
 ```
 
 Place shared repository implementations under:
@@ -823,8 +829,8 @@ Place feature-owned Room entities and DAOs close to the owning feature unless th
 Example:
 
 ```text
-feature/servers/data/local/entity/ServerEntity.kt
-feature/servers/data/local/dao/ServerDao.kt
+feature/serverinventory/data/local/entity/ServerEntity.kt
+feature/serverinventory/data/local/dao/ServerDao.kt
 ```
 
 Shared Room infrastructure belongs in:
@@ -838,20 +844,22 @@ core/database/
 Place app-level navigation infrastructure under:
 
 ```text
-core/navigation/
+navigation/
 ```
 
-Place feature-level navigation definitions under:
+Current examples:
 
 ```text
-feature/<feature-name>/navigation/
+navigation/AppNavHost.kt
+navigation/AppDestinations.kt
+navigation/NavigationDestination.kt
 ```
 
-Example:
+Feature-level navigation packages are optional.
 
-```text
-feature/servers/navigation/ServersRoutes.kt
-```
+Use feature-level navigation only when a feature owns a sufficiently complex navigation flow that justifies separate route definitions.
+
+Do not create placeholder navigation packages without implemented navigation behavior.
 
 ## Dependency Injection
 
@@ -883,9 +891,9 @@ app/src/androidTest/java/de/hamedtanha/servertoolkit
 Examples:
 
 ```text
-app/src/test/java/de/hamedtanha/servertoolkit/feature/servers/domain/ServerValidatorTest.kt
-app/src/test/java/de/hamedtanha/servertoolkit/feature/servers/data/ServerMapperTest.kt
-app/src/androidTest/java/de/hamedtanha/servertoolkit/feature/servers/data/local/ServerDaoTest.kt
+app/src/test/java/de/hamedtanha/servertoolkit/feature/serverinventory/domain/ServerValidatorTest.kt
+app/src/test/java/de/hamedtanha/servertoolkit/feature/serverinventory/data/ServerMapperTest.kt
+app/src/androidTest/java/de/hamedtanha/servertoolkit/feature/serverinventory/data/local/ServerDaoTest.kt
 ```
 
 Rules:
