@@ -5,6 +5,7 @@ import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
 import de.hamedtanha.servertoolkit.feature.dashboard.presentation.screen.DashboardRoute
+import de.hamedtanha.servertoolkit.feature.serverinventory.presentation.screen.ServerInventoryRoute
 
 @Composable
 fun AppNavHost() {
@@ -16,6 +17,10 @@ fun AppNavHost() {
     ) {
         composable(route = DashboardDestination.route) {
             DashboardRoute()
+        }
+
+        composable(route = ServerInventoryDestination.route) {
+            ServerInventoryRoute()
         }
     }
 }
