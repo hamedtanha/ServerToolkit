@@ -7,3 +7,7 @@ object DashboardDestination : NavigationDestination {
 object ServerInventoryDestination : NavigationDestination {
     override val route: String = "server_inventory"
 }
+
+object AddServerDestination : NavigationDestination {
+    override val route: String = "add_server"
+}

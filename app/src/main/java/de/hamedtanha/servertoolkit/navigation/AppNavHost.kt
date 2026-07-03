@@ -5,6 +5,7 @@ import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
 import de.hamedtanha.servertoolkit.feature.dashboard.presentation.screen.DashboardRoute
+import de.hamedtanha.servertoolkit.feature.serverinventory.presentation.screen.AddServerRoute
 import de.hamedtanha.servertoolkit.feature.serverinventory.presentation.screen.ServerInventoryRoute
 
 @Composable
@@ -28,7 +29,17 @@ fun AppNavHost() {
         composable(route = ServerInventoryDestination.route) {
             ServerInventoryRoute(
                 onAddServerClick = {
-                    // Add Server navigation will be connected when the Add Server destination exists.
+                    navController.navigate(AddServerDestination.route) {
+                        launchSingleTop = true
+                    }
+                },
+            )
+        }
+
+        composable(route = AddServerDestination.route) {
+            AddServerRoute(
+                onNavigateBack = {
+                    navController.navigateUp()
                 },
             )
         }
