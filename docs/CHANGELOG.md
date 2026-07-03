@@ -47,6 +47,7 @@ The project follows Conventional Commits and Semantic Versioning principles.
 - Improved Server Inventory screen structure by extracting shared centered content and message content.
 - Clarified Server Inventory UI state semantics for inventory-empty and filter-empty states.
 - Connected Server Inventory empty-state action to the Add Server placeholder route.
+- Connected Server Inventory ViewModel to the Server repository.
 
 ### Removed
 

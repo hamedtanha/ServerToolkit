@@ -55,6 +55,7 @@ The following application-level items are implemented:
 - Server repository contract.
 - In-memory Server repository implementation.
 - Server Inventory repository dependency injection binding.
+- Server Inventory ViewModel repository observation.
 - Package structure cleanup from `feature/servers` to `feature/serverinventory`.
 - App-level package structure alignment with the current source tree.
 
@@ -94,9 +95,8 @@ The next safe development steps are:
 
 1. Keep documentation synchronized with the current implementation.
 2. Review the Add Server form and validation behavior.
-3. Connect Server Inventory ViewModel to the repository.
-4. Connect Add Server validation flow to the repository-backed save path.
-5. Defer Room, SSH, and credential handling until the in-memory repository flow is reviewed.
+3. Connect Add Server validation flow to the repository-backed save path.
+4. Defer Room, SSH, and credential handling until the in-memory repository flow is reviewed.
 
 ---
 

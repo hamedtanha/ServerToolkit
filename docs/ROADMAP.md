@@ -110,6 +110,7 @@ Completed:
 - Server repository contract.
 - In-memory Server repository implementation.
 - Server Inventory repository dependency injection binding.
+- Server Inventory ViewModel repository observation.
 
 Planned:
 
