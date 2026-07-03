@@ -2,5 +2,29 @@ package de.hamedtanha.servertoolkit.feature.serverinventory.presentation.state
 
 data class AddServerUiState(
     val title: String = "Add server",
-    val description: String = "The add server form will be implemented in a later step.",
-)
+    val description: String = "Enter the connection details for a Linux server.",
+    val name: String = "",
+    val host: String = "",
+    val port: String = "22",
+    val username: String = "",
+    val nameError: String? = null,
+    val hostError: String? = null,
+    val portError: String? = null,
+    val usernameError: String? = null,
+    val formMessage: String? = null,
+) {
+    val canSave: Boolean
+        get() = name.isNotBlank() &&
+            host.isNotBlank() &&
+            username.isNotBlank() &&
+            port.toIntOrNull()?.let { it in MIN_PORT..MAX_PORT } == true &&
+            nameError == null &&
+            hostError == null &&
+            portError == null &&
+            usernameError == null
+
+    companion object {
+        const val MIN_PORT = 1
+        const val MAX_PORT = 65535
+    }
+}

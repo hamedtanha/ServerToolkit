@@ -29,6 +29,9 @@ The project follows Conventional Commits and Semantic Versioning principles.
 - Added Add Server placeholder screen.
 - Added Add Server UI state.
 - Added Add Server ViewModel.
+- Added Add Server form fields.
+- Added Add Server validation state.
+- Added Add Server validation-only save behavior.
 - Added Dashboard navigation action to open Server Inventory.
 
 ### Changed
@@ -56,9 +59,7 @@ The following items are intentionally not implemented yet:
 - Room persistence.
 - Server entity.
 - Server DAO.
-- Real Add Server form.
-- Add Server validation.
-- Add Server save workflow.
+- Add Server persistence-backed save workflow.
 - Edit server workflow.
 - SSH workflow.
 - Credential storage.

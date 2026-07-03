@@ -49,6 +49,9 @@ The following application-level items are implemented:
 - Add Server placeholder screen.
 - Add Server UI state.
 - Add Server ViewModel.
+- Add Server form fields.
+- Add Server validation state.
+- Add Server validation-only save action.
 - Package structure cleanup from `feature/servers` to `feature/serverinventory`.
 - App-level package structure alignment with the current source tree.
 
@@ -63,9 +66,7 @@ The following items are intentionally not implemented yet:
 - Room database integration.
 - Server entity.
 - Server DAO.
-- Real Add Server form.
-- Add Server validation.
-- Add Server save action.
+- Add Server persistence-backed save action.
 - Edit server screen.
 - Server list rendering.
 - SSH connection workflow.
@@ -81,8 +82,8 @@ The following items are intentionally not implemented yet:
 The current implementation area is:
 
 - Server Inventory feature scaffolding.
-- Add Server placeholder documentation alignment.
-- Preparation for real Add Server form design.
+- Add Server form documentation alignment.
+- Preparation for persistence-backed server inventory management.
 
 ---
 
@@ -91,9 +92,9 @@ The current implementation area is:
 The next safe development steps are:
 
 1. Keep documentation synchronized with the current implementation.
-2. Review whether an implementation note is needed for the current Server Inventory scaffold.
-3. Stabilize the Server Inventory UI foundation.
-4. Defer persistence, repository, add/edit server workflows, SSH, and credential handling until the current scaffold is reviewed.
+2. Review the Add Server form and validation behavior.
+3. Introduce the server repository contract.
+4. Defer Room, SSH, and credential handling until the repository boundary is defined.
 
 ---
 
@@ -107,4 +108,4 @@ feature/android-project
 
 ## Current Engineering Rule
 
-No database, repository, SSH, credential handling, or add/edit server workflow should be introduced until the Server Inventory scaffold is reviewed and documented.
+No database, SSH, or credential handling should be introduced until the server repository contract is defined.

@@ -104,13 +104,14 @@ Completed:
 - Add Server placeholder screen.
 - Add Server UI state.
 - Add Server ViewModel.
+- Real Add Server form.
+- Add Server validation.
+- Add Server validation-only save behavior.
 
 Planned:
 
 - Server list rendering.
-- Real Add Server form.
-- Add Server validation.
-- Add Server save workflow.
+- Add Server persistence-backed save workflow.
 - Edit server workflow.
 - Server repository contract.
 - Server repository implementation.
