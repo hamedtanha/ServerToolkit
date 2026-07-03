@@ -2,7 +2,7 @@
 
 **Project:** Server Toolkit  
 **Status:** Active  
-**Last Updated:** 2026-07-02
+**Last Updated:** 2026-07-03
 
 ---
 
@@ -60,7 +60,6 @@ app/src/main/java/de/hamedtanha/servertoolkit/
         common/
         database/
         di/
-        navigation/
 
     data/
         local/
@@ -73,7 +72,6 @@ app/src/main/java/de/hamedtanha/servertoolkit/
 
     feature/
         dashboard/
-            navigation/
             presentation/
                 component/
                 event/
@@ -81,24 +79,15 @@ app/src/main/java/de/hamedtanha/servertoolkit/
                 state/
                 viewmodel/
 
-        servers/
-            data/
-                local/
-                    dao/
-                    entity/
+        serverinventory/
             domain/
                 model/
-                repository/
-            navigation/
             presentation/
-                component/
-                event/
                 screen/
                 state/
                 viewmodel/
 
         settings/
-            navigation/
             presentation/
                 component/
                 event/
@@ -144,7 +133,6 @@ core/
     common/
     database/
     di/
-    navigation/
 ```
 
 ### core/common
@@ -207,28 +195,6 @@ Rules:
 - Feature-specific bindings should live inside the owning feature when practical.
 - Do not use dependency injection as a service locator.
 - Do not inject dependencies into domain models.
-
-### core/navigation
-
-Application-level navigation infrastructure.
-
-Examples:
-
-```text
-core/navigation/
-    AppRoute.kt
-    ServerToolkitNavHost.kt
-    TopLevelDestination.kt
-```
-
-Rules:
-
-- App-level route contracts belong here.
-- Root navigation host belongs here.
-- Feature destinations may be exposed through feature-level navigation packages.
-- Feature screens must not define unrelated global routes.
-
----
 
 ## data
 
@@ -331,7 +297,7 @@ The `feature` package contains user-facing application features.
 ```text
 feature/
     dashboard/
-    servers/
+    serverinventory/
     settings/
 ```
 
@@ -339,7 +305,7 @@ Each feature should be as self-contained as practical.
 
 Feature packages may contain:
 
-- navigation definitions
+- feature-level navigation definitions only when implemented
 - presentation state
 - presentation events
 - screens
@@ -401,7 +367,6 @@ feature/<feature-name>/
     domain/
         model/
         repository/
-    navigation/
     presentation/
         component/
         event/
@@ -422,7 +387,6 @@ The dashboard feature owns the main overview screen.
 
 ```text
 feature/dashboard/
-    navigation/
     presentation/
         component/
         event/
@@ -493,7 +457,6 @@ The settings feature owns application settings screens.
 
 ```text
 feature/settings/
-    navigation/
     presentation/
         component/
         event/
