@@ -2,7 +2,9 @@ package de.hamedtanha.servertoolkit.feature.serverinventory.presentation.screen
 
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.MaterialTheme
@@ -37,27 +39,16 @@ fun ServerInventoryScreen(
     modifier: Modifier = Modifier,
 ) {
     when {
-        uiState.isLoading -> {
-            ServerInventoryLoadingContent(modifier = modifier)
-        }
-
-        uiState.errorMessage != null -> {
-            ServerInventoryErrorContent(
-                message = uiState.errorMessage,
-                modifier = modifier,
-            )
-        }
-
-        uiState.isEmpty -> {
-            ServerInventoryEmptyContent(modifier = modifier)
-        }
-
-        else -> {
-            ServerInventoryLoadedContent(
-                serverCount = uiState.servers.size,
-                modifier = modifier,
-            )
-        }
+        uiState.isLoading -> ServerInventoryLoadingContent(modifier = modifier)
+        uiState.errorMessage != null -> ServerInventoryErrorContent(
+            message = uiState.errorMessage,
+            modifier = modifier,
+        )
+        uiState.isEmpty -> ServerInventoryEmptyContent(modifier = modifier)
+        else -> ServerInventoryLoadedContent(
+            serverCount = uiState.servers.size,
+            modifier = modifier,
+        )
     }
 }
 
@@ -65,40 +56,18 @@ fun ServerInventoryScreen(
 private fun ServerInventoryEmptyContent(
     modifier: Modifier = Modifier,
 ) {
-    Column(
-        modifier = modifier
-            .fillMaxSize()
-            .padding(24.dp),
-        verticalArrangement = Arrangement.Center,
-        horizontalAlignment = Alignment.CenterHorizontally,
-    ) {
-        Text(
-            text = "No servers yet",
-            style = MaterialTheme.typography.titleLarge,
-            textAlign = TextAlign.Center,
-        )
-
-        Text(
-            modifier = Modifier.padding(top = 8.dp),
-            text = "Your server inventory will appear here after servers are added.",
-            style = MaterialTheme.typography.bodyMedium,
-            textAlign = TextAlign.Center,
-            color = MaterialTheme.colorScheme.onSurfaceVariant,
-        )
-    }
+    ServerInventoryMessageContent(
+        title = "No servers yet",
+        message = "Your server inventory will appear here after servers are added.",
+        modifier = modifier,
+    )
 }
 
 @Composable
 private fun ServerInventoryLoadingContent(
     modifier: Modifier = Modifier,
 ) {
-    Column(
-        modifier = modifier
-            .fillMaxSize()
-            .padding(24.dp),
-        verticalArrangement = Arrangement.Center,
-        horizontalAlignment = Alignment.CenterHorizontally,
-    ) {
+    ServerInventoryCenteredContent(modifier = modifier) {
         CircularProgressIndicator()
     }
 }
@@ -108,33 +77,60 @@ private fun ServerInventoryErrorContent(
     message: String,
     modifier: Modifier = Modifier,
 ) {
-    Column(
-        modifier = modifier
-            .fillMaxSize()
-            .padding(24.dp),
-        verticalArrangement = Arrangement.Center,
-        horizontalAlignment = Alignment.CenterHorizontally,
-    ) {
-        Text(
-            text = "Server inventory could not be loaded",
-            style = MaterialTheme.typography.titleLarge,
-            textAlign = TextAlign.Center,
-            color = MaterialTheme.colorScheme.error,
-        )
-
-        Text(
-            modifier = Modifier.padding(top = 8.dp),
-            text = message,
-            style = MaterialTheme.typography.bodyMedium,
-            textAlign = TextAlign.Center,
-        )
-    }
+    ServerInventoryMessageContent(
+        title = "Server inventory could not be loaded",
+        message = message,
+        modifier = modifier,
+        isError = true,
+    )
 }
 
 @Composable
 private fun ServerInventoryLoadedContent(
     serverCount: Int,
     modifier: Modifier = Modifier,
+) {
+    ServerInventoryMessageContent(
+        title = "$serverCount servers",
+        message = "Server list rendering will be implemented in a later step.",
+        modifier = modifier,
+    )
+}
+
+@Composable
+private fun ServerInventoryMessageContent(
+    title: String,
+    message: String,
+    modifier: Modifier = Modifier,
+    isError: Boolean = false,
+) {
+    ServerInventoryCenteredContent(modifier = modifier) {
+        Text(
+            text = title,
+            style = MaterialTheme.typography.titleLarge,
+            textAlign = TextAlign.Center,
+            color = if (isError) {
+                MaterialTheme.colorScheme.error
+            } else {
+                MaterialTheme.colorScheme.onSurface
+            },
+        )
+
+        Spacer(modifier = Modifier.height(8.dp))
+
+        Text(
+            text = message,
+            style = MaterialTheme.typography.bodyMedium,
+            textAlign = TextAlign.Center,
+            color = MaterialTheme.colorScheme.onSurfaceVariant,
+        )
+    }
+}
+
+@Composable
+private fun ServerInventoryCenteredContent(
+    modifier: Modifier = Modifier,
+    content: @Composable () -> Unit,
 ) {
     Column(
         modifier = modifier
@@ -143,18 +139,6 @@ private fun ServerInventoryLoadedContent(
         verticalArrangement = Arrangement.Center,
         horizontalAlignment = Alignment.CenterHorizontally,
     ) {
-        Text(
-            text = "$serverCount servers",
-            style = MaterialTheme.typography.titleLarge,
-            textAlign = TextAlign.Center,
-        )
-
-        Text(
-            modifier = Modifier.padding(top = 8.dp),
-            text = "Server list rendering will be implemented in a later step.",
-            style = MaterialTheme.typography.bodyMedium,
-            textAlign = TextAlign.Center,
-            color = MaterialTheme.colorScheme.onSurfaceVariant,
-        )
+        content()
     }
 }
