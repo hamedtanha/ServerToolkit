@@ -10,22 +10,32 @@ import androidx.compose.material3.Button
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
+import androidx.hilt.lifecycle.viewmodel.compose.hiltViewModel
+import androidx.lifecycle.compose.collectAsStateWithLifecycle
+import de.hamedtanha.servertoolkit.feature.serverinventory.presentation.state.AddServerUiState
+import de.hamedtanha.servertoolkit.feature.serverinventory.presentation.viewmodel.AddServerViewModel
 
 @Composable
 fun AddServerRoute(
     onNavigateBack: () -> Unit,
+    viewModel: AddServerViewModel = hiltViewModel(),
 ) {
+    val uiState by viewModel.uiState.collectAsStateWithLifecycle()
+
     AddServerScreen(
+        uiState = uiState,
         onNavigateBack = onNavigateBack,
     )
 }
 
 @Composable
 fun AddServerScreen(
+    uiState: AddServerUiState,
     onNavigateBack: () -> Unit,
     modifier: Modifier = Modifier,
 ) {
@@ -37,7 +47,7 @@ fun AddServerScreen(
         horizontalAlignment = Alignment.CenterHorizontally,
     ) {
         Text(
-            text = "Add server",
+            text = uiState.title,
             style = MaterialTheme.typography.titleLarge,
             textAlign = TextAlign.Center,
         )
@@ -45,7 +55,7 @@ fun AddServerScreen(
         Spacer(modifier = Modifier.height(8.dp))
 
         Text(
-            text = "The add server form will be implemented in a later step.",
+            text = uiState.description,
             style = MaterialTheme.typography.bodyMedium,
             textAlign = TextAlign.Center,
             color = MaterialTheme.colorScheme.onSurfaceVariant,
