@@ -47,6 +47,8 @@ The following application-level items are implemented:
 - Server Inventory empty-state action.
 - Add Server navigation destination.
 - Add Server placeholder screen.
+- Add Server UI state.
+- Add Server ViewModel.
 - Package structure cleanup from `feature/servers` to `feature/serverinventory`.
 - App-level package structure alignment with the current source tree.
 

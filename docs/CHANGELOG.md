@@ -27,6 +27,8 @@ The project follows Conventional Commits and Semantic Versioning principles.
 - Added Add Server navigation destination.
 - Added Add Server placeholder route.
 - Added Add Server placeholder screen.
+- Added Add Server UI state.
+- Added Add Server ViewModel.
 - Added Dashboard navigation action to open Server Inventory.
 
 ### Changed

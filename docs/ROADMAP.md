@@ -102,6 +102,8 @@ Completed:
 - Server Inventory UI state semantic clarification.
 - Server Inventory empty-state action.
 - Add Server placeholder screen.
+- Add Server UI state.
+- Add Server ViewModel.
 
 Planned:
 
