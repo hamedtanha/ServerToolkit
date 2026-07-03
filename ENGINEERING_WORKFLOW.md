@@ -79,3 +79,47 @@ Avoid commits that mix unrelated changes such as code, formatting, documentation
 The main branch must remain releasable at all times.
 
 Feature work must happen on short-lived branches according to GitHub Flow.
+
+---
+
+# Feature Lifecycle
+
+Every feature in ServerToolkit must be developed incrementally and consistently.
+
+A feature should move through the following lifecycle:
+
+1. Define the feature scope.
+2. Create the feature package structure.
+3. Add navigation destination if the feature is user-facing.
+4. Add UI state.
+5. Add ViewModel.
+6. Add screen or UI components.
+7. Add domain model when business logic is required.
+8. Add repository abstraction when data access is required.
+9. Add local or remote data source when needed.
+10. Add tests when logic or data transformation exists.
+11. Update related documentation.
+12. Build and review before commit.
+
+A feature must not introduce unrelated architectural changes.
+
+If a feature requires a new architectural decision, an ADR must be created before or together with the implementation.
+
+Feature implementation should remain aligned with the existing package structure.
+
+Each feature should prefer the following structure when applicable:
+
+- presentation/screen
+- presentation/state
+- presentation/viewmodel
+- domain/model
+- domain/repository
+- data/local
+- data/remote
+- data/repository
+
+Not every feature requires every layer.
+
+Layers should be added only when they provide real value.
+
+Empty packages, placeholder abstractions, and unused interfaces should be avoided unless they are part of an intentional feature skeleton with immediate follow-up implementation.
