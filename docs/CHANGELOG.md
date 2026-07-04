@@ -27,7 +27,7 @@ The project follows Conventional Commits and Semantic Versioning principles.
 - Added Add Server navigation destination.
 - Added Add Server placeholder route.
 - Added Add Server placeholder screen.
-- Added Add Server UI state.
+- Added shared Server Form UI state.
 - Added Add Server ViewModel.
 - Added Add Server form fields.
 - Added Add Server validation state.
@@ -64,6 +64,8 @@ The project follows Conventional Commits and Semantic Versioning principles.
 - Aligned package structure with the current implementation.
 - Replaced obsolete `feature/servers` package scaffolding with `feature/serverinventory`.
 - Removed obsolete placeholder navigation packages.
+- Renamed the shared Add/Edit form state from Add Server naming to Server Form naming.
+- Renamed the shared Add/Edit form screen from Add Server naming to Server Form naming.
 - Updated package structure documentation to reflect app-level navigation.
 - Updated Dashboard empty-state copy to point users toward Server Inventory.
 - Improved Server Inventory screen structure by extracting shared centered content and message content.
@@ -74,7 +76,7 @@ The project follows Conventional Commits and Semantic Versioning principles.
 - Connected Server Inventory delete behavior to the Server repository.
 - Connected Server Inventory filter state to visible list rendering.
 - Connected Server Inventory edit behavior to the existing Server repository contract.
-- Reused the existing Add Server form implementation for the Edit Server route.
+- Reused the shared Server Form implementation for Add Server and Edit Server routes.
 - Updated the ADR index to include accepted application architecture, Room persistence, navigation, and dependency injection decisions.
 - Clarified the project state after the accepted Room persistence decision.
 - Switched the production Server repository binding from the in-memory implementation to the Room-backed implementation.
@@ -84,6 +86,7 @@ The project follows Conventional Commits and Semantic Versioning principles.
 - Updated project state documentation after adding delete behavior.
 - Updated project state documentation after adding search and filtering behavior.
 - Updated project state documentation after adding edit behavior.
+- Updated project state documentation after renaming the shared server form.
 - Recorded successful manual verification of the delete flow after application restart.
 - Recorded successful manual verification of search and filtering behavior.
 - Recorded successful automated verification after search and filtering implementation.
@@ -93,6 +96,8 @@ The project follows Conventional Commits and Semantic Versioning principles.
 
 - Removed obsolete `feature/servers` source package placeholders.
 - Removed obsolete `core/navigation` placeholder.
+- Removed obsolete Add Server-specific form screen file after introducing the shared Server Form screen.
+- Removed obsolete Add Server-specific form UI state after introducing the shared Server Form UI state.
 - Removed redundant `.gitkeep` files from packages that now contain implementation files.
 
 ### Not Added
