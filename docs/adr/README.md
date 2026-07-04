@@ -26,6 +26,7 @@ This directory contains all Architecture Decision Records for the Server Toolkit
 | ADR-004 | Navigation Strategy | Accepted |
 | ADR-005 | Dependency Injection Strategy | Accepted |
 | ADR-006 | Remote Connection Workflow Boundaries | Accepted |
+| ADR-007 | Secure Storage Strategy | Accepted |
 
 ---
 
