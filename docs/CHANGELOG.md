@@ -70,6 +70,7 @@ The project follows Conventional Commits and Semantic Versioning principles.
 - Reviewed Server Inventory package naming and kept `feature/serverinventory` as the current implemented feature boundary.
 - Documented that a broader `inventory` package should wait until non-server asset types are implemented.
 - Added an explicit Server Inventory stabilization gate before SSH implementation.
+- Accepted the Server Inventory 0.3.0 baseline as stable enough to support SSH workflow design.
 - Updated architecture documentation to reflect the current implemented inventory behavior.
 - Updated package structure documentation to reflect current Server Inventory files.
 - Updated package structure documentation to reflect app-level navigation.
@@ -94,6 +95,7 @@ The project follows Conventional Commits and Semantic Versioning principles.
 - Updated project state documentation after adding edit behavior.
 - Updated project state documentation after renaming the shared server form.
 - Updated project state documentation after adding the Server Inventory stabilization checklist.
+- Updated project state and roadmap after accepting the Server Inventory 0.3.0 baseline.
 - Recorded successful manual verification of the delete flow after application restart.
 - Recorded successful manual verification of search and filtering behavior.
 - Recorded successful automated verification after search and filtering implementation.
