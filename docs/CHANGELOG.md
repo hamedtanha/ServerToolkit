@@ -44,6 +44,7 @@ The project follows Conventional Commits and Semantic Versioning principles.
 - Added Server Inventory delete action with confirmation dialog.
 - Added Server Inventory search and filtering controls.
 - Added Server Inventory filter matcher unit tests.
+- Added Server Inventory stabilization checklist.
 - Added Dashboard navigation action to open Server Inventory.
 - Added ADR-003 for local persistence with Room.
 - Added Room dependencies with KSP compiler configuration.
@@ -68,6 +69,7 @@ The project follows Conventional Commits and Semantic Versioning principles.
 - Renamed the shared Add/Edit form screen from Add Server naming to Server Form naming.
 - Reviewed Server Inventory package naming and kept `feature/serverinventory` as the current implemented feature boundary.
 - Documented that a broader `inventory` package should wait until non-server asset types are implemented.
+- Added an explicit Server Inventory stabilization gate before SSH implementation.
 - Updated architecture documentation to reflect the current implemented inventory behavior.
 - Updated package structure documentation to reflect current Server Inventory files.
 - Updated package structure documentation to reflect app-level navigation.
@@ -91,6 +93,7 @@ The project follows Conventional Commits and Semantic Versioning principles.
 - Updated project state documentation after adding search and filtering behavior.
 - Updated project state documentation after adding edit behavior.
 - Updated project state documentation after renaming the shared server form.
+- Updated project state documentation after adding the Server Inventory stabilization checklist.
 - Recorded successful manual verification of the delete flow after application restart.
 - Recorded successful manual verification of search and filtering behavior.
 - Recorded successful automated verification after search and filtering implementation.
