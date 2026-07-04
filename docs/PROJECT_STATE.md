@@ -3,7 +3,7 @@
 **Project:** Server Toolkit  
 **Version:** 0.2.0-alpha  
 **Status:** Active Implementation  
-**Last Updated:** 2026-07-03
+**Last Updated:** 2026-07-04
 
 ---
 
@@ -21,7 +21,7 @@ This document must stay short, current, and factual.
 
 The project is in early Android feature implementation.
 
-The current focus is building the initial Dashboard and Server Inventory scaffolding while preserving architectural consistency and documentation accuracy.
+The current focus is moving from in-memory Server Inventory validation toward Room-backed local persistence while preserving architectural consistency and documentation accuracy.
 
 ---
 
@@ -59,6 +59,7 @@ The following application-level items are implemented:
 - Server Inventory repository dependency injection binding.
 - Server Inventory ViewModel repository observation.
 - Basic Server Inventory list rendering.
+- Local persistence with Room architecture decision.
 - Package structure cleanup from `feature/servers` to `feature/serverinventory`.
 - App-level package structure alignment with the current source tree.
 
@@ -87,7 +88,7 @@ The current implementation area is:
 
 - Server Inventory feature scaffolding.
 - Add Server repository-backed save documentation alignment.
-- Preparation for Room-backed server inventory persistence.
+- Preparation for Room-backed server inventory persistence implementation.
 
 ---
 
@@ -96,9 +97,9 @@ The current implementation area is:
 The next safe development steps are:
 
 1. Keep documentation synchronized with the current implementation.
-2. Review the in-memory Server Inventory flow before introducing persistence.
-3. Define the Room persistence boundary and required data-layer components.
-4. Defer SSH and credential handling until Room persistence is designed.
+2. Review Gradle, Kotlin, and KSP compatibility before adding Room dependencies.
+3. Introduce a small Room persistence skeleton behind the existing `ServerRepository` contract.
+4. Defer SSH and credential handling until Room-backed server inventory persistence is implemented and reviewed.
 
 ---
 
@@ -112,4 +113,4 @@ feature/android-project
 
 ## Current Engineering Rule
 
-No SSH or credential handling should be introduced until Room persistence is designed and reviewed.
+No SSH or credential handling should be introduced until Room-backed server inventory persistence is implemented and reviewed.

@@ -39,6 +39,7 @@ The project follows Conventional Commits and Semantic Versioning principles.
 - Added Server Inventory repository dependency injection binding.
 - Added basic Server Inventory list rendering.
 - Added Dashboard navigation action to open Server Inventory.
+- Added ADR-003 for local persistence with Room.
 
 ### Changed
 
@@ -52,6 +53,8 @@ The project follows Conventional Commits and Semantic Versioning principles.
 - Connected Server Inventory empty-state action to the Add Server placeholder route.
 - Connected Server Inventory ViewModel to the Server repository.
 - Connected Add Server save behavior to the Server repository.
+- Updated the ADR index to include accepted application architecture, Room persistence, navigation, and dependency injection decisions.
+- Clarified the project state after the accepted Room persistence decision.
 
 ### Removed
 
@@ -63,7 +66,7 @@ The project follows Conventional Commits and Semantic Versioning principles.
 
 The following items are intentionally not implemented yet:
 
-- Room persistence.
+- Room persistence implementation.
 - Server entity.
 - Server DAO.
 - Room-backed Add Server persistence workflow.
