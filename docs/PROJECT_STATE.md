@@ -21,7 +21,7 @@ This document must stay short, current, and factual.
 
 The Server Inventory 0.3.0 baseline is accepted.
 
-The current focus is testing the SSH presentation flow with a test-only fake connection service.
+The current focus is establishing the SSH data-layer adapter boundary without real connection behavior.
 
 ---
 
@@ -92,6 +92,9 @@ The following application-level items are implemented:
 - Secure storage strategy decision.
 - SSH client library selection decision.
 - SSHJ dependency declaration through the Gradle version catalog.
+- SSH data-layer adapter shell.
+- SSHJ-backed connection service shell without real network behavior.
+- SSHJ adapter shell unit test.
 - SSH domain connection request model.
 - SSH domain connection result model.
 - SSH domain connection error model.
@@ -126,7 +129,8 @@ The following application-level items are implemented:
 The following items are intentionally not implemented yet:
 
 - Real SSH connection behavior.
-- SSHJ adapter implementation.
+- SSH authentication handling.
+- SSH host key verification implementation.
 - SSH session lifecycle model.
 - Production SSH connection service binding.
 - Monitoring workflow.
@@ -141,9 +145,9 @@ The following items are intentionally not implemented yet:
 
 The current implementation area is:
 
-- SSH ViewModel test verification.
-- Production connection service planning.
-- Future SSHJ adapter boundary planning.
+- SSHJ adapter shell verification.
+- Production connection service binding planning.
+- Future host trust and authentication flow planning.
 
 ---
 
@@ -151,16 +155,16 @@ The current implementation area is:
 
 The next safe development steps are:
 
-1. Verify the fake SSH connection service and ViewModel tests with unit tests and debug build.
-2. Add a production connection service boundary without real network behavior only if needed for dependency injection.
-3. Add an SSHJ adapter shell without real connection behavior.
+1. Verify the SSHJ adapter shell with unit tests and debug build.
+2. Decide whether to add dependency injection for the connection service before real behavior.
+3. Plan host trust and authentication inputs before any real connection attempt.
 
 ---
 
 ## Current Git Branch
 
 ```text
-feature/ssh-fake-connection-service
+feature/sshj-adapter-shell
 ```
 
 ---
