@@ -118,6 +118,7 @@ Completed:
 - Manual delete flow verification.
 - Search and filtering behavior.
 - Manual search and filtering verification.
+- Automated search and filtering verification.
 - Local persistence with Room architecture decision.
 - Room dependency and KSP compiler setup.
 - Room schema export configuration.
@@ -135,7 +136,6 @@ Completed:
 
 Planned:
 
-- Local unit and instrumentation test execution verification after search/filter implementation.
 - Edit server workflow.
 - Migration tests when database version changes.
 
