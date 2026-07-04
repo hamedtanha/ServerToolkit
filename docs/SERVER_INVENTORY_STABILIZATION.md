@@ -2,7 +2,7 @@
 
 **Project:** Server Toolkit  
 **Version Target:** 0.3.0  
-**Status:** Active  
+**Status:** Accepted  
 **Last Updated:** 2026-07-04
 
 ---
@@ -73,26 +73,36 @@ Server Inventory 0.3.0 can be considered stable when all of the following criter
 
 ---
 
+## Acceptance Result
+
+The Server Inventory 0.3.0 baseline is accepted.
+
+The implemented Server Inventory foundation is stable enough to support SSH workflow design and implementation planning.
+
+This acceptance is based on completed automated verification, completed manual verification, and synchronized documentation for the current Server Inventory scope.
+
+---
+
 ## Current Known Follow-Up Items
 
-The following items may be addressed before or after 0.3.0 stabilization depending on priority:
+The following items may be addressed after 0.3.0 stabilization depending on priority:
 
 - Review Server Inventory UI density after adding edit, delete, search, and filter controls.
 - Review one-character search behavior to reduce broad host matches such as `.com` when appropriate.
 - Add migration tests when the Room database version changes.
 
-These items do not block the current Server Inventory foundation unless they are promoted to release blockers.
+These items do not block the accepted Server Inventory foundation unless they are promoted to release blockers.
 
 ---
 
 ## SSH Entry Gate
 
-SSH-related implementation must not begin until the following are true:
+SSH-related implementation may proceed after this acceptance, but only within the following constraints:
 
-1. Server Inventory automated verification passes.
-2. Server Inventory manual verification passes.
-3. Documentation is synchronized with the implemented behavior.
-4. The project has explicitly accepted that 0.3.0 Server Inventory foundation is stable enough to support SSH workflows.
+1. SSH implementation must build on the accepted Server Inventory foundation.
+2. SSH implementation must not introduce credential storage without a separate security decision.
+3. SSH implementation must preserve existing inventory tests and behavior.
+4. SSH implementation must document any new architecture decision that changes dependency boundaries, persistence, or security posture.
 
 Credential handling requires a separate security decision before implementation.
 
