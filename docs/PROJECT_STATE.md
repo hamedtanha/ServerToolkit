@@ -21,7 +21,7 @@ This document must stay short, current, and factual.
 
 The project is in early Android feature implementation.
 
-The current focus is moving from in-memory Server Inventory validation toward Room-backed local persistence while preserving architectural consistency and documentation accuracy.
+The current focus is validating the Room-backed Server Inventory persistence skeleton before expanding the inventory workflow.
 
 ---
 
@@ -52,10 +52,18 @@ The following application-level items are implemented:
 - Add Server form fields.
 - Add Server validation state.
 - Add Server validation-only save action.
-- Add Server repository-backed in-memory save flow.
+- Add Server repository-backed save flow.
 - Add Server automatic return after successful save.
 - Server repository contract.
-- In-memory Server repository implementation.
+- In-memory Server repository implementation for development and testing support.
+- Room dependency setup with KSP.
+- Room schema export location configuration.
+- Server Toolkit Room database class.
+- Server entity.
+- Server DAO.
+- Server entity/domain mapper.
+- Room-backed Server repository implementation.
+- Hilt database and DAO providers.
 - Server Inventory repository dependency injection binding.
 - Server Inventory ViewModel repository observation.
 - Basic Server Inventory list rendering.
@@ -69,11 +77,11 @@ The following application-level items are implemented:
 
 The following items are intentionally not implemented yet:
 
-- Room database integration.
-- Server entity.
-- Server DAO.
-- Room-backed Add Server persistence workflow.
 - Edit server screen.
+- Delete server UI action.
+- Search and filtering behavior.
+- Room migration beyond database version 1.
+- DAO or repository automated tests.
 - SSH connection workflow.
 - Monitoring workflow.
 - Command execution workflow.
@@ -86,9 +94,9 @@ The following items are intentionally not implemented yet:
 
 The current implementation area is:
 
-- Server Inventory feature scaffolding.
-- Add Server repository-backed save documentation alignment.
-- Preparation for Room-backed server inventory persistence implementation.
+- Room-backed Server Inventory persistence validation.
+- Local database schema verification.
+- Add Server persistence behavior review after app restart.
 
 ---
 
@@ -96,10 +104,10 @@ The current implementation area is:
 
 The next safe development steps are:
 
-1. Keep documentation synchronized with the current implementation.
-2. Review Gradle, Kotlin, and KSP compatibility before adding Room dependencies.
-3. Introduce a small Room persistence skeleton behind the existing `ServerRepository` contract.
-4. Defer SSH and credential handling until Room-backed server inventory persistence is implemented and reviewed.
+1. Run a local Android build to generate and verify the Room schema export.
+2. Manually verify that added servers persist after application restart.
+3. Add DAO and repository tests after the Room skeleton is stable.
+4. Defer SSH and credential handling until Room-backed server inventory persistence is tested and reviewed.
 
 ---
 
@@ -113,4 +121,4 @@ feature/android-project
 
 ## Current Engineering Rule
 
-No SSH or credential handling should be introduced until Room-backed server inventory persistence is implemented and reviewed.
+No SSH or credential handling should be introduced until Room-backed server inventory persistence is tested and reviewed.

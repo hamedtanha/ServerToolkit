@@ -3,7 +3,7 @@
 **Project:** Server Toolkit  
 **Version:** 0.2.0-alpha  
 **Status:** Active  
-**Last Updated:** 2026-07-03
+**Last Updated:** 2026-07-04
 
 ---
 
@@ -13,7 +13,7 @@ This document defines the practical application architecture for the Server Tool
 
 It translates accepted Architecture Decision Records into implementation rules for project structure, layer responsibilities, dependency direction, data flow, navigation, dependency injection, and persistence.
 
-This document is not a product roadmap. It must describe the architecture that the project currently follows or has explicitly accepted for implementation.
+This document describes the current implementation and accepted implementation direction. It must not advertise planned functionality as completed functionality.
 
 ---
 
@@ -31,7 +31,7 @@ The application follows:
 - Unidirectional Data Flow.
 - Hilt for dependency injection.
 - Jetpack Navigation Compose for screen navigation.
-- Room as the accepted local persistence technology when persistence is implemented.
+- Room for local structured persistence.
 
 The architecture is intentionally simple at the current project stage.
 
@@ -55,22 +55,6 @@ Accepted ADRs are the source of truth for architectural decisions. This document
 
 ---
 
-## Design Goals
-
-The architecture prioritizes:
-
-- Maintainability.
-- Readability.
-- Testability.
-- Security.
-- Incremental scalability.
-- Low accidental complexity.
-- Clear ownership of responsibilities.
-
-When trade-offs are required, Server Toolkit prioritizes long-term maintainability over short-term implementation speed.
-
----
-
 ## Current Implementation Status
 
 The current implementation includes:
@@ -81,17 +65,27 @@ The current implementation includes:
 - Dashboard route and screen.
 - Dashboard ViewModel and UI state.
 - Dashboard navigation action to Server Inventory.
-- Server Inventory route and empty screen.
+- Server Inventory route, screen, ViewModel, UI state, and filter state.
+- Add Server route, screen, ViewModel, UI state, form fields, and validation.
 - Server Inventory domain model and environment model.
-- Server Inventory UI state, filter state, and ViewModel.
+- Server repository contract.
+- In-memory Server repository implementation retained for development and testing support.
+- Room dependency setup with KSP.
+- Room schema export location configuration.
+- Server Toolkit Room database class.
+- Server entity.
+- Server DAO.
+- Server entity/domain mapper.
+- Room-backed Server repository implementation.
+- Hilt database, DAO, and repository wiring.
+- Basic Server Inventory list rendering.
 
 The following items are intentionally not implemented yet:
 
-- Server repository contract and implementation.
-- Room database, entities, and DAOs.
-- Add server workflow.
 - Edit server workflow.
-- Server list rendering.
+- Delete server UI action.
+- Search and filtering behavior.
+- DAO and repository automated tests.
 - SSH connection workflow.
 - Monitoring workflow.
 - Command execution workflow.
@@ -115,7 +109,9 @@ Data Layer
 Local Persistence / External Services
 ```
 
-The dependency direction must remain downward. Lower-level implementation details must not leak into higher layers.
+The dependency direction must remain downward from UI and presentation toward stable domain contracts and concrete data implementations.
+
+Lower-level implementation details must not leak into higher layers.
 
 ---
 
@@ -141,23 +137,6 @@ The UI layer is responsible for rendering application screens and handling user 
 - Screen-level behavior belongs in ViewModels.
 - Navigation actions should be passed down as lambdas where practical.
 
-### Example Responsibilities
-
-A server inventory screen may:
-
-- Display a list of servers.
-- Display an empty state.
-- Show loading or error state.
-- Emit an event when the user selects a server.
-- Emit an event when the user taps an add button.
-
-It must not:
-
-- Query the database directly.
-- Construct database entities.
-- Perform shared validation policy directly.
-- Decide persistence behavior.
-
 ---
 
 ## Presentation Layer
@@ -174,31 +153,11 @@ The presentation layer coordinates UI state and user actions.
 ### Rules
 
 - ViewModels expose immutable observable UI state.
-- ViewModels call repository contracts instead of data-source implementations when repositories exist.
+- ViewModels call repository contracts instead of data-source implementations.
 - ViewModels must not depend on Room DAOs.
 - ViewModels must not contain Android UI rendering logic.
 - ViewModels may perform simple presentation-specific validation.
 - Shared validation should be extracted into reusable domain or utility components when needed.
-
-### State Management
-
-State should follow a predictable model:
-
-```text
-User Action
-   ↓
-ViewModel
-   ↓
-Repository
-   ↓
-Data Source
-   ↓
-State Update
-   ↓
-Compose UI
-```
-
-During the current scaffold stage, ViewModels may expose static or simple UI state until repositories and persistence are implemented.
 
 ---
 
@@ -210,7 +169,7 @@ A full domain layer with use cases is not mandatory yet.
 
 ### Contains
 
-- Core business models.
+- Feature-owned domain models.
 - Repository interfaces when persistence or external data access is introduced.
 - Shared validation rules when they become reusable.
 
@@ -225,7 +184,7 @@ A full domain layer with use cases is not mandatory yet.
 
 The Server Inventory feature uses clean domain models that represent application meaning, not database storage mechanics.
 
-Room entities may mirror the domain model initially, but the project must preserve the option to separate them when persistence concerns become more complex.
+Room entities are separate persistence models and are mapped explicitly to domain models.
 
 ---
 
@@ -239,7 +198,8 @@ The data layer provides application data through repositories.
 - Local data sources.
 - Room database definitions.
 - DAOs.
-- Entity mapping when needed.
+- Entities.
+- Entity/domain mapping.
 
 ### Rules
 
@@ -247,7 +207,8 @@ The data layer provides application data through repositories.
 - Room DAOs are internal persistence details.
 - ViewModels must depend on repositories, not DAOs.
 - Database entities must not leak into UI code.
-- Mapping should be introduced when database models and domain models diverge.
+- Domain models and Room entities must remain separate.
+- Mapping must remain explicit when data crosses the persistence/domain boundary.
 
 ### Repository Responsibility
 
@@ -276,14 +237,19 @@ Room is the accepted persistence technology for local structured data.
 
 The initial persistence scope is server inventory data.
 
-Room will be used for:
+The Room persistence skeleton currently includes:
 
-- Structured local data.
-- Queryable server records.
-- Persistence across app restarts.
-- Future migration support.
+- `ServerToolkitDatabase`.
+- `ServerEntity`.
+- `ServerDao`.
+- `RoomServerRepository`.
+- Entity/domain mapping.
+- Hilt providers for the database and DAO.
+- KSP schema export configuration.
 
-Room is accepted but not implemented yet in the current codebase.
+The database version is `1`.
+
+The initial Room table stores server metadata only. It must not store credentials, private keys, passphrases, access tokens, certificates, or other secrets.
 
 ### Persistence Rules
 
@@ -292,28 +258,21 @@ Room is accepted but not implemented yet in the current codebase.
 - Database schema changes require migrations unless destructive migration is explicitly justified for a pre-release stage.
 - Sensitive credentials must not be stored casually in plain Room tables.
 - Credential storage requires a separate security decision before implementation.
+- The Room schema export directory is configured under `app/schemas` and generated schema files should be committed after local build verification.
 
-### Initial Database Direction
+### Database Aggregation Boundary
 
-The initial database should contain a `servers` table for server inventory metadata when persistence is implemented.
+`ServerToolkitDatabase` belongs to shared database infrastructure.
 
-Credential handling is intentionally outside the first persistence implementation unless a dedicated security strategy is accepted.
+Because Room requires a database class to aggregate entities and DAOs, the database class may reference feature-owned Room entities and DAOs for schema registration only.
+
+This is a narrow persistence exception. It must not be used as permission for general `core` code to depend on feature UI, presentation, domain workflows, or feature services.
 
 ---
 
 ## Navigation
 
 Server Toolkit uses Single Activity architecture with Jetpack Navigation Compose.
-
-### Navigation Goals
-
-Navigation must be:
-
-- Centralized.
-- Readable.
-- Type-conscious where practical.
-- Testable where practical.
-- Safe from scattered route strings.
 
 ### Rules
 
@@ -329,15 +288,15 @@ The current navigation graph supports:
 
 - Dashboard.
 - Server Inventory.
+- Add Server.
 
 Future destinations may include:
 
-- Add Server.
 - Edit Server.
 - Server Details.
 - Settings.
 
-A destination may exist as a placeholder during early implementation only when it is necessary to support navigation flow. Placeholder screens must be clearly identified and must not be documented as completed functionality.
+Placeholder screens must be clearly identified and must not be documented as completed functionality.
 
 ---
 
@@ -355,39 +314,26 @@ de.hamedtanha.servertoolkit
 │   ├── database
 │   └── di
 │
-├── data
-│   ├── local
-│   ├── remote
-│   └── repository
-│
-├── domain
-│   ├── model
-│   └── repository
-│
 ├── feature
 │   ├── dashboard
 │   │   └── presentation
-│   │       ├── component
-│   │       ├── event
-│   │       ├── screen
-│   │       ├── state
-│   │       └── viewmodel
-│   │
 │   ├── serverinventory
+│   │   ├── data
+│   │   │   ├── local
+│   │   │   │   ├── dao
+│   │   │   │   └── entity
+│   │   │   ├── mapper
+│   │   │   └── repository
+│   │   ├── di
 │   │   ├── domain
-│   │   │   └── model
+│   │   │   ├── model
+│   │   │   └── repository
 │   │   └── presentation
 │   │       ├── screen
 │   │       ├── state
 │   │       └── viewmodel
-│   │
 │   └── settings
 │       └── presentation
-│           ├── component
-│           ├── event
-│           ├── screen
-│           ├── state
-│           └── viewmodel
 │
 ├── navigation
 │
@@ -395,33 +341,7 @@ de.hamedtanha.servertoolkit
     └── theme
 ```
 
-Package names may be adjusted during implementation if doing so improves consistency, but structural changes must remain aligned with the accepted ADRs and package structure documentation.
-
----
-
-## Feature Package Rules
-
-Feature packages own feature-specific UI and presentation logic.
-
-Example:
-
-```text
-feature/serverinventory
-├── domain
-│   └── model
-└── presentation
-    ├── screen
-    ├── state
-    └── viewmodel
-```
-
-Rules:
-
-- Feature UI belongs inside the relevant feature package.
-- Feature-specific presentation state belongs inside the feature package.
-- Shared UI components belong in a shared UI or core UI package only after reuse is real.
-- Do not create shared abstractions before at least two features need them.
-- Keep feature packages cohesive.
+Package names may be adjusted during implementation only when doing so improves consistency and remains aligned with accepted ADRs and package structure documentation.
 
 ---
 
@@ -448,6 +368,7 @@ Rules:
 - Domain models must not depend on Room.
 - Data implementations may depend on Room.
 - Repository interfaces should be stable once consumed by ViewModels.
+- `core/database` may reference feature-owned Room persistence classes only for Room schema aggregation.
 
 ---
 
@@ -461,12 +382,14 @@ The current implementation includes:
 
 - Hilt-enabled application setup.
 - Hilt-enabled ViewModel integration.
-- A centralized `core.di` package for dependency modules.
+- `DatabaseModule` for the Room database.
+- Server Inventory database module for the feature-owned DAO provider.
+- Server Inventory repository binding from `ServerRepository` to `RoomServerRepository`.
 
 ### Rules
 
-- Dependency wiring should remain centralized.
-- ViewModels should receive dependencies through constructor injection when dependencies are introduced.
+- Dependency wiring should remain centralized by responsibility.
+- ViewModels should receive dependencies through constructor injection.
 - Modules should be small and grouped by responsibility.
 - Do not introduce bindings before a real dependency exists.
 - Do not use Hilt to hide unnecessary abstraction.
@@ -492,17 +415,18 @@ For early implementation, simple UI state or result models are acceptable.
 
 Validation must be consistent and testable.
 
-For server inventory, initial validation should include:
+For server inventory, initial validation includes:
 
 - Server name is required.
 - Host is required.
+- Username is required in the current Add Server form.
 - Port must be within `1..65535`.
 
 Rules:
 
-- Validation used by multiple screens must not be duplicated.
-- UI may display validation messages but should not own shared validation policy.
-- Validation rules should be covered by unit tests.
+- Validation used by multiple screens must not be duplicated indefinitely.
+- UI may display validation messages but should not own shared validation policy long-term.
+- Validation rules should be covered by unit tests when stabilized.
 
 ---
 
@@ -514,13 +438,15 @@ The architecture must support testing from the beginning.
 
 - Server validation.
 - Repository behavior.
+- Entity/domain mapping.
+- Room DAO behavior.
 - ViewModel state transitions.
-- Room DAO behavior where useful.
 
 ### Rules
 
 - Business rules must be unit-testable without Android UI.
 - Repository implementations should be testable with fake or in-memory data sources.
+- DAO behavior should be tested with Room-backed tests after the persistence skeleton stabilizes.
 - UI tests are useful later, but they are not the first priority for the current scaffold stage.
 
 ---
@@ -536,7 +462,7 @@ Rules:
 - Credential storage requires a dedicated security design before implementation.
 - Host fingerprint verification requires its own architecture decision before SSH connectivity is implemented.
 
-The first server inventory implementation must store only non-secret metadata unless a separate security decision is accepted.
+The first server inventory persistence implementation stores only non-secret server metadata.
 
 ---
 
@@ -581,6 +507,7 @@ Do not update this document to advertise planned features as if they already exi
 - [Project State](PROJECT_STATE.md)
 - [Development](DEVELOPMENT.md)
 - [Security](SECURITY.md)
+- [Package Structure](../PACKAGE_STRUCTURE.md)
 - [ADR-001: Project Vision](adr/ADR-001-project-vision.md)
 - [ADR-002: Application Architecture](adr/ADR-002-application-architecture.md)
 - [ADR-003: Local Persistence with Room](adr/ADR-003-local-persistence-with-room.md)

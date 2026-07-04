@@ -3,7 +3,7 @@
 **Project:** Server Toolkit  
 **Version:** 0.2.0-alpha  
 **Status:** Active  
-**Last Updated:** 2026-07-03
+**Last Updated:** 2026-07-04
 
 ---
 
@@ -68,7 +68,7 @@ Completed:
 - Server Inventory route.
 - Add Server route.
 - Dashboard-to-Server-Inventory navigation action.
-- Add Server placeholder navigation.
+- Add Server navigation.
 - Package structure cleanup.
 - Removal of obsolete package placeholders.
 
@@ -114,13 +114,23 @@ Completed:
 - Server Inventory repository dependency injection binding.
 - Server Inventory ViewModel repository observation.
 - Basic Server Inventory list rendering.
-
-Planned:
-- Room-backed Add Server persistence workflow.
-- Edit server workflow.
-- Local persistence with Room.
+- Local persistence with Room architecture decision.
+- Room dependency and KSP compiler setup.
+- Room schema export configuration.
+- Server Toolkit Room database class.
 - Server entity.
 - Server DAO.
+- Server entity/domain mapper.
+- Room-backed Server repository implementation.
+- Hilt database and DAO providers.
+
+Planned:
+
+- Local build verification for Room schema export.
+- Manual persistence verification after application restart.
+- DAO and repository tests.
+- Edit server workflow.
+- Delete server UI action.
 - Search and filtering behavior.
 
 Deliverable:
@@ -259,15 +269,15 @@ Prepare for production release.
 
 Planned:
 
-- UI refinement.
-- Performance improvements.
-- Bug fixing.
+- End-to-end flow review.
+- Error-state handling review.
+- UI consistency review.
 - Documentation review.
-- Test coverage improvements.
+- Release readiness checklist.
 
 Deliverable:
 
-Release candidate.
+Stable pre-1.0 application baseline.
 
 Status:
 
@@ -275,19 +285,19 @@ Planned.
 
 ---
 
-## Version 1.0.0 — Initial Release
+## Version 1.0.0 — Initial Production Release
 
 Objective:
 
-Deliver the first stable public release.
+Deliver the first production-ready version of Server Toolkit.
 
-Planned:
+Expected scope:
 
-- Stable Server Inventory.
-- Stable SSH workflow.
-- Stable operational workflows.
-- Updated documentation.
-- Release-ready build.
+- Stable local server inventory.
+- Stable SSH connection workflow.
+- Basic operational workflows.
+- Synchronized documentation.
+- Reviewed security boundaries.
 
 Status:
 

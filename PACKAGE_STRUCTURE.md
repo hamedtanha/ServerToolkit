@@ -2,41 +2,41 @@
 
 **Project:** Server Toolkit  
 **Status:** Active  
-**Last Updated:** 2026-07-03
+**Last Updated:** 2026-07-04
 
 ---
 
-# Purpose
+## Purpose
 
 This document defines the canonical package and directory structure for the Server Toolkit Android application.
 
 Its purpose is to keep the codebase consistent, maintainable, testable, and scalable as features are added incrementally.
 
-This document describes the intended implementation structure. It must remain synchronized with `ARCHITECTURE.md`, the accepted ADRs, and the actual source code.
+This document describes the intended implementation structure. It must remain synchronized with `docs/ARCHITECTURE.md`, the accepted ADRs, and the actual source code.
 
 ---
 
-# Scope
+## Scope
 
 This document applies to Android application source code.
 
 It covers:
 
-- Source package organization
-- Feature package boundaries
-- Shared package responsibilities
-- Dependency direction
-- Naming rules
-- File placement rules
-- Testing structure
-- Prohibited package patterns
-- Evolution policy
+- Source package organization.
+- Feature package boundaries.
+- Shared package responsibilities.
+- Dependency direction.
+- Naming rules.
+- File placement rules.
+- Testing structure.
+- Prohibited package patterns.
+- Evolution policy.
 
 This document does not define UI design, database schema details, release policy, or feature roadmap.
 
 ---
 
-# Base Package
+## Base Package
 
 The application package root is:
 
@@ -48,7 +48,7 @@ All application source code must live under this package.
 
 ---
 
-# Canonical Package Layout
+## Canonical Package Layout
 
 ```text
 app/src/main/java/de/hamedtanha/servertoolkit/
@@ -59,16 +59,10 @@ app/src/main/java/de/hamedtanha/servertoolkit/
     core/
         common/
         database/
+            ServerToolkitDatabase.kt
         di/
-
-    data/
-        local/
-        remote/
-        repository/
-
-    domain/
-        model/
-        repository/
+            AppModule.kt
+            DatabaseModule.kt
 
     feature/
         dashboard/
@@ -80,9 +74,19 @@ app/src/main/java/de/hamedtanha/servertoolkit/
                 viewmodel/
 
         serverinventory/
+            data/
+                local/
+                    dao/
+                    entity/
+                mapper/
+                repository/
+            di/
             domain/
                 model/
+                repository/
             presentation/
+                component/
+                event/
                 screen/
                 state/
                 viewmodel/
@@ -95,6 +99,8 @@ app/src/main/java/de/hamedtanha/servertoolkit/
                 state/
                 viewmodel/
 
+    navigation/
+
     ui/
         theme/
 ```
@@ -103,9 +109,9 @@ Not every package must contain implementation files immediately. Empty packages 
 
 ---
 
-# Top-Level Responsibilities
+## Top-Level Responsibilities
 
-## Root Package
+### Root Package
 
 The root package contains only application entry points.
 
@@ -124,7 +130,7 @@ Rules:
 
 ---
 
-## core
+### core
 
 The `core` package contains reusable infrastructure shared across the application.
 
@@ -135,18 +141,9 @@ core/
     di/
 ```
 
-### core/common
+#### core/common
 
 Shared application-level utilities that are genuinely cross-cutting.
-
-Examples:
-
-```text
-core/common/
-    Result.kt
-    AppDispatchers.kt
-    TimeProvider.kt
-```
 
 Rules:
 
@@ -155,38 +152,34 @@ Rules:
 - Avoid dumping unrelated utility functions here.
 - Prefer precise packages over vague utility containers.
 
-### core/database
+#### core/database
 
-Shared database infrastructure.
+Shared Room database infrastructure.
 
-Examples:
+Current files:
 
 ```text
-core/database/
-    ServerToolkitDatabase.kt
-    DatabaseMigrations.kt
-    DatabaseConstants.kt
+core/database/ServerToolkitDatabase.kt
 ```
 
 Rules:
 
-- The Room database class belongs here.
-- Database migrations belong here.
+- The application Room database class belongs here.
+- Database migrations belong here when introduced.
 - Shared database constants and converters may belong here.
 - Feature-owned entities and DAOs should remain close to the owning feature unless intentionally shared.
 - Room-specific types must not leak into presentation code.
+- `ServerToolkitDatabase` may reference feature-owned Room entities and DAOs only for schema aggregation.
 
-### core/di
+#### core/di
 
 Application-wide dependency injection modules.
 
-Examples:
+Current files:
 
 ```text
-core/di/
-    AppModule.kt
-    DatabaseModule.kt
-    DispatcherModule.kt
+core/di/AppModule.kt
+core/di/DatabaseModule.kt
 ```
 
 Rules:
@@ -196,101 +189,9 @@ Rules:
 - Do not use dependency injection as a service locator.
 - Do not inject dependencies into domain models.
 
-## data
-
-The top-level `data` package is reserved for shared data infrastructure.
-
-```text
-data/
-    local/
-    remote/
-    repository/
-```
-
-Rules:
-
-- Do not place every repository implementation here by default.
-- Use this package only for data components shared across multiple features.
-- Feature-owned data logic should live inside the owning feature.
-- Data models must not leak into presentation.
-
-### data/local
-
-Shared local persistence components.
-
-Examples:
-
-```text
-data/local/
-    SharedDao.kt
-    SharedEntity.kt
-```
-
-### data/remote
-
-Shared remote communication components.
-
-Examples:
-
-```text
-data/remote/
-    api/
-    dto/
-    datasource/
-```
-
-This package may remain empty until remote features exist.
-
-### data/repository
-
-Shared repository implementations.
-
-Feature-specific repository implementations should live inside the owning feature unless the repository represents application-wide data.
-
 ---
 
-## domain
-
-The top-level `domain` package is reserved for shared business models and repository contracts.
-
-```text
-domain/
-    model/
-    repository/
-```
-
-Rules:
-
-- Keep this package small.
-- Feature-specific domain models should live inside the owning feature.
-- Shared domain models belong here only when multiple features truly use them.
-- Domain types must not depend on Android framework APIs, Compose, Room, Retrofit, or Hilt.
-
-### domain/model
-
-Shared domain models used by multiple features.
-
-Examples:
-
-```text
-domain/model/
-    AppEnvironment.kt
-```
-
-### domain/repository
-
-Shared repository contracts used by multiple features.
-
-Examples:
-
-```text
-domain/repository/
-    SettingsRepository.kt
-```
-
----
-
-## feature
+### feature
 
 The `feature` package contains user-facing application features.
 
@@ -305,16 +206,18 @@ Each feature should be as self-contained as practical.
 
 Feature packages may contain:
 
-- feature-level navigation definitions only when implemented
-- presentation state
-- presentation events
-- screens
-- UI components
-- ViewModels
-- feature-specific domain models
-- feature-specific repository contracts
-- feature-specific data models
-- feature-specific repository implementations
+- feature-level navigation definitions only when implemented.
+- presentation state.
+- presentation events.
+- screens.
+- UI components.
+- ViewModels.
+- feature-specific domain models.
+- feature-specific repository contracts.
+- feature-specific data models.
+- feature-specific repository implementations.
+- feature-specific Room entities and DAOs.
+- feature-specific dependency injection modules.
 
 Rules:
 
@@ -327,61 +230,9 @@ Rules:
 
 ---
 
-## ui
+## Current Features
 
-The `ui` package contains application-wide design system primitives.
-
-```text
-ui/
-    theme/
-```
-
-### ui/theme
-
-Application-wide theme definitions.
-
-Examples:
-
-```text
-ui/theme/
-    Color.kt
-    Theme.kt
-    Type.kt
-```
-
-Rules:
-
-- Application-wide colors, typography, and theme setup belong here.
-- Feature-specific UI components do not belong here.
-- Only genuinely reusable design system elements may be promoted to shared UI packages.
-
----
-
-# Feature Package Structure
-
-Each feature should follow this structure when applicable:
-
-```text
-feature/<feature-name>/
-    data/
-    domain/
-        model/
-        repository/
-    presentation/
-        component/
-        event/
-        screen/
-        state/
-        viewmodel/
-```
-
-Not every feature must use every subpackage from day one.
-
----
-
-# Current Features
-
-## dashboard
+### dashboard
 
 The dashboard feature owns the main overview screen.
 
@@ -403,7 +254,7 @@ Rules:
 
 ---
 
-## serverinventory
+### serverinventory
 
 The server inventory feature owns server inventory behavior.
 
@@ -411,8 +262,16 @@ Current implementation:
 
 ```text
 feature/serverinventory/
+    data/
+        local/
+            dao/
+            entity/
+        mapper/
+        repository/
+    di/
     domain/
         model/
+        repository/
     presentation/
         screen/
         state/
@@ -422,36 +281,50 @@ feature/serverinventory/
 Implemented files:
 
 ```text
+feature/serverinventory/data/local/dao/ServerDao.kt
+feature/serverinventory/data/local/entity/ServerEntity.kt
+feature/serverinventory/data/mapper/ServerEntityMapper.kt
+feature/serverinventory/data/repository/InMemoryServerRepository.kt
+feature/serverinventory/data/repository/RoomServerRepository.kt
+feature/serverinventory/di/ServerInventoryDatabaseModule.kt
+feature/serverinventory/di/ServerInventoryModule.kt
 feature/serverinventory/domain/model/Server.kt
 feature/serverinventory/domain/model/ServerEnvironment.kt
+feature/serverinventory/domain/repository/ServerRepository.kt
+feature/serverinventory/presentation/screen/AddServerScreen.kt
 feature/serverinventory/presentation/screen/ServerInventoryScreen.kt
+feature/serverinventory/presentation/state/AddServerUiState.kt
 feature/serverinventory/presentation/state/ServerInventoryFilter.kt
 feature/serverinventory/presentation/state/ServerInventoryUiState.kt
+feature/serverinventory/presentation/viewmodel/AddServerViewModel.kt
 feature/serverinventory/presentation/viewmodel/ServerInventoryViewModel.kt
 ```
 
 Rules:
 
 - Server inventory models belong to `feature/serverinventory/domain/model`.
+- Server inventory repository contracts belong to `feature/serverinventory/domain/repository`.
+- Server inventory repository implementations belong to `feature/serverinventory/data/repository`.
+- Server inventory Room entities belong to `feature/serverinventory/data/local/entity`.
+- Server inventory DAOs belong to `feature/serverinventory/data/local/dao`.
+- Server inventory entity/domain mappers belong to `feature/serverinventory/data/mapper`.
+- Server inventory Hilt modules belong to `feature/serverinventory/di` when they bind or provide feature-owned dependencies.
 - Server inventory presentation state belongs to `feature/serverinventory/presentation/state`.
 - Server inventory screens belong to `feature/serverinventory/presentation/screen`.
 - Server inventory ViewModels belong to `feature/serverinventory/presentation/viewmodel`.
-- Repository contracts, persistence classes, DAO classes, entity classes, edit events, feature-local navigation classes, and list item components must not be added until the related behavior is implemented.
 - Do not place server-specific classes in global `model`, `viewmodel`, or `ui/screens` packages.
 
 Future packages may be added only when required by implementation:
 
 ```text
-feature/serverinventory/data/
-feature/serverinventory/data/local/dao/
-feature/serverinventory/data/local/entity/
-feature/serverinventory/domain/repository/
 feature/serverinventory/navigation/
 feature/serverinventory/presentation/component/
 feature/serverinventory/presentation/event/
 ```
 
-## settings
+---
+
+### settings
 
 The settings feature owns application settings screens.
 
@@ -472,28 +345,35 @@ Rules:
 
 ---
 
-# Dependency Direction
+## Dependency Direction
 
 Dependencies must point toward stable abstractions and away from volatile implementation details.
 
 Expected direction:
 
 ```text
-presentation -> domain -> data -> core
+presentation -> domain -> data -> persistence infrastructure
 ```
 
 Allowed patterns:
 
 ```text
 feature presentation -> feature domain
-feature presentation -> core
 feature data -> feature domain
-feature data -> core
+feature data -> core database infrastructure
+feature di -> feature data
+feature di -> core database infrastructure
 app/root -> feature
 app/root -> core
-shared data -> shared domain
-shared data -> core
 ```
+
+Narrow exception:
+
+```text
+core/database -> feature data/local entity and DAO
+```
+
+This exception exists only because Room requires the application database class to aggregate entity and DAO declarations. It must not be used for business logic, presentation code, or cross-feature communication.
 
 Forbidden patterns:
 
@@ -502,22 +382,23 @@ domain -> data
 domain -> presentation
 domain -> Android framework APIs
 data -> presentation
-core -> feature
 feature A -> feature B
+presentation -> DAO
+presentation -> Room entity
 ```
 
 Rules:
 
 - Domain must remain stable and framework-independent.
 - Data must not know Compose UI details.
-- Core must not depend on feature packages.
 - Features must communicate through shared contracts only when there is a justified need.
+- Room schema aggregation must remain isolated to `core/database`.
 
 ---
 
-# Naming Rules
+## Naming Rules
 
-## Domain Models
+### Domain Models
 
 Use clear noun-based names.
 
@@ -529,7 +410,7 @@ ServerEnvironment
 ServerStatus
 ```
 
-## Room Entities
+### Room Entities
 
 Append `Entity`.
 
@@ -540,7 +421,7 @@ ServerEntity
 CommandEntity
 ```
 
-## DAOs
+### DAOs
 
 Append `Dao`.
 
@@ -551,7 +432,7 @@ ServerDao
 CommandDao
 ```
 
-## Repository Interfaces
+### Repository Interfaces
 
 Use business-facing names.
 
@@ -562,18 +443,19 @@ ServerRepository
 CommandRepository
 ```
 
-## Repository Implementations
+### Repository Implementations
 
-Prefix with `Default` unless a more precise implementation name is justified.
+Use a precise implementation name.
 
 Examples:
 
 ```text
-DefaultServerRepository
+RoomServerRepository
+InMemoryServerRepository
 DefaultCommandRepository
 ```
 
-## ViewModels
+### ViewModels
 
 Append `ViewModel`.
 
@@ -584,7 +466,7 @@ ServerInventoryViewModel
 ServerEditViewModel
 ```
 
-## UI State
+### UI State
 
 Append `UiState`.
 
@@ -595,7 +477,7 @@ ServerInventoryUiState
 ServerEditUiState
 ```
 
-## UI Events
+### UI Events
 
 Append `UiEvent` when explicit UI events are required.
 
@@ -605,7 +487,7 @@ Examples:
 ServerEditUiEvent
 ```
 
-## Screens
+### Screens
 
 Append `Screen`.
 
@@ -613,28 +495,14 @@ Examples:
 
 ```text
 ServerInventoryScreen
-ServerEditScreen
 DashboardScreen
-SettingsScreen
-```
-
-## Components
-
-Use descriptive component names.
-
-Examples:
-
-```text
-ServerCard
-ServerInventoryEmptyContent
-EnvironmentChip
 ```
 
 ---
 
-# File Placement Rules
+## File Placement Rules
 
-## Application Entry Points
+### Application Entry Points
 
 Place application entry points in the root package:
 
@@ -643,7 +511,7 @@ de/hamedtanha/servertoolkit/MainActivity.kt
 de/hamedtanha/servertoolkit/ServerToolkitApplication.kt
 ```
 
-## Screens
+### Screens
 
 Place screens under the owning feature:
 
@@ -651,15 +519,9 @@ Place screens under the owning feature:
 feature/<feature-name>/presentation/screen/
 ```
 
-Example:
-
-```text
-feature/serverinventory/presentation/screen/ServerInventoryScreen.kt
-```
-
 Do not use a global `ui/screens` package.
 
-## Components
+### Components
 
 Place feature-specific components under:
 
@@ -667,15 +529,9 @@ Place feature-specific components under:
 feature/<feature-name>/presentation/component/
 ```
 
-Example:
-
-```text
-feature/serverinventory/presentation/component/ServerCard.kt
-```
-
 Only move components to shared UI packages after reuse is proven.
 
-## UI State
+### UI State
 
 Place feature-specific UI state classes under:
 
@@ -683,13 +539,7 @@ Place feature-specific UI state classes under:
 feature/<feature-name>/presentation/state/
 ```
 
-Example:
-
-```text
-feature/serverinventory/presentation/state/ServerInventoryUiState.kt
-```
-
-## UI Events
+### UI Events
 
 Place explicit UI event classes under:
 
@@ -697,15 +547,9 @@ Place explicit UI event classes under:
 feature/<feature-name>/presentation/event/
 ```
 
-Example:
-
-```text
-feature/serverinventory/presentation/event/ServerEditUiEvent.kt
-```
-
 This package is optional and should be used only when explicit event modeling improves clarity.
 
-## ViewModels
+### ViewModels
 
 Place ViewModels under:
 
@@ -713,15 +557,9 @@ Place ViewModels under:
 feature/<feature-name>/presentation/viewmodel/
 ```
 
-Example:
-
-```text
-feature/serverinventory/presentation/viewmodel/ServerInventoryViewModel.kt
-```
-
 Do not use a global `viewmodel` package.
 
-## Feature Domain Models
+### Feature Domain Models
 
 Place feature-owned domain models under:
 
@@ -729,23 +567,7 @@ Place feature-owned domain models under:
 feature/<feature-name>/domain/model/
 ```
 
-Example:
-
-```text
-feature/serverinventory/domain/model/Server.kt
-```
-
-## Shared Domain Models
-
-Place shared domain models under:
-
-```text
-domain/model/
-```
-
-Only move a model here when more than one feature truly owns or consumes the concept.
-
-## Repository Contracts
+### Repository Contracts
 
 Place feature-specific repository contracts under:
 
@@ -753,43 +575,17 @@ Place feature-specific repository contracts under:
 feature/<feature-name>/domain/repository/
 ```
 
-Example:
-
-```text
-feature/serverinventory/domain/repository/ServerRepository.kt
-```
-
-Place shared repository contracts under:
-
-```text
-domain/repository/
-```
-
-## Repository Implementations
+### Repository Implementations
 
 Place feature-local repository implementations under:
 
 ```text
-feature/<feature-name>/data/
+feature/<feature-name>/data/repository/
 ```
 
-Example:
-
-```text
-feature/serverinventory/data/DefaultServerRepository.kt
-```
-
-Place shared repository implementations under:
-
-```text
-data/repository/
-```
-
-## Room Entities and DAOs
+### Room Entities and DAOs
 
 Place feature-owned Room entities and DAOs close to the owning feature unless they are explicitly shared.
-
-Example:
 
 ```text
 feature/serverinventory/data/local/entity/ServerEntity.kt
@@ -802,29 +598,7 @@ Shared Room infrastructure belongs in:
 core/database/
 ```
 
-## Navigation
-
-Place app-level navigation infrastructure under:
-
-```text
-navigation/
-```
-
-Current examples:
-
-```text
-navigation/AppNavHost.kt
-navigation/AppDestinations.kt
-navigation/NavigationDestination.kt
-```
-
-Feature-level navigation packages are optional.
-
-Use feature-level navigation only when a feature owns a sufficiently complex navigation flow that justifies separate route definitions.
-
-Do not create placeholder navigation packages without implemented navigation behavior.
-
-## Dependency Injection
+### Dependency Injection
 
 Place app-wide Hilt modules under:
 
@@ -832,15 +606,15 @@ Place app-wide Hilt modules under:
 core/di/
 ```
 
-Place feature-specific Hilt modules close to the owning feature when practical:
+Place feature-specific Hilt modules close to the owning feature:
 
 ```text
-feature/<feature-name>/data/di/
+feature/<feature-name>/di/
 ```
 
 ---
 
-# Testing Structure
+## Testing Structure
 
 Unit tests should mirror the production package structure when practical.
 
@@ -854,8 +628,7 @@ app/src/androidTest/java/de/hamedtanha/servertoolkit
 Examples:
 
 ```text
-app/src/test/java/de/hamedtanha/servertoolkit/feature/serverinventory/domain/ServerValidatorTest.kt
-app/src/test/java/de/hamedtanha/servertoolkit/feature/serverinventory/data/ServerMapperTest.kt
+app/src/test/java/de/hamedtanha/servertoolkit/feature/serverinventory/data/ServerEntityMapperTest.kt
 app/src/androidTest/java/de/hamedtanha/servertoolkit/feature/serverinventory/data/local/ServerDaoTest.kt
 ```
 
@@ -869,7 +642,7 @@ Rules:
 
 ---
 
-# Prohibited Package Patterns
+## Prohibited Package Patterns
 
 The following package patterns are not allowed unless explicitly justified:
 
@@ -889,7 +662,7 @@ Use precise package names that describe responsibility.
 
 ---
 
-# Anti-Patterns
+## Anti-Patterns
 
 The following patterns are not allowed:
 
@@ -898,8 +671,6 @@ The following patterns are not allowed:
 - Placing all domain models in a vague global `model` package.
 - Placing Room entities in domain packages.
 - Placing repository implementations in presentation packages.
-- Exposing DAOs directly to ViewModels.
-- Creating generic `utils` packages filled with unrelated functions.
 - Moving feature-specific UI components into shared UI packages prematurely.
 - Creating remote/network packages before remote features exist.
 - Mixing navigation route definitions across unrelated features.
@@ -907,7 +678,7 @@ The following patterns are not allowed:
 
 ---
 
-# Refactoring Rule
+## Refactoring Rule
 
 When an existing file does not match this structure, it must be moved to the correct package before being expanded.
 
@@ -917,19 +688,19 @@ Existing nonconforming packages must be treated as cleanup targets, not as valid
 
 ---
 
-# Evolution Policy
+## Evolution Policy
 
 This structure may evolve as the project grows, but changes must be intentional.
 
 A package structure change requires documentation updates when it affects:
 
-- Layer boundaries
-- Dependency direction
-- Feature organization
-- Persistence organization
-- Navigation organization
-- Security-sensitive code placement
-- Testing structure
+- Layer boundaries.
+- Dependency direction.
+- Feature organization.
+- Persistence organization.
+- Navigation organization.
+- Security-sensitive code placement.
+- Testing structure.
 
 Significant structural changes may require a new ADR.
 
@@ -937,9 +708,9 @@ Accepted ADRs must remain historically traceable. If a structural decision super
 
 ---
 
-# Related Documents
+## Related Documents
 
-- `ARCHITECTURE.md`
+- `docs/ARCHITECTURE.md`
 - `docs/adr/ADR-002-application-architecture.md`
 - `docs/adr/ADR-003-local-persistence-with-room.md`
 - `docs/adr/ADR-004-navigation-strategy.md`
@@ -949,7 +720,7 @@ Accepted ADRs must remain historically traceable. If a structural decision super
 
 ---
 
-# Notes
+## Notes
 
 This document is intentionally strict.
 
