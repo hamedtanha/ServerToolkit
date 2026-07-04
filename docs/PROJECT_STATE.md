@@ -21,7 +21,7 @@ This document must stay short, current, and factual.
 
 The project is in early Android feature implementation.
 
-The current focus is validating Server Inventory search and filtering before starting the edit workflow.
+The current focus is preparing the edit server workflow after validating Server Inventory search and filtering manually.
 
 ---
 
@@ -75,6 +75,7 @@ The following application-level items are implemented:
 - Server Inventory environment filtering.
 - Server Inventory favorites-only filtering.
 - Server Inventory filter clearing.
+- Manual search and filtering verification.
 - Server Inventory filter matcher unit tests.
 - DAO instrumentation tests for insert, replace, and delete behavior.
 - Room-backed repository instrumentation tests for save, replace, and delete behavior.
@@ -104,9 +105,9 @@ The following items are intentionally not implemented yet:
 
 The current implementation area is:
 
-- Search and filtering behavior verification.
-- Search and filtering UI review.
-- Preservation of inventory modification coverage before adding edit operations.
+- Search and filtering automated verification after implementation.
+- Edit server workflow planning.
+- Preservation of inventory management coverage before adding edit operations.
 
 ---
 
@@ -114,10 +115,9 @@ The current implementation area is:
 
 The next safe development steps are:
 
-1. Run unit tests, instrumented tests, and manual search/filter verification on an emulator.
-2. Review whether search/filter UX needs refinement after manual testing.
-3. Start the edit server workflow only after search/filter behavior is reviewed.
-4. Keep SSH and credential handling out of scope until inventory management is stable.
+1. Run unit tests, instrumented tests, and debug build after pulling the latest documentation update.
+2. Start the edit server workflow after automated verification passes.
+3. Keep SSH and credential handling out of scope until inventory management is stable.
 
 ---
 
