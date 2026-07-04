@@ -2,11 +2,11 @@
 
 **Project:** Server Toolkit
 
-**Version:** 0.1.0
+**Version:** 0.2.0-alpha
 
 **Status:** Active
 
-**Last Updated:** 2026-07-01
+**Last Updated:** 2026-07-04
 
 ---
 
@@ -56,7 +56,7 @@ Do not create ADRs for minor implementation details.
 
 Every ADR follows this lifecycle.
 
-```
+```text
 Draft
 
 ↓
@@ -110,14 +110,12 @@ The decision is no longer recommended.
 
 Each ADR uses a sequential identifier.
 
-Examples
+Examples:
 
-```
+```text
 ADR-001-project-vision.md
-
-ADR-002-navigation.md
-
-ADR-003-room-database.md
+ADR-002-application-architecture.md
+ADR-003-local-persistence-with-room.md
 ```
 
 Numbers are never reused.
@@ -152,6 +150,10 @@ The history of architectural decisions should always remain traceable.
 | ADR | Title | Status |
 |------|-------|--------|
 | ADR-001 | Project Vision | Accepted |
+| ADR-002 | Application Architecture | Accepted |
+| ADR-003 | Local Persistence with Room | Accepted |
+| ADR-004 | Navigation Strategy | Accepted |
+| ADR-005 | Dependency Injection Strategy | Accepted |
 
 ---
 
@@ -160,3 +162,5 @@ The history of architectural decisions should always remain traceable.
 - PRODUCT_VISION.md
 - ARCHITECTURE.md
 - DEVELOPMENT.md
+- PROJECT_STATE.md
+- ROADMAP.md

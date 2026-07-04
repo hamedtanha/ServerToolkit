@@ -1,349 +1,278 @@
 # Architecture
 
 **Project:** Server Toolkit  
-**Version:** 0.1.0  
-**Status:** Architecture Baseline  
-**Last Updated:** 2026-07-02
+**Version:** 0.2.0-alpha  
+**Status:** Active  
+**Last Updated:** 2026-07-04
 
 ---
 
-# Purpose
+## Purpose
 
-This document defines the high-level software architecture of the Server Toolkit Android application.
+This document defines the practical application architecture for the Server Toolkit Android application.
 
-Its purpose is to establish a stable architectural foundation that supports long-term maintainability, scalability, security, and testability while remaining aligned with modern Android development practices.
+It translates accepted Architecture Decision Records into implementation rules for project structure, layer responsibilities, dependency direction, data flow, navigation, dependency injection, and persistence.
 
-This document describes the overall architecture. Individual technology selections are documented separately through Architecture Decision Records (ADRs).
+This document describes the current implementation and accepted implementation direction. It must not advertise planned functionality as completed functionality.
 
 ---
 
-# Architecture Status
+## Architecture Baseline
 
-The architecture baseline has been established for the current stage of the project.
+Server Toolkit is a modern Android application for Linux server administration and infrastructure management.
 
-Status:
+The application follows:
+
+- Kotlin.
+- Jetpack Compose.
+- Single Activity architecture.
+- MVVM.
+- Repository Pattern.
+- Unidirectional Data Flow.
+- Hilt for dependency injection.
+- Jetpack Navigation Compose for screen navigation.
+- Room for local structured persistence.
+
+The architecture is intentionally simple at the current project stage.
+
+The project must not introduce additional layers, frameworks, or abstractions unless they solve a real implementation problem.
+
+---
+
+## Accepted Architecture Decisions
+
+The current architecture is governed by the following ADRs:
+
+| ADR | Decision | Status |
+|---|---|---|
+| ADR-001 | Project Vision | Accepted |
+| ADR-002 | Application Architecture | Accepted |
+| ADR-003 | Local Persistence with Room | Accepted |
+| ADR-004 | Navigation Strategy | Accepted |
+| ADR-005 | Dependency Injection Strategy | Accepted |
+
+Accepted ADRs are the source of truth for architectural decisions. This document explains how those decisions are applied in the codebase.
+
+---
+
+## Current Implementation Status
+
+The current implementation includes:
+
+- Single Activity application entry point.
+- Hilt-enabled application setup.
+- App-level Navigation Compose infrastructure.
+- Dashboard route and screen.
+- Dashboard ViewModel and UI state.
+- Dashboard navigation action to Server Inventory.
+- Server Inventory route, screen, ViewModel, UI state, and filter state.
+- Add Server route, ViewModel, shared Server Form screen, form state, form fields, and validation.
+- Edit Server route and ViewModel using the shared Server Form screen.
+- Delete server UI action with confirmation dialog.
+- Search and filtering behavior.
+- Server Inventory domain model and environment model.
+- Server repository contract.
+- In-memory Server repository implementation retained for development and testing support.
+- Room dependency setup with KSP.
+- Room schema export location configuration.
+- Server Toolkit Room database class.
+- Server entity.
+- Server DAO.
+- Server entity/domain mapper.
+- Room-backed Server repository implementation.
+- Hilt database, DAO, and repository wiring.
+- DAO, repository, mapper, and filter matcher tests.
+- Manual and automated verification for add, edit, delete, search, filtering, and shared server form naming cleanup.
+
+The following items are intentionally not implemented yet:
+
+- SSH connection workflow.
+- Monitoring workflow.
+- Command execution workflow.
+- Secure credential storage.
+- Room migration beyond database version 1.
+
+---
+
+## Naming Scope
+
+The current inventory-related implementation is intentionally named `serverinventory` because it manages one concrete asset type: `Server`.
+
+A broader `inventory` package or model should be introduced only after the application implements additional non-server asset types or shared inventory behavior that is no longer server-specific.
+
+The current naming rules are:
+
+- Use `Server` for the implemented domain model.
+- Use `ServerInventory` for the implemented feature scope.
+- Use `ServerForm` for UI and state shared by Add Server and Edit Server.
+- Do not introduce `Device`, `ServerDevice`, `InventoryItem`, or `feature/inventory` naming until the broader concept is implemented.
+
+This prevents premature abstraction while keeping the future inventory direction open.
+
+---
+
+## Application Layers
+
+Server Toolkit uses a pragmatic layered architecture.
 
 ```text
-Architecture Baseline
+UI Layer
+   ↓
+Presentation Layer
+   ↓
+Domain Contracts / Models
+   ↓
+Data Layer
+   ↓
+Local Persistence / External Services
 ```
 
-This document defines the architectural direction of the project.
+The dependency direction must remain downward from UI and presentation toward stable domain contracts and concrete data implementations.
 
-Major architectural changes require an accepted ADR.
-
-Minor clarifications may be made during implementation as long as they remain consistent with accepted architectural decisions.
+Lower-level implementation details must not leak into higher layers.
 
 ---
-
-# Architecture Goals
-
-The architecture is designed to prioritize:
-
-- Maintainability
-- Readability
-- Scalability
-- Testability
-- Security
-- Simplicity
-- Clear separation of concerns
-- Incremental evolution
-
-Architectural decisions should favor long-term maintainability over short-term convenience.
-
----
-
-# Architectural Style
-
-Server Toolkit follows Google's recommended Android application architecture.
-
-The application is based on:
-
-- Kotlin
-- Jetpack Compose
-- Single Activity architecture
-- MVVM
-- Repository Pattern
-- Unidirectional Data Flow (UDF)
-
-The Domain layer is optional and will only be introduced when justified by implementation complexity.
-
----
-
-# High-Level Architecture
-
-```text
-                 UI
-                  │
-                  ▼
-             ViewModel
-                  │
-                  ▼
-             Repository
-          ┌──────────────┐
-          │              │
-          ▼              ▼
-   Local Data      Remote Services
-```
-
-The Repository layer separates presentation logic from implementation details.
-
----
-
-# Application Layers
 
 ## UI Layer
 
-Responsibilities:
+The UI layer is responsible for rendering application screens and handling user interaction events.
 
-- Render Compose UI
-- Collect UI state
-- Send user actions
-- Handle navigation
+### Contains
 
-Rules:
+- Compose screens.
+- Reusable Compose components when reuse is real.
+- Theme definitions.
+- Navigation host integration.
+- UI-specific state rendering.
 
-- Declarative only
-- No business logic
-- No direct database access
-- No direct SSH access
-- No networking
+### Rules
+
+- Composables must remain declarative.
+- Composables must not contain business logic.
+- Composables must not access Room DAOs directly.
+- Composables must not access repositories directly.
+- Composables receive state and emit events.
+- Screen-level behavior belongs in ViewModels.
+- Navigation actions should be passed down as lambdas where practical.
 
 ---
 
 ## Presentation Layer
 
-Responsibilities:
+The presentation layer coordinates UI state and user actions.
 
-- ViewModels
-- Screen state
-- User interaction handling
-- Coordination between UI and repositories
+### Contains
 
-Rules:
+- ViewModels.
+- UI state classes.
+- UI event handlers when needed.
+- Screen-specific state mapping.
 
-- Expose immutable UI state
-- Keep presentation logic independent from implementation details
+### Rules
+
+- ViewModels expose immutable observable UI state.
+- ViewModels call repository contracts instead of data-source implementations.
+- ViewModels must not depend on Room DAOs.
+- ViewModels must not contain Android UI rendering logic.
+- ViewModels may perform simple presentation-specific validation.
+- Shared validation should be extracted into reusable domain or utility components when needed.
 
 ---
 
-## Domain Layer (Optional)
+## Domain Model and Contracts
 
-The Domain layer is not part of the initial implementation.
+At the current stage, Server Toolkit uses a lightweight domain model approach.
 
-It may be introduced later if business logic becomes sufficiently complex.
+A full domain layer with use cases is not mandatory yet.
 
-Possible responsibilities include:
+### Contains
 
-- Use cases
-- Business rules
-- Validation
-- Cross-feature coordination
+- Feature-owned domain models.
+- Repository interfaces when persistence or external data access is introduced.
+- Shared validation rules when they become reusable.
 
-The Domain layer must solve a real engineering problem rather than satisfy architectural purity.
+### Rules
+
+- Do not create use cases only for theoretical purity.
+- Introduce use cases only when business logic becomes complex or reused.
+- Domain models must not depend on Room annotations.
+- Domain models must not depend on Compose, Android framework classes, or database implementation details.
+
+### Current Direction
+
+The Server Inventory feature uses clean domain models that represent application meaning, not database storage mechanics.
+
+Room entities are separate persistence models and are mapped explicitly to domain models.
 
 ---
 
 ## Data Layer
 
-Responsibilities:
+The data layer provides application data through repositories.
 
-- Repository implementations
-- Local data sources
-- Remote data sources
-- External service adapters
-- Persistence abstraction
+### Contains
 
-Rules:
+- Repository implementations.
+- Local data sources.
+- Room database definitions.
+- DAOs.
+- Entities.
+- Entity/domain mapping.
 
-- Hide implementation details
-- Expose stable interfaces
-- Centralize data access
-- Protect sensitive information
+### Rules
 
----
+- Repository implementations hide data-source details from ViewModels.
+- Room DAOs are internal persistence details.
+- ViewModels must depend on repositories, not DAOs.
+- Database entities must not leak into UI code.
+- Domain models and Room entities must remain separate.
+- Mapping must remain explicit when data crosses the persistence/domain boundary.
 
-# Package Structure
+### Repository Responsibility
 
-The initial project uses a single Android application module.
+Repositories are responsible for:
 
-Package organization:
+- Reading data from persistence.
+- Writing data to persistence.
+- Coordinating local data sources.
+- Returning domain-oriented data.
+- Hiding persistence implementation details.
 
-```text
-de.hamedtanha.servertoolkit
+Repositories are not responsible for:
 
-├── data
-│   ├── local
-│   ├── remote
-│   └── repository
-│
-├── model
-│
-├── navigation
-│
-├── ui
-│   ├── components
-│   ├── screens
-│   └── theme
-│
-├── utils
-│
-└── viewmodel
-```
-
-Packages should evolve gradually based on implementation needs.
+- Rendering UI.
+- Owning screen state.
+- Holding Android navigation logic.
+- Performing unrelated feature orchestration.
 
 ---
 
-# Module Strategy
+## Local Persistence
 
-Version 1.x uses a single application module.
+Room is the accepted persistence technology for local structured data.
 
-The package structure is intentionally designed to support future modularization without major refactoring.
+### Current Scope
 
-Multi-module architecture is deferred until justified by project size or build complexity.
+The initial persistence scope is server inventory data.
 
----
+The Room persistence skeleton currently includes:
 
-# Data Flow
+- `ServerToolkitDatabase`.
+- `ServerEntity`.
+- `ServerDao`.
+- `RoomServerRepository`.
+- Entity/domain mapping.
+- Hilt providers for the database and DAO.
+- KSP schema export configuration.
 
-Application data follows unidirectional flow.
+The database version is `1`.
 
-```text
-User
- │
- ▼
-Compose UI
- │
- ▼
-ViewModel
- │
- ▼
-Repository
- │
- ├── Local Data
- └── Remote Services
-```
+The initial Room table stores server metadata only. It must not store credentials, private keys, passphrases, access tokens, certificates, or other secrets.
 
-State changes should always move in one direction.
+### Persistence Rules
 
----
-
-# Dependency Rules
-
-Allowed dependency direction:
-
-```text
-UI
-    ↓
-ViewModel
-    ↓
-Repository
-    ↓
-Data Sources
-```
-
-Rules:
-
-- UI never accesses repositories directly.
-- UI never communicates with databases.
-- UI never communicates with SSH libraries.
-- ViewModels communicate only with repositories.
-- Repository implementations own data access.
-- Lower layers must not depend on higher layers.
-
----
-
-# Security Principles
-
-Architecture must support secure handling of:
-
-- Credentials
-- Private keys
-- SSH sessions
-- Server metadata
-- Sensitive configuration
-
-Security implementation details are defined separately in SECURITY.md and related ADRs.
-
----
-
-# Future Architecture Decisions
-
-The following technologies have not yet been selected:
-
-- Dependency Injection framework
-- Local persistence technology
-- Secure storage implementation
-- SSH library
-- Background work strategy
-- HTTP networking framework
-
-Each of these requires an individual ADR before adoption.
-
----
-
-# Design Principles
-
-Server Toolkit follows:
-
-- SOLID
-- Separation of Concerns
-- Single Responsibility Principle
-- Dependency Inversion Principle
-- Single Source of Truth
-- Unidirectional Data Flow
-- Explicit Architecture Decisions
-- Incremental Development
-
----
-
-# Architecture Evolution
-
-Architecture should evolve conservatively.
-
-Changes are justified only when:
-
-- An accepted ADR supersedes an earlier decision.
-- Implementation exposes architectural limitations.
-- Platform recommendations materially change.
-- Security requirements demand architectural changes.
-
-Frequent redesign should be avoided.
-
----
-
-# Related ADRs
-
-Current:
-
-- ADR-001 — Project Vision
-
-Planned:
-
-- ADR-002 — Navigation Strategy
-- ADR-003 — Dependency Injection
-- ADR-004 — Persistence Strategy
-- ADR-005 — SSH Integration
-- ADR-006 — Project Structure
-
----
-
-# Related Documents
-
-- README.md
-- PRODUCT_VISION.md
-- PROJECT_STATE.md
-- ROADMAP.md
-- DEVELOPMENT.md
-- SECURITY.md
-- docs/adr/README.md
-
----
-
-# Notes
-
-This document describes the architectural baseline of the project.
-
-It should remain stable throughout implementation.
-
-Detailed technology selections belong in ADRs rather than this document.
+- Room database access must go through DAOs.
+- DAOs must be accessed through repository implementations.
+- Database schema changes require migrations unless destructive migration is explicitly justified for a pre-release stage.
+- Sensitive credentials must not be stored casually in plain Room tables.
+- Credential storage requires a separate security decision before implementation.

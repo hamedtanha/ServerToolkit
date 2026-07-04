@@ -1,17 +1,17 @@
 # Project State
 
 **Project:** Server Toolkit  
-**Version:** 0.1.0  
-**Status:**  Implementation
-**Last Updated:** 2026-07-01
+**Version:** 0.3.0-baseline  
+**Status:** Active Implementation  
+**Last Updated:** 2026-07-04
 
 ---
 
 ## Purpose
 
-This document is the single source of truth for the current state of the Server Toolkit project.
+This document is the single source of truth for the current implementation state of the Server Toolkit project.
 
-It summarizes where the project is now, what has been completed, what is in progress, and what should happen next.
+It summarizes what is implemented, what is intentionally not implemented yet, and what should happen next.
 
 This document must stay short, current, and factual.
 
@@ -19,55 +19,128 @@ This document must stay short, current, and factual.
 
 ## Current Phase
 
-The project is currently in the foundation phase.
+The Server Inventory 0.3.0 baseline is accepted.
 
-The main focus is establishing the engineering baseline before feature implementation.
-
-No production application feature has been implemented yet.
+The current focus is preparing SSH workflow design and implementation while keeping credential storage out of scope until a separate security decision is accepted.
 
 ---
 
-## Completed
+## Implemented
 
-The following foundation items have been completed:
+The following application-level items are implemented:
 
-- Project repository created
-- Initial Android project structure created
-- Documentation structure created
-- Project vision defined
-- ADR process introduced
-- AI collaboration rules defined
-- Engineering memory document created
-- Development workflow documented
-- Initial roadmap created
-- Initial architecture document created
-- Android application skeleton
-- Initial MainActivity
-- Initial HomeScreen
-- Initial package structure
+- Single Activity application entry point.
+- Hilt-enabled application setup.
+- App-level Navigation Compose infrastructure.
+- Dashboard navigation destination.
+- Dashboard ViewModel.
+- Dashboard UI state.
+- Dashboard empty-state screen.
+- Dashboard navigation action to Server Inventory.
+- Server Inventory navigation destination.
+- Server Inventory domain model.
+- Server Inventory environment model.
+- Server Inventory filter state.
+- Server Inventory UI state.
+- Server Inventory ViewModel.
+- Server Inventory empty screen.
+- Server Inventory empty-state action.
+- Add Server navigation destination.
+- Add Server placeholder screen.
+- Server Form UI state shared by Add Server and Edit Server.
+- Add Server ViewModel.
+- Shared Server Form screen.
+- Add Server form fields.
+- Add Server validation state.
+- Add Server validation-only save action.
+- Add Server repository-backed save flow.
+- Add Server automatic return after successful save.
+- Edit Server navigation destination.
+- Edit Server route.
+- Edit Server ViewModel.
+- Edit Server form reuse through the shared Server Form screen.
+- Edit Server repository-backed save flow preserving the existing server id.
+- Manual Edit Server verification after app restart.
+- Server repository contract.
+- In-memory Server repository implementation for development and testing support.
+- Room dependency setup with KSP.
+- Room schema export location configuration.
+- Initial Room schema export.
+- Server Toolkit Room database class.
+- Server entity.
+- Server DAO.
+- Server entity/domain mapper.
+- Room-backed Server repository implementation.
+- Hilt database and DAO providers.
+- Server Inventory repository dependency injection binding.
+- Server Inventory ViewModel repository observation.
+- Basic Server Inventory list rendering.
+- Delete server UI action with confirmation dialog.
+- Server Inventory ViewModel delete action.
+- Manual delete flow verification after app restart.
+- Server Inventory search by name, host, username, category, and tags.
+- Server Inventory environment filtering.
+- Server Inventory favorites-only filtering.
+- Server Inventory filter clearing.
+- Manual search and filtering verification.
+- Automated search and filtering verification through unit tests, instrumented tests, and debug build.
+- Automated Edit Server verification through unit tests, instrumented tests, and debug build.
+- Automated shared Server Form naming verification through unit tests, instrumented tests, and debug build.
+- Server Inventory stabilization checklist.
+- Accepted Server Inventory 0.3.0 baseline.
+- Server Inventory filter matcher unit tests.
+- DAO instrumentation tests for insert, replace, and delete behavior.
+- Room-backed repository instrumentation tests for save, replace, and delete behavior.
+- Server entity/domain mapper unit tests.
+- Local persistence with Room architecture decision.
+- Package structure cleanup from `feature/servers` to `feature/serverinventory`.
+- Shared Add/Edit server form naming cleanup.
+- App-level package structure alignment with the current source tree.
+
+---
+
+## Not Implemented Yet
+
+The following items are intentionally not implemented yet:
+
+- SSH connection workflow.
+- Secure credential storage.
+- Monitoring workflow.
+- Command execution workflow.
+- Xray or x-ui management workflow.
+- Room migration beyond database version 1.
+- Migration tests.
 
 ---
 
 ## In Progress
 
-The following items are currently in progress:
+The current implementation area is:
 
-- Documentation consistency review
-- Server domain model
-- Initial feature implementation
-- Feature scope clarification
-- Preparation for Android project skeleton stabilization
- 
+- SSH workflow design.
+- SSH architecture boundary review.
+- Security decision preparation for credential handling.
+
 ---
 
 ## Next Planned Work
 
-The next milestone is:
-1. Define the Server domain model.
-2. Evaluate persistence requirements.
-3. Implement local storage.
-4. Begin Server Inventory feature.
-Server Domain Model
+The next safe development steps are:
+
+1. Create an ADR for the SSH workflow and security boundaries.
+2. Define the initial SSH scope without credential persistence.
+3. Keep credential storage out of scope until a separate security decision is accepted.
+
+---
+
+## Current Git Branch
 
 ```text
-v0.2.0 -Server Domain Model
+feature/android-project
+```
+
+---
+
+## Current Engineering Rule
+
+No credential handling should be introduced until a dedicated security decision defines storage, encryption, lifecycle, and user consent requirements.

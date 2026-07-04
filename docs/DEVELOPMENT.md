@@ -1,26 +1,23 @@
 # Development Process
 
-**Project:** Server Toolkit
-
-**Version:** 0.1.0
-
-**Status:** Frozen
-
-**Last Updated:** 2026-07-02
+**Project:** Server Toolkit  
+**Version:** 0.2.0-alpha  
+**Status:** Frozen  
+**Last Updated:** 2026-07-03
 
 ---
 
-# Purpose
+## Purpose
 
 This document defines the engineering process used throughout the development of the Server Toolkit project.
 
 The objective is to ensure that development remains consistent, maintainable, scalable, and production-ready throughout the entire lifecycle of the project.
 
-This document is considered the engineering playbook for the project.
+This document is the engineering playbook for the project.
 
 ---
 
-# Development Philosophy
+## Development Philosophy
 
 Server Toolkit is developed as a production-quality software project.
 
@@ -28,32 +25,31 @@ The goal is not only to build a functional Android application, but also to demo
 
 The project prioritizes:
 
-- Clean Architecture
-- Maintainability
-- Readability
-- Scalability
-- Security
-- Documentation
-- Long-term sustainability
+- Maintainability.
+- Readability.
+- Scalability.
+- Security.
+- Documentation.
+- Long-term sustainability.
 
 Fast implementation is never preferred over good engineering.
 
 ---
 
-# Development Methodology
+## Development Methodology
 
-Server Toolkit follows a Documentation-Driven Agile Development (DDAD) methodology.
+Server Toolkit follows a Documentation-Driven Agile Development methodology.
 
 The development process combines proven software engineering practices while remaining lightweight for a single-maintainer project.
 
 The project is based on:
 
-- Agile Principles
-- Lightweight Scrum
-- GitHub Flow
-- Architecture Decision Records (ADR)
-- Living Documentation
-- Semantic Versioning
+- Agile principles.
+- Lightweight Scrum.
+- GitHub Flow.
+- Architecture Decision Records.
+- Living Documentation.
+- Semantic Versioning.
 
 Core principles:
 
@@ -65,59 +61,35 @@ Core principles:
 
 ---
 
-# Development Workflow
+## Development Workflow
 
 Every feature follows the same engineering workflow.
 
-```
+```text
 Roadmap
-
 ↓
-
 Milestone
-
 ↓
-
 Sprint
-
 ↓
-
 GitHub Issue
-
 ↓
-
-Architecture Decision (if required)
-
+Architecture Decision, if required
 ↓
-
 Documentation
-
 ↓
-
 Feature Branch
-
 ↓
-
 Implementation
-
 ↓
-
 Testing
-
 ↓
-
 Code Review
-
 ↓
-
 Merge
-
 ↓
-
 Release
-
 ↓
-
 Git Tag
 ```
 
@@ -125,75 +97,64 @@ Every completed feature should leave the project in a releasable state.
 
 ---
 
-# Git Workflow
+## Git Workflow
 
 The project follows GitHub Flow.
 
-Permanent branch
+Permanent branch:
 
-```
+```text
 main
 ```
 
-Feature branches
+Feature branches:
 
-```
+```text
 feature/<feature-name>
 ```
 
-Examples
+Examples:
 
-```
-feature/navigation
-
-feature/dashboard
-
-feature/server-management
-
+```text
+feature/android-project
+feature/server-inventory
 feature/ssh
 ```
 
-Bug fixes
+Bug fixes:
 
-```
+```text
 fix/<bug-name>
 ```
 
-Documentation
+Documentation:
 
-```
+```text
 docs/<topic>
 ```
 
-Rules
+Rules:
 
 - Never develop directly on `main`.
 - Every feature must have its own branch.
-- Merge using `--no-ff`.
+- Merge using `--no-ff` when preserving explicit merge history is useful.
 - Keep commit history meaningful.
 - The `main` branch must always remain releasable.
 
 ---
 
-# Commit Convention
+## Commit Convention
 
 The project follows Conventional Commits.
 
-Examples
+Examples:
 
-```
-feat: add server dashboard
-
+```text
+feat: add server inventory route
 fix: resolve ssh timeout
-
 docs: update architecture
-
-refactor: simplify repository
-
-style: format compose code
-
+refactor: simplify server inventory screen
 test: add repository tests
-
 chore: update dependencies
 ```
 
@@ -201,19 +162,19 @@ Commit messages should be concise, descriptive, and written in English.
 
 ---
 
-# Branch Rules
+## Branch Rules
 
 - Never commit directly to `main`.
-- Every feature starts from `main`.
+- Every feature starts from an up-to-date base branch.
 - Every feature is developed in a dedicated branch.
 - Every feature is merged only after review.
-- Merge commits should preserve project history.
+- The branch must build successfully before merge.
 
 ---
 
-# Coding Standards
+## Coding Standards
 
-The project follows these engineering principles.
+The project follows these engineering principles:
 
 - Readability over cleverness.
 - Self-documenting code.
@@ -227,26 +188,26 @@ The project follows these engineering principles.
 
 ---
 
-# Comment Guidelines
+## Comment Guidelines
 
 Comments should explain **why**, not **what**.
 
 Good comments explain:
 
-- Architectural decisions
-- Business rules
-- Non-obvious algorithms
-- Important implementation details
+- Architectural decisions.
+- Business rules.
+- Non-obvious algorithms.
+- Important implementation details.
 
 Avoid comments that simply repeat the code.
 
-Good
+Good:
 
 ```kotlin
 // Retry only for transient network failures.
 ```
 
-Bad
+Bad:
 
 ```kotlin
 // Increment counter
@@ -255,7 +216,7 @@ counter++
 
 ---
 
-# Documentation Rules
+## Documentation Rules
 
 Documentation is considered part of the implementation.
 
@@ -263,20 +224,20 @@ Every significant feature should update the relevant documentation.
 
 Possible documents include:
 
-- PRODUCT_VISION.md
-- PROJECT_STATE.md
-- ARCHITECTURE.md
-- ROADMAP.md
-- CHANGELOG.md
-- SECURITY.md
-- RELEASES.md
+- `PRODUCT_VISION.md`
+- `PROJECT_STATE.md`
+- `ARCHITECTURE.md`
+- `ROADMAP.md`
+- `CHANGELOG.md`
+- `SECURITY.md`
+- `RELEASES.md`
 - ADR documents
 
 Documentation should evolve together with the source code.
 
 ---
 
-# Living Documentation
+## Living Documentation
 
 The project follows the Living Documentation approach.
 
@@ -288,93 +249,78 @@ Documentation always reflects the current state of the project.
 
 ---
 
-# Architecture Decisions
+## Architecture Decisions
 
-Architecture Decision Records (ADR) are created only after a significant technical decision has been accepted.
+Architecture Decision Records are created only after a significant technical decision has been accepted.
 
 Typical ADR topics include:
 
-- Navigation framework
-- Database technology
-- SSH library
-- Security architecture
-- Dependency Injection
-- Networking framework
+- Navigation framework.
+- Database technology.
+- SSH library.
+- Security architecture.
+- Dependency injection.
+- Networking framework.
 
 ADRs document accepted decisions, not future ideas.
 
 ---
 
-# Testing Strategy
+## Testing Strategy
 
 Testing will be introduced gradually.
 
 Planned testing levels:
 
-- Unit Tests
-- Integration Tests
-- UI Tests
+- Unit tests.
+- Integration tests.
+- UI tests.
 
 Testing coverage will increase as the project matures.
 
 ---
 
-# Sprint Strategy
+## Sprint Strategy
 
 Development is organized into short, goal-oriented sprints.
 
-Each sprint delivers one complete feature.
+Each sprint should deliver one cohesive feature area or engineering improvement.
 
-Examples
+Current sprint direction:
 
-Sprint 1
-
-Navigation
-
-Sprint 2
-
-Dashboard
-
-Sprint 3
-
-Server Management
-
-Sprint 4
-
-Room Database
-
-Sprint 5
-
-SSH
+```text
+Sprint 1  Android Architecture and Navigation
+Sprint 2  Server Inventory Foundation
+Sprint 3  Server Inventory Persistence
+Sprint 4  Server Inventory Add/Edit Workflow
+Sprint 5  SSH Connectivity
+```
 
 A sprint is complete only when:
 
-- Implementation is complete.
+- Implementation is complete for the agreed scope.
 - Documentation is updated.
 - Review is finished.
 - The project builds successfully.
+- The working tree is clean.
 
 ---
 
-# Versioning
+## Versioning
 
 The project follows Semantic Versioning.
 
-```
+```text
 MAJOR.MINOR.PATCH
 ```
 
-Examples
+Examples:
 
-```
+```text
 0.1.0
-
 0.2.0
-
 1.0.0
-
 1.1.0
-
 2.0.0
 ```
 
@@ -382,91 +328,83 @@ Version numbers represent stable milestones in the project's evolution.
 
 ---
 
-# Release Strategy
+## Release Strategy
 
 Every milestone may produce a tagged release.
 
-Current release roadmap
+Current release roadmap:
 
-```
-v0.1.0  Project Foundation
-
-v0.2.0  Navigation
-
-v0.3.0  Dashboard
-
-v0.4.0  Server Inventory
-
-v0.5.0  Local Storage
-
-v0.6.0  SSH Connectivity
-
+```text
+v0.1.0  Foundation
+v0.2.0  Android Architecture and Navigation
+v0.3.0  Server Inventory Foundation
+v0.4.0  SSH
+v0.5.0  Operations
+v0.6.0  Dashboard Evolution
 v0.7.0  Monitoring
-
-v0.8.0  Xray Integration
-
-v0.9.0  Beta Stabilization
-
-v1.0.0  First Stable Release
+v0.8.0  Infrastructure Helpers
+v0.9.0  Stabilization
+v1.0.0  Initial Release
 ```
 
 Every tagged version represents a stable checkpoint in the project's history.
 
 ---
 
-# Security Principles
+## Security Principles
 
 Security is a fundamental engineering requirement.
 
 The following information must never be committed to Git:
 
-- Passwords
-- API Keys
-- SSH Private Keys
-- Access Tokens
-- Certificates
-- Sensitive configuration files
+- Passwords.
+- API keys.
+- SSH private keys.
+- Access tokens.
+- Certificates.
+- Sensitive configuration files.
 
 Sensitive data should always be stored using secure Android mechanisms.
 
 ---
 
-# Project Quality Goals
+## Project Quality Goals
 
 Every commit should improve at least one of the following:
 
-- Functionality
-- Maintainability
-- Readability
-- Reliability
-- Performance
-- Security
-- Documentation
+- Functionality.
+- Maintainability.
+- Readability.
+- Reliability.
+- Performance.
+- Security.
+- Documentation.
 
 The project should become better after every completed feature.
 
 ---
 
-# Definition of Done
+## Definition of Done
 
-A task is considered complete only when all of the following conditions are satisfied.
+A task is considered complete only when all of the following conditions are satisfied:
 
-- Implementation is finished.
+- Implementation is finished for the agreed scope.
 - The project builds successfully.
 - Code follows project standards.
 - Documentation has been updated.
 - ADRs have been updated when necessary.
-- CHANGELOG has been updated when applicable.
-- PROJECT_STATE.md reflects the current project status.
+- `CHANGELOG.md` has been updated when applicable.
+- `PROJECT_STATE.md` reflects the current project status.
 - Commit messages follow Conventional Commits.
-- Changes have been merged into `main`.
 - The project remains releasable.
+
+Merging into `main` and tagging are release-level activities, not mandatory for every local feature commit.
 
 ---
 
-# Engineering Rules
+## Engineering Rules
 
-The following engineering rules are mandatory.
+The following engineering rules are mandatory:
 
 - Always develop in feature branches.
 - Keep the `main` branch stable.
@@ -475,174 +413,112 @@ The following engineering rules are mandatory.
 - Record important technical decisions using ADRs.
 - Never introduce breaking architectural changes without an ADR.
 - Every release should be reproducible.
-- Every milestone should be tagged.
+- Every milestone should be taggable from a releasable state.
 
 ---
 
-# Frozen Engineering Decisions
+## Frozen Engineering Decisions
 
 The following engineering decisions are considered stable and should not change without strong technical justification.
 
-Development Process
+Development process:
 
-- Documentation-Driven Agile Development
-- Lightweight Scrum
+- Documentation-Driven Agile Development.
+- Lightweight Scrum.
 
-Version Control
+Version control:
 
-- Git
-- GitHub
-- GitHub Flow
+- Git.
+- GitHub.
+- GitHub Flow.
 
-Architecture
+Architecture:
 
-- MVVM
-- Single Activity
-- Repository Pattern
+- MVVM.
+- Single Activity.
+- Repository Pattern.
+- Unidirectional Data Flow.
 
-Android
+Android:
 
-- Kotlin
-- Jetpack Compose
+- Kotlin.
+- Jetpack Compose.
+- Hilt.
+- Navigation Compose.
 
-Documentation
+Documentation:
 
-- Living Documentation
-- Architecture Decision Records (ADR)
+- Living Documentation.
+- Architecture Decision Records.
 
-Versioning
+Versioning:
 
-- Semantic Versioning
+- Semantic Versioning.
 
-Commits
+Commits:
 
-- Conventional Commits
+- Conventional Commits.
 
 These decisions form the engineering foundation of the project.
 
-Future changes to these decisions should be documented through a new ADR.
+Future changes to these decisions should be documented through a new ADR when architecturally significant.
 
 ---
 
-# Continuous Improvement
+## Continuous Improvement
 
 Engineering is an iterative process.
 
 The project should continuously improve through:
 
-- Better architecture
-- Cleaner code
-- Improved documentation
-- Better testing
-- Better developer experience
+- Better architecture.
+- Cleaner code.
+- Improved documentation.
+- Better testing.
+- Better developer experience.
 
 Continuous improvement is preferred over large-scale rewrites.
 
-
 ---
 
-# Documentation Governance
+## Documentation Governance
 
-Project documentation is divided into three governance levels.
+Project documentation is divided into governance levels.
 
-## Level A — Foundational Documents
+### Level A — Foundational Documents
 
 These documents define stable project rules and should rarely change:
 
-- PRODUCT_VISION.md
-- ARCHITECTURE.md
-- DEVELOPMENT.md
-- SECURITY.md
-- CONTRIBUTING.md
-- RELEASES.md
+- `PRODUCT_VISION.md`
+- `ARCHITECTURE.md`
+- `DEVELOPMENT.md`
+- `SECURITY.md`
+- `CONTRIBUTING.md`
+- `RELEASES.md`
 
-Status:
+### Level B — Living Project Documents
 
-```text
-Frozen
-```
+These documents must change whenever implementation state changes:
 
-Changes to foundational documents require at least one of the following:
+- `PROJECT_STATE.md`
+- `ROADMAP.md`
+- `CHANGELOG.md`
 
-- Accepted Architecture Decision Record
-- Major product scope change
-- Security requirement
-- Release process correction
-- Documented inconsistency that would mislead development
+### Level C — Supporting Documents
 
-Cosmetic edits should be avoided unless they improve clarity without changing meaning.
+These documents support implementation and review:
 
-## Level B — Planning Documents
-
-Planning documents may change when milestones, priorities, or sequencing change:
-
-- ROADMAP.md
-
-Roadmap changes should remain consistent with PRODUCT_VISION.md and PROJECT_STATE.md.
-
-## Level C — Operational Documents
-
-Operational documents are expected to change frequently:
-
-- PROJECT_STATE.md
-- CHANGELOG.md
-
-These documents track current work, completed work, release notes, and short-term project state.
+- ADR documents.
+- AI collaboration documents.
+- Package structure documentation.
+- Review checklists.
 
 ---
 
-# Documentation Freeze Rule
+## Related Documents
 
-Foundational documents are frozen after version `0.1.0`.
-
-A frozen document must not be edited casually during normal feature development.
-
-Before changing a frozen document, verify:
-
-- The change is necessary.
-- The reason is documented.
-- Related documents remain consistent.
-- The change does not describe functionality that does not exist.
-- The Last Updated field is updated.
-
----
-
-# Current Milestone Model
-
-The project uses versioned milestones:
-
-```text
-v0.1.0  Project Foundation
-v0.2.0  Navigation
-v0.3.0  Dashboard
-v0.4.0  Server Inventory
-v0.5.0  Local Storage
-v0.6.0  SSH Connectivity
-v0.7.0  Monitoring
-v0.8.0  Xray Integration
-v0.9.0  Beta Stabilization
-v1.0.0  First Stable Release
-```
-
-This model is the single reference for milestone sequencing. ROADMAP.md and PROJECT_STATE.md must remain consistent with it.
-
----
-
-# Related Documents
-
-- PRODUCT_VISION.md
-- PROJECT_STATE.md
-- ARCHITECTURE.md
-- ROADMAP.md
-- CHANGELOG.md
-- SECURITY.md
-- RELEASES.md
-- adr/README.md
-
----
-
-# Revision History
-
-| Version | Date | Description |
-|----------|------------|-------------------------------------------|
-| 0.1.0 | 2026-07-01 | Initial engineering process documentation. |
+- [Architecture](ARCHITECTURE.md)
+- [Roadmap](ROADMAP.md)
+- [Project State](PROJECT_STATE.md)
+- [Changelog](CHANGELOG.md)
+- [Release Process](RELEASES.md)

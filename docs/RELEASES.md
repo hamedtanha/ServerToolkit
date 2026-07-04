@@ -1,13 +1,13 @@
 # Release Process
 
 **Project:** Server Toolkit  
-**Version:** 0.1.0  
+**Version:** 0.2.0-alpha  
 **Status:** Frozen  
-**Last Updated:** 2026-07-02
+**Last Updated:** 2026-07-03
 
 ---
 
-# Purpose
+## Purpose
 
 This document defines how Server Toolkit releases are prepared, reviewed, versioned, tagged, and distributed.
 
@@ -15,7 +15,7 @@ The objective is to make every release reproducible, traceable, and reliable.
 
 ---
 
-# Release Strategy
+## Release Strategy
 
 Server Toolkit follows Semantic Versioning.
 
@@ -32,19 +32,21 @@ Examples:
 2.0.0
 ```
 
+During pre-1.0 development, minor versions represent stable development milestones.
+
 ---
 
-# Release Types
+## Release Types
 
-## Major Release
+### Major Release
 
 Used for breaking changes.
 
 Examples:
 
-- Architecture redesign
-- Database migration with breaking compatibility
-- Major UI redesign
+- Architecture redesign.
+- Database migration with breaking compatibility.
+- Major UI redesign.
 
 Example:
 
@@ -54,16 +56,16 @@ Example:
 
 ---
 
-## Minor Release
+### Minor Release
 
-Used for new features without breaking compatibility.
+Used for new milestone functionality without breaking compatibility.
 
 Examples:
 
-- Navigation
-- SSH support
-- Dashboard improvements
-- Monitoring
+- Server Inventory foundation.
+- SSH support.
+- Dashboard evolution.
+- Monitoring.
 
 Example:
 
@@ -73,16 +75,16 @@ Example:
 
 ---
 
-## Patch Release
+### Patch Release
 
 Used for fixes and safe improvements.
 
 Examples:
 
-- Crash fixes
-- UI corrections
-- Security fixes
-- Documentation corrections
+- Crash fixes.
+- UI corrections.
+- Security fixes.
+- Documentation corrections.
 
 Example:
 
@@ -92,26 +94,28 @@ Example:
 
 ---
 
-# Milestone Versioning
+## Milestone Versioning
 
 Current milestone model:
 
 ```text
-v0.1.0  Project Foundation
-v0.2.0  Navigation
-v0.3.0  Dashboard
-v0.4.0  Server Inventory
-v0.5.0  Local Storage
-v0.6.0  SSH Connectivity
+v0.1.0  Foundation
+v0.2.0  Android Architecture and Navigation
+v0.3.0  Server Inventory Foundation
+v0.4.0  SSH
+v0.5.0  Operations
+v0.6.0  Dashboard Evolution
 v0.7.0  Monitoring
-v0.8.0  Xray Integration
-v0.9.0  Beta Stabilization
-v1.0.0  First Stable Release
+v0.8.0  Infrastructure Helpers
+v0.9.0  Stabilization
+v1.0.0  Initial Release
 ```
+
+This model must stay synchronized with `ROADMAP.md`.
 
 ---
 
-# Release Workflow
+## Release Workflow
 
 Every release follows this process:
 
@@ -139,7 +143,7 @@ Distribution
 
 ---
 
-# Release Checklist
+## Release Checklist
 
 Before creating a release verify:
 
@@ -148,16 +152,16 @@ Before creating a release verify:
 - No critical compiler warnings remain.
 - Relevant tests are completed.
 - Documentation is updated.
-- CHANGELOG.md is updated.
-- PROJECT_STATE.md is updated.
+- `CHANGELOG.md` is updated.
+- `PROJECT_STATE.md` is updated.
 - Version is updated where applicable.
 - Sensitive data is removed.
 - Release notes are prepared.
-- The main branch is releasable.
+- The `main` branch is releasable.
 
 ---
 
-# Git Tags
+## Git Tags
 
 Every release must be tagged.
 
@@ -173,20 +177,20 @@ Tags should be created only from a releasable state of `main`.
 
 ---
 
-# Release Notes
+## Release Notes
 
 Every release should include:
 
-- New features
-- Improvements
-- Bug fixes
-- Security changes
-- Breaking changes
-- Known limitations
+- New features.
+- Improvements.
+- Bug fixes.
+- Security changes.
+- Breaking changes.
+- Known limitations.
 
 ---
 
-# APK Naming
+## APK Naming
 
 Recommended stable build naming format:
 
@@ -202,52 +206,52 @@ ServerToolkit-debug.apk
 
 ---
 
-# GitHub Releases
+## GitHub Releases
 
 Each stable release should create a GitHub Release.
 
 Recommended assets:
 
-- APK
-- Release notes
-- Source code archive
+- APK.
+- Release notes.
+- Source code archive.
 
 ---
 
-# Current Release State
+## Current Release State
 
 Current stable checkpoint:
 
 ```text
-v0.1.0 — Project Foundation
+v0.1.0 — Foundation
 ```
 
 Current development milestone:
 
 ```text
-v0.2.0 — Navigation
+v0.2.0-alpha — Android Architecture and Navigation
 ```
 
 Project status:
 
 ```text
-Development
+Active Development
 ```
 
 ---
 
-# Future Distribution Channels
+## Future Distribution Channels
 
 Planned distribution channels:
 
-- GitHub Releases
-- Internal testing
-- Closed beta
-- Google Play Store
+- GitHub Releases.
+- Internal testing.
+- Closed beta.
+- Google Play Store.
 
 ---
 
-# Document Governance
+## Document Governance
 
 This document is foundational and frozen.
 
@@ -260,9 +264,9 @@ Changes are allowed only when:
 
 ---
 
-# Related Documents
+## Related Documents
 
-- CHANGELOG.md
-- DEVELOPMENT.md
-- ROADMAP.md
-- PROJECT_STATE.md
+- [Changelog](CHANGELOG.md)
+- [Development Process](DEVELOPMENT.md)
+- [Roadmap](ROADMAP.md)
+- [Project State](PROJECT_STATE.md)
