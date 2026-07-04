@@ -21,3 +21,13 @@ object EditServerDestination : NavigationDestination {
         return "edit_server/$serverId"
     }
 }
+
+object SshDestination : NavigationDestination {
+    const val SERVER_ID_ARGUMENT: String = "serverId"
+
+    override val route: String = "ssh/{$SERVER_ID_ARGUMENT}"
+
+    fun createRoute(serverId: String): String {
+        return "ssh/$serverId"
+    }
+}

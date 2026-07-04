@@ -37,6 +37,13 @@ The project follows Conventional Commits and Semantic Versioning principles.
 - Added Edit Server navigation destination.
 - Added Edit Server route.
 - Added Edit Server ViewModel.
+- Added SSH workflow architecture decision.
+- Added secure storage strategy decision.
+- Added SSH navigation destination.
+- Added SSH placeholder screen.
+- Added SSH placeholder ViewModel.
+- Added SSH placeholder UI state.
+- Added Connect action from Server Inventory to the SSH placeholder.
 - Added Server repository contract.
 - Added in-memory Server repository implementation.
 - Added Server Inventory repository dependency injection binding.
@@ -84,7 +91,7 @@ The project follows Conventional Commits and Semantic Versioning principles.
 - Connected Server Inventory filter state to visible list rendering.
 - Connected Server Inventory edit behavior to the existing Server repository contract.
 - Reused the shared Server Form implementation for Add Server and Edit Server routes.
-- Updated the ADR index to include accepted application architecture, Room persistence, navigation, and dependency injection decisions.
+- Updated the ADR index to include accepted application architecture, Room persistence, navigation, dependency injection, SSH, and secure storage decisions.
 - Clarified the project state after the accepted Room persistence decision.
 - Switched the production Server repository binding from the in-memory implementation to the Room-backed implementation.
 - Updated architecture and package structure documentation for the Room persistence skeleton.
@@ -96,11 +103,13 @@ The project follows Conventional Commits and Semantic Versioning principles.
 - Updated project state documentation after renaming the shared server form.
 - Updated project state documentation after adding the Server Inventory stabilization checklist.
 - Updated project state and roadmap after accepting the Server Inventory 0.3.0 baseline.
+- Updated project state documentation after adding the SSH placeholder.
 - Recorded successful manual verification of the delete flow after application restart.
 - Recorded successful manual verification of search and filtering behavior.
 - Recorded successful automated verification after search and filtering implementation.
 - Recorded successful automated and manual verification after Edit Server implementation.
 - Recorded successful automated verification after shared Server Form naming cleanup.
+- Recorded successful manual and automated verification after SSH placeholder implementation.
 
 ### Removed
 
@@ -114,8 +123,8 @@ The project follows Conventional Commits and Semantic Versioning principles.
 
 The following items are intentionally not implemented yet:
 
-- SSH workflow.
-- Credential storage.
+- Real SSH connection behavior.
+- Persistent sensitive connection storage.
 - Monitoring workflow.
 - Migration tests.
 

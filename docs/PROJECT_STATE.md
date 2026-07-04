@@ -1,7 +1,7 @@
 # Project State
 
 **Project:** Server Toolkit  
-**Version:** 0.3.0-baseline  
+**Version:** 0.4.0-alpha  
 **Status:** Active Implementation  
 **Last Updated:** 2026-07-04
 
@@ -21,7 +21,7 @@ This document must stay short, current, and factual.
 
 The Server Inventory 0.3.0 baseline is accepted.
 
-The current focus is preparing SSH workflow design and implementation while keeping credential storage out of scope until a separate security decision is accepted.
+The current focus is stabilizing the first SSH UI boundary without real connection behavior.
 
 ---
 
@@ -88,6 +88,14 @@ The following application-level items are implemented:
 - Automated shared Server Form naming verification through unit tests, instrumented tests, and debug build.
 - Server Inventory stabilization checklist.
 - Accepted Server Inventory 0.3.0 baseline.
+- SSH workflow architecture decision.
+- Secure storage strategy decision.
+- SSH navigation destination.
+- SSH placeholder screen.
+- SSH placeholder ViewModel and UI state.
+- Server Inventory Connect action to open the SSH placeholder.
+- Manual SSH placeholder route verification.
+- Automated SSH placeholder verification through unit tests and debug build.
 - Server Inventory filter matcher unit tests.
 - DAO instrumentation tests for insert, replace, and delete behavior.
 - Room-backed repository instrumentation tests for save, replace, and delete behavior.
@@ -103,8 +111,8 @@ The following application-level items are implemented:
 
 The following items are intentionally not implemented yet:
 
-- SSH connection workflow.
-- Secure credential storage.
+- Real SSH connection behavior.
+- Persistent sensitive connection storage.
 - Monitoring workflow.
 - Command execution workflow.
 - Xray or x-ui management workflow.
@@ -117,9 +125,9 @@ The following items are intentionally not implemented yet:
 
 The current implementation area is:
 
-- SSH workflow design.
-- SSH architecture boundary review.
-- Security decision preparation for credential handling.
+- SSH UI boundary stabilization.
+- Preparation for a future SSH client decision.
+- Preservation of the placeholder-only SSH scope.
 
 ---
 
@@ -127,20 +135,20 @@ The current implementation area is:
 
 The next safe development steps are:
 
-1. Create an ADR for the SSH workflow and security boundaries.
-2. Define the initial SSH scope without credential persistence.
-3. Keep credential storage out of scope until a separate security decision is accepted.
+1. Review whether the SSH placeholder slice is ready for pull request review.
+2. Decide whether to merge the SSH architecture and placeholder slice before selecting an SSH client.
+3. Keep real SSH connection behavior out of scope until the SSH client decision is accepted.
 
 ---
 
 ## Current Git Branch
 
 ```text
-feature/android-project
+feature/ssh-architecture
 ```
 
 ---
 
 ## Current Engineering Rule
 
-No credential handling should be introduced until a dedicated security decision defines storage, encryption, lifecycle, and user consent requirements.
+Do not add real SSH behavior or persistent sensitive connection storage before the corresponding architecture decisions and tests are in place.
