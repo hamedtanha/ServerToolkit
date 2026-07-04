@@ -126,11 +126,11 @@ Completed:
 - Hilt database and DAO providers.
 - Server DAO instrumentation tests.
 - Room-backed Server repository instrumentation tests.
+- Server entity/domain mapper unit tests.
 
 Planned:
 
-- Local instrumentation test execution verification.
-- Mapping-specific tests if needed.
+- Local unit and instrumentation test execution verification.
 - Edit server workflow.
 - Delete server UI action.
 - Search and filtering behavior.
