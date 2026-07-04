@@ -21,7 +21,7 @@ This document must stay short, current, and factual.
 
 The Server Inventory 0.3.0 baseline is accepted.
 
-The current focus is preparing the first SSH implementation after selecting the SSH client library.
+The current focus is preparing the first SSH implementation through project-owned domain contracts.
 
 ---
 
@@ -92,6 +92,11 @@ The following application-level items are implemented:
 - Secure storage strategy decision.
 - SSH client library selection decision.
 - SSHJ dependency declaration through the Gradle version catalog.
+- SSH domain connection request model.
+- SSH domain connection result model.
+- SSH domain connection error model.
+- SSH domain connection service contract.
+- SSH domain model unit tests.
 - SSH navigation destination.
 - SSH placeholder screen.
 - SSH placeholder ViewModel and UI state.
@@ -114,6 +119,8 @@ The following application-level items are implemented:
 The following items are intentionally not implemented yet:
 
 - Real SSH connection behavior.
+- SSHJ adapter implementation.
+- SSH session lifecycle model.
 - Monitoring workflow.
 - Command execution workflow.
 - Xray or x-ui management workflow.
@@ -126,9 +133,9 @@ The following items are intentionally not implemented yet:
 
 The current implementation area is:
 
-- SSH domain contract planning.
-- SSH data-layer adapter planning.
-- Build verification after adding the SSHJ dependency.
+- SSH domain contract verification.
+- SSH UI state alignment planning.
+- Future fake SSH connection service planning.
 
 ---
 
@@ -136,16 +143,16 @@ The current implementation area is:
 
 The next safe development steps are:
 
-1. Add minimal SSH domain contracts.
-2. Add a fake SSH implementation for tests.
-3. Add a data-layer SSHJ adapter boundary without exposing SSHJ types to UI code.
+1. Verify the SSH domain contracts with unit tests and debug build.
+2. Align SSH UI state with the new domain result model.
+3. Add a fake SSH connection service for ViewModel tests.
 
 ---
 
 ## Current Git Branch
 
 ```text
-feature/sshj-dependency
+feature/ssh-domain-contracts
 ```
 
 ---

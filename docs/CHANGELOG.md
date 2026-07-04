@@ -41,6 +41,11 @@ The project follows Conventional Commits and Semantic Versioning principles.
 - Added secure storage strategy decision.
 - Added SSH client library selection decision.
 - Added SSHJ dependency through the Gradle version catalog.
+- Added SSH domain connection request model.
+- Added SSH domain connection result model.
+- Added SSH domain connection error model.
+- Added SSH domain connection service contract.
+- Added SSH domain model unit tests.
 - Added SSH navigation destination.
 - Added SSH placeholder screen.
 - Added SSH placeholder ViewModel.
@@ -108,6 +113,7 @@ The project follows Conventional Commits and Semantic Versioning principles.
 - Updated project state documentation after adding the SSH placeholder.
 - Updated project state documentation after selecting the SSH client library.
 - Updated project state documentation after adding the SSHJ dependency.
+- Updated project state documentation after adding SSH domain contracts.
 - Recorded successful manual verification of the delete flow after application restart.
 - Recorded successful manual verification of search and filtering behavior.
 - Recorded successful automated verification after search and filtering implementation.
