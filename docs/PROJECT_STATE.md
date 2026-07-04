@@ -21,7 +21,7 @@ This document must stay short, current, and factual.
 
 The Server Inventory 0.3.0 baseline is accepted.
 
-The current focus is preparing the first SSH implementation through project-owned domain contracts.
+The current focus is aligning the SSH presentation state with the project-owned domain result model.
 
 ---
 
@@ -97,6 +97,10 @@ The following application-level items are implemented:
 - SSH domain connection error model.
 - SSH domain connection service contract.
 - SSH domain model unit tests.
+- SSH UI connection status model.
+- SSH UI state alignment with domain connection result.
+- SSH connection result UI mapper.
+- SSH presentation state unit tests.
 - SSH navigation destination.
 - SSH placeholder screen.
 - SSH placeholder ViewModel and UI state.
@@ -121,6 +125,7 @@ The following items are intentionally not implemented yet:
 - Real SSH connection behavior.
 - SSHJ adapter implementation.
 - SSH session lifecycle model.
+- Fake SSH connection service.
 - Monitoring workflow.
 - Command execution workflow.
 - Xray or x-ui management workflow.
@@ -133,8 +138,8 @@ The following items are intentionally not implemented yet:
 
 The current implementation area is:
 
-- SSH domain contract verification.
-- SSH UI state alignment planning.
+- SSH presentation state verification.
+- SSH ViewModel test planning.
 - Future fake SSH connection service planning.
 
 ---
@@ -143,16 +148,16 @@ The current implementation area is:
 
 The next safe development steps are:
 
-1. Verify the SSH domain contracts with unit tests and debug build.
-2. Align SSH UI state with the new domain result model.
-3. Add a fake SSH connection service for ViewModel tests.
+1. Verify the SSH UI state alignment with unit tests and debug build.
+2. Add a fake SSH connection service for ViewModel tests.
+3. Connect the SSH ViewModel to the fake service without real network behavior.
 
 ---
 
 ## Current Git Branch
 
 ```text
-feature/ssh-domain-contracts
+feature/ssh-ui-state-alignment
 ```
 
 ---
