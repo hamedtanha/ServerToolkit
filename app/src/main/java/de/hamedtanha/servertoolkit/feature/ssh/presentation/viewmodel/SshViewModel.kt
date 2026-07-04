@@ -4,6 +4,7 @@ import androidx.lifecycle.SavedStateHandle
 import androidx.lifecycle.ViewModel
 import dagger.hilt.android.lifecycle.HiltViewModel
 import de.hamedtanha.servertoolkit.feature.ssh.domain.model.SshConnectionResult
+import de.hamedtanha.servertoolkit.feature.ssh.domain.service.SshConnectionService
 import de.hamedtanha.servertoolkit.feature.ssh.presentation.state.SshUiState
 import de.hamedtanha.servertoolkit.feature.ssh.presentation.state.withConnectionResult
 import de.hamedtanha.servertoolkit.navigation.SshDestination
@@ -15,6 +16,7 @@ import kotlinx.coroutines.flow.asStateFlow
 @HiltViewModel
 class SshViewModel @Inject constructor(
     savedStateHandle: SavedStateHandle,
+    private val connectionService: SshConnectionService,
 ) : ViewModel() {
 
     private val serverId: String = checkNotNull(savedStateHandle[SshDestination.SERVER_ID_ARGUMENT])
