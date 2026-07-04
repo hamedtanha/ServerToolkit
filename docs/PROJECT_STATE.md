@@ -1,7 +1,7 @@
 # Project State
 
 **Project:** Server Toolkit  
-**Version:** 0.2.0-alpha  
+**Version:** 0.3.0-baseline  
 **Status:** Active Implementation  
 **Last Updated:** 2026-07-04
 
@@ -19,9 +19,9 @@ This document must stay short, current, and factual.
 
 ## Current Phase
 
-The project is in early Android feature implementation.
+The Server Inventory 0.3.0 baseline is accepted.
 
-The current focus is stabilizing Server Inventory before starting SSH-related implementation.
+The current focus is preparing SSH workflow design and implementation while keeping credential storage out of scope until a separate security decision is accepted.
 
 ---
 
@@ -87,6 +87,7 @@ The following application-level items are implemented:
 - Automated Edit Server verification through unit tests, instrumented tests, and debug build.
 - Automated shared Server Form naming verification through unit tests, instrumented tests, and debug build.
 - Server Inventory stabilization checklist.
+- Accepted Server Inventory 0.3.0 baseline.
 - Server Inventory filter matcher unit tests.
 - DAO instrumentation tests for insert, replace, and delete behavior.
 - Room-backed repository instrumentation tests for save, replace, and delete behavior.
@@ -102,13 +103,13 @@ The following application-level items are implemented:
 
 The following items are intentionally not implemented yet:
 
-- Room migration beyond database version 1.
-- Migration tests.
 - SSH connection workflow.
+- Secure credential storage.
 - Monitoring workflow.
 - Command execution workflow.
 - Xray or x-ui management workflow.
-- Secure credential storage.
+- Room migration beyond database version 1.
+- Migration tests.
 
 ---
 
@@ -116,9 +117,9 @@ The following items are intentionally not implemented yet:
 
 The current implementation area is:
 
-- Server Inventory stabilization review.
-- Confirmation that the 0.3.0 Server Inventory foundation is stable enough to support SSH workflows.
-- Preservation of inventory management coverage before adding SSH or credential operations.
+- SSH workflow design.
+- SSH architecture boundary review.
+- Security decision preparation for credential handling.
 
 ---
 
@@ -126,9 +127,9 @@ The current implementation area is:
 
 The next safe development steps are:
 
-1. Review `docs/SERVER_INVENTORY_STABILIZATION.md` against the implemented application behavior.
-2. Decide whether the current Server Inventory foundation is ready to be treated as the 0.3.0 baseline.
-3. Keep SSH and credential handling out of scope until inventory stabilization is explicitly accepted.
+1. Create an ADR for the SSH workflow and security boundaries.
+2. Define the initial SSH scope without credential persistence.
+3. Keep credential storage out of scope until a separate security decision is accepted.
 
 ---
 
@@ -142,4 +143,4 @@ feature/android-project
 
 ## Current Engineering Rule
 
-No SSH or credential handling should be introduced until Room-backed server inventory persistence and basic inventory management flows are tested and reviewed.
+No credential handling should be introduced until a dedicated security decision defines storage, encryption, lifecycle, and user consent requirements.
