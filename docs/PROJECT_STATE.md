@@ -91,6 +91,7 @@ The following application-level items are implemented:
 - SSH workflow architecture decision.
 - Secure storage strategy decision.
 - SSH client library selection decision.
+- SSHJ dependency declaration through the Gradle version catalog.
 - SSH navigation destination.
 - SSH placeholder screen.
 - SSH placeholder ViewModel and UI state.
@@ -125,9 +126,9 @@ The following items are intentionally not implemented yet:
 
 The current implementation area is:
 
-- SSHJ dependency planning.
 - SSH domain contract planning.
 - SSH data-layer adapter planning.
+- Build verification after adding the SSHJ dependency.
 
 ---
 
@@ -135,8 +136,8 @@ The current implementation area is:
 
 The next safe development steps are:
 
-1. Add SSHJ through the version catalog.
-2. Add minimal SSH domain contracts.
+1. Add minimal SSH domain contracts.
+2. Add a fake SSH implementation for tests.
 3. Add a data-layer SSHJ adapter boundary without exposing SSHJ types to UI code.
 
 ---
@@ -144,7 +145,7 @@ The next safe development steps are:
 ## Current Git Branch
 
 ```text
-feature/ssh-client-decision
+feature/sshj-dependency
 ```
 
 ---
