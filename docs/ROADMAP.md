@@ -115,6 +115,7 @@ Completed:
 - Server Inventory ViewModel repository observation.
 - Basic Server Inventory list rendering.
 - Delete server UI action.
+- Manual delete flow verification.
 - Local persistence with Room architecture decision.
 - Room dependency and KSP compiler setup.
 - Room schema export configuration.
@@ -131,8 +132,7 @@ Completed:
 
 Planned:
 
-- Local unit and instrumentation test execution verification.
-- Manual delete flow verification.
+- Local unit and instrumentation test execution verification after documentation updates.
 - Edit server workflow.
 - Search and filtering behavior.
 - Migration tests when database version changes.

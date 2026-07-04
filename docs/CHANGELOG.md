@@ -74,6 +74,7 @@ The project follows Conventional Commits and Semantic Versioning principles.
 - Updated project state documentation after adding persistence tests.
 - Updated project state documentation after adding mapper tests.
 - Updated project state documentation after adding delete behavior.
+- Recorded successful manual verification of the delete flow after application restart.
 
 ### Removed
 

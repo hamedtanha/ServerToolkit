@@ -70,6 +70,7 @@ The following application-level items are implemented:
 - Basic Server Inventory list rendering.
 - Delete server UI action with confirmation dialog.
 - Server Inventory ViewModel delete action.
+- Manual delete flow verification after app restart.
 - DAO instrumentation tests for insert, replace, and delete behavior.
 - Room-backed repository instrumentation tests for save, replace, and delete behavior.
 - Server entity/domain mapper unit tests.
@@ -100,8 +101,8 @@ The following items are intentionally not implemented yet:
 The current implementation area is:
 
 - Server Inventory behavior expansion planning.
-- Manual delete flow verification.
-- Preservation of persistence test coverage before adding edit or search operations.
+- Selection of the next inventory workflow: edit server or search and filtering.
+- Preservation of persistence and delete-flow coverage before adding edit or search operations.
 
 ---
 
@@ -109,9 +110,9 @@ The current implementation area is:
 
 The next safe development steps are:
 
-1. Run unit tests, instrumented tests, and a manual delete verification on an emulator.
-2. Review whether delete confirmation UX needs refinement after manual testing.
-3. Keep edit, search, SSH, and credential handling out of scope until delete behavior is reviewed.
+1. Run the full local verification set after pulling the latest documentation update.
+2. Choose the next Server Inventory expansion: edit server workflow or search and filtering behavior.
+3. Keep SSH and credential handling out of scope until inventory management is stable.
 
 ---
 
