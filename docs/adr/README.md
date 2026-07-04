@@ -2,7 +2,7 @@
 
 **Project:** Server Toolkit
 
-**Version:** 0.3.0-baseline
+**Version:** 0.4.0-alpha
 
 **Status:** Active
 
@@ -27,6 +27,7 @@ This directory contains all Architecture Decision Records for the Server Toolkit
 | ADR-005 | Dependency Injection Strategy | Accepted |
 | ADR-006 | Remote Connection Workflow Boundaries | Accepted |
 | ADR-007 | Secure Storage Strategy | Accepted |
+| ADR-008 | SSH Client Library Selection | Accepted |
 
 ---
 
