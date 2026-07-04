@@ -104,8 +104,9 @@ Completed:
 - Server Inventory UI state semantic clarification.
 - Server Inventory empty-state action.
 - Add Server placeholder screen.
-- Add Server UI state.
+- Shared Server Form UI state.
 - Add Server ViewModel.
+- Shared Server Form screen.
 - Real Add Server form.
 - Add Server validation.
 - Add Server validation-only save behavior.
@@ -144,7 +145,7 @@ Completed:
 Planned:
 
 - Server Inventory UI stabilization.
-- Shared server form naming review.
+- Broader module and package naming review.
 - Migration tests when database version changes.
 
 Deliverable:
