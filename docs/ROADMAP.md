@@ -67,8 +67,10 @@ Completed:
 - Dashboard route.
 - Server Inventory route.
 - Add Server route.
+- Edit Server route.
 - Dashboard-to-Server-Inventory navigation action.
 - Add Server navigation.
+- Edit Server navigation.
 - Package structure cleanup.
 - Removal of obsolete package placeholders.
 
@@ -109,6 +111,9 @@ Completed:
 - Add Server validation-only save behavior.
 - Add Server repository-backed in-memory save behavior.
 - Add Server automatic return after successful save.
+- Edit Server ViewModel.
+- Edit Server form reuse.
+- Edit Server repository-backed save behavior preserving the existing server id.
 - Server repository contract.
 - In-memory Server repository implementation.
 - Server Inventory repository dependency injection binding.
@@ -130,13 +135,13 @@ Completed:
 - Room-backed Server repository implementation.
 - Hilt database and DAO providers.
 - Server DAO instrumentation tests.
-- Room-backed Server repository instrumentation tests.
+- Room-backed repository instrumentation tests.
 - Server entity/domain mapper unit tests.
 - Server Inventory filter matcher unit tests.
 
 Planned:
 
-- Edit server workflow.
+- Edit Server manual verification.
 - Migration tests when database version changes.
 
 Deliverable:

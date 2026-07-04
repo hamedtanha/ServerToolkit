@@ -24,6 +24,7 @@ import androidx.hilt.lifecycle.viewmodel.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import de.hamedtanha.servertoolkit.feature.serverinventory.presentation.state.AddServerUiState
 import de.hamedtanha.servertoolkit.feature.serverinventory.presentation.viewmodel.AddServerViewModel
+import de.hamedtanha.servertoolkit.feature.serverinventory.presentation.viewmodel.EditServerViewModel
 
 @Composable
 fun AddServerRoute(
@@ -32,6 +33,45 @@ fun AddServerRoute(
 ) {
     val uiState by viewModel.uiState.collectAsStateWithLifecycle()
 
+    ServerFormRouteContent(
+        uiState = uiState,
+        onNameChanged = viewModel::onNameChanged,
+        onHostChanged = viewModel::onHostChanged,
+        onPortChanged = viewModel::onPortChanged,
+        onUsernameChanged = viewModel::onUsernameChanged,
+        onSaveClicked = viewModel::onSaveClicked,
+        onNavigateBack = onNavigateBack,
+    )
+}
+
+@Composable
+fun EditServerRoute(
+    onNavigateBack: () -> Unit,
+    viewModel: EditServerViewModel = hiltViewModel(),
+) {
+    val uiState by viewModel.uiState.collectAsStateWithLifecycle()
+
+    ServerFormRouteContent(
+        uiState = uiState,
+        onNameChanged = viewModel::onNameChanged,
+        onHostChanged = viewModel::onHostChanged,
+        onPortChanged = viewModel::onPortChanged,
+        onUsernameChanged = viewModel::onUsernameChanged,
+        onSaveClicked = viewModel::onSaveClicked,
+        onNavigateBack = onNavigateBack,
+    )
+}
+
+@Composable
+private fun ServerFormRouteContent(
+    uiState: AddServerUiState,
+    onNameChanged: (String) -> Unit,
+    onHostChanged: (String) -> Unit,
+    onPortChanged: (String) -> Unit,
+    onUsernameChanged: (String) -> Unit,
+    onSaveClicked: () -> Unit,
+    onNavigateBack: () -> Unit,
+) {
     LaunchedEffect(uiState.isSaved) {
         if (uiState.isSaved) {
             onNavigateBack()
@@ -40,11 +80,11 @@ fun AddServerRoute(
 
     AddServerScreen(
         uiState = uiState,
-        onNameChanged = viewModel::onNameChanged,
-        onHostChanged = viewModel::onHostChanged,
-        onPortChanged = viewModel::onPortChanged,
-        onUsernameChanged = viewModel::onUsernameChanged,
-        onSaveClicked = viewModel::onSaveClicked,
+        onNameChanged = onNameChanged,
+        onHostChanged = onHostChanged,
+        onPortChanged = onPortChanged,
+        onUsernameChanged = onUsernameChanged,
+        onSaveClicked = onSaveClicked,
         onNavigateBack = onNavigateBack,
     )
 }

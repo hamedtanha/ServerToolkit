@@ -6,6 +6,7 @@ import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
 import de.hamedtanha.servertoolkit.feature.dashboard.presentation.screen.DashboardRoute
 import de.hamedtanha.servertoolkit.feature.serverinventory.presentation.screen.AddServerRoute
+import de.hamedtanha.servertoolkit.feature.serverinventory.presentation.screen.EditServerRoute
 import de.hamedtanha.servertoolkit.feature.serverinventory.presentation.screen.ServerInventoryRoute
 
 @Composable
@@ -33,6 +34,11 @@ fun AppNavHost() {
                         launchSingleTop = true
                     }
                 },
+                onEditServerClick = { serverId ->
+                    navController.navigate(EditServerDestination.createRoute(serverId)) {
+                        launchSingleTop = true
+                    }
+                },
             )
         }
 
@@ -43,6 +49,13 @@ fun AppNavHost() {
                 },
             )
         }
+
+        composable(route = EditServerDestination.route) {
+            EditServerRoute(
+                onNavigateBack = {
+                    navController.navigateUp()
+                },
+            )
+        }
     }
 }
-

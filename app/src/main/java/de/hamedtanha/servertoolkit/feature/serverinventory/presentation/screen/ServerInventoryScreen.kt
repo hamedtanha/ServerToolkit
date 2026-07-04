@@ -40,6 +40,7 @@ import de.hamedtanha.servertoolkit.feature.serverinventory.presentation.viewmode
 @Composable
 fun ServerInventoryRoute(
     onAddServerClick: () -> Unit,
+    onEditServerClick: (String) -> Unit,
     modifier: Modifier = Modifier,
     viewModel: ServerInventoryViewModel = hiltViewModel(),
 ) {
@@ -48,6 +49,7 @@ fun ServerInventoryRoute(
     ServerInventoryScreen(
         uiState = uiState,
         onAddServerClick = onAddServerClick,
+        onEditServerClick = onEditServerClick,
         onSearchQueryChanged = viewModel::onSearchQueryChanged,
         onEnvironmentFilterChanged = viewModel::onEnvironmentFilterChanged,
         onFavoritesOnlyChanged = viewModel::onFavoritesOnlyChanged,
@@ -61,6 +63,7 @@ fun ServerInventoryRoute(
 fun ServerInventoryScreen(
     uiState: ServerInventoryUiState,
     onAddServerClick: () -> Unit,
+    onEditServerClick: (String) -> Unit,
     onSearchQueryChanged: (String) -> Unit,
     onEnvironmentFilterChanged: (ServerEnvironment?) -> Unit,
     onFavoritesOnlyChanged: (Boolean) -> Unit,
@@ -88,6 +91,7 @@ fun ServerInventoryScreen(
             filter = uiState.filter,
             operationMessage = uiState.operationMessage,
             onAddServerClick = onAddServerClick,
+            onEditServerClick = onEditServerClick,
             onSearchQueryChanged = onSearchQueryChanged,
             onEnvironmentFilterChanged = onEnvironmentFilterChanged,
             onFavoritesOnlyChanged = onFavoritesOnlyChanged,
@@ -161,6 +165,7 @@ private fun ServerInventoryLoadedContent(
     filter: ServerInventoryFilter,
     operationMessage: String?,
     onAddServerClick: () -> Unit,
+    onEditServerClick: (String) -> Unit,
     onSearchQueryChanged: (String) -> Unit,
     onEnvironmentFilterChanged: (ServerEnvironment?) -> Unit,
     onFavoritesOnlyChanged: (Boolean) -> Unit,
@@ -237,6 +242,7 @@ private fun ServerInventoryLoadedContent(
                 ) { server ->
                     ServerInventoryListItem(
                         server = server,
+                        onEditServerClick = onEditServerClick,
                         onDeleteServerClick = onDeleteServerClick,
                     )
                 }
@@ -355,6 +361,7 @@ private fun ServerInventoryNoMatchingServersContent(
 @Composable
 private fun ServerInventoryListItem(
     server: Server,
+    onEditServerClick: (String) -> Unit,
     onDeleteServerClick: (Server) -> Unit,
     modifier: Modifier = Modifier,
 ) {
@@ -402,12 +409,25 @@ private fun ServerInventoryListItem(
                 )
             }
 
-            TextButton(
-                onClick = {
-                    onDeleteServerClick(server)
-                },
+            Row(
+                horizontalArrangement = Arrangement.spacedBy(4.dp),
+                verticalAlignment = Alignment.CenterVertically,
             ) {
-                Text(text = "Delete")
+                TextButton(
+                    onClick = {
+                        onEditServerClick(server.id)
+                    },
+                ) {
+                    Text(text = "Edit")
+                }
+
+                TextButton(
+                    onClick = {
+                        onDeleteServerClick(server)
+                    },
+                ) {
+                    Text(text = "Delete")
+                }
             }
         }
     }

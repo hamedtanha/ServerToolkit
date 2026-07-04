@@ -21,7 +21,7 @@ This document must stay short, current, and factual.
 
 The project is in early Android feature implementation.
 
-The current focus is preparing the edit server workflow after validating Server Inventory search and filtering manually and through automated tests.
+The current focus is validating the edit server workflow after adding route-based editing on top of the existing Server Inventory form.
 
 ---
 
@@ -54,6 +54,11 @@ The following application-level items are implemented:
 - Add Server validation-only save action.
 - Add Server repository-backed save flow.
 - Add Server automatic return after successful save.
+- Edit Server navigation destination.
+- Edit Server route.
+- Edit Server ViewModel.
+- Edit Server form reuse through the existing Add Server screen implementation.
+- Edit Server repository-backed save flow preserving the existing server id.
 - Server repository contract.
 - In-memory Server repository implementation for development and testing support.
 - Room dependency setup with KSP.
@@ -91,7 +96,7 @@ The following application-level items are implemented:
 
 The following items are intentionally not implemented yet:
 
-- Edit server screen.
+- Edit Server manual verification.
 - Room migration beyond database version 1.
 - Migration tests.
 - SSH connection workflow.
@@ -106,9 +111,9 @@ The following items are intentionally not implemented yet:
 
 The current implementation area is:
 
-- Edit server workflow planning.
-- Reuse of existing Add Server form state and validation where practical.
-- Preservation of inventory management coverage before adding edit operations.
+- Edit server workflow verification.
+- Edit server UI review.
+- Preservation of inventory management coverage before adding SSH or credential operations.
 
 ---
 
@@ -116,9 +121,10 @@ The current implementation area is:
 
 The next safe development steps are:
 
-1. Design the edit server workflow around the existing repository contract.
-2. Reuse existing form state and validation where practical instead of duplicating form logic.
-3. Keep SSH and credential handling out of scope until inventory management is stable.
+1. Run unit tests, instrumented tests, and debug build after pulling the edit server workflow.
+2. Manually verify editing an existing server and persistence after app restart.
+3. Review whether shared server form naming should be refactored from Add Server naming to a neutral form name.
+4. Keep SSH and credential handling out of scope until inventory management is stable.
 
 ---
 

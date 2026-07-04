@@ -34,6 +34,9 @@ The project follows Conventional Commits and Semantic Versioning principles.
 - Added Add Server validation-only save behavior.
 - Added Add Server repository-backed in-memory save behavior.
 - Added Add Server automatic return after successful save.
+- Added Edit Server navigation destination.
+- Added Edit Server route.
+- Added Edit Server ViewModel.
 - Added Server repository contract.
 - Added in-memory Server repository implementation.
 - Added Server Inventory repository dependency injection binding.
@@ -70,6 +73,8 @@ The project follows Conventional Commits and Semantic Versioning principles.
 - Connected Add Server save behavior to the Server repository.
 - Connected Server Inventory delete behavior to the Server repository.
 - Connected Server Inventory filter state to visible list rendering.
+- Connected Server Inventory edit behavior to the existing Server repository contract.
+- Reused the existing Add Server form implementation for the Edit Server route.
 - Updated the ADR index to include accepted application architecture, Room persistence, navigation, and dependency injection decisions.
 - Clarified the project state after the accepted Room persistence decision.
 - Switched the production Server repository binding from the in-memory implementation to the Room-backed implementation.
@@ -78,6 +83,7 @@ The project follows Conventional Commits and Semantic Versioning principles.
 - Updated project state documentation after adding mapper tests.
 - Updated project state documentation after adding delete behavior.
 - Updated project state documentation after adding search and filtering behavior.
+- Updated project state documentation after adding edit behavior.
 - Recorded successful manual verification of the delete flow after application restart.
 - Recorded successful manual verification of search and filtering behavior.
 - Recorded successful automated verification after search and filtering implementation.
@@ -92,7 +98,6 @@ The project follows Conventional Commits and Semantic Versioning principles.
 
 The following items are intentionally not implemented yet:
 
-- Edit server workflow.
 - SSH workflow.
 - Credential storage.
 - Monitoring workflow.
