@@ -21,7 +21,7 @@ This document must stay short, current, and factual.
 
 The Server Inventory 0.3.0 baseline is accepted.
 
-The current focus is wiring a user-triggered SSH connect event shell without real connection behavior.
+The current focus is planning SSH host trust and authentication input boundaries before any real SSH connection behavior.
 
 ---
 
@@ -150,8 +150,8 @@ The following items are intentionally not implemented yet:
 
 The current implementation area is:
 
-- SSH connect event shell verification.
-- Future host trust and authentication flow planning.
+- SSH host trust and authentication input strategy planning.
+- SSH host key verification behavior planning.
 - Future real connection behavior planning.
 
 ---
@@ -160,17 +160,17 @@ The current implementation area is:
 
 The next safe development steps are:
 
-1. Verify the SSH connect event shell with unit tests and debug build.
-2. Plan host trust and authentication inputs before any real connection attempt.
-3. Add explicit safeguards before enabling real SSH connection behavior.
+1. Review and accept ADR-009 before any real SSH connection behavior.
+2. Implement host trust and authentication input models after ADR acceptance.
+3. Add explicit safeguards and tests before enabling real SSH connection behavior.
 
 ---
 
-## Current Git Branch
+## Current Git Workflow Context
 
-```text
-feature/ssh-connect-event-shell
-```
+Main branch must remain releasable.
+
+Implementation and documentation changes must happen on short-lived GitHub Flow branches and be merged through pull requests.
 
 ---
 

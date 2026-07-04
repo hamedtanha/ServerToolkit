@@ -28,6 +28,7 @@ This directory contains all Architecture Decision Records for the Server Toolkit
 | ADR-006 | Remote Connection Workflow Boundaries | Accepted |
 | ADR-007 | Secure Storage Strategy | Accepted |
 | ADR-008 | SSH Client Library Selection | Accepted |
+| ADR-009 | SSH Host Trust and Authentication Input Strategy | Draft |
 
 ---
 
