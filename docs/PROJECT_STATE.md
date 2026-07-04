@@ -21,7 +21,7 @@ This document must stay short, current, and factual.
 
 The Server Inventory 0.3.0 baseline is accepted.
 
-The current focus is completing the SSH connection service dependency graph without real connection behavior.
+The current focus is wiring a user-triggered SSH connect event shell without real connection behavior.
 
 ---
 
@@ -96,6 +96,9 @@ The following application-level items are implemented:
 - SSHJ-backed connection service shell without real network behavior.
 - SSH connection service dependency injection binding.
 - SSH ViewModel dependency injection for the connection service.
+- SSH user-triggered connect event shell.
+- SSH placeholder Connect button.
+- SSH connect event shell ViewModel tests.
 - SSHJ adapter shell unit test.
 - SSH domain connection request model.
 - SSH domain connection result model.
@@ -134,7 +137,7 @@ The following items are intentionally not implemented yet:
 - SSH authentication handling.
 - SSH host key verification implementation.
 - SSH session lifecycle model.
-- User-triggered SSH connection event.
+- Credential input.
 - Monitoring workflow.
 - Command execution workflow.
 - Xray or x-ui management workflow.
@@ -147,9 +150,9 @@ The following items are intentionally not implemented yet:
 
 The current implementation area is:
 
-- SSH connection service binding verification.
-- Future user-triggered connection event planning.
+- SSH connect event shell verification.
 - Future host trust and authentication flow planning.
+- Future real connection behavior planning.
 
 ---
 
@@ -157,16 +160,16 @@ The current implementation area is:
 
 The next safe development steps are:
 
-1. Verify the SSH connection service binding with unit tests and debug build.
-2. Plan a user-triggered connection event without credentials or real network behavior.
-3. Plan host trust and authentication inputs before any real connection attempt.
+1. Verify the SSH connect event shell with unit tests and debug build.
+2. Plan host trust and authentication inputs before any real connection attempt.
+3. Add explicit safeguards before enabling real SSH connection behavior.
 
 ---
 
 ## Current Git Branch
 
 ```text
-feature/ssh-connection-service-binding
+feature/ssh-connect-event-shell
 ```
 
 ---

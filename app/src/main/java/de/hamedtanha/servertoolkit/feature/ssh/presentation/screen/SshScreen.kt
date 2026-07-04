@@ -18,6 +18,7 @@ import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.hilt.lifecycle.viewmodel.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
+import de.hamedtanha.servertoolkit.feature.ssh.presentation.state.SshConnectionStatus
 import de.hamedtanha.servertoolkit.feature.ssh.presentation.state.SshUiState
 import de.hamedtanha.servertoolkit.feature.ssh.presentation.viewmodel.SshViewModel
 
@@ -31,6 +32,7 @@ fun SshRoute(
 
     SshScreen(
         uiState = uiState,
+        onConnectClick = viewModel::onConnectClicked,
         onNavigateBack = onNavigateBack,
         modifier = modifier,
     )
@@ -39,6 +41,7 @@ fun SshRoute(
 @Composable
 fun SshScreen(
     uiState: SshUiState,
+    onConnectClick: () -> Unit,
     onNavigateBack: () -> Unit,
     modifier: Modifier = Modifier,
 ) {
@@ -91,6 +94,16 @@ fun SshScreen(
         )
 
         Spacer(modifier = Modifier.height(24.dp))
+
+        Button(
+            onClick = onConnectClick,
+            enabled = uiState.status != SshConnectionStatus.Connecting,
+            modifier = Modifier.fillMaxWidth(),
+        ) {
+            Text(text = "Connect")
+        }
+
+        Spacer(modifier = Modifier.height(8.dp))
 
         Button(
             onClick = onNavigateBack,

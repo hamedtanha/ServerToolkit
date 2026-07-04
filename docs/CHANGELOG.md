@@ -43,6 +43,9 @@ The project follows Conventional Commits and Semantic Versioning principles.
 - Added SSHJ dependency through the Gradle version catalog.
 - Added SSHJ connection service shell.
 - Added SSH connection service dependency injection binding.
+- Added SSH user-triggered connect event shell.
+- Added SSH placeholder Connect button.
+- Added SSH connect event shell ViewModel tests.
 - Added SSHJ adapter shell unit test.
 - Added SSH domain connection request model.
 - Added SSH domain connection result model.
@@ -108,6 +111,7 @@ The project follows Conventional Commits and Semantic Versioning principles.
 - Reused the shared Server Form implementation for Add Server and Edit Server routes.
 - Injected the SSH connection service contract into the SSH ViewModel.
 - Updated SSH ViewModel tests for connection service injection.
+- Updated the test-only fake SSH connection service for event-state verification.
 - Updated the ADR index to include accepted application architecture, Room persistence, navigation, dependency injection, SSH, secure storage, and SSH client selection decisions.
 - Clarified the project state after the accepted Room persistence decision.
 - Switched the production Server repository binding from the in-memory implementation to the Room-backed implementation.
@@ -128,6 +132,7 @@ The project follows Conventional Commits and Semantic Versioning principles.
 - Updated project state documentation after adding fake SSH service tests.
 - Updated project state documentation after adding the SSHJ adapter shell.
 - Updated project state documentation after binding the SSH connection service.
+- Updated project state documentation after adding the SSH connect event shell.
 - Recorded successful manual verification of the delete flow after application restart.
 - Recorded successful manual verification of search and filtering behavior.
 - Recorded successful automated verification after search and filtering implementation.
