@@ -21,7 +21,7 @@ This document must stay short, current, and factual.
 
 The Server Inventory 0.3.0 baseline is accepted.
 
-The current focus is stabilizing the first SSH UI boundary without real connection behavior.
+The current focus is preparing the first SSH implementation after selecting the SSH client library.
 
 ---
 
@@ -90,6 +90,7 @@ The following application-level items are implemented:
 - Accepted Server Inventory 0.3.0 baseline.
 - SSH workflow architecture decision.
 - Secure storage strategy decision.
+- SSH client library selection decision.
 - SSH navigation destination.
 - SSH placeholder screen.
 - SSH placeholder ViewModel and UI state.
@@ -112,7 +113,6 @@ The following application-level items are implemented:
 The following items are intentionally not implemented yet:
 
 - Real SSH connection behavior.
-- Persistent sensitive connection storage.
 - Monitoring workflow.
 - Command execution workflow.
 - Xray or x-ui management workflow.
@@ -125,9 +125,9 @@ The following items are intentionally not implemented yet:
 
 The current implementation area is:
 
-- SSH UI boundary stabilization.
-- Preparation for a future SSH client decision.
-- Preservation of the placeholder-only SSH scope.
+- SSHJ dependency planning.
+- SSH domain contract planning.
+- SSH data-layer adapter planning.
 
 ---
 
@@ -135,20 +135,20 @@ The current implementation area is:
 
 The next safe development steps are:
 
-1. Review whether the SSH placeholder slice is ready for pull request review.
-2. Decide whether to merge the SSH architecture and placeholder slice before selecting an SSH client.
-3. Keep real SSH connection behavior out of scope until the SSH client decision is accepted.
+1. Add SSHJ through the version catalog.
+2. Add minimal SSH domain contracts.
+3. Add a data-layer SSHJ adapter boundary without exposing SSHJ types to UI code.
 
 ---
 
 ## Current Git Branch
 
 ```text
-feature/ssh-architecture
+feature/ssh-client-decision
 ```
 
 ---
 
 ## Current Engineering Rule
 
-Do not add real SSH behavior or persistent sensitive connection storage before the corresponding architecture decisions and tests are in place.
+Do not add real SSH behavior before the corresponding architecture decisions and tests are in place.
