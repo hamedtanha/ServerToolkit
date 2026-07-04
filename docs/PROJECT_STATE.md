@@ -21,7 +21,7 @@ This document must stay short, current, and factual.
 
 The Server Inventory 0.3.0 baseline is accepted.
 
-The current focus is aligning the SSH presentation state with the project-owned domain result model.
+The current focus is testing the SSH presentation flow with a test-only fake connection service.
 
 ---
 
@@ -97,6 +97,9 @@ The following application-level items are implemented:
 - SSH domain connection error model.
 - SSH domain connection service contract.
 - SSH domain model unit tests.
+- Test-only fake SSH connection service.
+- SSH ViewModel result handling seam for tests.
+- SSH ViewModel fake result unit tests.
 - SSH UI connection status model.
 - SSH UI state alignment with domain connection result.
 - SSH connection result UI mapper.
@@ -125,7 +128,7 @@ The following items are intentionally not implemented yet:
 - Real SSH connection behavior.
 - SSHJ adapter implementation.
 - SSH session lifecycle model.
-- Fake SSH connection service.
+- Production SSH connection service binding.
 - Monitoring workflow.
 - Command execution workflow.
 - Xray or x-ui management workflow.
@@ -138,9 +141,9 @@ The following items are intentionally not implemented yet:
 
 The current implementation area is:
 
-- SSH presentation state verification.
-- SSH ViewModel test planning.
-- Future fake SSH connection service planning.
+- SSH ViewModel test verification.
+- Production connection service planning.
+- Future SSHJ adapter boundary planning.
 
 ---
 
@@ -148,16 +151,16 @@ The current implementation area is:
 
 The next safe development steps are:
 
-1. Verify the SSH UI state alignment with unit tests and debug build.
-2. Add a fake SSH connection service for ViewModel tests.
-3. Connect the SSH ViewModel to the fake service without real network behavior.
+1. Verify the fake SSH connection service and ViewModel tests with unit tests and debug build.
+2. Add a production connection service boundary without real network behavior only if needed for dependency injection.
+3. Add an SSHJ adapter shell without real connection behavior.
 
 ---
 
 ## Current Git Branch
 
 ```text
-feature/ssh-ui-state-alignment
+feature/ssh-fake-connection-service
 ```
 
 ---
