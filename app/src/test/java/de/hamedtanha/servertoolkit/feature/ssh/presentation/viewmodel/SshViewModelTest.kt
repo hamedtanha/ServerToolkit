@@ -23,9 +23,12 @@ class SshViewModelTest {
 
     @Test
     fun `maps fake connected result into ui state`() = runBlocking {
-        val viewModel = createViewModel(serverId = "server-1")
         val service = FakeSshConnectionService(
             result = SshConnectionResult.Connected,
+        )
+        val viewModel = createViewModel(
+            serverId = "server-1",
+            service = service,
         )
 
         val result = service.connect(connectionRequest())
@@ -38,9 +41,12 @@ class SshViewModelTest {
 
     @Test
     fun `maps fake failure result into ui state`() = runBlocking {
-        val viewModel = createViewModel(serverId = "server-1")
         val service = FakeSshConnectionService(
             result = SshConnectionResult.Failed(SshConnectionError.AuthenticationRequired),
+        )
+        val viewModel = createViewModel(
+            serverId = "server-1",
+            service = service,
         )
 
         val result = service.connect(connectionRequest())
@@ -51,11 +57,15 @@ class SshViewModelTest {
         assertEquals("Authentication is required before connecting.", viewModel.uiState.value.message)
     }
 
-    private fun createViewModel(serverId: String): SshViewModel {
+    private fun createViewModel(
+        serverId: String,
+        service: FakeSshConnectionService = FakeSshConnectionService(SshConnectionResult.Connected),
+    ): SshViewModel {
         return SshViewModel(
             savedStateHandle = SavedStateHandle(
                 mapOf(SshDestination.SERVER_ID_ARGUMENT to serverId),
             ),
+            connectionService = service,
         )
     }
 

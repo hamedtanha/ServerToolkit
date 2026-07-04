@@ -21,7 +21,7 @@ This document must stay short, current, and factual.
 
 The Server Inventory 0.3.0 baseline is accepted.
 
-The current focus is establishing the SSH data-layer adapter boundary without real connection behavior.
+The current focus is completing the SSH connection service dependency graph without real connection behavior.
 
 ---
 
@@ -94,6 +94,8 @@ The following application-level items are implemented:
 - SSHJ dependency declaration through the Gradle version catalog.
 - SSH data-layer adapter shell.
 - SSHJ-backed connection service shell without real network behavior.
+- SSH connection service dependency injection binding.
+- SSH ViewModel dependency injection for the connection service.
 - SSHJ adapter shell unit test.
 - SSH domain connection request model.
 - SSH domain connection result model.
@@ -132,7 +134,7 @@ The following items are intentionally not implemented yet:
 - SSH authentication handling.
 - SSH host key verification implementation.
 - SSH session lifecycle model.
-- Production SSH connection service binding.
+- User-triggered SSH connection event.
 - Monitoring workflow.
 - Command execution workflow.
 - Xray or x-ui management workflow.
@@ -145,8 +147,8 @@ The following items are intentionally not implemented yet:
 
 The current implementation area is:
 
-- SSHJ adapter shell verification.
-- Production connection service binding planning.
+- SSH connection service binding verification.
+- Future user-triggered connection event planning.
 - Future host trust and authentication flow planning.
 
 ---
@@ -155,8 +157,8 @@ The current implementation area is:
 
 The next safe development steps are:
 
-1. Verify the SSHJ adapter shell with unit tests and debug build.
-2. Decide whether to add dependency injection for the connection service before real behavior.
+1. Verify the SSH connection service binding with unit tests and debug build.
+2. Plan a user-triggered connection event without credentials or real network behavior.
 3. Plan host trust and authentication inputs before any real connection attempt.
 
 ---
@@ -164,7 +166,7 @@ The next safe development steps are:
 ## Current Git Branch
 
 ```text
-feature/sshj-adapter-shell
+feature/ssh-connection-service-binding
 ```
 
 ---

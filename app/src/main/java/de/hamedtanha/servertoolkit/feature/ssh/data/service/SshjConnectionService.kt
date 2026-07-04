@@ -4,6 +4,7 @@ import de.hamedtanha.servertoolkit.feature.ssh.domain.model.SshConnectionError
 import de.hamedtanha.servertoolkit.feature.ssh.domain.model.SshConnectionRequest
 import de.hamedtanha.servertoolkit.feature.ssh.domain.model.SshConnectionResult
 import de.hamedtanha.servertoolkit.feature.ssh.domain.service.SshConnectionService
+import javax.inject.Inject
 import net.schmizz.sshj.SSHClient
 
 /**
@@ -13,7 +14,7 @@ import net.schmizz.sshj.SSHClient
  * boundary that will later contain SSHJ-specific connection logic while keeping SSHJ types out of
  * domain and presentation code.
  */
-class SshjConnectionService : SshConnectionService {
+class SshjConnectionService @Inject constructor() : SshConnectionService {
 
     override suspend fun connect(request: SshConnectionRequest): SshConnectionResult {
         return SSHClient().use {
