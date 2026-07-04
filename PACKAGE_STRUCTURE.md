@@ -109,6 +109,36 @@ Not every package must contain implementation files immediately. Empty packages 
 
 ---
 
+## Naming Decision: Server Inventory and Future Inventory Scope
+
+`feature/serverinventory` remains the canonical package for the current implementation.
+
+The current implemented asset type is `Server`. The current feature scope is local server inventory management.
+
+A broader `inventory` feature package must not be introduced until the application implements additional non-server asset types or shared inventory behavior that is no longer server-specific.
+
+Examples of future asset types that may justify a broader inventory boundary include:
+
+- Network devices.
+- Services.
+- Certificates.
+- Endpoints.
+- Clusters.
+
+Until such implementation exists, package names must reflect the current product reality rather than anticipated future scope.
+
+Do not introduce package structures such as the following yet:
+
+```text
+feature/inventory/serverdevice/
+feature/inventory/device/
+feature/inventory/common/
+```
+
+These structures may be reconsidered through an ADR or documented architecture review when more than one concrete inventory asset type exists.
+
+---
+
 ## Top-Level Responsibilities
 
 ### Root Package
@@ -256,7 +286,7 @@ Rules:
 
 ### serverinventory
 
-The server inventory feature owns server inventory behavior.
+The server inventory feature owns local server inventory behavior.
 
 Current implementation:
 
@@ -291,12 +321,14 @@ feature/serverinventory/di/ServerInventoryModule.kt
 feature/serverinventory/domain/model/Server.kt
 feature/serverinventory/domain/model/ServerEnvironment.kt
 feature/serverinventory/domain/repository/ServerRepository.kt
-feature/serverinventory/presentation/screen/AddServerScreen.kt
+feature/serverinventory/presentation/screen/ServerFormScreen.kt
 feature/serverinventory/presentation/screen/ServerInventoryScreen.kt
-feature/serverinventory/presentation/state/AddServerUiState.kt
+feature/serverinventory/presentation/state/ServerFormUiState.kt
 feature/serverinventory/presentation/state/ServerInventoryFilter.kt
+feature/serverinventory/presentation/state/ServerInventoryFilterMatcher.kt
 feature/serverinventory/presentation/state/ServerInventoryUiState.kt
 feature/serverinventory/presentation/viewmodel/AddServerViewModel.kt
+feature/serverinventory/presentation/viewmodel/EditServerViewModel.kt
 feature/serverinventory/presentation/viewmodel/ServerInventoryViewModel.kt
 ```
 
@@ -312,6 +344,7 @@ Rules:
 - Server inventory presentation state belongs to `feature/serverinventory/presentation/state`.
 - Server inventory screens belong to `feature/serverinventory/presentation/screen`.
 - Server inventory ViewModels belong to `feature/serverinventory/presentation/viewmodel`.
+- Shared Add/Edit server form code should use neutral `ServerForm` naming.
 - Do not place server-specific classes in global `model`, `viewmodel`, or `ui/screens` packages.
 
 Future packages may be added only when required by implementation:
@@ -410,6 +443,8 @@ ServerEnvironment
 ServerStatus
 ```
 
+Do not rename the current `Server` domain model to `Device`, `ServerDevice`, or `InventoryItem` until the broader concept is implemented.
+
 ### Room Entities
 
 Append `Entity`.
@@ -418,310 +453,4 @@ Examples:
 
 ```text
 ServerEntity
-CommandEntity
 ```
-
-### DAOs
-
-Append `Dao`.
-
-Examples:
-
-```text
-ServerDao
-CommandDao
-```
-
-### Repository Interfaces
-
-Use business-facing names.
-
-Examples:
-
-```text
-ServerRepository
-CommandRepository
-```
-
-### Repository Implementations
-
-Use a precise implementation name.
-
-Examples:
-
-```text
-RoomServerRepository
-InMemoryServerRepository
-DefaultCommandRepository
-```
-
-### ViewModels
-
-Append `ViewModel`.
-
-Examples:
-
-```text
-ServerInventoryViewModel
-ServerEditViewModel
-```
-
-### UI State
-
-Append `UiState`.
-
-Examples:
-
-```text
-ServerInventoryUiState
-ServerEditUiState
-```
-
-### UI Events
-
-Append `UiEvent` when explicit UI events are required.
-
-Examples:
-
-```text
-ServerEditUiEvent
-```
-
-### Screens
-
-Append `Screen`.
-
-Examples:
-
-```text
-ServerInventoryScreen
-DashboardScreen
-```
-
----
-
-## File Placement Rules
-
-### Application Entry Points
-
-Place application entry points in the root package:
-
-```text
-de/hamedtanha/servertoolkit/MainActivity.kt
-de/hamedtanha/servertoolkit/ServerToolkitApplication.kt
-```
-
-### Screens
-
-Place screens under the owning feature:
-
-```text
-feature/<feature-name>/presentation/screen/
-```
-
-Do not use a global `ui/screens` package.
-
-### Components
-
-Place feature-specific components under:
-
-```text
-feature/<feature-name>/presentation/component/
-```
-
-Only move components to shared UI packages after reuse is proven.
-
-### UI State
-
-Place feature-specific UI state classes under:
-
-```text
-feature/<feature-name>/presentation/state/
-```
-
-### UI Events
-
-Place explicit UI event classes under:
-
-```text
-feature/<feature-name>/presentation/event/
-```
-
-This package is optional and should be used only when explicit event modeling improves clarity.
-
-### ViewModels
-
-Place ViewModels under:
-
-```text
-feature/<feature-name>/presentation/viewmodel/
-```
-
-Do not use a global `viewmodel` package.
-
-### Feature Domain Models
-
-Place feature-owned domain models under:
-
-```text
-feature/<feature-name>/domain/model/
-```
-
-### Repository Contracts
-
-Place feature-specific repository contracts under:
-
-```text
-feature/<feature-name>/domain/repository/
-```
-
-### Repository Implementations
-
-Place feature-local repository implementations under:
-
-```text
-feature/<feature-name>/data/repository/
-```
-
-### Room Entities and DAOs
-
-Place feature-owned Room entities and DAOs close to the owning feature unless they are explicitly shared.
-
-```text
-feature/serverinventory/data/local/entity/ServerEntity.kt
-feature/serverinventory/data/local/dao/ServerDao.kt
-```
-
-Shared Room infrastructure belongs in:
-
-```text
-core/database/
-```
-
-### Dependency Injection
-
-Place app-wide Hilt modules under:
-
-```text
-core/di/
-```
-
-Place feature-specific Hilt modules close to the owning feature:
-
-```text
-feature/<feature-name>/di/
-```
-
----
-
-## Testing Structure
-
-Unit tests should mirror the production package structure when practical.
-
-Expected test roots:
-
-```text
-app/src/test/java/de/hamedtanha/servertoolkit
-app/src/androidTest/java/de/hamedtanha/servertoolkit
-```
-
-Examples:
-
-```text
-app/src/test/java/de/hamedtanha/servertoolkit/feature/serverinventory/data/ServerEntityMapperTest.kt
-app/src/androidTest/java/de/hamedtanha/servertoolkit/feature/serverinventory/data/local/ServerDaoTest.kt
-```
-
-Rules:
-
-- Domain validation should be unit-tested.
-- Mapping logic should be unit-tested when non-trivial.
-- DAO behavior should be tested with Android instrumentation tests or an appropriate Room test setup.
-- ViewModel behavior should be tested when business-relevant state transitions exist.
-- UI tests should be added only when UI behavior is stable enough to justify maintenance cost.
-
----
-
-## Prohibited Package Patterns
-
-The following package patterns are not allowed unless explicitly justified:
-
-```text
-utils/
-helpers/
-managers/
-model/
-viewmodel/
-ui/screens/
-ui/components/
-```
-
-These package names usually hide unclear ownership and become dumping grounds.
-
-Use precise package names that describe responsibility.
-
----
-
-## Anti-Patterns
-
-The following patterns are not allowed:
-
-- Placing all screens in a global `ui/screens` package.
-- Placing all ViewModels in a global `viewmodel` package.
-- Placing all domain models in a vague global `model` package.
-- Placing Room entities in domain packages.
-- Placing repository implementations in presentation packages.
-- Moving feature-specific UI components into shared UI packages prematurely.
-- Creating remote/network packages before remote features exist.
-- Mixing navigation route definitions across unrelated features.
-- Allowing one feature package to depend directly on another feature package.
-
----
-
-## Refactoring Rule
-
-When an existing file does not match this structure, it must be moved to the correct package before being expanded.
-
-Do not add new code to legacy, temporary, or prohibited package locations.
-
-Existing nonconforming packages must be treated as cleanup targets, not as valid extension points.
-
----
-
-## Evolution Policy
-
-This structure may evolve as the project grows, but changes must be intentional.
-
-A package structure change requires documentation updates when it affects:
-
-- Layer boundaries.
-- Dependency direction.
-- Feature organization.
-- Persistence organization.
-- Navigation organization.
-- Security-sensitive code placement.
-- Testing structure.
-
-Significant structural changes may require a new ADR.
-
-Accepted ADRs must remain historically traceable. If a structural decision supersedes an accepted ADR, create a new ADR instead of silently rewriting architectural history.
-
----
-
-## Related Documents
-
-- `docs/ARCHITECTURE.md`
-- `docs/adr/ADR-002-application-architecture.md`
-- `docs/adr/ADR-003-local-persistence-with-room.md`
-- `docs/adr/ADR-004-navigation-strategy.md`
-- `docs/adr/ADR-005-dependency-injection-strategy.md`
-- `docs/DEVELOPMENT.md`
-- `docs/PROJECT_STATE.md`
-
----
-
-## Notes
-
-This document is intentionally strict.
-
-A strict package structure reduces ambiguity, improves review quality, and prevents feature implementation from drifting into inconsistent architecture.
