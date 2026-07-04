@@ -51,6 +51,7 @@ The project follows Conventional Commits and Semantic Versioning principles.
 - Added Room test helper dependency.
 - Added Server DAO instrumentation tests.
 - Added Room-backed Server repository instrumentation tests.
+- Added Server entity/domain mapper unit tests.
 
 ### Changed
 
@@ -69,6 +70,7 @@ The project follows Conventional Commits and Semantic Versioning principles.
 - Switched the production Server repository binding from the in-memory implementation to the Room-backed implementation.
 - Updated architecture and package structure documentation for the Room persistence skeleton.
 - Updated project state documentation after adding persistence tests.
+- Updated project state documentation after adding mapper tests.
 
 ### Removed
 
