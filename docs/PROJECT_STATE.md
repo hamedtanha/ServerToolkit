@@ -21,7 +21,7 @@ This document must stay short, current, and factual.
 
 The project is in early Android feature implementation.
 
-The current focus is stabilizing Server Inventory after validating add, edit, delete, search, filtering, and Room-backed persistence.
+The current focus is stabilizing Server Inventory after validating add, edit, delete, search, filtering, shared form naming, and Room-backed persistence.
 
 ---
 
@@ -85,6 +85,7 @@ The following application-level items are implemented:
 - Manual search and filtering verification.
 - Automated search and filtering verification through unit tests, instrumented tests, and debug build.
 - Automated Edit Server verification through unit tests, instrumented tests, and debug build.
+- Automated shared Server Form naming verification through unit tests, instrumented tests, and debug build.
 - Server Inventory filter matcher unit tests.
 - DAO instrumentation tests for insert, replace, and delete behavior.
 - Room-backed repository instrumentation tests for save, replace, and delete behavior.
@@ -124,10 +125,9 @@ The current implementation area is:
 
 The next safe development steps are:
 
-1. Run unit tests, instrumented tests, and debug build after the shared form naming refactor.
-2. Review broader module and package naming before starting SSH-related work.
-3. Decide whether to stabilize version 0.3.0 before starting SSH-related work.
-4. Keep SSH and credential handling out of scope until inventory management is stable.
+1. Review broader module and package naming before starting SSH-related work.
+2. Decide whether to stabilize version 0.3.0 before starting SSH-related work.
+3. Keep SSH and credential handling out of scope until inventory management is stable.
 
 ---
 
