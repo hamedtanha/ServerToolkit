@@ -114,6 +114,8 @@ Completed:
 - Edit Server ViewModel.
 - Edit Server form reuse.
 - Edit Server repository-backed save behavior preserving the existing server id.
+- Manual Edit Server verification.
+- Automated Edit Server verification.
 - Server repository contract.
 - In-memory Server repository implementation.
 - Server Inventory repository dependency injection binding.
@@ -141,7 +143,8 @@ Completed:
 
 Planned:
 
-- Edit Server manual verification.
+- Server Inventory UI stabilization.
+- Shared server form naming review.
 - Migration tests when database version changes.
 
 Deliverable:

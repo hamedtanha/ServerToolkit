@@ -87,6 +87,7 @@ The project follows Conventional Commits and Semantic Versioning principles.
 - Recorded successful manual verification of the delete flow after application restart.
 - Recorded successful manual verification of search and filtering behavior.
 - Recorded successful automated verification after search and filtering implementation.
+- Recorded successful automated and manual verification after Edit Server implementation.
 
 ### Removed
 

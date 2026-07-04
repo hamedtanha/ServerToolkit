@@ -21,7 +21,7 @@ This document must stay short, current, and factual.
 
 The project is in early Android feature implementation.
 
-The current focus is validating the edit server workflow after adding route-based editing on top of the existing Server Inventory form.
+The current focus is stabilizing Server Inventory after validating add, edit, delete, search, filtering, and Room-backed persistence.
 
 ---
 
@@ -59,6 +59,7 @@ The following application-level items are implemented:
 - Edit Server ViewModel.
 - Edit Server form reuse through the existing Add Server screen implementation.
 - Edit Server repository-backed save flow preserving the existing server id.
+- Manual Edit Server verification after app restart.
 - Server repository contract.
 - In-memory Server repository implementation for development and testing support.
 - Room dependency setup with KSP.
@@ -82,6 +83,7 @@ The following application-level items are implemented:
 - Server Inventory filter clearing.
 - Manual search and filtering verification.
 - Automated search and filtering verification through unit tests, instrumented tests, and debug build.
+- Automated Edit Server verification through unit tests, instrumented tests, and debug build.
 - Server Inventory filter matcher unit tests.
 - DAO instrumentation tests for insert, replace, and delete behavior.
 - Room-backed repository instrumentation tests for save, replace, and delete behavior.
@@ -96,7 +98,6 @@ The following application-level items are implemented:
 
 The following items are intentionally not implemented yet:
 
-- Edit Server manual verification.
 - Room migration beyond database version 1.
 - Migration tests.
 - SSH connection workflow.
@@ -111,8 +112,8 @@ The following items are intentionally not implemented yet:
 
 The current implementation area is:
 
-- Edit server workflow verification.
-- Edit server UI review.
+- Server Inventory stabilization.
+- Review of shared form naming after Add/Edit form reuse.
 - Preservation of inventory management coverage before adding SSH or credential operations.
 
 ---
@@ -121,9 +122,9 @@ The current implementation area is:
 
 The next safe development steps are:
 
-1. Run unit tests, instrumented tests, and debug build after pulling the edit server workflow.
-2. Manually verify editing an existing server and persistence after app restart.
-3. Review whether shared server form naming should be refactored from Add Server naming to a neutral form name.
+1. Review whether shared server form naming should be refactored from Add Server naming to a neutral form name.
+2. Review Server Inventory UI density after adding edit, delete, search, and filter controls.
+3. Decide whether to stabilize version 0.3.0 before starting SSH-related work.
 4. Keep SSH and credential handling out of scope until inventory management is stable.
 
 ---
