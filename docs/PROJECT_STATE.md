@@ -21,7 +21,7 @@ This document must stay short, current, and factual.
 
 The Server Inventory 0.3.0 baseline is accepted.
 
-The current focus is introducing the first SSH UI boundary without real connection behavior.
+The current focus is stabilizing the first SSH UI boundary without real connection behavior.
 
 ---
 
@@ -94,6 +94,8 @@ The following application-level items are implemented:
 - SSH placeholder screen.
 - SSH placeholder ViewModel and UI state.
 - Server Inventory Connect action to open the SSH placeholder.
+- Manual SSH placeholder route verification.
+- Automated SSH placeholder verification through unit tests and debug build.
 - Server Inventory filter matcher unit tests.
 - DAO instrumentation tests for insert, replace, and delete behavior.
 - Room-backed repository instrumentation tests for save, replace, and delete behavior.
@@ -123,9 +125,9 @@ The following items are intentionally not implemented yet:
 
 The current implementation area is:
 
-- SSH placeholder verification.
 - SSH UI boundary stabilization.
 - Preparation for a future SSH client decision.
+- Preservation of the placeholder-only SSH scope.
 
 ---
 
@@ -133,8 +135,8 @@ The current implementation area is:
 
 The next safe development steps are:
 
-1. Verify the SSH placeholder route manually from a server item.
-2. Add automated coverage for the SSH placeholder if the UI boundary grows.
+1. Review whether the SSH placeholder slice is ready for pull request review.
+2. Decide whether to merge the SSH architecture and placeholder slice before selecting an SSH client.
 3. Keep real SSH connection behavior out of scope until the SSH client decision is accepted.
 
 ---
