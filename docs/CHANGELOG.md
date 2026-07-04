@@ -40,6 +40,7 @@ The project follows Conventional Commits and Semantic Versioning principles.
 - Added SSH workflow architecture decision.
 - Added secure storage strategy decision.
 - Added SSH client library selection decision.
+- Added SSHJ dependency through the Gradle version catalog.
 - Added SSH navigation destination.
 - Added SSH placeholder screen.
 - Added SSH placeholder ViewModel.
@@ -106,6 +107,7 @@ The project follows Conventional Commits and Semantic Versioning principles.
 - Updated project state and roadmap after accepting the Server Inventory 0.3.0 baseline.
 - Updated project state documentation after adding the SSH placeholder.
 - Updated project state documentation after selecting the SSH client library.
+- Updated project state documentation after adding the SSHJ dependency.
 - Recorded successful manual verification of the delete flow after application restart.
 - Recorded successful manual verification of search and filtering behavior.
 - Recorded successful automated verification after search and filtering implementation.
