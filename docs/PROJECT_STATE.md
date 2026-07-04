@@ -21,7 +21,7 @@ This document must stay short, current, and factual.
 
 The project is in early Android feature implementation.
 
-The current focus is preparing the next Server Inventory behavior after validating the first Room-backed persistence boundary and basic delete flow.
+The current focus is validating Server Inventory search and filtering before starting the edit workflow.
 
 ---
 
@@ -71,6 +71,11 @@ The following application-level items are implemented:
 - Delete server UI action with confirmation dialog.
 - Server Inventory ViewModel delete action.
 - Manual delete flow verification after app restart.
+- Server Inventory search by name, host, username, category, and tags.
+- Server Inventory environment filtering.
+- Server Inventory favorites-only filtering.
+- Server Inventory filter clearing.
+- Server Inventory filter matcher unit tests.
 - DAO instrumentation tests for insert, replace, and delete behavior.
 - Room-backed repository instrumentation tests for save, replace, and delete behavior.
 - Server entity/domain mapper unit tests.
@@ -85,7 +90,6 @@ The following application-level items are implemented:
 The following items are intentionally not implemented yet:
 
 - Edit server screen.
-- Search and filtering behavior.
 - Room migration beyond database version 1.
 - Migration tests.
 - SSH connection workflow.
@@ -100,9 +104,9 @@ The following items are intentionally not implemented yet:
 
 The current implementation area is:
 
-- Server Inventory behavior expansion planning.
-- Selection of the next inventory workflow: edit server or search and filtering.
-- Preservation of persistence and delete-flow coverage before adding edit or search operations.
+- Search and filtering behavior verification.
+- Search and filtering UI review.
+- Preservation of inventory modification coverage before adding edit operations.
 
 ---
 
@@ -110,9 +114,10 @@ The current implementation area is:
 
 The next safe development steps are:
 
-1. Run the full local verification set after pulling the latest documentation update.
-2. Choose the next Server Inventory expansion: edit server workflow or search and filtering behavior.
-3. Keep SSH and credential handling out of scope until inventory management is stable.
+1. Run unit tests, instrumented tests, and manual search/filter verification on an emulator.
+2. Review whether search/filter UX needs refinement after manual testing.
+3. Start the edit server workflow only after search/filter behavior is reviewed.
+4. Keep SSH and credential handling out of scope until inventory management is stable.
 
 ---
 
@@ -126,4 +131,4 @@ feature/android-project
 
 ## Current Engineering Rule
 
-No SSH or credential handling should be introduced until Room-backed server inventory persistence and basic inventory modification flows are tested and reviewed.
+No SSH or credential handling should be introduced until Room-backed server inventory persistence and basic inventory management flows are tested and reviewed.

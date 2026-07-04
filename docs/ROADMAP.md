@@ -116,6 +116,7 @@ Completed:
 - Basic Server Inventory list rendering.
 - Delete server UI action.
 - Manual delete flow verification.
+- Search and filtering behavior.
 - Local persistence with Room architecture decision.
 - Room dependency and KSP compiler setup.
 - Room schema export configuration.
@@ -129,12 +130,13 @@ Completed:
 - Server DAO instrumentation tests.
 - Room-backed Server repository instrumentation tests.
 - Server entity/domain mapper unit tests.
+- Server Inventory filter matcher unit tests.
 
 Planned:
 
-- Local unit and instrumentation test execution verification after documentation updates.
+- Local unit and instrumentation test execution verification after search/filter implementation.
+- Manual search/filter verification.
 - Edit server workflow.
-- Search and filtering behavior.
 - Migration tests when database version changes.
 
 Deliverable:

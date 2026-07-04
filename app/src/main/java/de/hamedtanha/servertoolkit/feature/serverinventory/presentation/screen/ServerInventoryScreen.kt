@@ -9,12 +9,15 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.lazy.LazyColumn
+import androidx.compose.foundation.lazy.LazyRow
 import androidx.compose.foundation.lazy.items
 import androidx.compose.material3.AlertDialog
 import androidx.compose.material3.Button
 import androidx.compose.material3.Card
 import androidx.compose.material3.CircularProgressIndicator
+import androidx.compose.material3.FilterChip
 import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
 import androidx.compose.runtime.Composable
@@ -29,6 +32,8 @@ import androidx.compose.ui.unit.dp
 import androidx.hilt.lifecycle.viewmodel.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import de.hamedtanha.servertoolkit.feature.serverinventory.domain.model.Server
+import de.hamedtanha.servertoolkit.feature.serverinventory.domain.model.ServerEnvironment
+import de.hamedtanha.servertoolkit.feature.serverinventory.presentation.state.ServerInventoryFilter
 import de.hamedtanha.servertoolkit.feature.serverinventory.presentation.state.ServerInventoryUiState
 import de.hamedtanha.servertoolkit.feature.serverinventory.presentation.viewmodel.ServerInventoryViewModel
 
@@ -43,6 +48,10 @@ fun ServerInventoryRoute(
     ServerInventoryScreen(
         uiState = uiState,
         onAddServerClick = onAddServerClick,
+        onSearchQueryChanged = viewModel::onSearchQueryChanged,
+        onEnvironmentFilterChanged = viewModel::onEnvironmentFilterChanged,
+        onFavoritesOnlyChanged = viewModel::onFavoritesOnlyChanged,
+        onClearFilters = viewModel::onClearFilters,
         onDeleteServerConfirmed = viewModel::onDeleteServerConfirmed,
         modifier = modifier,
     )
@@ -52,6 +61,10 @@ fun ServerInventoryRoute(
 fun ServerInventoryScreen(
     uiState: ServerInventoryUiState,
     onAddServerClick: () -> Unit,
+    onSearchQueryChanged: (String) -> Unit,
+    onEnvironmentFilterChanged: (ServerEnvironment?) -> Unit,
+    onFavoritesOnlyChanged: (Boolean) -> Unit,
+    onClearFilters: () -> Unit,
     onDeleteServerConfirmed: (String) -> Unit,
     modifier: Modifier = Modifier,
 ) {
@@ -69,11 +82,16 @@ fun ServerInventoryScreen(
             onAddServerClick = onAddServerClick,
             modifier = modifier,
         )
-        uiState.isFilterResultEmpty -> ServerInventoryEmptyFilterContent(modifier = modifier)
-        uiState.hasVisibleServers -> ServerInventoryLoadedContent(
+        uiState.hasVisibleServers || uiState.isFilterResultEmpty -> ServerInventoryLoadedContent(
             servers = uiState.servers,
+            totalServerCount = uiState.totalServerCount,
+            filter = uiState.filter,
             operationMessage = uiState.operationMessage,
             onAddServerClick = onAddServerClick,
+            onSearchQueryChanged = onSearchQueryChanged,
+            onEnvironmentFilterChanged = onEnvironmentFilterChanged,
+            onFavoritesOnlyChanged = onFavoritesOnlyChanged,
+            onClearFilters = onClearFilters,
             onDeleteServerClick = { server ->
                 serverPendingDeletion = server
             },
@@ -115,17 +133,6 @@ private fun ServerInventoryEmptyContent(
 }
 
 @Composable
-private fun ServerInventoryEmptyFilterContent(
-    modifier: Modifier = Modifier,
-) {
-    ServerInventoryMessageContent(
-        title = "No matching servers",
-        message = "Try changing the current search or filter criteria.",
-        modifier = modifier,
-    )
-}
-
-@Composable
 private fun ServerInventoryLoadingContent(
     modifier: Modifier = Modifier,
 ) {
@@ -150,8 +157,14 @@ private fun ServerInventoryErrorContent(
 @Composable
 private fun ServerInventoryLoadedContent(
     servers: List<Server>,
+    totalServerCount: Int,
+    filter: ServerInventoryFilter,
     operationMessage: String?,
     onAddServerClick: () -> Unit,
+    onSearchQueryChanged: (String) -> Unit,
+    onEnvironmentFilterChanged: (ServerEnvironment?) -> Unit,
+    onFavoritesOnlyChanged: (Boolean) -> Unit,
+    onClearFilters: () -> Unit,
     onDeleteServerClick: (Server) -> Unit,
     modifier: Modifier = Modifier,
 ) {
@@ -168,7 +181,11 @@ private fun ServerInventoryLoadedContent(
         Spacer(modifier = Modifier.height(8.dp))
 
         Text(
-            text = "${servers.size} servers configured.",
+            text = serverCountText(
+                visibleServerCount = servers.size,
+                totalServerCount = totalServerCount,
+                hasActiveFilter = filter.hasActiveFilter,
+            ),
             style = MaterialTheme.typography.bodyMedium,
             color = MaterialTheme.colorScheme.onSurfaceVariant,
         )
@@ -185,6 +202,16 @@ private fun ServerInventoryLoadedContent(
 
         Spacer(modifier = Modifier.height(16.dp))
 
+        ServerInventoryFilterControls(
+            filter = filter,
+            onSearchQueryChanged = onSearchQueryChanged,
+            onEnvironmentFilterChanged = onEnvironmentFilterChanged,
+            onFavoritesOnlyChanged = onFavoritesOnlyChanged,
+            onClearFilters = onClearFilters,
+        )
+
+        Spacer(modifier = Modifier.height(16.dp))
+
         Button(
             onClick = onAddServerClick,
             modifier = Modifier.fillMaxWidth(),
@@ -194,19 +221,133 @@ private fun ServerInventoryLoadedContent(
 
         Spacer(modifier = Modifier.height(16.dp))
 
-        LazyColumn(
-            modifier = Modifier.fillMaxSize(),
-            verticalArrangement = Arrangement.spacedBy(12.dp),
+        if (servers.isEmpty()) {
+            ServerInventoryNoMatchingServersContent(
+                onClearFilters = onClearFilters,
+                modifier = Modifier.fillMaxWidth(),
+            )
+        } else {
+            LazyColumn(
+                modifier = Modifier.fillMaxSize(),
+                verticalArrangement = Arrangement.spacedBy(12.dp),
+            ) {
+                items(
+                    items = servers,
+                    key = { server -> server.id },
+                ) { server ->
+                    ServerInventoryListItem(
+                        server = server,
+                        onDeleteServerClick = onDeleteServerClick,
+                    )
+                }
+            }
+        }
+    }
+}
+
+@Composable
+private fun ServerInventoryFilterControls(
+    filter: ServerInventoryFilter,
+    onSearchQueryChanged: (String) -> Unit,
+    onEnvironmentFilterChanged: (ServerEnvironment?) -> Unit,
+    onFavoritesOnlyChanged: (Boolean) -> Unit,
+    onClearFilters: () -> Unit,
+    modifier: Modifier = Modifier,
+) {
+    Column(
+        modifier = modifier.fillMaxWidth(),
+        verticalArrangement = Arrangement.spacedBy(12.dp),
+    ) {
+        OutlinedTextField(
+            value = filter.searchQuery,
+            onValueChange = onSearchQueryChanged,
+            modifier = Modifier.fillMaxWidth(),
+            singleLine = true,
+            label = {
+                Text(text = "Search servers")
+            },
+        )
+
+        LazyRow(
+            horizontalArrangement = Arrangement.spacedBy(8.dp),
         ) {
-            items(
-                items = servers,
-                key = { server -> server.id },
-            ) { server ->
-                ServerInventoryListItem(
-                    server = server,
-                    onDeleteServerClick = onDeleteServerClick,
+            item {
+                FilterChip(
+                    selected = filter.environment == null,
+                    onClick = {
+                        onEnvironmentFilterChanged(null)
+                    },
+                    label = {
+                        Text(text = "All")
+                    },
                 )
             }
+
+            items(ServerEnvironment.entries.toList()) { environment ->
+                FilterChip(
+                    selected = filter.environment == environment,
+                    onClick = {
+                        onEnvironmentFilterChanged(environment)
+                    },
+                    label = {
+                        Text(text = environment.name)
+                    },
+                )
+            }
+        }
+
+        Row(
+            modifier = Modifier.fillMaxWidth(),
+            horizontalArrangement = Arrangement.SpaceBetween,
+            verticalAlignment = Alignment.CenterVertically,
+        ) {
+            FilterChip(
+                selected = filter.favoritesOnly,
+                onClick = {
+                    onFavoritesOnlyChanged(!filter.favoritesOnly)
+                },
+                label = {
+                    Text(text = "Favorites only")
+                },
+            )
+
+            if (filter.hasActiveFilter) {
+                TextButton(onClick = onClearFilters) {
+                    Text(text = "Clear filters")
+                }
+            }
+        }
+    }
+}
+
+@Composable
+private fun ServerInventoryNoMatchingServersContent(
+    onClearFilters: () -> Unit,
+    modifier: Modifier = Modifier,
+) {
+    Column(
+        modifier = modifier.padding(top = 24.dp),
+        horizontalAlignment = Alignment.CenterHorizontally,
+    ) {
+        Text(
+            text = "No matching servers",
+            style = MaterialTheme.typography.titleMedium,
+            textAlign = TextAlign.Center,
+        )
+
+        Spacer(modifier = Modifier.height(8.dp))
+
+        Text(
+            text = "Try changing the current search or filter criteria.",
+            style = MaterialTheme.typography.bodyMedium,
+            textAlign = TextAlign.Center,
+            color = MaterialTheme.colorScheme.onSurfaceVariant,
+        )
+
+        Spacer(modifier = Modifier.height(16.dp))
+
+        TextButton(onClick = onClearFilters) {
+            Text(text = "Clear filters")
         }
     }
 }
@@ -348,5 +489,17 @@ private fun ServerInventoryCenteredContent(
         horizontalAlignment = Alignment.CenterHorizontally,
     ) {
         content()
+    }
+}
+
+private fun serverCountText(
+    visibleServerCount: Int,
+    totalServerCount: Int,
+    hasActiveFilter: Boolean,
+): String {
+    return if (hasActiveFilter) {
+        "$visibleServerCount of $totalServerCount servers shown."
+    } else {
+        "$totalServerCount servers configured."
     }
 }
