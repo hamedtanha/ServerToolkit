@@ -66,6 +66,10 @@ The project follows Conventional Commits and Semantic Versioning principles.
 - Removed obsolete placeholder navigation packages.
 - Renamed the shared Add/Edit form state from Add Server naming to Server Form naming.
 - Renamed the shared Add/Edit form screen from Add Server naming to Server Form naming.
+- Reviewed Server Inventory package naming and kept `feature/serverinventory` as the current implemented feature boundary.
+- Documented that a broader `inventory` package should wait until non-server asset types are implemented.
+- Updated architecture documentation to reflect the current implemented inventory behavior.
+- Updated package structure documentation to reflect current Server Inventory files.
 - Updated package structure documentation to reflect app-level navigation.
 - Updated Dashboard empty-state copy to point users toward Server Inventory.
 - Improved Server Inventory screen structure by extracting shared centered content and message content.
