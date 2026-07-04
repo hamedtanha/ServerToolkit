@@ -21,7 +21,7 @@ This document must stay short, current, and factual.
 
 The project is in early Android feature implementation.
 
-The current focus is validating Room-backed Server Inventory persistence before expanding the inventory workflow.
+The current focus is preparing the next Server Inventory behavior after validating the first Room-backed persistence boundary.
 
 ---
 
@@ -70,6 +70,7 @@ The following application-level items are implemented:
 - Basic Server Inventory list rendering.
 - DAO instrumentation tests for insert, replace, and delete behavior.
 - Room-backed repository instrumentation tests for save, replace, and delete behavior.
+- Server entity/domain mapper unit tests.
 - Local persistence with Room architecture decision.
 - Package structure cleanup from `feature/servers` to `feature/serverinventory`.
 - App-level package structure alignment with the current source tree.
@@ -97,9 +98,9 @@ The following items are intentionally not implemented yet:
 
 The current implementation area is:
 
-- Room-backed Server Inventory persistence validation.
-- Local database behavior verification.
-- Test coverage review for the first persistence boundary.
+- Server Inventory behavior expansion planning.
+- Delete server action design.
+- Preservation of persistence test coverage before adding new inventory operations.
 
 ---
 
@@ -107,10 +108,9 @@ The current implementation area is:
 
 The next safe development steps are:
 
-1. Run the Android instrumented persistence tests on an emulator.
-2. Review Room test coverage and add mapping-specific tests if needed.
-3. Start the next inventory behavior only after persistence tests pass locally.
-4. Defer SSH and credential handling until Room-backed server inventory persistence is tested and reviewed.
+1. Run mapper unit tests and persistence instrumentation tests locally.
+2. Add a delete server UI action behind the existing `ServerRepository.deleteServer` contract.
+3. Keep edit, search, SSH, and credential handling out of scope until delete behavior is implemented and reviewed.
 
 ---
 
@@ -124,4 +124,4 @@ feature/android-project
 
 ## Current Engineering Rule
 
-No SSH or credential handling should be introduced until Room-backed server inventory persistence is tested and reviewed.
+No SSH or credential handling should be introduced until Room-backed server inventory persistence and basic inventory modification flows are tested and reviewed.
