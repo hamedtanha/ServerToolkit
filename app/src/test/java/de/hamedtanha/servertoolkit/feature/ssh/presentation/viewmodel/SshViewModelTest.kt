@@ -22,6 +22,27 @@ class SshViewModelTest {
     }
 
     @Test
+    fun `sets connecting state before invoking connection service`() = runBlocking {
+        lateinit var viewModel: SshViewModel
+        val service = FakeSshConnectionService(
+            result = SshConnectionResult.Failed(SshConnectionError.UnsupportedConfiguration),
+            onConnect = {
+                assertEquals(SshConnectionStatus.Connecting, viewModel.uiState.value.status)
+                assertEquals("Connecting", viewModel.uiState.value.statusLabel)
+            },
+        )
+        viewModel = createViewModel(
+            serverId = "server-1",
+            service = service,
+        )
+
+        viewModel.connect()
+
+        assertEquals(SshConnectionStatus.Failed, viewModel.uiState.value.status)
+        assertEquals("placeholder.invalid", service.lastRequest?.host)
+    }
+
+    @Test
     fun `maps fake connected result into ui state`() = runBlocking {
         val service = FakeSshConnectionService(
             result = SshConnectionResult.Connected,
