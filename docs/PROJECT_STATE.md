@@ -47,8 +47,9 @@ The following application-level items are implemented:
 - Server Inventory empty-state action.
 - Add Server navigation destination.
 - Add Server placeholder screen.
-- Add Server UI state.
+- Server Form UI state shared by Add Server and Edit Server.
 - Add Server ViewModel.
+- Shared Server Form screen.
 - Add Server form fields.
 - Add Server validation state.
 - Add Server validation-only save action.
@@ -57,7 +58,7 @@ The following application-level items are implemented:
 - Edit Server navigation destination.
 - Edit Server route.
 - Edit Server ViewModel.
-- Edit Server form reuse through the existing Add Server screen implementation.
+- Edit Server form reuse through the shared Server Form screen.
 - Edit Server repository-backed save flow preserving the existing server id.
 - Manual Edit Server verification after app restart.
 - Server repository contract.
@@ -90,6 +91,7 @@ The following application-level items are implemented:
 - Server entity/domain mapper unit tests.
 - Local persistence with Room architecture decision.
 - Package structure cleanup from `feature/servers` to `feature/serverinventory`.
+- Shared Add/Edit server form naming cleanup.
 - App-level package structure alignment with the current source tree.
 
 ---
@@ -113,7 +115,7 @@ The following items are intentionally not implemented yet:
 The current implementation area is:
 
 - Server Inventory stabilization.
-- Review of shared form naming after Add/Edit form reuse.
+- Review of broader module and package naming before starting SSH-related work.
 - Preservation of inventory management coverage before adding SSH or credential operations.
 
 ---
@@ -122,8 +124,8 @@ The current implementation area is:
 
 The next safe development steps are:
 
-1. Review whether shared server form naming should be refactored from Add Server naming to a neutral form name.
-2. Review Server Inventory UI density after adding edit, delete, search, and filter controls.
+1. Run unit tests, instrumented tests, and debug build after the shared form naming refactor.
+2. Review broader module and package naming before starting SSH-related work.
 3. Decide whether to stabilize version 0.3.0 before starting SSH-related work.
 4. Keep SSH and credential handling out of scope until inventory management is stable.
 
