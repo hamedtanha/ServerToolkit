@@ -117,21 +117,24 @@ Completed:
 - Local persistence with Room architecture decision.
 - Room dependency and KSP compiler setup.
 - Room schema export configuration.
+- Initial Room schema export.
 - Server Toolkit Room database class.
 - Server entity.
 - Server DAO.
 - Server entity/domain mapper.
 - Room-backed Server repository implementation.
 - Hilt database and DAO providers.
+- Server DAO instrumentation tests.
+- Room-backed Server repository instrumentation tests.
 
 Planned:
 
-- Local build verification for Room schema export.
-- Manual persistence verification after application restart.
-- DAO and repository tests.
+- Local instrumentation test execution verification.
+- Mapping-specific tests if needed.
 - Edit server workflow.
 - Delete server UI action.
 - Search and filtering behavior.
+- Migration tests when database version changes.
 
 Deliverable:
 

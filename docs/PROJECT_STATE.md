@@ -21,7 +21,7 @@ This document must stay short, current, and factual.
 
 The project is in early Android feature implementation.
 
-The current focus is validating the Room-backed Server Inventory persistence skeleton before expanding the inventory workflow.
+The current focus is validating Room-backed Server Inventory persistence before expanding the inventory workflow.
 
 ---
 
@@ -58,6 +58,7 @@ The following application-level items are implemented:
 - In-memory Server repository implementation for development and testing support.
 - Room dependency setup with KSP.
 - Room schema export location configuration.
+- Initial Room schema export.
 - Server Toolkit Room database class.
 - Server entity.
 - Server DAO.
@@ -67,6 +68,8 @@ The following application-level items are implemented:
 - Server Inventory repository dependency injection binding.
 - Server Inventory ViewModel repository observation.
 - Basic Server Inventory list rendering.
+- DAO instrumentation tests for insert, replace, and delete behavior.
+- Room-backed repository instrumentation tests for save, replace, and delete behavior.
 - Local persistence with Room architecture decision.
 - Package structure cleanup from `feature/servers` to `feature/serverinventory`.
 - App-level package structure alignment with the current source tree.
@@ -81,7 +84,7 @@ The following items are intentionally not implemented yet:
 - Delete server UI action.
 - Search and filtering behavior.
 - Room migration beyond database version 1.
-- DAO or repository automated tests.
+- Migration tests.
 - SSH connection workflow.
 - Monitoring workflow.
 - Command execution workflow.
@@ -95,8 +98,8 @@ The following items are intentionally not implemented yet:
 The current implementation area is:
 
 - Room-backed Server Inventory persistence validation.
-- Local database schema verification.
-- Add Server persistence behavior review after app restart.
+- Local database behavior verification.
+- Test coverage review for the first persistence boundary.
 
 ---
 
@@ -104,9 +107,9 @@ The current implementation area is:
 
 The next safe development steps are:
 
-1. Run a local Android build to generate and verify the Room schema export.
-2. Manually verify that added servers persist after application restart.
-3. Add DAO and repository tests after the Room skeleton is stable.
+1. Run the Android instrumented persistence tests on an emulator.
+2. Review Room test coverage and add mapping-specific tests if needed.
+3. Start the next inventory behavior only after persistence tests pass locally.
 4. Defer SSH and credential handling until Room-backed server inventory persistence is tested and reviewed.
 
 ---

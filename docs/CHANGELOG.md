@@ -42,11 +42,15 @@ The project follows Conventional Commits and Semantic Versioning principles.
 - Added ADR-003 for local persistence with Room.
 - Added Room dependencies with KSP compiler configuration.
 - Added Room schema export directory configuration.
+- Added initial Room schema export.
 - Added Server Toolkit Room database class.
 - Added Server entity and DAO.
 - Added Server entity/domain mapper.
 - Added Room-backed Server repository implementation.
 - Added Hilt providers for the Room database and Server DAO.
+- Added Room test helper dependency.
+- Added Server DAO instrumentation tests.
+- Added Room-backed Server repository instrumentation tests.
 
 ### Changed
 
@@ -64,6 +68,7 @@ The project follows Conventional Commits and Semantic Versioning principles.
 - Clarified the project state after the accepted Room persistence decision.
 - Switched the production Server repository binding from the in-memory implementation to the Room-backed implementation.
 - Updated architecture and package structure documentation for the Room persistence skeleton.
+- Updated project state documentation after adding persistence tests.
 
 ### Removed
 
@@ -81,7 +86,7 @@ The following items are intentionally not implemented yet:
 - SSH workflow.
 - Credential storage.
 - Monitoring workflow.
-- DAO and repository automated tests.
+- Migration tests.
 
 ---
 
