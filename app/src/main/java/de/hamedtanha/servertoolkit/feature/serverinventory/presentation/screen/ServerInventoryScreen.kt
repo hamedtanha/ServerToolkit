@@ -2,6 +2,7 @@ package de.hamedtanha.servertoolkit.feature.serverinventory.presentation.screen
 
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
@@ -9,13 +10,18 @@ import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
+import androidx.compose.material3.AlertDialog
 import androidx.compose.material3.Button
 import androidx.compose.material3.Card
 import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
+import androidx.compose.material3.TextButton
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.text.style.TextAlign
@@ -37,6 +43,7 @@ fun ServerInventoryRoute(
     ServerInventoryScreen(
         uiState = uiState,
         onAddServerClick = onAddServerClick,
+        onDeleteServerConfirmed = viewModel::onDeleteServerConfirmed,
         modifier = modifier,
     )
 }
@@ -45,8 +52,13 @@ fun ServerInventoryRoute(
 fun ServerInventoryScreen(
     uiState: ServerInventoryUiState,
     onAddServerClick: () -> Unit,
+    onDeleteServerConfirmed: (String) -> Unit,
     modifier: Modifier = Modifier,
 ) {
+    var serverPendingDeletion by remember {
+        mutableStateOf<Server?>(null)
+    }
+
     when {
         uiState.isLoading -> ServerInventoryLoadingContent(modifier = modifier)
         uiState.errorMessage != null -> ServerInventoryErrorContent(
@@ -60,8 +72,25 @@ fun ServerInventoryScreen(
         uiState.isFilterResultEmpty -> ServerInventoryEmptyFilterContent(modifier = modifier)
         uiState.hasVisibleServers -> ServerInventoryLoadedContent(
             servers = uiState.servers,
+            operationMessage = uiState.operationMessage,
             onAddServerClick = onAddServerClick,
+            onDeleteServerClick = { server ->
+                serverPendingDeletion = server
+            },
             modifier = modifier,
+        )
+    }
+
+    serverPendingDeletion?.let { server ->
+        DeleteServerConfirmationDialog(
+            server = server,
+            onDismiss = {
+                serverPendingDeletion = null
+            },
+            onConfirmDelete = {
+                onDeleteServerConfirmed(server.id)
+                serverPendingDeletion = null
+            },
         )
     }
 }
@@ -121,7 +150,9 @@ private fun ServerInventoryErrorContent(
 @Composable
 private fun ServerInventoryLoadedContent(
     servers: List<Server>,
+    operationMessage: String?,
     onAddServerClick: () -> Unit,
+    onDeleteServerClick: (Server) -> Unit,
     modifier: Modifier = Modifier,
 ) {
     Column(
@@ -142,6 +173,16 @@ private fun ServerInventoryLoadedContent(
             color = MaterialTheme.colorScheme.onSurfaceVariant,
         )
 
+        operationMessage?.let { message ->
+            Spacer(modifier = Modifier.height(8.dp))
+
+            Text(
+                text = message,
+                style = MaterialTheme.typography.bodySmall,
+                color = MaterialTheme.colorScheme.error,
+            )
+        }
+
         Spacer(modifier = Modifier.height(16.dp))
 
         Button(
@@ -161,7 +202,10 @@ private fun ServerInventoryLoadedContent(
                 items = servers,
                 key = { server -> server.id },
             ) { server ->
-                ServerInventoryListItem(server = server)
+                ServerInventoryListItem(
+                    server = server,
+                    onDeleteServerClick = onDeleteServerClick,
+                )
             }
         }
     }
@@ -170,48 +214,89 @@ private fun ServerInventoryLoadedContent(
 @Composable
 private fun ServerInventoryListItem(
     server: Server,
+    onDeleteServerClick: (Server) -> Unit,
     modifier: Modifier = Modifier,
 ) {
     Card(
         modifier = modifier.fillMaxWidth(),
     ) {
-        Column(
+        Row(
             modifier = Modifier.padding(16.dp),
+            verticalAlignment = Alignment.CenterVertically,
         ) {
-            Text(
-                text = server.name,
-                style = MaterialTheme.typography.titleMedium,
-            )
+            Column(
+                modifier = Modifier.weight(1f),
+            ) {
+                Text(
+                    text = server.name,
+                    style = MaterialTheme.typography.titleMedium,
+                )
 
-            Spacer(modifier = Modifier.height(4.dp))
-
-            Text(
-                text = "${server.host}:${server.sshPort}",
-                style = MaterialTheme.typography.bodyMedium,
-                color = MaterialTheme.colorScheme.onSurfaceVariant,
-            )
-
-            server.sshUsername?.takeIf { username ->
-                username.isNotBlank()
-            }?.let { username ->
                 Spacer(modifier = Modifier.height(4.dp))
 
                 Text(
-                    text = "User: $username",
+                    text = "${server.host}:${server.sshPort}",
+                    style = MaterialTheme.typography.bodyMedium,
+                    color = MaterialTheme.colorScheme.onSurfaceVariant,
+                )
+
+                server.sshUsername?.takeIf { username ->
+                    username.isNotBlank()
+                }?.let { username ->
+                    Spacer(modifier = Modifier.height(4.dp))
+
+                    Text(
+                        text = "User: $username",
+                        style = MaterialTheme.typography.bodySmall,
+                        color = MaterialTheme.colorScheme.onSurfaceVariant,
+                    )
+                }
+
+                Spacer(modifier = Modifier.height(4.dp))
+
+                Text(
+                    text = "Environment: ${server.environment}",
                     style = MaterialTheme.typography.bodySmall,
                     color = MaterialTheme.colorScheme.onSurfaceVariant,
                 )
             }
 
-            Spacer(modifier = Modifier.height(4.dp))
-
-            Text(
-                text = "Environment: ${server.environment}",
-                style = MaterialTheme.typography.bodySmall,
-                color = MaterialTheme.colorScheme.onSurfaceVariant,
-            )
+            TextButton(
+                onClick = {
+                    onDeleteServerClick(server)
+                },
+            ) {
+                Text(text = "Delete")
+            }
         }
     }
+}
+
+@Composable
+private fun DeleteServerConfirmationDialog(
+    server: Server,
+    onConfirmDelete: () -> Unit,
+    onDismiss: () -> Unit,
+) {
+    AlertDialog(
+        onDismissRequest = onDismiss,
+        title = {
+            Text(text = "Delete server?")
+        },
+        text = {
+            Text(text = "This removes ${server.name} from the local inventory.")
+        },
+        confirmButton = {
+            TextButton(onClick = onConfirmDelete) {
+                Text(text = "Delete")
+            }
+        },
+        dismissButton = {
+            TextButton(onClick = onDismiss) {
+                Text(text = "Cancel")
+            }
+        },
+    )
 }
 
 @Composable

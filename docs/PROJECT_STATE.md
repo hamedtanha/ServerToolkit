@@ -21,7 +21,7 @@ This document must stay short, current, and factual.
 
 The project is in early Android feature implementation.
 
-The current focus is preparing the next Server Inventory behavior after validating the first Room-backed persistence boundary.
+The current focus is preparing the next Server Inventory behavior after validating the first Room-backed persistence boundary and basic delete flow.
 
 ---
 
@@ -68,6 +68,8 @@ The following application-level items are implemented:
 - Server Inventory repository dependency injection binding.
 - Server Inventory ViewModel repository observation.
 - Basic Server Inventory list rendering.
+- Delete server UI action with confirmation dialog.
+- Server Inventory ViewModel delete action.
 - DAO instrumentation tests for insert, replace, and delete behavior.
 - Room-backed repository instrumentation tests for save, replace, and delete behavior.
 - Server entity/domain mapper unit tests.
@@ -82,7 +84,6 @@ The following application-level items are implemented:
 The following items are intentionally not implemented yet:
 
 - Edit server screen.
-- Delete server UI action.
 - Search and filtering behavior.
 - Room migration beyond database version 1.
 - Migration tests.
@@ -99,8 +100,8 @@ The following items are intentionally not implemented yet:
 The current implementation area is:
 
 - Server Inventory behavior expansion planning.
-- Delete server action design.
-- Preservation of persistence test coverage before adding new inventory operations.
+- Manual delete flow verification.
+- Preservation of persistence test coverage before adding edit or search operations.
 
 ---
 
@@ -108,9 +109,9 @@ The current implementation area is:
 
 The next safe development steps are:
 
-1. Run mapper unit tests and persistence instrumentation tests locally.
-2. Add a delete server UI action behind the existing `ServerRepository.deleteServer` contract.
-3. Keep edit, search, SSH, and credential handling out of scope until delete behavior is implemented and reviewed.
+1. Run unit tests, instrumented tests, and a manual delete verification on an emulator.
+2. Review whether delete confirmation UX needs refinement after manual testing.
+3. Keep edit, search, SSH, and credential handling out of scope until delete behavior is reviewed.
 
 ---
 

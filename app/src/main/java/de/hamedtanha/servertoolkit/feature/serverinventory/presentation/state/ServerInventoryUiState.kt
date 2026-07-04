@@ -7,6 +7,7 @@ data class ServerInventoryUiState(
     val filter: ServerInventoryFilter = ServerInventoryFilter(),
     val isLoading: Boolean = false,
     val errorMessage: String? = null,
+    val operationMessage: String? = null,
 ) {
     val isInventoryEmpty: Boolean
         get() = servers.isEmpty() && !filter.hasActiveFilter && !isLoading && errorMessage == null
@@ -17,4 +18,3 @@ data class ServerInventoryUiState(
     val hasVisibleServers: Boolean
         get() = servers.isNotEmpty()
 }
-

@@ -38,6 +38,7 @@ The project follows Conventional Commits and Semantic Versioning principles.
 - Added in-memory Server repository implementation.
 - Added Server Inventory repository dependency injection binding.
 - Added basic Server Inventory list rendering.
+- Added Server Inventory delete action with confirmation dialog.
 - Added Dashboard navigation action to open Server Inventory.
 - Added ADR-003 for local persistence with Room.
 - Added Room dependencies with KSP compiler configuration.
@@ -65,12 +66,14 @@ The project follows Conventional Commits and Semantic Versioning principles.
 - Connected Server Inventory empty-state action to the Add Server placeholder route.
 - Connected Server Inventory ViewModel to the Server repository.
 - Connected Add Server save behavior to the Server repository.
+- Connected Server Inventory delete behavior to the Server repository.
 - Updated the ADR index to include accepted application architecture, Room persistence, navigation, and dependency injection decisions.
 - Clarified the project state after the accepted Room persistence decision.
 - Switched the production Server repository binding from the in-memory implementation to the Room-backed implementation.
 - Updated architecture and package structure documentation for the Room persistence skeleton.
 - Updated project state documentation after adding persistence tests.
 - Updated project state documentation after adding mapper tests.
+- Updated project state documentation after adding delete behavior.
 
 ### Removed
 
@@ -83,7 +86,6 @@ The project follows Conventional Commits and Semantic Versioning principles.
 The following items are intentionally not implemented yet:
 
 - Edit server workflow.
-- Delete server UI action.
 - Search and filtering behavior.
 - SSH workflow.
 - Credential storage.
