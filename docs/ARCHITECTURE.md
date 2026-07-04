@@ -66,7 +66,10 @@ The current implementation includes:
 - Dashboard ViewModel and UI state.
 - Dashboard navigation action to Server Inventory.
 - Server Inventory route, screen, ViewModel, UI state, and filter state.
-- Add Server route, screen, ViewModel, UI state, form fields, and validation.
+- Add Server route, ViewModel, shared Server Form screen, form state, form fields, and validation.
+- Edit Server route and ViewModel using the shared Server Form screen.
+- Delete server UI action with confirmation dialog.
+- Search and filtering behavior.
 - Server Inventory domain model and environment model.
 - Server repository contract.
 - In-memory Server repository implementation retained for development and testing support.
@@ -78,18 +81,33 @@ The current implementation includes:
 - Server entity/domain mapper.
 - Room-backed Server repository implementation.
 - Hilt database, DAO, and repository wiring.
-- Basic Server Inventory list rendering.
+- DAO, repository, mapper, and filter matcher tests.
+- Manual and automated verification for add, edit, delete, search, filtering, and shared server form naming cleanup.
 
 The following items are intentionally not implemented yet:
 
-- Edit server workflow.
-- Delete server UI action.
-- Search and filtering behavior.
-- DAO and repository automated tests.
 - SSH connection workflow.
 - Monitoring workflow.
 - Command execution workflow.
 - Secure credential storage.
+- Room migration beyond database version 1.
+
+---
+
+## Naming Scope
+
+The current inventory-related implementation is intentionally named `serverinventory` because it manages one concrete asset type: `Server`.
+
+A broader `inventory` package or model should be introduced only after the application implements additional non-server asset types or shared inventory behavior that is no longer server-specific.
+
+The current naming rules are:
+
+- Use `Server` for the implemented domain model.
+- Use `ServerInventory` for the implemented feature scope.
+- Use `ServerForm` for UI and state shared by Add Server and Edit Server.
+- Do not introduce `Device`, `ServerDevice`, `InventoryItem`, or `feature/inventory` naming until the broader concept is implemented.
+
+This prevents premature abstraction while keeping the future inventory direction open.
 
 ---
 
@@ -258,258 +276,3 @@ The initial Room table stores server metadata only. It must not store credential
 - Database schema changes require migrations unless destructive migration is explicitly justified for a pre-release stage.
 - Sensitive credentials must not be stored casually in plain Room tables.
 - Credential storage requires a separate security decision before implementation.
-- The Room schema export directory is configured under `app/schemas` and generated schema files should be committed after local build verification.
-
-### Database Aggregation Boundary
-
-`ServerToolkitDatabase` belongs to shared database infrastructure.
-
-Because Room requires a database class to aggregate entities and DAOs, the database class may reference feature-owned Room entities and DAOs for schema registration only.
-
-This is a narrow persistence exception. It must not be used as permission for general `core` code to depend on feature UI, presentation, domain workflows, or feature services.
-
----
-
-## Navigation
-
-Server Toolkit uses Single Activity architecture with Jetpack Navigation Compose.
-
-### Rules
-
-- Route definitions must be centralized.
-- Composables must not hard-code route strings.
-- Navigation actions should be passed down as lambdas where practical.
-- Feature screens should not know the internal structure of the navigation graph beyond the actions they can trigger.
-- Navigation arguments must be explicit and minimal.
-
-### Current Navigation Destinations
-
-The current navigation graph supports:
-
-- Dashboard.
-- Server Inventory.
-- Add Server.
-
-Future destinations may include:
-
-- Edit Server.
-- Server Details.
-- Settings.
-
-Placeholder screens must be clearly identified and must not be documented as completed functionality.
-
----
-
-## Package Structure
-
-The package structure should reflect feature ownership and layer responsibilities.
-
-Current baseline:
-
-```text
-de.hamedtanha.servertoolkit
-
-├── core
-│   ├── common
-│   ├── database
-│   └── di
-│
-├── feature
-│   ├── dashboard
-│   │   └── presentation
-│   ├── serverinventory
-│   │   ├── data
-│   │   │   ├── local
-│   │   │   │   ├── dao
-│   │   │   │   └── entity
-│   │   │   ├── mapper
-│   │   │   └── repository
-│   │   ├── di
-│   │   ├── domain
-│   │   │   ├── model
-│   │   │   └── repository
-│   │   └── presentation
-│   │       ├── screen
-│   │       ├── state
-│   │       └── viewmodel
-│   └── settings
-│       └── presentation
-│
-├── navigation
-│
-└── ui
-    └── theme
-```
-
-Package names may be adjusted during implementation only when doing so improves consistency and remains aligned with accepted ADRs and package structure documentation.
-
----
-
-## Dependency Direction
-
-Allowed dependency direction:
-
-```text
-Compose Screen
-   ↓
-ViewModel
-   ↓
-Repository Interface
-   ↓
-Repository Implementation
-   ↓
-DAO / Database
-```
-
-Rules:
-
-- UI must not depend on database implementation.
-- UI must not depend on DAO classes.
-- Domain models must not depend on Room.
-- Data implementations may depend on Room.
-- Repository interfaces should be stable once consumed by ViewModels.
-- `core/database` may reference feature-owned Room persistence classes only for Room schema aggregation.
-
----
-
-## Dependency Injection
-
-Server Toolkit uses Hilt for dependency injection.
-
-### Current Scope
-
-The current implementation includes:
-
-- Hilt-enabled application setup.
-- Hilt-enabled ViewModel integration.
-- `DatabaseModule` for the Room database.
-- Server Inventory database module for the feature-owned DAO provider.
-- Server Inventory repository binding from `ServerRepository` to `RoomServerRepository`.
-
-### Rules
-
-- Dependency wiring should remain centralized by responsibility.
-- ViewModels should receive dependencies through constructor injection.
-- Modules should be small and grouped by responsibility.
-- Do not introduce bindings before a real dependency exists.
-- Do not use Hilt to hide unnecessary abstraction.
-
----
-
-## Error Handling
-
-Error handling should be explicit and user-safe.
-
-Rules:
-
-- Do not expose raw exceptions directly to the UI.
-- Convert technical failures into meaningful UI states.
-- Log internal errors only when logging infrastructure exists and is appropriate.
-- Avoid swallowing errors silently.
-
-For early implementation, simple UI state or result models are acceptable.
-
----
-
-## Validation
-
-Validation must be consistent and testable.
-
-For server inventory, initial validation includes:
-
-- Server name is required.
-- Host is required.
-- Username is required in the current Add Server form.
-- Port must be within `1..65535`.
-
-Rules:
-
-- Validation used by multiple screens must not be duplicated indefinitely.
-- UI may display validation messages but should not own shared validation policy long-term.
-- Validation rules should be covered by unit tests when stabilized.
-
----
-
-## Testing Strategy
-
-The architecture must support testing from the beginning.
-
-### Initial Test Targets
-
-- Server validation.
-- Repository behavior.
-- Entity/domain mapping.
-- Room DAO behavior.
-- ViewModel state transitions.
-
-### Rules
-
-- Business rules must be unit-testable without Android UI.
-- Repository implementations should be testable with fake or in-memory data sources.
-- DAO behavior should be tested with Room-backed tests after the persistence skeleton stabilizes.
-- UI tests are useful later, but they are not the first priority for the current scaffold stage.
-
----
-
-## Security Boundaries
-
-Server Toolkit is an infrastructure management application. Security mistakes are expensive.
-
-Rules:
-
-- Do not store SSH passwords or private keys in plain Room tables.
-- Do not log credentials, tokens, private keys, server secrets, or sensitive infrastructure identifiers.
-- Credential storage requires a dedicated security design before implementation.
-- Host fingerprint verification requires its own architecture decision before SSH connectivity is implemented.
-
-The first server inventory persistence implementation stores only non-secret server metadata.
-
----
-
-## Future Architecture Candidates
-
-The following are not part of the current implementation baseline unless accepted by future ADRs:
-
-- SSH client library.
-- Secure credential storage abstraction.
-- WorkManager.
-- Retrofit or another HTTP client.
-- Background monitoring.
-- Synchronization across devices.
-- Cloud provider integrations.
-- Docker management.
-- Kubernetes support.
-
-These are future candidates, not current functionality.
-
----
-
-## Governance
-
-This document must stay synchronized with accepted ADRs and actual implementation.
-
-Update this document when:
-
-- A new ADR changes architecture.
-- The implementation adopts a new architectural pattern.
-- Package structure changes materially.
-- Persistence or navigation strategy changes.
-- Security boundaries change.
-
-Do not update this document to advertise planned features as if they already exist.
-
----
-
-## Related Documents
-
-- [Product Vision](PRODUCT_VISION.md)
-- [Roadmap](ROADMAP.md)
-- [Project State](PROJECT_STATE.md)
-- [Development](DEVELOPMENT.md)
-- [Security](SECURITY.md)
-- [Package Structure](../PACKAGE_STRUCTURE.md)
-- [ADR-001: Project Vision](adr/ADR-001-project-vision.md)
-- [ADR-002: Application Architecture](adr/ADR-002-application-architecture.md)
-- [ADR-003: Local Persistence with Room](adr/ADR-003-local-persistence-with-room.md)
-- [ADR-004: Navigation Strategy](adr/ADR-004-navigation-strategy.md)
-- [ADR-005: Dependency Injection Strategy](adr/ADR-005-dependency-injection-strategy.md)
