@@ -41,6 +41,7 @@ import de.hamedtanha.servertoolkit.feature.serverinventory.presentation.viewmode
 fun ServerInventoryRoute(
     onAddServerClick: () -> Unit,
     onEditServerClick: (String) -> Unit,
+    onConnectServerClick: (String) -> Unit,
     modifier: Modifier = Modifier,
     viewModel: ServerInventoryViewModel = hiltViewModel(),
 ) {
@@ -50,6 +51,7 @@ fun ServerInventoryRoute(
         uiState = uiState,
         onAddServerClick = onAddServerClick,
         onEditServerClick = onEditServerClick,
+        onConnectServerClick = onConnectServerClick,
         onSearchQueryChanged = viewModel::onSearchQueryChanged,
         onEnvironmentFilterChanged = viewModel::onEnvironmentFilterChanged,
         onFavoritesOnlyChanged = viewModel::onFavoritesOnlyChanged,
@@ -64,6 +66,7 @@ fun ServerInventoryScreen(
     uiState: ServerInventoryUiState,
     onAddServerClick: () -> Unit,
     onEditServerClick: (String) -> Unit,
+    onConnectServerClick: (String) -> Unit,
     onSearchQueryChanged: (String) -> Unit,
     onEnvironmentFilterChanged: (ServerEnvironment?) -> Unit,
     onFavoritesOnlyChanged: (Boolean) -> Unit,
@@ -92,6 +95,7 @@ fun ServerInventoryScreen(
             operationMessage = uiState.operationMessage,
             onAddServerClick = onAddServerClick,
             onEditServerClick = onEditServerClick,
+            onConnectServerClick = onConnectServerClick,
             onSearchQueryChanged = onSearchQueryChanged,
             onEnvironmentFilterChanged = onEnvironmentFilterChanged,
             onFavoritesOnlyChanged = onFavoritesOnlyChanged,
@@ -166,6 +170,7 @@ private fun ServerInventoryLoadedContent(
     operationMessage: String?,
     onAddServerClick: () -> Unit,
     onEditServerClick: (String) -> Unit,
+    onConnectServerClick: (String) -> Unit,
     onSearchQueryChanged: (String) -> Unit,
     onEnvironmentFilterChanged: (ServerEnvironment?) -> Unit,
     onFavoritesOnlyChanged: (Boolean) -> Unit,
@@ -243,6 +248,7 @@ private fun ServerInventoryLoadedContent(
                     ServerInventoryListItem(
                         server = server,
                         onEditServerClick = onEditServerClick,
+                        onConnectServerClick = onConnectServerClick,
                         onDeleteServerClick = onDeleteServerClick,
                     )
                 }
@@ -362,6 +368,7 @@ private fun ServerInventoryNoMatchingServersContent(
 private fun ServerInventoryListItem(
     server: Server,
     onEditServerClick: (String) -> Unit,
+    onConnectServerClick: (String) -> Unit,
     onDeleteServerClick: (Server) -> Unit,
     modifier: Modifier = Modifier,
 ) {
@@ -413,6 +420,14 @@ private fun ServerInventoryListItem(
                 horizontalArrangement = Arrangement.spacedBy(4.dp),
                 verticalAlignment = Alignment.CenterVertically,
             ) {
+                TextButton(
+                    onClick = {
+                        onConnectServerClick(server.id)
+                    },
+                ) {
+                    Text(text = "Connect")
+                }
+
                 TextButton(
                     onClick = {
                         onEditServerClick(server.id)
