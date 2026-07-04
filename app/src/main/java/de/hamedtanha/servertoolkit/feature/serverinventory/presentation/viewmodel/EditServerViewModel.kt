@@ -6,7 +6,7 @@ import androidx.lifecycle.viewModelScope
 import dagger.hilt.android.lifecycle.HiltViewModel
 import de.hamedtanha.servertoolkit.feature.serverinventory.domain.model.Server
 import de.hamedtanha.servertoolkit.feature.serverinventory.domain.repository.ServerRepository
-import de.hamedtanha.servertoolkit.feature.serverinventory.presentation.state.AddServerUiState
+import de.hamedtanha.servertoolkit.feature.serverinventory.presentation.state.ServerFormUiState
 import javax.inject.Inject
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
@@ -24,13 +24,13 @@ class EditServerViewModel @Inject constructor(
     private var originalServer: Server? = null
 
     private val _uiState = MutableStateFlow(
-        AddServerUiState(
+        ServerFormUiState(
             title = "Edit server",
             description = "Update the connection details for this server.",
             formMessage = "Loading server details.",
         ),
     )
-    val uiState: StateFlow<AddServerUiState> = _uiState.asStateFlow()
+    val uiState: StateFlow<ServerFormUiState> = _uiState.asStateFlow()
 
     init {
         loadServer()
@@ -40,10 +40,7 @@ class EditServerViewModel @Inject constructor(
         _uiState.update { currentState ->
             currentState.copy(
                 name = name,
-                nameError = validateRequiredText(
-                    value = name,
-                    fieldName = "Server name",
-                ),
+                nameError = validateRequiredText(name, "Server name"),
                 formMessage = null,
                 isSaved = false,
             )
@@ -54,10 +51,7 @@ class EditServerViewModel @Inject constructor(
         _uiState.update { currentState ->
             currentState.copy(
                 host = host,
-                hostError = validateRequiredText(
-                    value = host,
-                    fieldName = "Host",
-                ),
+                hostError = validateRequiredText(host, "Host"),
                 formMessage = null,
                 isSaved = false,
             )
@@ -79,10 +73,7 @@ class EditServerViewModel @Inject constructor(
         _uiState.update { currentState ->
             currentState.copy(
                 username = username,
-                usernameError = validateRequiredText(
-                    value = username,
-                    fieldName = "Username",
-                ),
+                usernameError = validateRequiredText(username, "Username"),
                 formMessage = null,
                 isSaved = false,
             )
@@ -94,34 +85,23 @@ class EditServerViewModel @Inject constructor(
         val loadedServer = originalServer
 
         if (loadedServer == null) {
-            _uiState.value = validatedState.copy(
-                formMessage = "Server could not be loaded.",
-            )
+            _uiState.value = validatedState.copy(formMessage = "Server could not be loaded.")
             return
         }
 
         if (!validatedState.canSave) {
-            _uiState.value = validatedState.copy(
-                formMessage = "Please fix the highlighted fields.",
-            )
+            _uiState.value = validatedState.copy(formMessage = "Please fix the highlighted fields.")
             return
         }
 
         viewModelScope.launch {
-            _uiState.value = validatedState.copy(
-                isSaving = true,
-                formMessage = null,
-            )
+            _uiState.value = validatedState.copy(isSaving = true, formMessage = null)
 
             runCatching {
                 serverRepository.saveServer(validatedState.toUpdatedServer(loadedServer))
             }.onSuccess {
                 _uiState.update { currentState ->
-                    currentState.copy(
-                        isSaving = false,
-                        isSaved = true,
-                        formMessage = null,
-                    )
+                    currentState.copy(isSaving = false, isSaved = true, formMessage = null)
                 }
             }.onFailure { throwable ->
                 _uiState.update { currentState ->
@@ -168,33 +148,17 @@ class EditServerViewModel @Inject constructor(
         }
     }
 
-    private fun validateState(state: AddServerUiState): AddServerUiState {
+    private fun validateState(state: ServerFormUiState): ServerFormUiState {
         return state.copy(
-            nameError = validateRequiredText(
-                value = state.name,
-                fieldName = "Server name",
-            ),
-            hostError = validateRequiredText(
-                value = state.host,
-                fieldName = "Host",
-            ),
+            nameError = validateRequiredText(state.name, "Server name"),
+            hostError = validateRequiredText(state.host, "Host"),
             portError = validatePort(state.port),
-            usernameError = validateRequiredText(
-                value = state.username,
-                fieldName = "Username",
-            ),
+            usernameError = validateRequiredText(state.username, "Username"),
         )
     }
 
-    private fun validateRequiredText(
-        value: String,
-        fieldName: String,
-    ): String? {
-        return if (value.isBlank()) {
-            "$fieldName is required."
-        } else {
-            null
-        }
+    private fun validateRequiredText(value: String, fieldName: String): String? {
+        return if (value.isBlank()) "$fieldName is required." else null
     }
 
     private fun validatePort(port: String): String? {
@@ -203,14 +167,14 @@ class EditServerViewModel @Inject constructor(
         return when {
             port.isBlank() -> "Port is required."
             parsedPort == null -> "Port must be a number."
-            parsedPort !in AddServerUiState.MIN_PORT..AddServerUiState.MAX_PORT ->
-                "Port must be between ${AddServerUiState.MIN_PORT} and ${AddServerUiState.MAX_PORT}."
+            parsedPort !in ServerFormUiState.MIN_PORT..ServerFormUiState.MAX_PORT ->
+                "Port must be between ${ServerFormUiState.MIN_PORT} and ${ServerFormUiState.MAX_PORT}."
             else -> null
         }
     }
 
-    private fun Server.toUiState(): AddServerUiState {
-        return AddServerUiState(
+    private fun Server.toUiState(): ServerFormUiState {
+        return ServerFormUiState(
             title = "Edit server",
             description = "Update the connection details for this server.",
             name = name,
@@ -220,7 +184,7 @@ class EditServerViewModel @Inject constructor(
         )
     }
 
-    private fun AddServerUiState.toUpdatedServer(server: Server): Server {
+    private fun ServerFormUiState.toUpdatedServer(server: Server): Server {
         return server.copy(
             name = name.trim(),
             host = host.trim(),
