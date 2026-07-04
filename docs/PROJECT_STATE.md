@@ -21,7 +21,7 @@ This document must stay short, current, and factual.
 
 The project is in early Android feature implementation.
 
-The current focus is stabilizing Server Inventory after validating add, edit, delete, search, filtering, shared form naming, and Room-backed persistence.
+The current focus is stabilizing Server Inventory before starting SSH-related implementation.
 
 ---
 
@@ -86,6 +86,7 @@ The following application-level items are implemented:
 - Automated search and filtering verification through unit tests, instrumented tests, and debug build.
 - Automated Edit Server verification through unit tests, instrumented tests, and debug build.
 - Automated shared Server Form naming verification through unit tests, instrumented tests, and debug build.
+- Server Inventory stabilization checklist.
 - Server Inventory filter matcher unit tests.
 - DAO instrumentation tests for insert, replace, and delete behavior.
 - Room-backed repository instrumentation tests for save, replace, and delete behavior.
@@ -115,8 +116,8 @@ The following items are intentionally not implemented yet:
 
 The current implementation area is:
 
-- Server Inventory stabilization.
-- Review of broader module and package naming before starting SSH-related work.
+- Server Inventory stabilization review.
+- Confirmation that the 0.3.0 Server Inventory foundation is stable enough to support SSH workflows.
 - Preservation of inventory management coverage before adding SSH or credential operations.
 
 ---
@@ -125,9 +126,9 @@ The current implementation area is:
 
 The next safe development steps are:
 
-1. Review broader module and package naming before starting SSH-related work.
-2. Decide whether to stabilize version 0.3.0 before starting SSH-related work.
-3. Keep SSH and credential handling out of scope until inventory management is stable.
+1. Review `docs/SERVER_INVENTORY_STABILIZATION.md` against the implemented application behavior.
+2. Decide whether the current Server Inventory foundation is ready to be treated as the 0.3.0 baseline.
+3. Keep SSH and credential handling out of scope until inventory stabilization is explicitly accepted.
 
 ---
 
