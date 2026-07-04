@@ -8,6 +8,7 @@ import de.hamedtanha.servertoolkit.feature.dashboard.presentation.screen.Dashboa
 import de.hamedtanha.servertoolkit.feature.serverinventory.presentation.screen.AddServerRoute
 import de.hamedtanha.servertoolkit.feature.serverinventory.presentation.screen.EditServerRoute
 import de.hamedtanha.servertoolkit.feature.serverinventory.presentation.screen.ServerInventoryRoute
+import de.hamedtanha.servertoolkit.feature.ssh.presentation.screen.SshRoute
 
 @Composable
 fun AppNavHost() {
@@ -39,6 +40,11 @@ fun AppNavHost() {
                         launchSingleTop = true
                     }
                 },
+                onConnectServerClick = { serverId ->
+                    navController.navigate(SshDestination.createRoute(serverId)) {
+                        launchSingleTop = true
+                    }
+                },
             )
         }
 
@@ -52,6 +58,14 @@ fun AppNavHost() {
 
         composable(route = EditServerDestination.route) {
             EditServerRoute(
+                onNavigateBack = {
+                    navController.navigateUp()
+                },
+            )
+        }
+
+        composable(route = SshDestination.route) {
+            SshRoute(
                 onNavigateBack = {
                     navController.navigateUp()
                 },
