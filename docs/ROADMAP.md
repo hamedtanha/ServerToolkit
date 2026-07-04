@@ -1,7 +1,7 @@
 # Roadmap
 
 **Project:** Server Toolkit  
-**Version:** 0.2.0-alpha  
+**Version:** 0.3.0-baseline  
 **Status:** Active  
 **Last Updated:** 2026-07-04
 
@@ -53,7 +53,7 @@ Completed.
 
 ---
 
-## Version 0.2.0 — Android Architecture and Navigation
+## Version 0.2.0 — Android Architecture and Navigation ✅
 
 Objective:
 
@@ -74,19 +74,13 @@ Completed:
 - Package structure cleanup.
 - Removal of obsolete package placeholders.
 
-Remaining:
-
-- Documentation alignment.
-- Navigation flow review.
-- Basic UI stabilization.
-
 Status:
 
-In Progress.
+Completed.
 
 ---
 
-## Version 0.3.0 — Server Inventory Foundation
+## Version 0.3.0 — Server Inventory Foundation ✅
 
 Objective:
 
@@ -128,6 +122,7 @@ Completed:
 - Manual search and filtering verification.
 - Automated search and filtering verification.
 - Server Inventory stabilization checklist.
+- Accepted Server Inventory 0.3.0 baseline.
 - Local persistence with Room architecture decision.
 - Room dependency and KSP compiler setup.
 - Room schema export configuration.
@@ -143,19 +138,19 @@ Completed:
 - Server entity/domain mapper unit tests.
 - Server Inventory filter matcher unit tests.
 
-Planned:
+Follow-up:
 
-- Server Inventory stabilization review.
-- Decision on whether to treat the current Server Inventory foundation as the 0.3.0 baseline.
+- Server Inventory UI density review.
+- One-character search behavior review.
 - Migration tests when database version changes.
 
 Deliverable:
 
-Working local server inventory.
+Working local server inventory baseline.
 
 Status:
 
-In Progress.
+Accepted baseline.
 
 ---
 
@@ -167,12 +162,13 @@ Introduce secure SSH connectivity.
 
 Entry condition:
 
-SSH implementation must not begin until the Server Inventory stabilization checklist is reviewed and the 0.3.0 baseline is accepted.
+The Server Inventory 0.3.0 baseline has been accepted. Credential storage still requires a separate security decision before implementation.
 
 Planned:
 
+- SSH architecture and security ADR.
 - SSH client integration.
-- Authentication.
+- Authentication boundary definition.
 - Host key verification.
 - Session management.
 - Connection history.
