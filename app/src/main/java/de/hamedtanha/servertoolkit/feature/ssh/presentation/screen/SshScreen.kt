@@ -64,6 +64,15 @@ fun SshScreen(
             color = MaterialTheme.colorScheme.onSurfaceVariant,
         )
 
+        Spacer(modifier = Modifier.height(8.dp))
+
+        Text(
+            text = "Status: ${uiState.statusLabel}",
+            style = MaterialTheme.typography.bodySmall,
+            textAlign = TextAlign.Center,
+            color = MaterialTheme.colorScheme.onSurfaceVariant,
+        )
+
         Spacer(modifier = Modifier.height(16.dp))
 
         Text(
