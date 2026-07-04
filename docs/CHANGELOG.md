@@ -46,6 +46,8 @@ The project follows Conventional Commits and Semantic Versioning principles.
 - Added SSH domain connection error model.
 - Added SSH domain connection service contract.
 - Added SSH domain model unit tests.
+- Added test-only fake SSH connection service.
+- Added SSH ViewModel fake result unit tests.
 - Added SSH UI connection status model.
 - Added SSH connection result UI mapper.
 - Added SSH presentation state unit tests.
@@ -118,6 +120,7 @@ The project follows Conventional Commits and Semantic Versioning principles.
 - Updated project state documentation after adding the SSHJ dependency.
 - Updated project state documentation after adding SSH domain contracts.
 - Updated project state documentation after aligning SSH UI state with domain results.
+- Updated project state documentation after adding fake SSH service tests.
 - Recorded successful manual verification of the delete flow after application restart.
 - Recorded successful manual verification of search and filtering behavior.
 - Recorded successful automated verification after search and filtering implementation.
