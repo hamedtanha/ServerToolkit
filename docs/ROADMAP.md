@@ -127,6 +127,7 @@ Completed:
 - Search and filtering behavior.
 - Manual search and filtering verification.
 - Automated search and filtering verification.
+- Server Inventory stabilization checklist.
 - Local persistence with Room architecture decision.
 - Room dependency and KSP compiler setup.
 - Room schema export configuration.
@@ -144,8 +145,8 @@ Completed:
 
 Planned:
 
-- Server Inventory UI stabilization.
-- Broader module and package naming review.
+- Server Inventory stabilization review.
+- Decision on whether to treat the current Server Inventory foundation as the 0.3.0 baseline.
 - Migration tests when database version changes.
 
 Deliverable:
@@ -163,6 +164,10 @@ In Progress.
 Objective:
 
 Introduce secure SSH connectivity.
+
+Entry condition:
+
+SSH implementation must not begin until the Server Inventory stabilization checklist is reviewed and the 0.3.0 baseline is accepted.
 
 Planned:
 
