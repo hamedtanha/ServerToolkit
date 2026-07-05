@@ -414,6 +414,52 @@ class SshViewModelTest {
     }
 
     @Test
+    fun `ignores command result when session is invalidated before command completes`() = runBlocking {
+        val commandStarted = CompletableDeferred<Unit>()
+        val releaseCommand = CompletableDeferred<Unit>()
+        val commandExecutionService = FakeSshCommandExecutionService(
+            result = SshCommandExecutionResult.Completed(
+                SshCommandExecutionOutput(
+                    stdout = "stale output",
+                    stderr = "",
+                    exitStatus = 0,
+                ),
+            ),
+            onExecute = {
+                commandStarted.complete(Unit)
+                releaseCommand.await()
+            },
+        )
+        val viewModel = createViewModel(
+            serverId = "server-1",
+            commandExecutionService = commandExecutionService,
+        )
+
+        viewModel.onConnectionResultReceived(sshConnectedResult())
+        viewModel.onCommandChanged("uptime")
+
+        val execution = launch {
+            viewModel.executeCommand()
+        }
+
+        commandStarted.await()
+
+        viewModel.onConnectionResultReceived(
+            SshConnectionResult.Failed(SshConnectionError.AuthenticationRequired),
+        )
+
+        releaseCommand.complete(Unit)
+        execution.join()
+
+        assertEquals(1, commandExecutionService.executeCallCount)
+        assertEquals(SshCommandExecutionStatus.Idle, viewModel.uiState.value.commandExecution.status)
+        assertEquals("", viewModel.uiState.value.commandExecution.stdout)
+        assertEquals("", viewModel.uiState.value.commandExecution.stderr)
+        assertNull(viewModel.uiState.value.commandExecution.exitStatus)
+        assertFalse(viewModel.uiState.value.commandExecution.hasOutput)
+    }
+
+    @Test
     fun `maps fake failure result into ui state`() = runBlocking {
         val service = FakeSshConnectionService(
             result = SshConnectionResult.Failed(SshConnectionError.AuthenticationRequired),

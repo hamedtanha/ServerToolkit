@@ -251,9 +251,11 @@ class SshViewModel @Inject constructor(
                 command = command,
             )
 
-            _uiState.value = _uiState.value.copy(
-                commandExecution = _uiState.value.commandExecution.withExecutionResult(result),
-            )
+            if (activeSessionHandle == sessionHandle) {
+                _uiState.value = _uiState.value.copy(
+                    commandExecution = _uiState.value.commandExecution.withExecutionResult(result),
+                )
+            }
         } catch (error: CancellationException) {
             _uiState.value = _uiState.value.copy(
                 commandExecution = _uiState.value.commandExecution.withExecutionResult(
