@@ -211,7 +211,7 @@ The current implementation area is:
 The next safe development steps are:
 
 1. Add command execution planning behind owned SSH sessions.
-2. Add real SSH session open and close execution behind the lifecycle boundary and owner registry.
+2. Add command/channel open and close execution behind owned SSH sessions.
 3. Keep command execution disabled until all remaining ADR-009 implementation gates are satisfied.
 
 ---
