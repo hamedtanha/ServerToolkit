@@ -7,25 +7,27 @@ import java.io.IOException
 import java.net.SocketTimeoutException
 import java.net.UnknownHostException
 import net.schmizz.sshj.SSHClient
+import net.schmizz.sshj.userauth.UserAuthException
 
 /**
  * Opens an SSHJ transport connection only with a trusted host-key verifier installed.
  *
- * This executor intentionally closes the SSHJ client before returning. It proves trusted transport
- * connection execution while keeping authentication, session ownership, command execution, and
- * terminal interaction disabled for this implementation gate.
+ * Authentication is executed inside this boundary while the SSHJ client is still connected. The
+ * client is still closed before returning because long-lived session ownership is intentionally not
+ * enabled in this implementation gate.
  */
 internal interface SshjTrustedConnectionExecutor {
 
-    fun connect(
+    fun connectAndAuthenticate(
         request: SshConnectionRequest,
         trustedHostKey: SshTrustedHostKey,
+        authenticationMapping: SshjAuthenticationMapping,
     ): SshjTrustedConnectionExecutionResult
 }
 
 internal sealed interface SshjTrustedConnectionExecutionResult {
 
-    data object Connected : SshjTrustedConnectionExecutionResult
+    data object Authenticated : SshjTrustedConnectionExecutionResult
 
     data class Failed(
         val error: SshConnectionError,
@@ -34,11 +36,13 @@ internal sealed interface SshjTrustedConnectionExecutionResult {
 
 internal class SshjNetworkTrustedConnectionExecutor(
     private val trustedHostKeyVerifierFactory: SshjTrustedHostKeyVerifierFactory,
+    private val authenticationExecutor: SshjAuthenticationExecutor,
 ) : SshjTrustedConnectionExecutor {
 
-    override fun connect(
+    override fun connectAndAuthenticate(
         request: SshConnectionRequest,
         trustedHostKey: SshTrustedHostKey,
+        authenticationMapping: SshjAuthenticationMapping,
     ): SshjTrustedConnectionExecutionResult {
         return try {
             SSHClient().use { client ->
@@ -48,7 +52,21 @@ internal class SshjNetworkTrustedConnectionExecutor(
                     trustedHostKeyVerifierFactory.create(trustedHostKey),
                 )
                 client.connect(request.host, request.port)
-                SshjTrustedConnectionExecutionResult.Connected
+
+                when (
+                    val result = authenticationExecutor.authenticate(
+                        client = SshjAuthenticatedClientAdapter(client),
+                        mapping = authenticationMapping,
+                    )
+                ) {
+                    SshjAuthenticationExecutionResult.Authenticated -> {
+                        SshjTrustedConnectionExecutionResult.Authenticated
+                    }
+
+                    is SshjAuthenticationExecutionResult.Failed -> {
+                        SshjTrustedConnectionExecutionResult.Failed(result.error)
+                    }
+                }
             }
         } catch (error: UnknownHostException) {
             SshjTrustedConnectionExecutionResult.Failed(SshConnectionError.UnknownHost)
@@ -56,6 +74,22 @@ internal class SshjNetworkTrustedConnectionExecutor(
             SshjTrustedConnectionExecutionResult.Failed(SshConnectionError.ConnectionTimeout)
         } catch (error: IOException) {
             SshjTrustedConnectionExecutionResult.Failed(SshConnectionError.Unknown)
+        }
+    }
+}
+
+private class SshjAuthenticatedClientAdapter(
+    private val client: SSHClient,
+) : SshjAuthenticatedClient {
+
+    override fun authPassword(
+        username: String,
+        password: String,
+    ) {
+        try {
+            client.authPassword(username, password)
+        } catch (error: UserAuthException) {
+            throw SshjAuthenticationFailedException(error)
         }
     }
 }

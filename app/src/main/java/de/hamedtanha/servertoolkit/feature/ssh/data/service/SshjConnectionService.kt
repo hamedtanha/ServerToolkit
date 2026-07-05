@@ -15,18 +15,22 @@ import kotlinx.coroutines.withContext
  * SSHJ-backed trusted connection service shell.
  *
  * This service may open a short-lived SSHJ transport connection only after a trusted host key has
- * been resolved and installed as the SSHJ host-key verifier. Authentication, long-lived session
- * ownership, command execution, and terminal interaction remain disabled in this implementation
- * gate.
+ * been resolved and installed as the SSHJ host-key verifier. Password authentication may execute
+ * inside that trusted boundary, but long-lived session ownership, command execution, and terminal
+ * interaction remain disabled in this implementation gate.
  */
 class SshjConnectionService @Inject constructor(
     private val authenticationAdapter: SshjAuthenticationAdapter,
     private val hostTrustRepository: SshHostTrustRepository,
     trustedHostKeyVerifierFactory: SshjTrustedHostKeyVerifierFactory,
+    authenticationExecutor: SshjAuthenticationExecutor,
 ) : SshConnectionService {
 
     private var trustedConnectionExecutor: SshjTrustedConnectionExecutor =
-        SshjNetworkTrustedConnectionExecutor(trustedHostKeyVerifierFactory)
+        SshjNetworkTrustedConnectionExecutor(
+            trustedHostKeyVerifierFactory = trustedHostKeyVerifierFactory,
+            authenticationExecutor = authenticationExecutor,
+        )
 
     internal constructor(
         authenticationAdapter: SshjAuthenticationAdapter,
@@ -36,6 +40,7 @@ class SshjConnectionService @Inject constructor(
         authenticationAdapter = authenticationAdapter,
         hostTrustRepository = hostTrustRepository,
         trustedHostKeyVerifierFactory = SshjTrustedHostKeyVerifierFactory(),
+        authenticationExecutor = SshjAuthenticationExecutor(),
     ) {
         this.trustedConnectionExecutor = trustedConnectionExecutor
     }
@@ -52,12 +57,13 @@ class SshjConnectionService @Inject constructor(
                 )
 
                 when (
-                    val result = trustedConnectionExecutor.connect(
+                    val result = trustedConnectionExecutor.connectAndAuthenticate(
                         request = request,
                         trustedHostKey = trustedHostKey,
+                        authenticationMapping = authenticationMapping,
                     )
                 ) {
-                    SshjTrustedConnectionExecutionResult.Connected -> {
+                    SshjTrustedConnectionExecutionResult.Authenticated -> {
                         SshConnectionResult.Failed(SshConnectionError.UnsupportedConfiguration)
                     }
 
