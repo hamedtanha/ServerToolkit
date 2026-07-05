@@ -139,6 +139,7 @@ The following application-level items are implemented:
 - SSH session close result model.
 - SSH session lifecycle service contract.
 - SSHJ session lifecycle shell.
+- SSHJ session owner registry boundary.
 - SSHJ authentication adapter mapping.
 - SSH ViewModel dependency injection for the connection attempt use case.
 - SSH user-triggered connect event shell.
@@ -205,7 +206,7 @@ The current implementation area is:
 The next safe development steps are:
 
 1. Add real SSH authentication execution behind the existing adapter and authentication boundary.
-2. Add real SSH session open and close execution behind the lifecycle boundary.
+2. Add real SSH session open and close execution behind the lifecycle boundary and owner registry.
 3. Keep command execution disabled until all remaining ADR-009 implementation gates are satisfied.
 
 ---

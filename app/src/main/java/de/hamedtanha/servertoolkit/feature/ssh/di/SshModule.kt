@@ -30,6 +30,7 @@ abstract class SshModule {
     ): SshHostKeyObservationService
 
     @Binds
+    @Singleton
     abstract fun bindSshSessionLifecycleService(
         service: SshjSessionLifecycleService,
     ): SshSessionLifecycleService
