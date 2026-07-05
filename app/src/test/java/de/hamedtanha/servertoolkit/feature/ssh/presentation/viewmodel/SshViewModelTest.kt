@@ -4,6 +4,7 @@ import androidx.lifecycle.SavedStateHandle
 import de.hamedtanha.servertoolkit.core.connection.domain.model.ConnectionTargetInvalidReason
 import de.hamedtanha.servertoolkit.core.connection.domain.model.ConnectionTargetResolution
 import de.hamedtanha.servertoolkit.core.connection.domain.model.RemoteConnectionTarget
+import de.hamedtanha.servertoolkit.feature.ssh.domain.model.SshAuthenticationInput
 import de.hamedtanha.servertoolkit.feature.ssh.domain.model.SshAuthenticationMethod
 import de.hamedtanha.servertoolkit.feature.ssh.domain.model.SshConnectionError
 import de.hamedtanha.servertoolkit.feature.ssh.domain.model.SshConnectionRequest
@@ -366,6 +367,31 @@ class SshViewModelTest {
             viewModel.uiState.value.authenticationInput.selectedMethod,
         )
         assertFalse(viewModel.uiState.value.authenticationInput.hasSensitiveInput)
+    }
+
+    @Test
+    fun `connect passes password authentication input through request boundary without exposing secret`() = runBlocking {
+        var observedPassword = ""
+        val service = FakeSshConnectionService(
+            result = SshConnectionResult.Connected,
+            onConnect = { request ->
+                val passwordInput = request.authenticationInput as SshAuthenticationInput.Password
+                observedPassword = passwordInput.password
+                assertFalse(request.toString().contains("secret-password"))
+            },
+        )
+        val viewModel = createViewModel(
+            serverId = "server-1",
+            service = service,
+        )
+
+        viewModel.onPasswordChanged("secret-password")
+        viewModel.connect()
+
+        assertEquals("secret-password", observedPassword)
+        assertFalse(viewModel.uiState.value.authenticationInput.hasSensitiveInput)
+        assertFalse(viewModel.uiState.value.toString().contains("secret-password"))
+        assertFalse(service.lastRequest.toString().contains("secret-password"))
     }
 
     @Test

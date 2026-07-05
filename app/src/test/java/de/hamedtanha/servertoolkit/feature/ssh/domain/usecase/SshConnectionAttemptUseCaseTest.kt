@@ -3,6 +3,7 @@ package de.hamedtanha.servertoolkit.feature.ssh.domain.usecase
 import de.hamedtanha.servertoolkit.core.connection.domain.model.ConnectionTargetInvalidReason
 import de.hamedtanha.servertoolkit.core.connection.domain.model.ConnectionTargetResolution
 import de.hamedtanha.servertoolkit.core.connection.domain.model.RemoteConnectionTarget
+import de.hamedtanha.servertoolkit.feature.ssh.domain.model.SshAuthenticationInput
 import de.hamedtanha.servertoolkit.feature.ssh.domain.model.SshConnectionError
 import de.hamedtanha.servertoolkit.feature.ssh.domain.model.SshConnectionResult
 import de.hamedtanha.servertoolkit.feature.ssh.test.FakeConnectionTargetResolver
@@ -11,6 +12,8 @@ import kotlinx.coroutines.CancellationException
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.runBlocking
 import org.junit.Assert.assertEquals
+import org.junit.Assert.assertFalse
+import org.junit.Assert.assertTrue
 import org.junit.Assert.fail
 import org.junit.Test
 
@@ -31,6 +34,37 @@ class SshConnectionAttemptUseCaseTest {
         assertEquals("example.com", service.lastRequest?.host)
         assertEquals(2222, service.lastRequest?.port)
         assertEquals("admin", service.lastRequest?.username)
+    }
+
+    @Test
+    fun `passes authentication input to connection request and clears it after attempt`() = runBlocking {
+        var observedSensitiveInput = false
+        var observedPassword = ""
+        val authenticationInput = SshAuthenticationInput.Password("secret-password")
+        val service = FakeSshConnectionService(
+            result = SshConnectionResult.Connected,
+            onConnect = { request ->
+                val passwordInput = request.authenticationInput as SshAuthenticationInput.Password
+                observedSensitiveInput = passwordInput.hasSensitiveValue
+                observedPassword = passwordInput.password
+                assertFalse(request.toString().contains("secret-password"))
+            },
+        )
+        val useCase = createUseCase(
+            resolver = FakeConnectionTargetResolver(resolvedTarget()),
+            service = service,
+        )
+
+        val result = useCase(
+            serverId = "server-1",
+            authenticationInput = authenticationInput,
+        )
+
+        assertEquals(SshConnectionResult.Connected, result)
+        assertTrue(observedSensitiveInput)
+        assertEquals("secret-password", observedPassword)
+        assertFalse(authenticationInput.hasSensitiveValue)
+        assertFalse(service.lastRequest.toString().contains("secret-password"))
     }
 
     @Test

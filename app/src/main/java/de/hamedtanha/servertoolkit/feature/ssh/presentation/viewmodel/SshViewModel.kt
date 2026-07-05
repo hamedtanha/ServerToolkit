@@ -4,6 +4,7 @@ import androidx.lifecycle.SavedStateHandle
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import dagger.hilt.android.lifecycle.HiltViewModel
+import de.hamedtanha.servertoolkit.feature.ssh.domain.model.SshAuthenticationInput
 import de.hamedtanha.servertoolkit.feature.ssh.domain.model.SshAuthenticationMethod
 import de.hamedtanha.servertoolkit.feature.ssh.domain.model.SshConnectionResult
 import de.hamedtanha.servertoolkit.feature.ssh.domain.model.SshHostTrustDecision
@@ -127,7 +128,13 @@ class SshViewModel @Inject constructor(
                 hostKeyReview = null,
             )
 
-            val result = connectionAttemptUseCase(serverId)
+            val authenticationInput = pendingAuthenticationSecrets.toAuthenticationInput(
+                method = _uiState.value.authenticationInput.selectedMethod,
+            )
+            val result = connectionAttemptUseCase(
+                serverId = serverId,
+                authenticationInput = authenticationInput,
+            )
             onConnectionResultReceived(result)
         } finally {
             isConnectionAttemptInProgress = false
@@ -186,6 +193,15 @@ private class PendingAuthenticationSecrets {
     var password: String = ""
 
     var privateKeyPassphrase: String = ""
+
+    fun toAuthenticationInput(method: SshAuthenticationMethod): SshAuthenticationInput {
+        return when (method) {
+            SshAuthenticationMethod.PASSWORD -> SshAuthenticationInput.Password(password)
+            SshAuthenticationMethod.PRIVATE_KEY -> SshAuthenticationInput.PrivateKeyPassphrase(
+                privateKeyPassphrase,
+            )
+        }
+    }
 
     fun clear() {
         password = ""

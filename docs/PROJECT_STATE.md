@@ -129,6 +129,8 @@ The following application-level items are implemented:
 - SSH authentication input UI-safe presentation state.
 - SSH ephemeral authentication input ViewModel events.
 - SSH authentication input clearing behavior.
+- SSH credential-bearing connection request boundary.
+- SSH authentication input redaction and clearing at the connection attempt boundary.
 - SSH ViewModel dependency injection for the connection attempt use case.
 - SSH user-triggered connect event shell.
 - SSH placeholder Connect button.
@@ -184,8 +186,8 @@ The following items are intentionally not implemented yet:
 
 The current implementation area is:
 
-- SSH connection request authentication boundary planning.
 - SSH host-key review integration planning.
+- SSHJ authentication adapter planning.
 
 ---
 
@@ -193,8 +195,8 @@ The current implementation area is:
 
 The next safe development steps are:
 
-1. Add credential-bearing SSH connection request boundary without persistent credential storage.
-2. Integrate observed host-key review with the future SSH connection boundary.
+1. Integrate observed host-key review with the future SSH connection boundary.
+2. Add SSHJ authentication adapter mapping behind the existing host-trust and authentication boundaries.
 3. Keep real SSH behavior disabled until all remaining ADR-009 implementation gates are satisfied.
 
 ---

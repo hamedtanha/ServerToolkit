@@ -110,6 +110,9 @@ The project follows Conventional Commits and Semantic Versioning principles.
 - Added UI-safe SSH authentication input state without secret values.
 - Added ViewModel events for ephemeral authentication input.
 - Added authentication input clearing tests.
+- Added credential-bearing SSH connection request boundary.
+- Added redacted SSH authentication input request model.
+- Added authentication input clearing at the connection attempt boundary.
 
 ### Changed
 
