@@ -1,5 +1,7 @@
 package de.hamedtanha.servertoolkit.feature.ssh.data.service
 
+import de.hamedtanha.servertoolkit.feature.ssh.domain.model.SshCommandExecutionError
+import de.hamedtanha.servertoolkit.feature.ssh.domain.model.SshCommandExecutionResult
 import de.hamedtanha.servertoolkit.feature.ssh.domain.model.SshConnectionError
 import de.hamedtanha.servertoolkit.feature.ssh.domain.model.SshConnectionRequest
 import de.hamedtanha.servertoolkit.feature.ssh.domain.model.SshSessionHandle
@@ -70,6 +72,11 @@ internal class SshjNetworkTrustedConnectionExecutor(
                         sessionHandle = request.toSessionHandle(),
                         closeAction = {
                             client.close()
+                        },
+                        commandExecutionAction = {
+                            SshCommandExecutionResult.Failed(
+                                SshCommandExecutionError.UnsupportedConfiguration,
+                            )
                         },
                     )
                     ownershipTransferred = true
