@@ -23,6 +23,7 @@ import de.hamedtanha.servertoolkit.feature.ssh.test.FakeConnectionTargetResolver
 import de.hamedtanha.servertoolkit.feature.ssh.test.FakeSshConnectionService
 import de.hamedtanha.servertoolkit.feature.ssh.test.FakeSshHostTrustRepository
 import de.hamedtanha.servertoolkit.navigation.SshDestination
+import kotlinx.coroutines.CancellationException
 import kotlinx.coroutines.CompletableDeferred
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.runBlocking
@@ -30,6 +31,7 @@ import org.junit.Assert.assertEquals
 import org.junit.Assert.assertFalse
 import org.junit.Assert.assertNull
 import org.junit.Assert.assertTrue
+import org.junit.Assert.fail
 import org.junit.Test
 
 class SshViewModelTest {
@@ -392,6 +394,32 @@ class SshViewModelTest {
         assertFalse(viewModel.uiState.value.authenticationInput.hasSensitiveInput)
         assertFalse(viewModel.uiState.value.toString().contains("secret-password"))
         assertFalse(service.lastRequest.toString().contains("secret-password"))
+    }
+
+    @Test
+    fun `connect clears authentication input state when cancelled`() = runBlocking {
+        val service = FakeSshConnectionService(
+            result = SshConnectionResult.Connected,
+            onConnect = {
+                throw CancellationException("Connection cancelled")
+            },
+        )
+        val viewModel = createViewModel(
+            serverId = "server-1",
+            service = service,
+        )
+
+        viewModel.onPasswordChanged("secret-password")
+
+        try {
+            viewModel.connect()
+            fail("Expected CancellationException")
+        } catch (error: CancellationException) {
+            assertEquals("Connection cancelled", error.message)
+        }
+
+        assertFalse(viewModel.uiState.value.authenticationInput.hasSensitiveInput)
+        assertFalse(viewModel.uiState.value.toString().contains("secret-password"))
     }
 
     @Test

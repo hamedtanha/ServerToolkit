@@ -137,6 +137,10 @@ class SshViewModel @Inject constructor(
             )
             onConnectionResultReceived(result)
         } finally {
+            pendingAuthenticationSecrets.clear()
+            _uiState.value = _uiState.value.copy(
+                authenticationInput = SshAuthenticationInputUiState(),
+            )
             isConnectionAttemptInProgress = false
         }
     }
