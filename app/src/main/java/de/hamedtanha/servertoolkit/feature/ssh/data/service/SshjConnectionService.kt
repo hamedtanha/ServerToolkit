@@ -12,16 +12,17 @@ import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
 
 /**
- * SSHJ-backed trusted connection service shell.
+ * SSHJ-backed trusted connection service.
  *
- * This service may open a short-lived SSHJ transport connection only after a trusted host key has
- * been resolved and installed as the SSHJ host-key verifier. Password authentication may execute
- * inside that trusted boundary, but long-lived session ownership, command execution, and terminal
- * interaction remain disabled in this implementation gate.
+ * This service opens an SSHJ transport connection only after a trusted host key has been resolved,
+ * executes password authentication inside that trusted boundary, and registers the authenticated
+ * SSHJ client in the data-layer session owner registry. Command execution and terminal interaction
+ * remain disabled.
  */
 class SshjConnectionService @Inject constructor(
     private val authenticationAdapter: SshjAuthenticationAdapter,
     private val hostTrustRepository: SshHostTrustRepository,
+    private val sessionOwnerRegistry: SshjSessionOwnerRegistry,
     trustedHostKeyVerifierFactory: SshjTrustedHostKeyVerifierFactory,
     authenticationExecutor: SshjAuthenticationExecutor,
 ) : SshConnectionService {
@@ -36,9 +37,11 @@ class SshjConnectionService @Inject constructor(
         authenticationAdapter: SshjAuthenticationAdapter,
         hostTrustRepository: SshHostTrustRepository,
         trustedConnectionExecutor: SshjTrustedConnectionExecutor,
+        sessionOwnerRegistry: SshjSessionOwnerRegistry = SshjSessionOwnerRegistry(),
     ) : this(
         authenticationAdapter = authenticationAdapter,
         hostTrustRepository = hostTrustRepository,
+        sessionOwnerRegistry = sessionOwnerRegistry,
         trustedHostKeyVerifierFactory = SshjTrustedHostKeyVerifierFactory(),
         authenticationExecutor = SshjAuthenticationExecutor(),
     ) {
@@ -63,8 +66,8 @@ class SshjConnectionService @Inject constructor(
                         authenticationMapping = authenticationMapping,
                     )
                 ) {
-                    SshjTrustedConnectionExecutionResult.Authenticated -> {
-                        SshConnectionResult.Failed(SshConnectionError.UnsupportedConfiguration)
+                    is SshjTrustedConnectionExecutionResult.Connected -> {
+                        registerConnectedSession(result.sessionOwner)
                     }
 
                     is SshjTrustedConnectionExecutionResult.Failed -> {
@@ -78,6 +81,19 @@ class SshjConnectionService @Inject constructor(
             SshConnectionResult.Failed(SshConnectionError.Unknown)
         } finally {
             authenticationMapping.clearSensitiveValues()
+        }
+    }
+
+    private fun registerConnectedSession(
+        sessionOwner: SshjSessionOwner,
+    ): SshConnectionResult {
+        return if (sessionOwnerRegistry.register(sessionOwner)) {
+            SshConnectionResult.Connected(sessionOwner.sessionHandle)
+        } else {
+            runCatching {
+                sessionOwner.close()
+            }
+            SshConnectionResult.Failed(SshConnectionError.Unknown)
         }
     }
 }

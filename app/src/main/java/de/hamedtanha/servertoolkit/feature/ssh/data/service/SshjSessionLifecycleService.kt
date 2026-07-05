@@ -8,9 +8,8 @@ import javax.inject.Inject
 /**
  * SSHJ-backed session lifecycle service.
  *
- * Real session opening is intentionally not implemented yet. This service delegates close requests
- * to the data-layer owner registry so future SSHJ session cleanup remains outside ViewModels and
- * outside domain/presentation models.
+ * This service delegates close requests to the data-layer owner registry so SSHJ session cleanup
+ * remains outside ViewModels and outside domain/presentation models.
  */
 class SshjSessionLifecycleService @Inject constructor(
     private val sessionOwnerRegistry: SshjSessionOwnerRegistry,

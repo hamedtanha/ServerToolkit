@@ -2,19 +2,21 @@ package de.hamedtanha.servertoolkit.feature.ssh.data.service
 
 import de.hamedtanha.servertoolkit.feature.ssh.domain.model.SshConnectionError
 import de.hamedtanha.servertoolkit.feature.ssh.domain.model.SshConnectionRequest
+import de.hamedtanha.servertoolkit.feature.ssh.domain.model.SshSessionHandle
 import de.hamedtanha.servertoolkit.feature.ssh.domain.model.SshTrustedHostKey
 import java.io.IOException
 import java.net.SocketTimeoutException
 import java.net.UnknownHostException
+import java.util.UUID
 import net.schmizz.sshj.SSHClient
 import net.schmizz.sshj.userauth.UserAuthException
 
 /**
  * Opens an SSHJ transport connection only with a trusted host-key verifier installed.
  *
- * Authentication is executed inside this boundary while the SSHJ client is still connected. The
- * client is still closed before returning because long-lived session ownership is intentionally not
- * enabled in this implementation gate.
+ * After successful authentication, this executor transfers SSHJ client ownership to an
+ * SshjSessionOwner. It must close the client on every failure path and must not expose SSHJ types
+ * outside the data-layer boundary.
  */
 internal interface SshjTrustedConnectionExecutor {
 
@@ -27,7 +29,9 @@ internal interface SshjTrustedConnectionExecutor {
 
 internal sealed interface SshjTrustedConnectionExecutionResult {
 
-    data object Authenticated : SshjTrustedConnectionExecutionResult
+    data class Connected(
+        val sessionOwner: SshjSessionOwner,
+    ) : SshjTrustedConnectionExecutionResult
 
     data class Failed(
         val error: SshConnectionError,
@@ -44,28 +48,36 @@ internal class SshjNetworkTrustedConnectionExecutor(
         trustedHostKey: SshTrustedHostKey,
         authenticationMapping: SshjAuthenticationMapping,
     ): SshjTrustedConnectionExecutionResult {
+        val client = SSHClient()
+        var ownershipTransferred = false
+
         return try {
-            SSHClient().use { client ->
-                client.connectTimeout = SSHJ_TRUSTED_CONNECTION_TIMEOUT_MILLIS
-                client.timeout = SSHJ_TRUSTED_CONNECTION_TIMEOUT_MILLIS
-                client.addHostKeyVerifier(
-                    trustedHostKeyVerifierFactory.create(trustedHostKey),
+            client.connectTimeout = SSHJ_TRUSTED_CONNECTION_TIMEOUT_MILLIS
+            client.timeout = SSHJ_TRUSTED_CONNECTION_TIMEOUT_MILLIS
+            client.addHostKeyVerifier(
+                trustedHostKeyVerifierFactory.create(trustedHostKey),
+            )
+            client.connect(request.host, request.port)
+
+            when (
+                val result = authenticationExecutor.authenticate(
+                    client = SshjAuthenticatedClientAdapter(client),
+                    mapping = authenticationMapping,
                 )
-                client.connect(request.host, request.port)
-
-                when (
-                    val result = authenticationExecutor.authenticate(
-                        client = SshjAuthenticatedClientAdapter(client),
-                        mapping = authenticationMapping,
+            ) {
+                SshjAuthenticationExecutionResult.Authenticated -> {
+                    val sessionOwner = SshjSessionOwner(
+                        sessionHandle = request.toSessionHandle(),
+                        closeAction = {
+                            client.close()
+                        },
                     )
-                ) {
-                    SshjAuthenticationExecutionResult.Authenticated -> {
-                        SshjTrustedConnectionExecutionResult.Authenticated
-                    }
+                    ownershipTransferred = true
+                    SshjTrustedConnectionExecutionResult.Connected(sessionOwner)
+                }
 
-                    is SshjAuthenticationExecutionResult.Failed -> {
-                        SshjTrustedConnectionExecutionResult.Failed(result.error)
-                    }
+                is SshjAuthenticationExecutionResult.Failed -> {
+                    SshjTrustedConnectionExecutionResult.Failed(result.error)
                 }
             }
         } catch (error: UnknownHostException) {
@@ -74,6 +86,12 @@ internal class SshjNetworkTrustedConnectionExecutor(
             SshjTrustedConnectionExecutionResult.Failed(SshConnectionError.ConnectionTimeout)
         } catch (error: IOException) {
             SshjTrustedConnectionExecutionResult.Failed(SshConnectionError.Unknown)
+        } finally {
+            if (!ownershipTransferred) {
+                runCatching {
+                    client.close()
+                }
+            }
         }
     }
 }
@@ -92,6 +110,16 @@ private class SshjAuthenticatedClientAdapter(
             throw SshjAuthenticationFailedException(error)
         }
     }
+}
+
+private fun SshConnectionRequest.toSessionHandle(): SshSessionHandle {
+    return SshSessionHandle(
+        sessionId = UUID.randomUUID().toString(),
+        serverId = serverId,
+        host = host,
+        port = port,
+        username = username,
+    )
 }
 
 private const val SSHJ_TRUSTED_CONNECTION_TIMEOUT_MILLIS = 10_000
