@@ -1,5 +1,6 @@
 package de.hamedtanha.servertoolkit.feature.ssh.presentation.state
 
+import de.hamedtanha.servertoolkit.feature.ssh.domain.model.SshAuthenticationMethod
 import org.junit.Assert.assertEquals
 import org.junit.Assert.assertFalse
 import org.junit.Assert.assertNull
@@ -16,5 +17,7 @@ class SshUiStateTest {
         assertEquals("SSH connectivity is not implemented yet.", uiState.message)
         assertNull(uiState.hostKeyReview)
         assertFalse(uiState.isHostKeyReviewRequired)
+        assertEquals(SshAuthenticationMethod.PASSWORD, uiState.authenticationInput.selectedMethod)
+        assertFalse(uiState.authenticationInput.hasSensitiveInput)
     }
 }

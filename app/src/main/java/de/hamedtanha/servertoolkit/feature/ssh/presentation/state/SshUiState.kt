@@ -8,6 +8,7 @@ data class SshUiState(
     val message: String = "SSH connectivity is not implemented yet.",
     val detail: String = "This placeholder prepares the navigation and UI boundary for the future SSH workflow.",
     val hostKeyReview: SshHostKeyReviewUiState? = null,
+    val authenticationInput: SshAuthenticationInputUiState = SshAuthenticationInputUiState(),
 ) {
 
     val isHostKeyReviewRequired: Boolean

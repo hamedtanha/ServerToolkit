@@ -106,6 +106,10 @@ The project follows Conventional Commits and Semantic Versioning principles.
 - Added SSH host-key review UI mapper and tests.
 - Added SSH host-key review confirmation and cancellation ViewModel events.
 - Added SSH screen actions for host-key review.
+- Added SSH authentication method model.
+- Added UI-safe SSH authentication input state without secret values.
+- Added ViewModel events for ephemeral authentication input.
+- Added authentication input clearing tests.
 
 ### Changed
 

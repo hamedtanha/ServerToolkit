@@ -4,11 +4,13 @@ import androidx.lifecycle.SavedStateHandle
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import dagger.hilt.android.lifecycle.HiltViewModel
+import de.hamedtanha.servertoolkit.feature.ssh.domain.model.SshAuthenticationMethod
 import de.hamedtanha.servertoolkit.feature.ssh.domain.model.SshConnectionResult
 import de.hamedtanha.servertoolkit.feature.ssh.domain.model.SshHostTrustDecision
 import de.hamedtanha.servertoolkit.feature.ssh.domain.model.SshObservedHostKey
 import de.hamedtanha.servertoolkit.feature.ssh.domain.usecase.ConfirmSshHostTrustUseCase
 import de.hamedtanha.servertoolkit.feature.ssh.domain.usecase.SshConnectionAttemptUseCase
+import de.hamedtanha.servertoolkit.feature.ssh.presentation.state.SshAuthenticationInputUiState
 import de.hamedtanha.servertoolkit.feature.ssh.presentation.state.SshConnectionStatus
 import de.hamedtanha.servertoolkit.feature.ssh.presentation.state.SshUiState
 import de.hamedtanha.servertoolkit.feature.ssh.presentation.state.withConnectionResult
@@ -33,6 +35,8 @@ class SshViewModel @Inject constructor(
 
     private var pendingObservedHostKey: SshObservedHostKey? = null
 
+    private val pendingAuthenticationSecrets = PendingAuthenticationSecrets()
+
     private val _uiState = MutableStateFlow(
         SshUiState(serverId = serverId),
     )
@@ -55,6 +59,56 @@ class SshViewModel @Inject constructor(
             message = "Server identity review was cancelled.",
             detail = "No SSH session was opened.",
         )
+    }
+
+    fun onAuthenticationMethodSelected(method: SshAuthenticationMethod) {
+        pendingAuthenticationSecrets.clear()
+
+        _uiState.value = _uiState.value.copy(
+            authenticationInput = _uiState.value.authenticationInput.copy(
+                selectedMethod = method,
+                hasPasswordInput = false,
+                hasPrivateKeyPassphraseInput = false,
+            ),
+        )
+    }
+
+    fun onAuthenticationUsernameChanged(username: String) {
+        _uiState.value = _uiState.value.copy(
+            authenticationInput = _uiState.value.authenticationInput.copy(
+                username = username,
+            ),
+        )
+    }
+
+    fun onPasswordChanged(password: String) {
+        pendingAuthenticationSecrets.password = password
+        pendingAuthenticationSecrets.privateKeyPassphrase = ""
+
+        _uiState.value = _uiState.value.copy(
+            authenticationInput = _uiState.value.authenticationInput.copy(
+                selectedMethod = SshAuthenticationMethod.PASSWORD,
+                hasPasswordInput = password.isNotEmpty(),
+                hasPrivateKeyPassphraseInput = false,
+            ),
+        )
+    }
+
+    fun onPrivateKeyPassphraseChanged(passphrase: String) {
+        pendingAuthenticationSecrets.password = ""
+        pendingAuthenticationSecrets.privateKeyPassphrase = passphrase
+
+        _uiState.value = _uiState.value.copy(
+            authenticationInput = _uiState.value.authenticationInput.copy(
+                selectedMethod = SshAuthenticationMethod.PRIVATE_KEY,
+                hasPasswordInput = false,
+                hasPrivateKeyPassphraseInput = passphrase.isNotEmpty(),
+            ),
+        )
+    }
+
+    fun onAuthenticationInputCleared() {
+        clearAuthenticationInputState()
     }
 
     internal suspend fun connect() {
@@ -82,6 +136,7 @@ class SshViewModel @Inject constructor(
 
     internal fun onConnectionResultReceived(result: SshConnectionResult) {
         pendingObservedHostKey = null
+        clearAuthenticationInputState()
         _uiState.value = _uiState.value.withConnectionResult(result)
     }
 
@@ -115,5 +170,25 @@ class SshViewModel @Inject constructor(
             detail = detail,
             hostKeyReview = null,
         )
+    }
+
+    private fun clearAuthenticationInputState() {
+        pendingAuthenticationSecrets.clear()
+
+        _uiState.value = _uiState.value.copy(
+            authenticationInput = SshAuthenticationInputUiState(),
+        )
+    }
+}
+
+private class PendingAuthenticationSecrets {
+
+    var password: String = ""
+
+    var privateKeyPassphrase: String = ""
+
+    fun clear() {
+        password = ""
+        privateKeyPassphrase = ""
     }
 }
