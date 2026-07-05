@@ -1,6 +1,6 @@
 # ADR-009: SSH Host Trust and Authentication Input Strategy
 
-**Status:** Draft
+**Status:** Accepted
 
 **Date:** 2026-07-04
 
@@ -190,6 +190,22 @@ Accepted for the first real SSH connection milestone.
 
 ---
 
+# Implementation Gates
+
+Before real SSH connection behavior is implemented, the project must:
+
+- Define a host trust repository or equivalent project-owned persistence boundary.
+- Store trusted host key material separately from generic server inventory metadata.
+- Define how Android backup and data-extraction rules apply to inventory, credentials, and trusted host keys.
+- Define ephemeral authentication input models that do not expose secrets through UI state, saved state, logs, or crash diagnostics.
+- Add failure containment for connection attempts, including exception mapping, timeout behavior, cancellation preservation, and state recovery.
+- Prevent duplicate concurrent connection attempts from the UI and ViewModel boundary.
+- Ensure blocking SSHJ operations run on an I/O dispatcher, not the main dispatcher.
+- Add tests for unknown host key, accepted host key, changed host key, authentication failure, transport failure, timeout, cancellation, and duplicate connect attempts.
+- Add the `INTERNET` permission only in the same reviewed implementation slice that introduces real network behavior.
+
+---
+
 # Consequences
 
 ## Positive
@@ -229,4 +245,4 @@ This ADR intentionally does not implement real SSH behavior.
 
 It defines the security and workflow boundaries required before real SSH connection behavior can be safely added.
 
-Implementation should proceed only after this ADR is reviewed and accepted.
+Real SSH implementation must proceed only through the implementation gates defined above.

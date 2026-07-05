@@ -3,7 +3,7 @@
 **Project:** Server Toolkit  
 **Version:** 0.4.0-alpha  
 **Status:** Active Implementation  
-**Last Updated:** 2026-07-04
+**Last Updated:** 2026-07-05
 
 ---
 
@@ -21,7 +21,9 @@ This document must stay short, current, and factual.
 
 The Server Inventory 0.3.0 baseline is accepted.
 
-The current focus is planning SSH host trust and authentication input boundaries before any real SSH connection behavior.
+ADR-009 is accepted as the SSH host trust and authentication input strategy.
+
+The current focus is defining the remaining security and integration gates before any real SSH connection behavior.
 
 ---
 
@@ -91,6 +93,7 @@ The following application-level items are implemented:
 - SSH workflow architecture decision.
 - Secure storage strategy decision.
 - SSH client library selection decision.
+- Accepted SSH host trust and authentication input strategy decision.
 - SSHJ dependency declaration through the Gradle version catalog.
 - SSH data-layer adapter shell.
 - SSHJ-backed connection service shell without real network behavior.
@@ -150,9 +153,9 @@ The following items are intentionally not implemented yet:
 
 The current implementation area is:
 
-- SSH host trust and authentication input strategy planning.
-- SSH host key verification behavior planning.
-- Future real connection behavior planning.
+- Android backup and data-extraction policy planning.
+- SSH target-resolution boundary planning.
+- SSH connection attempt failure-containment planning.
 
 ---
 
@@ -160,9 +163,9 @@ The current implementation area is:
 
 The next safe development steps are:
 
-1. Review and accept ADR-009 before any real SSH connection behavior.
-2. Implement host trust and authentication input models after ADR acceptance.
-3. Add explicit safeguards and tests before enabling real SSH connection behavior.
+1. Decide Android backup and data-extraction behavior before introducing trusted-host persistence or sensitive SSH state.
+2. Add an SSH target-resolution boundary for inventory-backed connection metadata without feature-to-feature persistence coupling.
+3. Add host trust, ephemeral authentication input, duplicate-attempt prevention, timeout, cancellation, and exception-handling tests before enabling real SSH network behavior.
 
 ---
 
@@ -176,4 +179,4 @@ Implementation and documentation changes must happen on short-lived GitHub Flow 
 
 ## Current Engineering Rule
 
-Do not add real SSH behavior before the corresponding architecture decisions and tests are in place.
+Do not add real SSH behavior before the ADR-009 implementation gates, backup policy, target-resolution boundary, failure containment, and tests are in place.

@@ -1,9 +1,9 @@
 # Architecture
 
 **Project:** Server Toolkit  
-**Version:** 0.2.0-alpha  
+**Version:** 0.4.0-alpha
 **Status:** Active  
-**Last Updated:** 2026-07-04
+**Last Updated:** 2026-07-05
 
 ---
 
@@ -50,6 +50,10 @@ The current architecture is governed by the following ADRs:
 | ADR-003 | Local Persistence with Room | Accepted |
 | ADR-004 | Navigation Strategy | Accepted |
 | ADR-005 | Dependency Injection Strategy | Accepted |
+| ADR-006 | Remote Connection Workflow Boundaries | Accepted |
+| ADR-007 | Secure Storage Strategy | Accepted |
+| ADR-008 | SSH Client Library Selection | Accepted |
+| ADR-009 | SSH Host Trust and Authentication Input Strategy | Accepted |
 
 Accepted ADRs are the source of truth for architectural decisions. This document explains how those decisions are applied in the codebase.
 
@@ -83,13 +87,28 @@ The current implementation includes:
 - Hilt database, DAO, and repository wiring.
 - DAO, repository, mapper, and filter matcher tests.
 - Manual and automated verification for add, edit, delete, search, filtering, and shared server form naming cleanup.
+- SSH navigation destination, placeholder screen, placeholder ViewModel, and UI state.
+- Server Inventory Connect action that opens the SSH placeholder route.
+- SSH domain connection request, result, error, and service contract models.
+- SSH UI connection status model and connection result mapper.
+- Test-only fake SSH connection service.
+- SSHJ dependency declaration through the Gradle version catalog.
+- SSHJ-backed data-layer adapter shell without real network behavior.
+- SSH connection service dependency injection binding.
+- SSH ViewModel injection of the connection service contract.
+- SSH user-triggered connect event shell and placeholder Connect button.
+- SSH tests for domain models, presentation state, fake results, adapter shell, and connect event shell.
 
 The following items are intentionally not implemented yet:
 
-- SSH connection workflow.
+- Real SSH connection behavior.
+- SSH authentication handling.
+- SSH host key verification implementation.
+- SSH session lifecycle model.
+- Credential input.
+- Secure credential storage.
 - Monitoring workflow.
 - Command execution workflow.
-- Secure credential storage.
 - Room migration beyond database version 1.
 
 ---
