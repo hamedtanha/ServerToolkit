@@ -176,6 +176,7 @@ The following features are planned candidates and are not guaranteed to exist un
 
 - Biometric authentication
 - Certificate pinning
+- Android backup is disabled for the alpha release until a reviewed restore model exists.
 - Secure backup
 - Encrypted export
 - Automatic session lock
