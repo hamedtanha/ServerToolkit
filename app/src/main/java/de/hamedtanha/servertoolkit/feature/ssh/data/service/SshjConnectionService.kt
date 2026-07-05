@@ -14,11 +14,19 @@ import net.schmizz.sshj.SSHClient
  * boundary that will later contain SSHJ-specific connection logic while keeping SSHJ types out of
  * domain and presentation code.
  */
-class SshjConnectionService @Inject constructor() : SshConnectionService {
+class SshjConnectionService @Inject constructor(
+    private val authenticationAdapter: SshjAuthenticationAdapter,
+) : SshConnectionService {
 
     override suspend fun connect(request: SshConnectionRequest): SshConnectionResult {
-        return SSHClient().use {
-            SshConnectionResult.Failed(SshConnectionError.UnsupportedConfiguration)
+        val authenticationMapping = authenticationAdapter.map(request)
+
+        return try {
+            SSHClient().use {
+                SshConnectionResult.Failed(SshConnectionError.UnsupportedConfiguration)
+            }
+        } finally {
+            authenticationMapping.clearSensitiveValues()
         }
     }
 }
