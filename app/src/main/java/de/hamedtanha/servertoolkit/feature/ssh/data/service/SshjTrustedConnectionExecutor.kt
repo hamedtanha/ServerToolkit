@@ -41,6 +41,7 @@ internal sealed interface SshjTrustedConnectionExecutionResult {
 internal class SshjNetworkTrustedConnectionExecutor(
     private val trustedHostKeyVerifierFactory: SshjTrustedHostKeyVerifierFactory,
     private val authenticationExecutor: SshjAuthenticationExecutor,
+    private val commandChannelExecutor: SshjCommandChannelExecutor = SshjNetworkCommandChannelExecutor(),
 ) : SshjTrustedConnectionExecutor {
 
     override fun connectAndAuthenticate(
@@ -70,6 +71,12 @@ internal class SshjNetworkTrustedConnectionExecutor(
                         sessionHandle = request.toSessionHandle(),
                         closeAction = {
                             client.close()
+                        },
+                        commandExecutionAction = { commandRequest ->
+                            commandChannelExecutor.execute(
+                                commandClient = SshjCommandChannelClientAdapter(client),
+                                request = commandRequest,
+                            )
                         },
                     )
                     ownershipTransferred = true

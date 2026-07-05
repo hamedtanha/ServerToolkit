@@ -8,6 +8,10 @@ package de.hamedtanha.servertoolkit.feature.ssh.domain.model
  */
 enum class SshCommandExecutionError {
     SessionNotFound,
+    ChannelOpenFailed,
+    CommandExecutionFailed,
+    CommandTimedOut,
+    CommandCancelled,
     UnsupportedConfiguration,
     Unknown,
 }

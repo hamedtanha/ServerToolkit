@@ -112,20 +112,25 @@ The current implementation includes:
 - SSHJ session owner registry boundary.
 - SSH command channel execution strategy.
 - SSH command execution planning boundary.
+- SSH command execution result model.
 - SSHJ command channel planning shell.
+- SSH command execution routing through the data-layer session owner registry.
+- SSHJ command channel lifecycle executor.
+- SSH command execution service contract.
+- SSHJ-backed command execution service.
+- SSH command execution service dependency injection binding.
 - SSH ViewModel injection of the connection attempt use case.
 - SSH user-triggered connect event shell and placeholder Connect button.
-- SSH tests for domain models, presentation state, fake results, SSHJ adapter boundaries, host trust, authentication input, session ownership, and command planning.
+- SSH tests for domain models, presentation state, fake results, SSHJ adapter boundaries, host trust, authentication input, session ownership, command planning, and command execution lifecycle boundaries.
 
 The following items are intentionally not implemented yet:
 
-- Real SSH command execution against owned sessions.
+- User-facing SSH command execution workflow.
 - Interactive terminal workflow for owned sessions.
 - Full SSH host key verification hardening beyond the current trusted verifier shell.
-- Real command/channel lifecycle execution.
 - Persistent credential storage.
 - Monitoring workflow.
-- Command execution workflow.
+- Saved command workflow.
 - Xray or x-ui management workflow.
 - Room migrations beyond database version 2.
 - Migration tests beyond the trusted-host v1-to-v2 migration.

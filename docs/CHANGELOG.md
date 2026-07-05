@@ -131,7 +131,12 @@ The project follows Conventional Commits and Semantic Versioning principles.
 - Added SSHJ session ownership execution shell.
 - Added SSH command channel execution strategy decision.
 - Added SSH command execution planning boundary.
+- Added SSH command execution result model.
 - Added SSHJ command channel planning shell.
+- Added SSH command execution routing through the data-layer session owner registry.
+- Added SSHJ command channel lifecycle executor.
+- Added SSH command execution service contract.
+- Added SSHJ-backed command execution service and dependency injection binding.
 
 ### Changed
 

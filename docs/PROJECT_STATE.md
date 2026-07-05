@@ -25,7 +25,7 @@ ADR-009 is accepted as the SSH host trust and authentication input strategy.
 
 Android backup and data extraction are disabled for the alpha release to avoid backing up infrastructure inventory or future SSH trust material before a reviewed restore model exists.
 
-The current focus is defining the remaining security and integration gates before any real SSH connection behavior.
+The current focus is SSH command/channel lifecycle execution behind owned SSH sessions while keeping terminal UI, saved command workflows, and persistent credentials out of scope.
 
 ---
 
@@ -148,7 +148,13 @@ The following application-level items are implemented:
 - SSHJ session ownership execution shell.
 - SSH command channel execution strategy decision.
 - SSH command execution planning boundary.
+- SSH command execution result model.
 - SSHJ command channel planning shell.
+- SSH command execution routed through the data-layer session owner registry.
+- SSHJ command channel lifecycle executor.
+- SSH command execution service contract.
+- SSHJ-backed command execution service.
+- SSH command execution service dependency injection binding.
 - SSH ViewModel dependency injection for the connection attempt use case.
 - SSH user-triggered connect event shell.
 - SSH placeholder Connect button.
@@ -187,13 +193,12 @@ The following application-level items are implemented:
 
 The following items are intentionally not implemented yet:
 
-- Real SSH command execution against owned sessions.
+- User-facing SSH command execution workflow.
 - Interactive terminal workflow for owned sessions.
 - Full SSH host key verification hardening beyond the current trusted verifier shell.
-- Real command/channel lifecycle execution.
 - Persistent credential storage.
 - Monitoring workflow.
-- Command execution workflow.
+- Saved command workflow.
 - Xray or x-ui management workflow.
 - Room migrations beyond database version 2.
 - Migration tests beyond the trusted-host v1-to-v2 migration.
@@ -204,8 +209,8 @@ The following items are intentionally not implemented yet:
 
 The current implementation area is:
 
-- SSH command/channel lifecycle execution planning.
-- SSH documentation synchronization after command planning boundary.
+- SSH command/channel lifecycle execution behind owned SSH sessions.
+- SSH documentation synchronization after command execution service wiring.
 
 ---
 
@@ -213,9 +218,9 @@ The current implementation area is:
 
 The next safe development steps are:
 
-1. Add command/channel open and close execution behind owned SSH sessions.
-2. Add result mapping for stdout, stderr, exit status, timeout, and execution failure.
-3. Keep terminal UI and persistent credentials out of scope.
+1. Add a reviewed user-facing command execution workflow only after the current headless execution boundary is accepted.
+2. Keep terminal UI, saved command history, and persistent credentials out of scope.
+3. Continue hardening timeout, cancellation, cleanup, and failure mapping behavior before expanding the UX surface.
 
 ---
 
@@ -229,4 +234,4 @@ Implementation and documentation changes must happen on short-lived GitHub Flow 
 
 ## Current Engineering Rule
 
-Do not add real SSH behavior before the remaining ADR-009 implementation gates, host trust, ephemeral authentication input, and tests are in place.
+Do not expand SSH command execution into terminal UI, saved commands, background monitoring, or persistent credentials without a separate reviewed design and documentation update.

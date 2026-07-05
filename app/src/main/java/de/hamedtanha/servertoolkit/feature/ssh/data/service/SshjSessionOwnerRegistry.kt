@@ -1,5 +1,8 @@
 package de.hamedtanha.servertoolkit.feature.ssh.data.service
 
+import de.hamedtanha.servertoolkit.feature.ssh.domain.model.SshCommandExecutionError
+import de.hamedtanha.servertoolkit.feature.ssh.domain.model.SshCommandExecutionResult
+import de.hamedtanha.servertoolkit.feature.ssh.domain.model.SshCommandRequest
 import de.hamedtanha.servertoolkit.feature.ssh.domain.model.SshSessionCloseResult
 import de.hamedtanha.servertoolkit.feature.ssh.domain.model.SshSessionHandle
 import javax.inject.Inject
@@ -35,6 +38,14 @@ class SshjSessionOwnerRegistry @Inject constructor() {
         }
     }
 
+    internal fun execute(request: SshCommandRequest): SshCommandExecutionResult {
+        val owner = synchronized(this) {
+            sessionOwners[request.sessionHandle.sessionId]
+        } ?: return SshCommandExecutionResult.Failed(SshCommandExecutionError.SessionNotFound)
+
+        return owner.execute(request)
+    }
+
     internal fun close(sessionHandle: SshSessionHandle): SshSessionCloseResult {
         val owner = synchronized(this) {
             sessionOwners[sessionHandle.sessionId]
@@ -63,7 +74,14 @@ class SshjSessionOwnerRegistry @Inject constructor() {
 internal class SshjSessionOwner(
     val sessionHandle: SshSessionHandle,
     private val closeAction: () -> Unit,
+    private val commandExecutionAction: (SshCommandRequest) -> SshCommandExecutionResult = {
+        SshCommandExecutionResult.Failed(SshCommandExecutionError.UnsupportedConfiguration)
+    },
 ) {
+
+    fun execute(request: SshCommandRequest): SshCommandExecutionResult {
+        return commandExecutionAction(request)
+    }
 
     fun close() {
         closeAction()

@@ -14,6 +14,7 @@ The application is designed for system administrators, DevOps engineers, and inf
 - Server search and filtering.
 - SSH connection planning and security boundaries.
 - SSH command execution planning boundary.
+- Headless SSH command/channel lifecycle execution boundary.
 
 ## Planned Direction
 
@@ -24,7 +25,7 @@ The application is designed for system administrators, DevOps engineers, and inf
 - x-ui management.
 - Let's Encrypt helper workflows.
 - System logs viewer.
-- Real command execution.
+- User-facing command execution workflow.
 
 ---
 
