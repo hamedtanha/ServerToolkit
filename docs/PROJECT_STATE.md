@@ -117,6 +117,10 @@ The following application-level items are implemented:
 - SSH trusted host repository dependency injection binding.
 - Server Toolkit database version 2 with trusted-host migration.
 - SSH host trust evaluator.
+- SSH host trust decision model.
+- SSH host trust decision use case.
+- SSH explicit unknown-host trust confirmation use case.
+- SSH changed-host-key blocking decision flow.
 - SSH ViewModel dependency injection for the connection attempt use case.
 - SSH user-triggered connect event shell.
 - SSH placeholder Connect button.
@@ -172,7 +176,7 @@ The following items are intentionally not implemented yet:
 
 The current implementation area is:
 
-- SSH changed-host-key confirmation flow planning.
+- SSH host-key review presentation flow planning.
 - Ephemeral authentication input planning.
 
 ---
@@ -181,7 +185,7 @@ The current implementation area is:
 
 The next safe development steps are:
 
-1. Add changed-host-key confirmation flow before real SSH network behavior.
+1. Add host-key review UI state and confirmation presentation before real SSH network behavior.
 2. Add ephemeral authentication input models before real SSH network behavior.
 3. Keep real SSH behavior disabled until all remaining ADR-009 implementation gates are satisfied.
 
