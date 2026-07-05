@@ -6,10 +6,10 @@ The application is designed for system administrators, DevOps engineers, and inf
 
 ---
 
-## Features (Planned)
+## Features
 
 - Server inventory
-- SSH connection
+- SSH connection planning and security boundaries
 - Ping & latency test
 - Server status monitoring
 - Favorite servers
@@ -41,7 +41,7 @@ The application is designed for system administrators, DevOps engineers, and inf
 Current Version:
 
 ```
-v0.1.0 (Development)
+v0.4.0-alpha (Development)
 ```
 
 ---
