@@ -116,6 +116,8 @@ The project follows Conventional Commits and Semantic Versioning principles.
 - Added SSH host-key observation service boundary.
 - Added SSH connection attempt outcome model for connection results and host-trust decisions.
 - Added host-trust gating before SSH connection service execution.
+- Added SSHJ host-key observation adapter mapping.
+- Added tests for observed, unavailable, and failed SSHJ host-key observation mapping.
 
 ### Changed
 
