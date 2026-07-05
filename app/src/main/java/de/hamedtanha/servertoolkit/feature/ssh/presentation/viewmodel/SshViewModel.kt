@@ -6,19 +6,27 @@ import androidx.lifecycle.viewModelScope
 import dagger.hilt.android.lifecycle.HiltViewModel
 import de.hamedtanha.servertoolkit.feature.ssh.domain.model.SshAuthenticationInput
 import de.hamedtanha.servertoolkit.feature.ssh.domain.model.SshAuthenticationMethod
+import de.hamedtanha.servertoolkit.feature.ssh.domain.model.SshCommandExecutionError
+import de.hamedtanha.servertoolkit.feature.ssh.domain.model.SshCommandExecutionResult
 import de.hamedtanha.servertoolkit.feature.ssh.domain.model.SshConnectionAttemptOutcome
 import de.hamedtanha.servertoolkit.feature.ssh.domain.model.SshConnectionResult
 import de.hamedtanha.servertoolkit.feature.ssh.domain.model.SshHostTrustDecision
 import de.hamedtanha.servertoolkit.feature.ssh.domain.model.SshObservedHostKey
+import de.hamedtanha.servertoolkit.feature.ssh.domain.model.SshSessionHandle
 import de.hamedtanha.servertoolkit.feature.ssh.domain.usecase.ConfirmSshHostTrustUseCase
+import de.hamedtanha.servertoolkit.feature.ssh.domain.usecase.SshCommandExecutionUseCase
 import de.hamedtanha.servertoolkit.feature.ssh.domain.usecase.SshConnectionAttemptUseCase
 import de.hamedtanha.servertoolkit.feature.ssh.presentation.state.SshAuthenticationInputUiState
 import de.hamedtanha.servertoolkit.feature.ssh.presentation.state.SshConnectionStatus
 import de.hamedtanha.servertoolkit.feature.ssh.presentation.state.SshUiState
+import de.hamedtanha.servertoolkit.feature.ssh.presentation.state.asRunning
+import de.hamedtanha.servertoolkit.feature.ssh.presentation.state.withCommandText
 import de.hamedtanha.servertoolkit.feature.ssh.presentation.state.withConnectionResult
+import de.hamedtanha.servertoolkit.feature.ssh.presentation.state.withExecutionResult
 import de.hamedtanha.servertoolkit.feature.ssh.presentation.state.withHostTrustDecision
 import de.hamedtanha.servertoolkit.navigation.SshDestination
 import javax.inject.Inject
+import kotlinx.coroutines.CancellationException
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
@@ -29,11 +37,16 @@ class SshViewModel @Inject constructor(
     savedStateHandle: SavedStateHandle,
     private val connectionAttemptUseCase: SshConnectionAttemptUseCase,
     private val confirmHostTrustUseCase: ConfirmSshHostTrustUseCase,
+    private val commandExecutionUseCase: SshCommandExecutionUseCase,
 ) : ViewModel() {
 
     private val serverId: String = checkNotNull(savedStateHandle[SshDestination.SERVER_ID_ARGUMENT])
 
     private var isConnectionAttemptInProgress: Boolean = false
+
+    private var isCommandExecutionInProgress: Boolean = false
+
+    private var activeSessionHandle: SshSessionHandle? = null
 
     private var pendingObservedHostKey: SshObservedHostKey? = null
 
@@ -113,12 +126,25 @@ class SshViewModel @Inject constructor(
         clearAuthenticationInputState()
     }
 
+    fun onCommandChanged(command: String) {
+        _uiState.value = _uiState.value.copy(
+            commandExecution = _uiState.value.commandExecution.withCommandText(command),
+        )
+    }
+
+    fun onExecuteCommandClicked() {
+        viewModelScope.launch {
+            executeCommand()
+        }
+    }
+
     internal suspend fun connect() {
         if (isConnectionAttemptInProgress) {
             return
         }
 
         isConnectionAttemptInProgress = true
+        activeSessionHandle = null
 
         try {
             _uiState.value = _uiState.value.copy(
@@ -149,6 +175,10 @@ class SshViewModel @Inject constructor(
     internal fun onConnectionResultReceived(result: SshConnectionResult) {
         pendingObservedHostKey = null
         clearAuthenticationInputState()
+        activeSessionHandle = when (result) {
+            is SshConnectionResult.Connected -> result.sessionHandle
+            is SshConnectionResult.Failed -> null
+        }
         _uiState.value = _uiState.value.withConnectionResult(result)
     }
 
@@ -166,6 +196,8 @@ class SshViewModel @Inject constructor(
     }
 
     internal fun onHostTrustDecisionReceived(decision: SshHostTrustDecision) {
+        activeSessionHandle = null
+
         pendingObservedHostKey = when (decision) {
             is SshHostTrustDecision.ReviewRequired -> decision.observedHostKey
             is SshHostTrustDecision.BlockedChangedHostKey -> null
@@ -173,6 +205,54 @@ class SshViewModel @Inject constructor(
         }
 
         _uiState.value = _uiState.value.withHostTrustDecision(decision)
+    }
+
+    internal suspend fun executeCommand() {
+        if (isCommandExecutionInProgress) {
+            return
+        }
+
+        val sessionHandle = activeSessionHandle
+        if (sessionHandle == null) {
+            _uiState.value = _uiState.value.copy(
+                commandExecution = _uiState.value.commandExecution.withExecutionResult(
+                    SshCommandExecutionResult.Failed(SshCommandExecutionError.SessionNotFound),
+                ),
+            )
+            return
+        }
+
+        if (!_uiState.value.canExecuteCommand) {
+            return
+        }
+
+        isCommandExecutionInProgress = true
+
+        try {
+            val command = _uiState.value.commandExecution.command
+
+            _uiState.value = _uiState.value.copy(
+                commandExecution = _uiState.value.commandExecution.asRunning(),
+            )
+
+            val result = commandExecutionUseCase(
+                sessionHandle = sessionHandle,
+                command = command,
+            )
+
+            _uiState.value = _uiState.value.copy(
+                commandExecution = _uiState.value.commandExecution.withExecutionResult(result),
+            )
+        } catch (error: CancellationException) {
+            _uiState.value = _uiState.value.copy(
+                commandExecution = _uiState.value.commandExecution.withExecutionResult(
+                    SshCommandExecutionResult.Failed(SshCommandExecutionError.CommandCancelled),
+                ),
+            )
+            throw error
+        } finally {
+            isCommandExecutionInProgress = false
+        }
     }
 
     internal suspend fun confirmPendingHostKey() {
@@ -186,6 +266,7 @@ class SshViewModel @Inject constructor(
         message: String,
         detail: String,
     ) {
+        activeSessionHandle = null
         pendingObservedHostKey = null
 
         _uiState.value = _uiState.value.copy(
