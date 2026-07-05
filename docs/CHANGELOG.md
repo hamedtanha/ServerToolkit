@@ -94,12 +94,17 @@ The project follows Conventional Commits and Semantic Versioning principles.
 - Added SSH host trust domain models.
 - Added SSH trusted host storage contract.
 - Added SSH host trust evaluator and unit tests.
+- Added SSH trusted host Room persistence skeleton.
+- Added SSH trusted host DAO, mapper, repository, and dependency injection binding.
+- Added Server Toolkit database migration from version 1 to version 2 for trusted host keys.
+- Added trusted host persistence and migration tests.
 
 ### Changed
 
 - Disabled Android backup and data extraction for the alpha release to protect infrastructure inventory metadata.
 - Replaced SSH placeholder connection metadata with resolved inventory-backed connection targets.
 - Moved SSH connection attempt orchestration from the ViewModel into a dedicated domain use case.
+- Updated the Server Toolkit database schema to version 2 for SSH trusted host keys.
 
 - Aligned package structure with the current implementation.
 - Replaced obsolete `feature/servers` package scaffolding with `feature/serverinventory`.

@@ -7,6 +7,12 @@ interface SshHostTrustRepository {
 
     suspend fun getTrustedHostKey(endpoint: SshHostEndpoint): SshTrustedHostKey?
 
+    /**
+     * Persists a host key that has been explicitly trusted by the user.
+     *
+     * Implementations must not silently replace an existing trusted host key for the same endpoint.
+     * A changed host key requires a separate explicit replacement flow.
+     */
     suspend fun saveTrustedHostKey(trustedHostKey: SshTrustedHostKey)
 
     suspend fun removeTrustedHostKey(endpoint: SshHostEndpoint)
