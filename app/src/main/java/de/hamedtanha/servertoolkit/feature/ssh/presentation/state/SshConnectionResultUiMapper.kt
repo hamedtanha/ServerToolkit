@@ -28,6 +28,8 @@ internal fun SshUiState.withConnectionResult(
 
 private fun SshConnectionError.toUserMessage(): String {
     return when (this) {
+        SshConnectionError.TargetNotFound -> "The selected server could not be found."
+        SshConnectionError.MissingConnectionMetadata -> "The selected server is missing required SSH connection metadata."
         SshConnectionError.UnknownHost -> "The server host could not be resolved."
         SshConnectionError.ConnectionTimeout -> "The connection attempt timed out."
         SshConnectionError.AuthenticationRequired -> "Authentication is required before connecting."

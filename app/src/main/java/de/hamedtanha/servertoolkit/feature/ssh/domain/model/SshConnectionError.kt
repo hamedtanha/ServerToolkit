@@ -7,6 +7,8 @@ package de.hamedtanha.servertoolkit.feature.ssh.domain.model
  * code can remain stable if the underlying implementation changes.
  */
 enum class SshConnectionError {
+    TargetNotFound,
+    MissingConnectionMetadata,
     UnknownHost,
     ConnectionTimeout,
     AuthenticationRequired,
