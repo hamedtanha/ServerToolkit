@@ -20,6 +20,7 @@ import de.hamedtanha.servertoolkit.feature.ssh.presentation.state.SshAuthenticat
 import de.hamedtanha.servertoolkit.feature.ssh.presentation.state.SshConnectionStatus
 import de.hamedtanha.servertoolkit.feature.ssh.presentation.state.SshUiState
 import de.hamedtanha.servertoolkit.feature.ssh.presentation.state.asRunning
+import de.hamedtanha.servertoolkit.feature.ssh.presentation.state.asSessionUnavailable
 import de.hamedtanha.servertoolkit.feature.ssh.presentation.state.withCommandText
 import de.hamedtanha.servertoolkit.feature.ssh.presentation.state.withConnectionResult
 import de.hamedtanha.servertoolkit.feature.ssh.presentation.state.withExecutionResult
@@ -153,6 +154,7 @@ class SshViewModel @Inject constructor(
                 message = "Starting connection attempt.",
                 detail = "The connection attempt is contained by timeout, cancellation, and error-mapping boundaries.",
                 hostKeyReview = null,
+                commandExecution = _uiState.value.commandExecution.asSessionUnavailable(),
             )
 
             val authenticationInput = pendingAuthenticationSecrets.toAuthenticationInput(
@@ -179,7 +181,14 @@ class SshViewModel @Inject constructor(
             is SshConnectionResult.Connected -> result.sessionHandle
             is SshConnectionResult.Failed -> null
         }
-        _uiState.value = _uiState.value.withConnectionResult(result)
+        val commandExecution = when (result) {
+            is SshConnectionResult.Connected -> _uiState.value.commandExecution
+            is SshConnectionResult.Failed -> _uiState.value.commandExecution.asSessionUnavailable()
+        }
+
+        _uiState.value = _uiState.value.withConnectionResult(result).copy(
+            commandExecution = commandExecution,
+        )
     }
 
     internal fun onConnectionAttemptOutcomeReceived(outcome: SshConnectionAttemptOutcome) {
@@ -204,7 +213,9 @@ class SshViewModel @Inject constructor(
             is SshHostTrustDecision.Accepted -> null
         }
 
-        _uiState.value = _uiState.value.withHostTrustDecision(decision)
+        _uiState.value = _uiState.value.withHostTrustDecision(decision).copy(
+            commandExecution = _uiState.value.commandExecution.asSessionUnavailable(),
+        )
     }
 
     internal suspend fun executeCommand() {
@@ -275,6 +286,7 @@ class SshViewModel @Inject constructor(
             message = message,
             detail = detail,
             hostKeyReview = null,
+            commandExecution = _uiState.value.commandExecution.asSessionUnavailable(),
         )
     }
 

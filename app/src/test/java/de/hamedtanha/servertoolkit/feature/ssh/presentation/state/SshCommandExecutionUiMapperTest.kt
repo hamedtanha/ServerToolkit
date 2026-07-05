@@ -50,6 +50,27 @@ class SshCommandExecutionUiMapperTest {
     }
 
     @Test
+    fun `maps session unavailable state and clears previous output`() {
+        val state = SshCommandExecutionUiState(
+            command = "uptime",
+            status = SshCommandExecutionStatus.Completed,
+            stdout = "old output",
+            stderr = "old error",
+            exitStatus = 1,
+        )
+
+        val mapped = state.asSessionUnavailable()
+
+        assertEquals("uptime", mapped.command)
+        assertEquals(SshCommandExecutionStatus.Idle, mapped.status)
+        assertEquals("No command executed", mapped.statusLabel)
+        assertEquals("", mapped.stdout)
+        assertEquals("", mapped.stderr)
+        assertEquals(null, mapped.exitStatus)
+        assertFalse(mapped.hasOutput)
+    }
+
+    @Test
     fun `maps completed command result`() {
         val state = SshCommandExecutionUiState(command = "uptime")
 
