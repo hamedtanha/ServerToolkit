@@ -113,6 +113,9 @@ The project follows Conventional Commits and Semantic Versioning principles.
 - Added credential-bearing SSH connection request boundary.
 - Added redacted SSH authentication input request model.
 - Added authentication input clearing at the connection attempt boundary.
+- Added SSH host-key observation service boundary.
+- Added SSH connection attempt outcome model for connection results and host-trust decisions.
+- Added host-trust gating before SSH connection service execution.
 
 ### Changed
 
