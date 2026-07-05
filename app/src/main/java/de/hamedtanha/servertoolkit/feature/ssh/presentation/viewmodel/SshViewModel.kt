@@ -6,6 +6,7 @@ import androidx.lifecycle.viewModelScope
 import dagger.hilt.android.lifecycle.HiltViewModel
 import de.hamedtanha.servertoolkit.feature.ssh.domain.model.SshAuthenticationInput
 import de.hamedtanha.servertoolkit.feature.ssh.domain.model.SshAuthenticationMethod
+import de.hamedtanha.servertoolkit.feature.ssh.domain.model.SshConnectionAttemptOutcome
 import de.hamedtanha.servertoolkit.feature.ssh.domain.model.SshConnectionResult
 import de.hamedtanha.servertoolkit.feature.ssh.domain.model.SshHostTrustDecision
 import de.hamedtanha.servertoolkit.feature.ssh.domain.model.SshObservedHostKey
@@ -131,11 +132,11 @@ class SshViewModel @Inject constructor(
             val authenticationInput = pendingAuthenticationSecrets.toAuthenticationInput(
                 method = _uiState.value.authenticationInput.selectedMethod,
             )
-            val result = connectionAttemptUseCase(
+            val outcome = connectionAttemptUseCase(
                 serverId = serverId,
                 authenticationInput = authenticationInput,
             )
-            onConnectionResultReceived(result)
+            onConnectionAttemptOutcomeReceived(outcome)
         } finally {
             pendingAuthenticationSecrets.clear()
             _uiState.value = _uiState.value.copy(
@@ -149,6 +150,19 @@ class SshViewModel @Inject constructor(
         pendingObservedHostKey = null
         clearAuthenticationInputState()
         _uiState.value = _uiState.value.withConnectionResult(result)
+    }
+
+    internal fun onConnectionAttemptOutcomeReceived(outcome: SshConnectionAttemptOutcome) {
+        when (outcome) {
+            is SshConnectionAttemptOutcome.ConnectionResult -> onConnectionResultReceived(
+                outcome.result,
+            )
+
+            is SshConnectionAttemptOutcome.HostTrustDecisionRequired -> {
+                clearAuthenticationInputState()
+                onHostTrustDecisionReceived(outcome.decision)
+            }
+        }
     }
 
     internal fun onHostTrustDecisionReceived(decision: SshHostTrustDecision) {

@@ -131,6 +131,9 @@ The following application-level items are implemented:
 - SSH authentication input clearing behavior.
 - SSH credential-bearing connection request boundary.
 - SSH authentication input redaction and clearing at the connection attempt boundary.
+- SSH host-key observation service boundary.
+- SSH connection attempt outcome model for connection results and host-trust decisions.
+- SSH connection attempt host-trust gating before connection service execution.
 - SSH ViewModel dependency injection for the connection attempt use case.
 - SSH user-triggered connect event shell.
 - SSH placeholder Connect button.
@@ -186,7 +189,7 @@ The following items are intentionally not implemented yet:
 
 The current implementation area is:
 
-- SSH host-key review integration planning.
+- SSHJ host-key observation adapter planning.
 - SSHJ authentication adapter planning.
 
 ---
@@ -195,8 +198,8 @@ The current implementation area is:
 
 The next safe development steps are:
 
-1. Integrate observed host-key review with the future SSH connection boundary.
-2. Add SSHJ authentication adapter mapping behind the existing host-trust and authentication boundaries.
+1. Add SSHJ host-key observation adapter mapping behind the existing host-trust boundary.
+2. Add SSHJ authentication adapter mapping behind the existing authentication boundary.
 3. Keep real SSH behavior disabled until all remaining ADR-009 implementation gates are satisfied.
 
 ---

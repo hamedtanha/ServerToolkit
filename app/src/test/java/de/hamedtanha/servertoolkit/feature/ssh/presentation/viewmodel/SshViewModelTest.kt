@@ -6,9 +6,11 @@ import de.hamedtanha.servertoolkit.core.connection.domain.model.ConnectionTarget
 import de.hamedtanha.servertoolkit.core.connection.domain.model.RemoteConnectionTarget
 import de.hamedtanha.servertoolkit.feature.ssh.domain.model.SshAuthenticationInput
 import de.hamedtanha.servertoolkit.feature.ssh.domain.model.SshAuthenticationMethod
+import de.hamedtanha.servertoolkit.feature.ssh.domain.model.SshConnectionAttemptOutcome
 import de.hamedtanha.servertoolkit.feature.ssh.domain.model.SshConnectionError
 import de.hamedtanha.servertoolkit.feature.ssh.domain.model.SshConnectionRequest
 import de.hamedtanha.servertoolkit.feature.ssh.domain.model.SshConnectionResult
+import de.hamedtanha.servertoolkit.feature.ssh.domain.model.SshHostKeyObservationResult
 import de.hamedtanha.servertoolkit.feature.ssh.domain.model.SshHostEndpoint
 import de.hamedtanha.servertoolkit.feature.ssh.domain.model.SshHostKeyFingerprint
 import de.hamedtanha.servertoolkit.feature.ssh.domain.model.SshHostTrustDecision
@@ -21,6 +23,7 @@ import de.hamedtanha.servertoolkit.feature.ssh.domain.usecase.SshHostTrustEvalua
 import de.hamedtanha.servertoolkit.feature.ssh.presentation.state.SshConnectionStatus
 import de.hamedtanha.servertoolkit.feature.ssh.test.FakeConnectionTargetResolver
 import de.hamedtanha.servertoolkit.feature.ssh.test.FakeSshConnectionService
+import de.hamedtanha.servertoolkit.feature.ssh.test.FakeSshHostKeyObservationService
 import de.hamedtanha.servertoolkit.feature.ssh.test.FakeSshHostTrustRepository
 import de.hamedtanha.servertoolkit.navigation.SshDestination
 import kotlinx.coroutines.CancellationException
@@ -203,6 +206,20 @@ class SshViewModelTest {
         assertEquals(SshConnectionStatus.Failed, viewModel.uiState.value.status)
         assertEquals("Connection failed", viewModel.uiState.value.statusLabel)
         assertEquals("Authentication is required before connecting.", viewModel.uiState.value.message)
+    }
+
+    @Test
+    fun `maps connection attempt host trust outcome into review state`() {
+        val viewModel = createViewModel(serverId = "server-1")
+
+        viewModel.onConnectionAttemptOutcomeReceived(
+            SshConnectionAttemptOutcome.HostTrustDecisionRequired(
+                SshHostTrustDecision.ReviewRequired(observedHostKey()),
+            ),
+        )
+
+        assertEquals("Server identity review required", viewModel.uiState.value.statusLabel)
+        assertEquals("example.com", viewModel.uiState.value.hostKeyReview?.host)
     }
 
     @Test
@@ -437,7 +454,12 @@ class SshViewModelTest {
         serverId: String,
         resolver: FakeConnectionTargetResolver = FakeConnectionTargetResolver(resolvedTarget()),
         service: FakeSshConnectionService = FakeSshConnectionService(SshConnectionResult.Connected),
-        hostTrustRepository: FakeSshHostTrustRepository = FakeSshHostTrustRepository(),
+        observationService: FakeSshHostKeyObservationService = FakeSshHostKeyObservationService(
+            SshHostKeyObservationResult.Observed(observedHostKey()),
+        ),
+        hostTrustRepository: FakeSshHostTrustRepository = FakeSshHostTrustRepository(
+            initialTrustedHostKey = trustedHostKey(),
+        ),
     ): SshViewModel {
         val hostTrustDecisionUseCase = SshHostTrustDecisionUseCase(
             hostTrustEvaluator = SshHostTrustEvaluator(hostTrustRepository),
@@ -450,6 +472,8 @@ class SshViewModelTest {
             connectionAttemptUseCase = SshConnectionAttemptUseCase(
                 connectionTargetResolver = resolver,
                 connectionService = service,
+                hostKeyObservationService = observationService,
+                hostTrustDecisionUseCase = hostTrustDecisionUseCase,
                 timeoutMillis = 1_000,
             ),
             confirmHostTrustUseCase = ConfirmSshHostTrustUseCase(
