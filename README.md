@@ -6,20 +6,25 @@ The application is designed for system administrators, DevOps engineers, and inf
 
 ---
 
-## Features (Planned)
+## Current Implementation
 
-- Server inventory
-- SSH connection
-- Ping & latency test
-- Server status monitoring
-- Favorite servers
-- Xray service management
-- x-ui management
-- Let's Encrypt helper
-- System logs viewer
-- Command execution
-- Dashboard
-- Search servers
+- Dashboard.
+- Server inventory.
+- Local Room-backed server persistence.
+- Server search and filtering.
+- SSH connection planning and security boundaries.
+- SSH command execution planning boundary.
+
+## Planned Direction
+
+- Ping and latency checks.
+- Server status monitoring.
+- Favorite servers.
+- Xray service management.
+- x-ui management.
+- Let's Encrypt helper workflows.
+- System logs viewer.
+- Real command execution.
 
 ---
 
@@ -41,7 +46,7 @@ The application is designed for system administrators, DevOps engineers, and inf
 Current Version:
 
 ```
-v0.1.0 (Development)
+v0.4.0-alpha (Development)
 ```
 
 ---

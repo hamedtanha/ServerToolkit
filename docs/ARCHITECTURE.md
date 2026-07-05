@@ -54,6 +54,7 @@ The current architecture is governed by the following ADRs:
 | ADR-007 | Secure Storage Strategy | Accepted |
 | ADR-008 | SSH Client Library Selection | Accepted |
 | ADR-009 | SSH Host Trust and Authentication Input Strategy | Accepted |
+| ADR-010 | SSH Command Channel Execution Strategy | Accepted |
 
 Accepted ADRs are the source of truth for architectural decisions. This document explains how those decisions are applied in the codebase.
 
@@ -93,23 +94,41 @@ The current implementation includes:
 - SSH UI connection status model and connection result mapper.
 - Test-only fake SSH connection service.
 - SSHJ dependency declaration through the Gradle version catalog.
-- SSHJ-backed data-layer adapter shell without real network behavior.
+- SSHJ-backed data-layer adapter boundary.
 - SSH connection service dependency injection binding.
-- SSH ViewModel injection of the connection service contract.
+- SSH host trust persistence boundary.
+- SSH host trust decision workflow.
+- SSH explicit unknown-host trust confirmation workflow.
+- SSH changed-host-key blocking decision flow.
+- SSH ephemeral authentication input boundary.
+- SSH credential-bearing connection request boundary.
+- SSH authentication input clearing behavior.
+- SSHJ trusted host-key verifier boundary.
+- SSHJ trusted connection execution shell.
+- SSHJ password authentication execution shell.
+- SSHJ session ownership execution shell.
+- SSH project-owned session handle model.
+- SSH session lifecycle service contract.
+- SSHJ session owner registry boundary.
+- SSH command channel execution strategy.
+- SSH command execution planning boundary.
+- SSHJ command channel planning shell.
+- SSH ViewModel injection of the connection attempt use case.
 - SSH user-triggered connect event shell and placeholder Connect button.
-- SSH tests for domain models, presentation state, fake results, adapter shell, and connect event shell.
+- SSH tests for domain models, presentation state, fake results, SSHJ adapter boundaries, host trust, authentication input, session ownership, and command planning.
 
 The following items are intentionally not implemented yet:
 
-- Real SSH connection behavior.
-- SSH authentication handling.
-- SSH host key verification implementation.
-- SSH session lifecycle model.
-- Credential input.
-- Secure credential storage.
+- Real SSH command execution against owned sessions.
+- Interactive terminal workflow for owned sessions.
+- Full SSH host key verification hardening beyond the current trusted verifier shell.
+- Real command/channel lifecycle execution.
+- Persistent credential storage.
 - Monitoring workflow.
 - Command execution workflow.
-- Room migration beyond database version 1.
+- Xray or x-ui management workflow.
+- Room migrations beyond database version 2.
+- Migration tests beyond the trusted-host v1-to-v2 migration.
 
 ---
 
@@ -272,7 +291,7 @@ Room is the accepted persistence technology for local structured data.
 
 ### Current Scope
 
-The initial persistence scope is server inventory data.
+The current persistence scope includes server inventory data and SSH trusted host key material.
 
 The Room persistence skeleton currently includes:
 
@@ -280,13 +299,19 @@ The Room persistence skeleton currently includes:
 - `ServerEntity`.
 - `ServerDao`.
 - `RoomServerRepository`.
-- Entity/domain mapping.
-- Hilt providers for the database and DAO.
+- Server entity/domain mapping.
+- SSH trusted host entity.
+- SSH trusted host DAO.
+- Room-backed SSH host trust repository.
+- SSH trusted host entity/domain mapping.
+- Hilt providers for the database, DAOs, and repositories.
 - KSP schema export configuration.
 
-The database version is `1`.
+The database version is `2`.
 
-The initial Room table stores server metadata only. It must not store credentials, private keys, passphrases, access tokens, certificates, or other secrets.
+The server inventory table stores server metadata only. It must not store credentials, private keys, passphrases, access tokens, certificates, or other secrets.
+
+Trusted SSH host key material is stored separately from generic server inventory metadata.
 
 ### Persistence Rules
 
