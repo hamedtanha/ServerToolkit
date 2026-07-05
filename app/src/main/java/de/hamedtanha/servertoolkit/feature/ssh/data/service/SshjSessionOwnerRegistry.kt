@@ -57,8 +57,8 @@ class SshjSessionOwnerRegistry @Inject constructor() {
 /**
  * Data-layer owner for a live SSHJ-backed session resource.
  *
- * The close action will later wrap SSHJ client/session cleanup. It is modeled as a callback now so
- * the ownership and cleanup contract can be tested before real network sessions are enabled.
+ * The close action wraps concrete SSHJ cleanup while keeping SSHJ clients, sessions, sockets, and
+ * future command channels out of domain, presentation, and ViewModel code.
  */
 internal class SshjSessionOwner(
     val sessionHandle: SshSessionHandle,

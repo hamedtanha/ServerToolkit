@@ -145,6 +145,7 @@ The following application-level items are implemented:
 - SSHJ trusted host-key verifier boundary.
 - SSHJ trusted connection execution shell.
 - SSHJ password authentication execution shell.
+- SSHJ session ownership execution shell.
 - SSH ViewModel dependency injection for the connection attempt use case.
 - SSH user-triggered connect event shell.
 - SSH placeholder Connect button.
@@ -183,10 +184,10 @@ The following application-level items are implemented:
 
 The following items are intentionally not implemented yet:
 
-- Fully authenticated SSH connection behavior.
-- Fully authenticated long-lived SSH session ownership.
+- SSH command execution against owned sessions.
+- Interactive terminal workflow for owned sessions.
 - Full SSH host key verification hardening beyond the current trusted verifier shell.
-- Real SSH session lifecycle execution.
+- Command/channel lifecycle execution.
 - Persistent credential storage.
 - Monitoring workflow.
 - Command execution workflow.
@@ -200,7 +201,7 @@ The following items are intentionally not implemented yet:
 
 The current implementation area is:
 
-- SSHJ session ownership execution planning.
+- SSH command execution planning.
 - SSH session lifecycle execution planning.
 
 ---
@@ -209,7 +210,7 @@ The current implementation area is:
 
 The next safe development steps are:
 
-1. Add real SSH session ownership after trusted connection and password authentication execution.
+1. Add command execution planning behind owned SSH sessions.
 2. Add real SSH session open and close execution behind the lifecycle boundary and owner registry.
 3. Keep command execution disabled until all remaining ADR-009 implementation gates are satisfied.
 

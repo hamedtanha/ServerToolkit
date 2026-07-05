@@ -128,6 +128,7 @@ The project follows Conventional Commits and Semantic Versioning principles.
 - Added SSHJ trusted host-key verifier boundary.
 - Added SSHJ trusted connection execution shell.
 - Added SSHJ password authentication execution shell.
+- Added SSHJ session ownership execution shell.
 
 ### Changed
 
