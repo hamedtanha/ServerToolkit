@@ -7,10 +7,13 @@ import de.hamedtanha.servertoolkit.core.connection.domain.model.RemoteConnection
 import de.hamedtanha.servertoolkit.feature.ssh.domain.model.SshConnectionError
 import de.hamedtanha.servertoolkit.feature.ssh.domain.model.SshConnectionRequest
 import de.hamedtanha.servertoolkit.feature.ssh.domain.model.SshConnectionResult
+import de.hamedtanha.servertoolkit.feature.ssh.domain.usecase.SshConnectionAttemptUseCase
 import de.hamedtanha.servertoolkit.feature.ssh.presentation.state.SshConnectionStatus
 import de.hamedtanha.servertoolkit.feature.ssh.test.FakeConnectionTargetResolver
 import de.hamedtanha.servertoolkit.feature.ssh.test.FakeSshConnectionService
 import de.hamedtanha.servertoolkit.navigation.SshDestination
+import kotlinx.coroutines.CompletableDeferred
+import kotlinx.coroutines.launch
 import kotlinx.coroutines.runBlocking
 import org.junit.Assert.assertEquals
 import org.junit.Assert.assertNull
@@ -27,21 +30,59 @@ class SshViewModelTest {
     }
 
     @Test
-    fun `sets connecting state before resolving connection target`() = runBlocking {
-        val resolver = FakeConnectionTargetResolver(resolvedTarget())
-        val service = FakeSshConnectionService(
-            result = SshConnectionResult.Failed(SshConnectionError.UnsupportedConfiguration),
+    fun `sets connecting state before invoking connection attempt`() = runBlocking {
+        lateinit var viewModel: SshViewModel
+        val resolver = FakeConnectionTargetResolver(
+            resolution = resolvedTarget(),
+            onResolve = {
+                assertEquals(SshConnectionStatus.Connecting, viewModel.uiState.value.status)
+                assertEquals("Connecting", viewModel.uiState.value.statusLabel)
+            },
         )
-        val viewModel = createViewModel(
+        viewModel = createViewModel(
             serverId = "server-1",
             resolver = resolver,
-            service = service,
         )
 
         viewModel.connect()
 
-        assertEquals(SshConnectionStatus.Failed, viewModel.uiState.value.status)
-        assertEquals("example.com", service.lastRequest?.host)
+        assertEquals(SshConnectionStatus.Connected, viewModel.uiState.value.status)
+    }
+
+    @Test
+    fun `ignores duplicate connection attempts while one attempt is running`() = runBlocking {
+        val serviceStarted = CompletableDeferred<Unit>()
+        val releaseService = CompletableDeferred<Unit>()
+        val service = FakeSshConnectionService(
+            result = SshConnectionResult.Connected,
+            onConnect = {
+                serviceStarted.complete(Unit)
+                releaseService.await()
+            },
+        )
+        val viewModel = createViewModel(
+            serverId = "server-1",
+            service = service,
+        )
+
+        val firstAttempt = launch {
+            viewModel.connect()
+        }
+
+        serviceStarted.await()
+
+        val duplicateAttempt = launch {
+            viewModel.connect()
+        }
+
+        duplicateAttempt.join()
+
+        assertEquals(1, service.connectCallCount)
+
+        releaseService.complete(Unit)
+        firstAttempt.join()
+
+        assertEquals(SshConnectionStatus.Connected, viewModel.uiState.value.status)
     }
 
     @Test
@@ -99,6 +140,21 @@ class SshViewModelTest {
     }
 
     @Test
+    fun `maps timeout result into failed ui state`() = runBlocking {
+        val viewModel = createViewModel(
+            serverId = "server-1",
+            service = FakeSshConnectionService(
+                result = SshConnectionResult.Failed(SshConnectionError.ConnectionTimeout),
+            ),
+        )
+
+        viewModel.connect()
+
+        assertEquals(SshConnectionStatus.Failed, viewModel.uiState.value.status)
+        assertEquals("The connection attempt timed out.", viewModel.uiState.value.message)
+    }
+
+    @Test
     fun `maps fake connected result into ui state`() = runBlocking {
         val service = FakeSshConnectionService(
             result = SshConnectionResult.Connected,
@@ -143,8 +199,11 @@ class SshViewModelTest {
             savedStateHandle = SavedStateHandle(
                 mapOf(SshDestination.SERVER_ID_ARGUMENT to serverId),
             ),
-            connectionTargetResolver = resolver,
-            connectionService = service,
+            connectionAttemptUseCase = SshConnectionAttemptUseCase(
+                connectionTargetResolver = resolver,
+                connectionService = service,
+                timeoutMillis = 1_000,
+            ),
         )
     }
 

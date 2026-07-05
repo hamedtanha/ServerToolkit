@@ -88,11 +88,15 @@ The project follows Conventional Commits and Semantic Versioning principles.
 - Added core connection target-resolution contract.
 - Added Server Inventory-backed connection target resolver.
 - Added SSH ViewModel target-resolution tests.
+- Added SSH connection attempt use case with timeout, exception mapping, and cancellation preservation.
+- Added SSH duplicate-attempt prevention at the ViewModel boundary.
+- Added SSH failure-containment unit tests.
 
 ### Changed
 
 - Disabled Android backup and data extraction for the alpha release to protect infrastructure inventory metadata.
 - Replaced SSH placeholder connection metadata with resolved inventory-backed connection targets.
+- Moved SSH connection attempt orchestration from the ViewModel into a dedicated domain use case.
 
 - Aligned package structure with the current implementation.
 - Replaced obsolete `feature/servers` package scaffolding with `feature/serverinventory`.
