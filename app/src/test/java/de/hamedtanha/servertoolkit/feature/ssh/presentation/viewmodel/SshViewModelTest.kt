@@ -7,10 +7,19 @@ import de.hamedtanha.servertoolkit.core.connection.domain.model.RemoteConnection
 import de.hamedtanha.servertoolkit.feature.ssh.domain.model.SshConnectionError
 import de.hamedtanha.servertoolkit.feature.ssh.domain.model.SshConnectionRequest
 import de.hamedtanha.servertoolkit.feature.ssh.domain.model.SshConnectionResult
+import de.hamedtanha.servertoolkit.feature.ssh.domain.model.SshHostEndpoint
+import de.hamedtanha.servertoolkit.feature.ssh.domain.model.SshHostKeyFingerprint
+import de.hamedtanha.servertoolkit.feature.ssh.domain.model.SshHostTrustDecision
+import de.hamedtanha.servertoolkit.feature.ssh.domain.model.SshObservedHostKey
+import de.hamedtanha.servertoolkit.feature.ssh.domain.model.SshTrustedHostKey
+import de.hamedtanha.servertoolkit.feature.ssh.domain.usecase.ConfirmSshHostTrustUseCase
 import de.hamedtanha.servertoolkit.feature.ssh.domain.usecase.SshConnectionAttemptUseCase
+import de.hamedtanha.servertoolkit.feature.ssh.domain.usecase.SshHostTrustDecisionUseCase
+import de.hamedtanha.servertoolkit.feature.ssh.domain.usecase.SshHostTrustEvaluator
 import de.hamedtanha.servertoolkit.feature.ssh.presentation.state.SshConnectionStatus
 import de.hamedtanha.servertoolkit.feature.ssh.test.FakeConnectionTargetResolver
 import de.hamedtanha.servertoolkit.feature.ssh.test.FakeSshConnectionService
+import de.hamedtanha.servertoolkit.feature.ssh.test.FakeSshHostTrustRepository
 import de.hamedtanha.servertoolkit.navigation.SshDestination
 import kotlinx.coroutines.CompletableDeferred
 import kotlinx.coroutines.launch
@@ -190,11 +199,110 @@ class SshViewModelTest {
         assertEquals("Authentication is required before connecting.", viewModel.uiState.value.message)
     }
 
+    @Test
+    fun `maps host key review required decision into ui state`() {
+        val viewModel = createViewModel(serverId = "server-1")
+
+        viewModel.onHostTrustDecisionReceived(
+            SshHostTrustDecision.ReviewRequired(observedHostKey()),
+        )
+
+        assertEquals(SshConnectionStatus.Failed, viewModel.uiState.value.status)
+        assertEquals("Server identity review required", viewModel.uiState.value.statusLabel)
+        assertEquals("example.com", viewModel.uiState.value.hostKeyReview?.host)
+        assertEquals("SHA256:abc123", viewModel.uiState.value.hostKeyReview?.displayFingerprint)
+    }
+
+    @Test
+    fun `confirm pending host key trusts reviewed identity`() = runBlocking {
+        val repository = FakeSshHostTrustRepository()
+        val viewModel = createViewModel(
+            serverId = "server-1",
+            hostTrustRepository = repository,
+        )
+
+        viewModel.onHostTrustDecisionReceived(
+            SshHostTrustDecision.ReviewRequired(observedHostKey()),
+        )
+        viewModel.confirmPendingHostKey()
+
+        assertEquals("Server identity trusted", viewModel.uiState.value.statusLabel)
+        assertNull(viewModel.uiState.value.hostKeyReview)
+        assertEquals(1, repository.saveCallCount)
+        assertEquals(trustedHostKey(), repository.trustedHostKey)
+    }
+
+    @Test
+    fun `confirm pending host key is ignored when no review is pending`() = runBlocking {
+        val repository = FakeSshHostTrustRepository()
+        val viewModel = createViewModel(
+            serverId = "server-1",
+            hostTrustRepository = repository,
+        )
+
+        viewModel.confirmPendingHostKey()
+
+        assertEquals(0, repository.saveCallCount)
+        assertNull(viewModel.uiState.value.hostKeyReview)
+    }
+
+    @Test
+    fun `cancel host key review clears pending review state`() {
+        val viewModel = createViewModel(serverId = "server-1")
+
+        viewModel.onHostTrustDecisionReceived(
+            SshHostTrustDecision.ReviewRequired(observedHostKey()),
+        )
+        viewModel.onCancelHostKeyReviewClicked()
+
+        assertEquals(SshConnectionStatus.Failed, viewModel.uiState.value.status)
+        assertEquals("Server identity review cancelled", viewModel.uiState.value.statusLabel)
+        assertEquals("Server identity review was cancelled.", viewModel.uiState.value.message)
+        assertNull(viewModel.uiState.value.hostKeyReview)
+    }
+
+    @Test
+    fun `changed host key decision does not create confirmable pending review`() = runBlocking {
+        val repository = FakeSshHostTrustRepository(
+            initialTrustedHostKey = trustedHostKey(
+                fingerprint = fingerprint(value = "trusted-fingerprint"),
+            ),
+        )
+        val viewModel = createViewModel(
+            serverId = "server-1",
+            hostTrustRepository = repository,
+        )
+
+        viewModel.onHostTrustDecisionReceived(
+            SshHostTrustDecision.BlockedChangedHostKey(
+                trustedHostKey = trustedHostKey(
+                    fingerprint = fingerprint(value = "trusted-fingerprint"),
+                ),
+                observedHostKey = observedHostKey(
+                    fingerprint = fingerprint(value = "observed-fingerprint"),
+                ),
+            ),
+        )
+        viewModel.confirmPendingHostKey()
+
+        assertEquals("Server identity changed", viewModel.uiState.value.statusLabel)
+        assertEquals(0, repository.saveCallCount)
+        assertEquals(
+            "trusted-fingerprint",
+            repository.trustedHostKey?.fingerprint?.value,
+        )
+    }
+
     private fun createViewModel(
         serverId: String,
         resolver: FakeConnectionTargetResolver = FakeConnectionTargetResolver(resolvedTarget()),
         service: FakeSshConnectionService = FakeSshConnectionService(SshConnectionResult.Connected),
+        hostTrustRepository: FakeSshHostTrustRepository = FakeSshHostTrustRepository(),
     ): SshViewModel {
+        val hostTrustDecisionUseCase = SshHostTrustDecisionUseCase(
+            hostTrustEvaluator = SshHostTrustEvaluator(hostTrustRepository),
+        )
+
         return SshViewModel(
             savedStateHandle = SavedStateHandle(
                 mapOf(SshDestination.SERVER_ID_ARGUMENT to serverId),
@@ -203,6 +311,10 @@ class SshViewModelTest {
                 connectionTargetResolver = resolver,
                 connectionService = service,
                 timeoutMillis = 1_000,
+            ),
+            confirmHostTrustUseCase = ConfirmSshHostTrustUseCase(
+                hostTrustDecisionUseCase = hostTrustDecisionUseCase,
+                hostTrustRepository = hostTrustRepository,
             ),
         )
     }
@@ -224,6 +336,41 @@ class SshViewModelTest {
             host = "example.com",
             port = 22,
             username = "admin",
+        )
+    }
+
+    private fun endpoint(): SshHostEndpoint {
+        return SshHostEndpoint(
+            serverId = "server-1",
+            host = "example.com",
+            port = 22,
+        )
+    }
+
+    private fun fingerprint(
+        value: String = "abc123",
+    ): SshHostKeyFingerprint {
+        return SshHostKeyFingerprint(
+            algorithm = "SHA256",
+            value = value,
+        )
+    }
+
+    private fun observedHostKey(
+        fingerprint: SshHostKeyFingerprint = fingerprint(),
+    ): SshObservedHostKey {
+        return SshObservedHostKey(
+            endpoint = endpoint(),
+            fingerprint = fingerprint,
+        )
+    }
+
+    private fun trustedHostKey(
+        fingerprint: SshHostKeyFingerprint = fingerprint(),
+    ): SshTrustedHostKey {
+        return SshTrustedHostKey(
+            endpoint = endpoint(),
+            fingerprint = fingerprint,
         )
     }
 }

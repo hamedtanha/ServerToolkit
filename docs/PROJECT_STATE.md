@@ -121,6 +121,10 @@ The following application-level items are implemented:
 - SSH host trust decision use case.
 - SSH explicit unknown-host trust confirmation use case.
 - SSH changed-host-key blocking decision flow.
+- SSH host-key review presentation state.
+- SSH host-key review UI mapper.
+- SSH host-key review confirmation and cancellation ViewModel events.
+- SSH host-key review screen actions.
 - SSH ViewModel dependency injection for the connection attempt use case.
 - SSH user-triggered connect event shell.
 - SSH placeholder Connect button.
@@ -176,8 +180,8 @@ The following items are intentionally not implemented yet:
 
 The current implementation area is:
 
-- SSH host-key review presentation flow planning.
 - Ephemeral authentication input planning.
+- SSH host-key review integration planning.
 
 ---
 
@@ -185,8 +189,8 @@ The current implementation area is:
 
 The next safe development steps are:
 
-1. Add host-key review UI state and confirmation presentation before real SSH network behavior.
-2. Add ephemeral authentication input models before real SSH network behavior.
+1. Add ephemeral authentication input models before real SSH network behavior.
+2. Integrate observed host-key review with the future SSH connection boundary.
 3. Keep real SSH behavior disabled until all remaining ADR-009 implementation gates are satisfied.
 
 ---

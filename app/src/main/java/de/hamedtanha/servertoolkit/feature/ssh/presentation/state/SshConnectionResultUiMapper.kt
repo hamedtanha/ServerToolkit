@@ -15,6 +15,7 @@ internal fun SshUiState.withConnectionResult(
             statusLabel = "Connected",
             message = "SSH connection is ready.",
             detail = "Session handling will be introduced in a later implementation slice.",
+            hostKeyReview = null,
         )
 
         is SshConnectionResult.Failed -> copy(
@@ -22,6 +23,7 @@ internal fun SshUiState.withConnectionResult(
             statusLabel = "Connection failed",
             message = result.error.toUserMessage(),
             detail = "No SSH session was opened.",
+            hostKeyReview = null,
         )
     }
 }
