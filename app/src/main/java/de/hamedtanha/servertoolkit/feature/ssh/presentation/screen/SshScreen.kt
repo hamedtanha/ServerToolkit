@@ -1,5 +1,7 @@
 package de.hamedtanha.servertoolkit.feature.ssh.presentation.screen
 
+import androidx.compose.foundation.rememberScrollState
+import androidx.compose.foundation.verticalScroll
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Spacer
@@ -9,6 +11,7 @@ import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.material3.Button
 import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
@@ -18,6 +21,7 @@ import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.hilt.lifecycle.viewmodel.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
+import de.hamedtanha.servertoolkit.feature.ssh.presentation.state.SshCommandExecutionUiState
 import de.hamedtanha.servertoolkit.feature.ssh.presentation.state.SshConnectionStatus
 import de.hamedtanha.servertoolkit.feature.ssh.presentation.state.SshHostKeyReviewUiState
 import de.hamedtanha.servertoolkit.feature.ssh.presentation.state.SshUiState
@@ -36,6 +40,8 @@ fun SshRoute(
         onConnectClick = viewModel::onConnectClicked,
         onConfirmHostKeyClick = viewModel::onConfirmHostKeyClicked,
         onCancelHostKeyReviewClick = viewModel::onCancelHostKeyReviewClicked,
+        onCommandChange = viewModel::onCommandChanged,
+        onExecuteCommandClick = viewModel::onExecuteCommandClicked,
         onNavigateBack = onNavigateBack,
         modifier = modifier,
     )
@@ -47,14 +53,17 @@ fun SshScreen(
     onConnectClick: () -> Unit,
     onConfirmHostKeyClick: () -> Unit,
     onCancelHostKeyReviewClick: () -> Unit,
+    onCommandChange: (String) -> Unit,
+    onExecuteCommandClick: () -> Unit,
     onNavigateBack: () -> Unit,
     modifier: Modifier = Modifier,
 ) {
     Column(
         modifier = modifier
             .fillMaxSize()
+            .verticalScroll(rememberScrollState())
             .padding(24.dp),
-        verticalArrangement = Arrangement.Center,
+        verticalArrangement = Arrangement.Top,
         horizontalAlignment = Alignment.CenterHorizontally,
     ) {
         Text(
@@ -131,7 +140,17 @@ fun SshScreen(
             }
         }
 
-        Spacer(modifier = Modifier.height(8.dp))
+        Spacer(modifier = Modifier.height(24.dp))
+
+        CommandExecutionContent(
+            commandExecution = uiState.commandExecution,
+            canExecuteCommand = uiState.canExecuteCommand,
+            isConnected = uiState.status == SshConnectionStatus.Connected,
+            onCommandChange = onCommandChange,
+            onExecuteCommandClick = onExecuteCommandClick,
+        )
+
+        Spacer(modifier = Modifier.height(24.dp))
 
         Button(
             onClick = onNavigateBack,
@@ -139,6 +158,117 @@ fun SshScreen(
         ) {
             Text(text = "Back")
         }
+    }
+}
+
+@Composable
+private fun CommandExecutionContent(
+    commandExecution: SshCommandExecutionUiState,
+    canExecuteCommand: Boolean,
+    isConnected: Boolean,
+    onCommandChange: (String) -> Unit,
+    onExecuteCommandClick: () -> Unit,
+) {
+    Text(
+        text = "Command execution",
+        style = MaterialTheme.typography.titleMedium,
+        textAlign = TextAlign.Center,
+    )
+
+    Spacer(modifier = Modifier.height(8.dp))
+
+    Text(
+        text = commandExecution.message,
+        style = MaterialTheme.typography.bodySmall,
+        textAlign = TextAlign.Center,
+        color = MaterialTheme.colorScheme.onSurfaceVariant,
+    )
+
+    Spacer(modifier = Modifier.height(12.dp))
+
+    OutlinedTextField(
+        value = commandExecution.command,
+        onValueChange = onCommandChange,
+        label = {
+            Text(text = "Command")
+        },
+        placeholder = {
+            Text(text = "uptime")
+        },
+        enabled = isConnected,
+        singleLine = true,
+        modifier = Modifier.fillMaxWidth(),
+    )
+
+    Spacer(modifier = Modifier.height(8.dp))
+
+    Button(
+        onClick = onExecuteCommandClick,
+        enabled = canExecuteCommand,
+        modifier = Modifier.fillMaxWidth(),
+    ) {
+        Text(text = "Run command")
+    }
+
+    Spacer(modifier = Modifier.height(8.dp))
+
+    Text(
+        text = "Command status: ${commandExecution.statusLabel}",
+        style = MaterialTheme.typography.bodySmall,
+        textAlign = TextAlign.Center,
+        color = MaterialTheme.colorScheme.onSurfaceVariant,
+    )
+
+    if (commandExecution.hasOutput) {
+        Spacer(modifier = Modifier.height(12.dp))
+
+        CommandOutputContent(commandExecution)
+    }
+}
+
+@Composable
+private fun CommandOutputContent(
+    commandExecution: SshCommandExecutionUiState,
+) {
+    commandExecution.exitStatus?.let { exitStatus ->
+        Text(
+            text = "Exit status: $exitStatus",
+            style = MaterialTheme.typography.bodySmall,
+            textAlign = TextAlign.Center,
+            color = MaterialTheme.colorScheme.onSurfaceVariant,
+        )
+
+        Spacer(modifier = Modifier.height(8.dp))
+    }
+
+    if (commandExecution.stdout.isNotBlank()) {
+        Text(
+            text = "stdout",
+            style = MaterialTheme.typography.labelMedium,
+            modifier = Modifier.fillMaxWidth(),
+        )
+
+        Text(
+            text = commandExecution.stdout,
+            style = MaterialTheme.typography.bodySmall,
+            modifier = Modifier.fillMaxWidth(),
+        )
+
+        Spacer(modifier = Modifier.height(8.dp))
+    }
+
+    if (commandExecution.stderr.isNotBlank()) {
+        Text(
+            text = "stderr",
+            style = MaterialTheme.typography.labelMedium,
+            modifier = Modifier.fillMaxWidth(),
+        )
+
+        Text(
+            text = commandExecution.stderr,
+            style = MaterialTheme.typography.bodySmall,
+            modifier = Modifier.fillMaxWidth(),
+        )
     }
 }
 
