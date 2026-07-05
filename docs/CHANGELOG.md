@@ -125,6 +125,7 @@ The project follows Conventional Commits and Semantic Versioning principles.
 - Added SSHJ session owner registry boundary.
 - Added SSHJ authentication adapter mapping.
 - Added SSHJ authentication executor boundary.
+- Added SSHJ trusted host-key verifier boundary.
 
 ### Changed
 
