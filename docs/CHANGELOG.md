@@ -46,7 +46,7 @@ The project follows Conventional Commits and Semantic Versioning principles.
 - Added SSH user-triggered connect event shell.
 - Added SSH placeholder Connect button.
 - Added SSH connect event shell ViewModel tests.
-- Added draft ADR-009 for SSH host trust and authentication input strategy.
+- Added ADR-009 for SSH host trust and authentication input strategy.
 - Added SSHJ adapter shell unit test.
 - Added SSH domain connection request model.
 - Added SSH domain connection result model.
@@ -135,6 +135,8 @@ The project follows Conventional Commits and Semantic Versioning principles.
 - Updated project state documentation after binding the SSH connection service.
 - Updated project state documentation after adding the SSH connect event shell.
 - Updated project state documentation for SSH trust and authentication planning.
+- Accepted ADR-009 and documented the implementation gates required before real SSH behavior.
+- Updated architecture documentation to include the accepted SSH-related ADRs and implemented SSH shell boundaries.
 - Replaced stale current branch tracking with stable Git workflow context.
 - Recorded successful manual verification of the delete flow after application restart.
 - Recorded successful manual verification of search and filtering behavior.
