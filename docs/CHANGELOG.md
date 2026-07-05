@@ -137,9 +137,15 @@ The project follows Conventional Commits and Semantic Versioning principles.
 - Added SSHJ command channel lifecycle executor.
 - Added SSH command execution service contract.
 - Added SSHJ-backed command execution service and dependency injection binding.
+- Added SSH command execution use case.
+- Added SSH command execution presentation state and UI mapper.
+- Added SSH ViewModel command execution wiring through active project-owned session handles.
+- Added SSH command input and Run command UI controls.
+- Added SSH command output rendering for stdout, stderr, and exit status.
 
 ### Changed
 
+- Updated the SSH screen from placeholder-only connection UI to include non-interactive command execution controls.
 - Disabled Android backup and data extraction for the alpha release to protect infrastructure inventory metadata.
 - Replaced SSH placeholder connection metadata with resolved inventory-backed connection targets.
 - Moved SSH connection attempt orchestration from the ViewModel into a dedicated domain use case.
@@ -214,7 +220,9 @@ The project follows Conventional Commits and Semantic Versioning principles.
 
 The following items are intentionally not implemented yet:
 
-- Real SSH connection behavior.
+- Real SSH connection behavior beyond the currently implemented connection and command execution boundaries.
+- Interactive terminal workflow.
+- Saved command history.
 - Persistent sensitive connection storage.
 - Monitoring workflow.
 - Migration tests.

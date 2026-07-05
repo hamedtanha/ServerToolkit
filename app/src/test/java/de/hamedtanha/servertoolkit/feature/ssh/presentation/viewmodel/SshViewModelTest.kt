@@ -6,6 +6,10 @@ import de.hamedtanha.servertoolkit.core.connection.domain.model.ConnectionTarget
 import de.hamedtanha.servertoolkit.core.connection.domain.model.RemoteConnectionTarget
 import de.hamedtanha.servertoolkit.feature.ssh.domain.model.SshAuthenticationInput
 import de.hamedtanha.servertoolkit.feature.ssh.domain.model.SshAuthenticationMethod
+import de.hamedtanha.servertoolkit.feature.ssh.domain.model.SshCommandExecutionError
+import de.hamedtanha.servertoolkit.feature.ssh.domain.model.SshCommandExecutionOutput
+import de.hamedtanha.servertoolkit.feature.ssh.domain.model.SshCommandExecutionResult
+import de.hamedtanha.servertoolkit.feature.ssh.domain.model.SshCommandRequest
 import de.hamedtanha.servertoolkit.feature.ssh.domain.model.SshConnectionAttemptOutcome
 import de.hamedtanha.servertoolkit.feature.ssh.domain.model.SshConnectionError
 import de.hamedtanha.servertoolkit.feature.ssh.domain.model.SshConnectionRequest
@@ -16,10 +20,13 @@ import de.hamedtanha.servertoolkit.feature.ssh.domain.model.SshHostKeyFingerprin
 import de.hamedtanha.servertoolkit.feature.ssh.domain.model.SshHostTrustDecision
 import de.hamedtanha.servertoolkit.feature.ssh.domain.model.SshObservedHostKey
 import de.hamedtanha.servertoolkit.feature.ssh.domain.model.SshTrustedHostKey
+import de.hamedtanha.servertoolkit.feature.ssh.domain.service.SshCommandExecutionService
 import de.hamedtanha.servertoolkit.feature.ssh.domain.usecase.ConfirmSshHostTrustUseCase
+import de.hamedtanha.servertoolkit.feature.ssh.domain.usecase.SshCommandExecutionUseCase
 import de.hamedtanha.servertoolkit.feature.ssh.domain.usecase.SshConnectionAttemptUseCase
 import de.hamedtanha.servertoolkit.feature.ssh.domain.usecase.SshHostTrustDecisionUseCase
 import de.hamedtanha.servertoolkit.feature.ssh.domain.usecase.SshHostTrustEvaluator
+import de.hamedtanha.servertoolkit.feature.ssh.presentation.state.SshCommandExecutionStatus
 import de.hamedtanha.servertoolkit.feature.ssh.presentation.state.SshConnectionStatus
 import de.hamedtanha.servertoolkit.feature.ssh.test.FakeConnectionTargetResolver
 import de.hamedtanha.servertoolkit.feature.ssh.test.FakeSshConnectionService
@@ -189,6 +196,120 @@ class SshViewModelTest {
         assertEquals(SshConnectionStatus.Connected, viewModel.uiState.value.status)
         assertEquals("Connected", viewModel.uiState.value.statusLabel)
         assertEquals("SSH connection is ready.", viewModel.uiState.value.message)
+    }
+
+    @Test
+    fun `executes command through active connected session`() = runBlocking {
+        val commandExecutionService = FakeSshCommandExecutionService(
+            result = SshCommandExecutionResult.Completed(
+                SshCommandExecutionOutput(
+                    stdout = "ok",
+                    stderr = "",
+                    exitStatus = 0,
+                ),
+            ),
+        )
+        val viewModel = createViewModel(
+            serverId = "server-1",
+            commandExecutionService = commandExecutionService,
+        )
+
+        viewModel.onConnectionResultReceived(sshConnectedResult())
+        viewModel.onCommandChanged("uptime")
+        viewModel.executeCommand()
+
+        assertEquals(1, commandExecutionService.executeCallCount)
+        assertEquals("uptime", commandExecutionService.lastRequest?.command)
+        assertEquals(SshCommandExecutionStatus.Completed, viewModel.uiState.value.commandExecution.status)
+        assertEquals("ok", viewModel.uiState.value.commandExecution.stdout)
+        assertEquals(0, viewModel.uiState.value.commandExecution.exitStatus)
+    }
+
+    @Test
+    fun `maps command execution without active session to failed state`() = runBlocking {
+        val commandExecutionService = FakeSshCommandExecutionService()
+        val viewModel = createViewModel(
+            serverId = "server-1",
+            commandExecutionService = commandExecutionService,
+        )
+
+        viewModel.onCommandChanged("uptime")
+        viewModel.executeCommand()
+
+        assertEquals(0, commandExecutionService.executeCallCount)
+        assertEquals(SshCommandExecutionStatus.Failed, viewModel.uiState.value.commandExecution.status)
+        assertEquals(
+            "No active SSH session was found.",
+            viewModel.uiState.value.commandExecution.message,
+        )
+    }
+
+    @Test
+    fun `clears active command session handle when connection fails`() = runBlocking {
+        val commandExecutionService = FakeSshCommandExecutionService()
+        val viewModel = createViewModel(
+            serverId = "server-1",
+            commandExecutionService = commandExecutionService,
+        )
+
+        viewModel.onConnectionResultReceived(sshConnectedResult())
+        viewModel.onConnectionResultReceived(
+            SshConnectionResult.Failed(SshConnectionError.AuthenticationRequired),
+        )
+        viewModel.onCommandChanged("uptime")
+        viewModel.executeCommand()
+
+        assertEquals(0, commandExecutionService.executeCallCount)
+        assertEquals(SshCommandExecutionStatus.Failed, viewModel.uiState.value.commandExecution.status)
+        assertEquals(
+            "No active SSH session was found.",
+            viewModel.uiState.value.commandExecution.message,
+        )
+    }
+
+    @Test
+    fun `ignores duplicate command execution while one command is running`() = runBlocking {
+        val commandStarted = CompletableDeferred<Unit>()
+        val releaseCommand = CompletableDeferred<Unit>()
+        val commandExecutionService = FakeSshCommandExecutionService(
+            result = SshCommandExecutionResult.Completed(
+                SshCommandExecutionOutput(
+                    stdout = "ok",
+                    stderr = "",
+                    exitStatus = 0,
+                ),
+            ),
+            onExecute = {
+                commandStarted.complete(Unit)
+                releaseCommand.await()
+            },
+        )
+        val viewModel = createViewModel(
+            serverId = "server-1",
+            commandExecutionService = commandExecutionService,
+        )
+
+        viewModel.onConnectionResultReceived(sshConnectedResult())
+        viewModel.onCommandChanged("uptime")
+
+        val firstExecution = launch {
+            viewModel.executeCommand()
+        }
+
+        commandStarted.await()
+
+        val duplicateExecution = launch {
+            viewModel.executeCommand()
+        }
+
+        duplicateExecution.join()
+
+        assertEquals(1, commandExecutionService.executeCallCount)
+
+        releaseCommand.complete(Unit)
+        firstExecution.join()
+
+        assertEquals(SshCommandExecutionStatus.Completed, viewModel.uiState.value.commandExecution.status)
     }
 
     @Test
@@ -451,6 +572,31 @@ class SshViewModelTest {
         assertFalse(viewModel.uiState.value.toString().contains("secret-password"))
     }
 
+    private class FakeSshCommandExecutionService(
+        private val result: SshCommandExecutionResult = SshCommandExecutionResult.Completed(
+            SshCommandExecutionOutput(
+                stdout = "",
+                stderr = "",
+                exitStatus = 0,
+            ),
+        ),
+        private val onExecute: suspend (SshCommandRequest) -> Unit = {},
+    ) : SshCommandExecutionService {
+
+        var lastRequest: SshCommandRequest? = null
+            private set
+
+        var executeCallCount: Int = 0
+            private set
+
+        override suspend fun execute(request: SshCommandRequest): SshCommandExecutionResult {
+            executeCallCount += 1
+            lastRequest = request
+            onExecute(request)
+            return result
+        }
+    }
+
     private fun createViewModel(
         serverId: String,
         resolver: FakeConnectionTargetResolver = FakeConnectionTargetResolver(resolvedTarget()),
@@ -461,6 +607,7 @@ class SshViewModelTest {
         hostTrustRepository: FakeSshHostTrustRepository = FakeSshHostTrustRepository(
             initialTrustedHostKey = trustedHostKey(),
         ),
+        commandExecutionService: FakeSshCommandExecutionService = FakeSshCommandExecutionService(),
     ): SshViewModel {
         val hostTrustDecisionUseCase = SshHostTrustDecisionUseCase(
             hostTrustEvaluator = SshHostTrustEvaluator(hostTrustRepository),
@@ -481,6 +628,7 @@ class SshViewModelTest {
                 hostTrustDecisionUseCase = hostTrustDecisionUseCase,
                 hostTrustRepository = hostTrustRepository,
             ),
+            commandExecutionUseCase = SshCommandExecutionUseCase(commandExecutionService),
         )
     }
 

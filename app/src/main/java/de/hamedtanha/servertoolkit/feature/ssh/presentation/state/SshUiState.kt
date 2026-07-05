@@ -9,8 +9,12 @@ data class SshUiState(
     val detail: String = "This placeholder prepares the navigation and UI boundary for the future SSH workflow.",
     val hostKeyReview: SshHostKeyReviewUiState? = null,
     val authenticationInput: SshAuthenticationInputUiState = SshAuthenticationInputUiState(),
+    val commandExecution: SshCommandExecutionUiState = SshCommandExecutionUiState(),
 ) {
 
     val isHostKeyReviewRequired: Boolean
         get() = hostKeyReview != null
+
+    val canExecuteCommand: Boolean
+        get() = status == SshConnectionStatus.Connected && commandExecution.canExecute
 }
