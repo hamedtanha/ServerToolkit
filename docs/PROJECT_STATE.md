@@ -100,7 +100,9 @@ The following application-level items are implemented:
 - SSH data-layer adapter shell.
 - SSHJ-backed connection service shell without real network behavior.
 - SSH connection service dependency injection binding.
-- SSH ViewModel dependency injection for the connection service.
+- Core connection target-resolution contract.
+- Server Inventory-backed connection target resolver.
+- SSH ViewModel dependency injection for the connection service and target resolver.
 - SSH user-triggered connect event shell.
 - SSH placeholder Connect button.
 - SSH connect event shell ViewModel tests.
@@ -155,9 +157,9 @@ The following items are intentionally not implemented yet:
 
 The current implementation area is:
 
-- Android backup and data-extraction policy planning.
-- SSH target-resolution boundary planning.
 - SSH connection attempt failure-containment planning.
+- SSH host trust model planning.
+- Ephemeral authentication input planning.
 
 ---
 
@@ -165,9 +167,9 @@ The current implementation area is:
 
 The next safe development steps are:
 
-1. Decide Android backup and data-extraction behavior before introducing trusted-host persistence or sensitive SSH state.
-2. Add an SSH target-resolution boundary for inventory-backed connection metadata without feature-to-feature persistence coupling.
-3. Add host trust, ephemeral authentication input, duplicate-attempt prevention, timeout, cancellation, and exception-handling tests before enabling real SSH network behavior.
+1. Add duplicate-attempt prevention, timeout, cancellation preservation, exception handling, and state-recovery tests for SSH connection attempts.
+2. Add host trust and ephemeral authentication input models before real SSH network behavior.
+3. Keep real SSH behavior disabled until all ADR-009 implementation gates are satisfied.
 
 ---
 
@@ -181,4 +183,4 @@ Implementation and documentation changes must happen on short-lived GitHub Flow 
 
 ## Current Engineering Rule
 
-Do not add real SSH behavior before the ADR-009 implementation gates, backup policy, target-resolution boundary, failure containment, and tests are in place.
+Do not add real SSH behavior before the ADR-009 implementation gates, failure containment, host trust, ephemeral authentication input, and tests are in place.

@@ -4,6 +4,9 @@ import androidx.lifecycle.SavedStateHandle
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import dagger.hilt.android.lifecycle.HiltViewModel
+import de.hamedtanha.servertoolkit.core.connection.domain.model.ConnectionTargetResolution
+import de.hamedtanha.servertoolkit.core.connection.domain.resolver.ConnectionTargetResolver
+import de.hamedtanha.servertoolkit.feature.ssh.domain.model.SshConnectionError
 import de.hamedtanha.servertoolkit.feature.ssh.domain.model.SshConnectionRequest
 import de.hamedtanha.servertoolkit.feature.ssh.domain.model.SshConnectionResult
 import de.hamedtanha.servertoolkit.feature.ssh.domain.service.SshConnectionService
@@ -20,6 +23,7 @@ import kotlinx.coroutines.launch
 @HiltViewModel
 class SshViewModel @Inject constructor(
     savedStateHandle: SavedStateHandle,
+    private val connectionTargetResolver: ConnectionTargetResolver,
     private val connectionService: SshConnectionService,
 ) : ViewModel() {
 
@@ -40,23 +44,41 @@ class SshViewModel @Inject constructor(
         _uiState.value = _uiState.value.copy(
             status = SshConnectionStatus.Connecting,
             statusLabel = "Connecting",
-            message = "Preparing connection.",
-            detail = "This action is limited to the current adapter shell.",
+            message = "Resolving connection target.",
+            detail = "This action resolves stored server metadata before invoking the SSH adapter shell.",
         )
 
-        val result = connectionService.connect(
-            SshConnectionRequest(
-                serverId = serverId,
-                host = "placeholder.invalid",
-                port = 22,
-                username = "placeholder",
-            ),
-        )
+        when (val resolution = connectionTargetResolver.resolve(serverId)) {
+            is ConnectionTargetResolution.Resolved -> connectToResolvedTarget(resolution)
 
-        onConnectionResultReceived(result)
+            ConnectionTargetResolution.NotFound -> onConnectionResultReceived(
+                SshConnectionResult.Failed(SshConnectionError.TargetNotFound),
+            )
+
+            is ConnectionTargetResolution.Invalid -> onConnectionResultReceived(
+                SshConnectionResult.Failed(SshConnectionError.MissingConnectionMetadata),
+            )
+        }
     }
 
     internal fun onConnectionResultReceived(result: SshConnectionResult) {
         _uiState.value = _uiState.value.withConnectionResult(result)
+    }
+
+    private suspend fun connectToResolvedTarget(
+        resolution: ConnectionTargetResolution.Resolved,
+    ) {
+        val target = resolution.target
+
+        val result = connectionService.connect(
+            SshConnectionRequest(
+                serverId = target.serverId,
+                host = target.host,
+                port = target.port,
+                username = target.username,
+            ),
+        )
+
+        onConnectionResultReceived(result)
     }
 }
