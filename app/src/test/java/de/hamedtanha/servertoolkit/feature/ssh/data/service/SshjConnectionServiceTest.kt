@@ -28,11 +28,11 @@ class SshjConnectionServiceTest {
             SshConnectionResult.Failed(SshConnectionError.HostTrustRequired),
             result,
         )
-        assertEquals(0, executor.connectCallCount)
+        assertEquals(0, executor.connectAndAuthenticateCallCount)
     }
 
     @Test
-    fun `executes trusted connection when trusted host key exists`() = runBlocking {
+    fun `executes trusted connection authentication when trusted host key exists`() = runBlocking {
         val trustedHostKey = trustedHostKey()
         val executor = FakeTrustedConnectionExecutor()
         val service = sshjConnectionService(
@@ -47,13 +47,14 @@ class SshjConnectionServiceTest {
             SshConnectionResult.Failed(SshConnectionError.UnsupportedConfiguration),
             result,
         )
-        assertEquals(1, executor.connectCallCount)
+        assertEquals(1, executor.connectAndAuthenticateCallCount)
         assertEquals(request, executor.lastRequest)
         assertEquals(trustedHostKey, executor.lastTrustedHostKey)
+        assertEquals(true, executor.lastAuthenticationMapping is SshjAuthenticationMapping.None)
     }
 
     @Test
-    fun `maps trusted connection execution failure to connection failure`() = runBlocking {
+    fun `maps trusted connection authentication failure to connection failure`() = runBlocking {
         val executor = FakeTrustedConnectionExecutor(
             result = SshjTrustedConnectionExecutionResult.Failed(
                 SshConnectionError.ConnectionTimeout,
@@ -139,10 +140,10 @@ class SshjConnectionServiceTest {
 
     private class FakeTrustedConnectionExecutor(
         private val result: SshjTrustedConnectionExecutionResult =
-            SshjTrustedConnectionExecutionResult.Connected,
+            SshjTrustedConnectionExecutionResult.Authenticated,
     ) : SshjTrustedConnectionExecutor {
 
-        var connectCallCount = 0
+        var connectAndAuthenticateCallCount = 0
             private set
 
         var lastRequest: SshConnectionRequest? = null
@@ -151,13 +152,18 @@ class SshjConnectionServiceTest {
         var lastTrustedHostKey: SshTrustedHostKey? = null
             private set
 
-        override fun connect(
+        var lastAuthenticationMapping: SshjAuthenticationMapping? = null
+            private set
+
+        override fun connectAndAuthenticate(
             request: SshConnectionRequest,
             trustedHostKey: SshTrustedHostKey,
+            authenticationMapping: SshjAuthenticationMapping,
         ): SshjTrustedConnectionExecutionResult {
-            connectCallCount += 1
+            connectAndAuthenticateCallCount += 1
             lastRequest = request
             lastTrustedHostKey = trustedHostKey
+            lastAuthenticationMapping = authenticationMapping
             return result
         }
     }
