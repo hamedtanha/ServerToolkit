@@ -6,13 +6,17 @@ import de.hamedtanha.servertoolkit.feature.ssh.domain.service.SshConnectionServi
 
 class FakeSshConnectionService(
     var result: SshConnectionResult,
-    private val onConnect: (SshConnectionRequest) -> Unit = {},
+    private val onConnect: suspend (SshConnectionRequest) -> Unit = {},
 ) : SshConnectionService {
 
     var lastRequest: SshConnectionRequest? = null
         private set
 
+    var connectCallCount: Int = 0
+        private set
+
     override suspend fun connect(request: SshConnectionRequest): SshConnectionResult {
+        connectCallCount += 1
         lastRequest = request
         onConnect(request)
         return result
