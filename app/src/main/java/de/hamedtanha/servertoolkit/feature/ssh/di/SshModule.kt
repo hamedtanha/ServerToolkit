@@ -7,9 +7,11 @@ import dagger.hilt.components.SingletonComponent
 import de.hamedtanha.servertoolkit.feature.ssh.data.repository.RoomSshHostTrustRepository
 import de.hamedtanha.servertoolkit.feature.ssh.data.service.SshjConnectionService
 import de.hamedtanha.servertoolkit.feature.ssh.data.service.SshjHostKeyObservationService
+import de.hamedtanha.servertoolkit.feature.ssh.data.service.SshjSessionLifecycleService
 import de.hamedtanha.servertoolkit.feature.ssh.domain.repository.SshHostTrustRepository
 import de.hamedtanha.servertoolkit.feature.ssh.domain.service.SshConnectionService
 import de.hamedtanha.servertoolkit.feature.ssh.domain.service.SshHostKeyObservationService
+import de.hamedtanha.servertoolkit.feature.ssh.domain.service.SshSessionLifecycleService
 import javax.inject.Singleton
 
 @Module
@@ -26,6 +28,11 @@ abstract class SshModule {
     abstract fun bindSshHostKeyObservationService(
         service: SshjHostKeyObservationService,
     ): SshHostKeyObservationService
+
+    @Binds
+    abstract fun bindSshSessionLifecycleService(
+        service: SshjSessionLifecycleService,
+    ): SshSessionLifecycleService
 
     @Binds
     @Singleton

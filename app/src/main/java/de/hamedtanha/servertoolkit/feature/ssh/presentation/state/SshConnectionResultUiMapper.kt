@@ -10,11 +10,11 @@ internal fun SshUiState.withConnectionResult(
     result: SshConnectionResult,
 ): SshUiState {
     return when (result) {
-        SshConnectionResult.Connected -> copy(
+        is SshConnectionResult.Connected -> copy(
             status = SshConnectionStatus.Connected,
             statusLabel = "Connected",
             message = "SSH connection is ready.",
-            detail = "Session handling will be introduced in a later implementation slice.",
+            detail = "A project-owned SSH session handle was opened.",
             hostKeyReview = null,
         )
 

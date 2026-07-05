@@ -4,19 +4,20 @@ import de.hamedtanha.servertoolkit.feature.ssh.domain.model.SshConnectionError
 import de.hamedtanha.servertoolkit.feature.ssh.domain.model.SshConnectionResult
 import org.junit.Assert.assertEquals
 import org.junit.Test
+import de.hamedtanha.servertoolkit.feature.ssh.test.sshConnectedResult
 
 class SshConnectionResultUiMapperTest {
 
     @Test
     fun `maps connected result to connected ui state`() {
         val uiState = SshUiState(serverId = "server-1")
-            .withConnectionResult(SshConnectionResult.Connected)
+            .withConnectionResult(sshConnectedResult())
 
         assertEquals(SshConnectionStatus.Connected, uiState.status)
         assertEquals("Connected", uiState.statusLabel)
         assertEquals("SSH connection is ready.", uiState.message)
         assertEquals(
-            "Session handling will be introduced in a later implementation slice.",
+            "A project-owned SSH session handle was opened.",
             uiState.detail,
         )
         assertEquals("server-1", uiState.serverId)

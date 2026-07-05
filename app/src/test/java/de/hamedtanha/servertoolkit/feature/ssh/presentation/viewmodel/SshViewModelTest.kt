@@ -36,6 +36,7 @@ import org.junit.Assert.assertNull
 import org.junit.Assert.assertTrue
 import org.junit.Assert.fail
 import org.junit.Test
+import de.hamedtanha.servertoolkit.feature.ssh.test.sshConnectedResult
 
 class SshViewModelTest {
 
@@ -72,7 +73,7 @@ class SshViewModelTest {
         val serviceStarted = CompletableDeferred<Unit>()
         val releaseService = CompletableDeferred<Unit>()
         val service = FakeSshConnectionService(
-            result = SshConnectionResult.Connected,
+            result = sshConnectedResult(),
             onConnect = {
                 serviceStarted.complete(Unit)
                 releaseService.await()
@@ -105,7 +106,7 @@ class SshViewModelTest {
 
     @Test
     fun `uses resolved target metadata for connection request`() = runBlocking {
-        val service = FakeSshConnectionService(SshConnectionResult.Connected)
+        val service = FakeSshConnectionService(sshConnectedResult())
         val viewModel = createViewModel(
             serverId = "server-1",
             resolver = FakeConnectionTargetResolver(resolvedTarget()),
@@ -122,7 +123,7 @@ class SshViewModelTest {
 
     @Test
     fun `maps missing target into failed ui state without invoking connection service`() = runBlocking {
-        val service = FakeSshConnectionService(SshConnectionResult.Connected)
+        val service = FakeSshConnectionService(sshConnectedResult())
         val viewModel = createViewModel(
             serverId = "missing-server",
             resolver = FakeConnectionTargetResolver(ConnectionTargetResolution.NotFound),
@@ -138,7 +139,7 @@ class SshViewModelTest {
 
     @Test
     fun `maps invalid target into failed ui state without invoking connection service`() = runBlocking {
-        val service = FakeSshConnectionService(SshConnectionResult.Connected)
+        val service = FakeSshConnectionService(sshConnectedResult())
         val viewModel = createViewModel(
             serverId = "server-1",
             resolver = FakeConnectionTargetResolver(
@@ -175,7 +176,7 @@ class SshViewModelTest {
     @Test
     fun `maps fake connected result into ui state`() = runBlocking {
         val service = FakeSshConnectionService(
-            result = SshConnectionResult.Connected,
+            result = sshConnectedResult(),
         )
         val viewModel = createViewModel(
             serverId = "server-1",
@@ -392,7 +393,7 @@ class SshViewModelTest {
     fun `connect passes password authentication input through request boundary without exposing secret`() = runBlocking {
         var observedPassword = ""
         val service = FakeSshConnectionService(
-            result = SshConnectionResult.Connected,
+            result = sshConnectedResult(),
             onConnect = { request ->
                 val passwordInput = request.authenticationInput as SshAuthenticationInput.Password
                 observedPassword = passwordInput.password
@@ -416,7 +417,7 @@ class SshViewModelTest {
     @Test
     fun `connect clears authentication input state when cancelled`() = runBlocking {
         val service = FakeSshConnectionService(
-            result = SshConnectionResult.Connected,
+            result = sshConnectedResult(),
             onConnect = {
                 throw CancellationException("Connection cancelled")
             },
@@ -444,7 +445,7 @@ class SshViewModelTest {
         val viewModel = createViewModel(serverId = "server-1")
 
         viewModel.onPasswordChanged("secret-password")
-        viewModel.onConnectionResultReceived(SshConnectionResult.Connected)
+        viewModel.onConnectionResultReceived(sshConnectedResult())
 
         assertFalse(viewModel.uiState.value.authenticationInput.hasSensitiveInput)
         assertFalse(viewModel.uiState.value.toString().contains("secret-password"))
@@ -453,7 +454,7 @@ class SshViewModelTest {
     private fun createViewModel(
         serverId: String,
         resolver: FakeConnectionTargetResolver = FakeConnectionTargetResolver(resolvedTarget()),
-        service: FakeSshConnectionService = FakeSshConnectionService(SshConnectionResult.Connected),
+        service: FakeSshConnectionService = FakeSshConnectionService(sshConnectedResult()),
         observationService: FakeSshHostKeyObservationService = FakeSshHostKeyObservationService(
             SshHostKeyObservationResult.Observed(observedHostKey()),
         ),
