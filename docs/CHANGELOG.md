@@ -102,6 +102,10 @@ The project follows Conventional Commits and Semantic Versioning principles.
 - Added SSH host trust decision use case.
 - Added explicit unknown-host trust confirmation use case.
 - Added changed-host-key blocking decision-flow tests.
+- Added SSH host-key review presentation state.
+- Added SSH host-key review UI mapper and tests.
+- Added SSH host-key review confirmation and cancellation ViewModel events.
+- Added SSH screen actions for host-key review.
 
 ### Changed
 

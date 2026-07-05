@@ -19,6 +19,7 @@ import androidx.compose.ui.unit.dp
 import androidx.hilt.lifecycle.viewmodel.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import de.hamedtanha.servertoolkit.feature.ssh.presentation.state.SshConnectionStatus
+import de.hamedtanha.servertoolkit.feature.ssh.presentation.state.SshHostKeyReviewUiState
 import de.hamedtanha.servertoolkit.feature.ssh.presentation.state.SshUiState
 import de.hamedtanha.servertoolkit.feature.ssh.presentation.viewmodel.SshViewModel
 
@@ -33,6 +34,8 @@ fun SshRoute(
     SshScreen(
         uiState = uiState,
         onConnectClick = viewModel::onConnectClicked,
+        onConfirmHostKeyClick = viewModel::onConfirmHostKeyClicked,
+        onCancelHostKeyReviewClick = viewModel::onCancelHostKeyReviewClicked,
         onNavigateBack = onNavigateBack,
         modifier = modifier,
     )
@@ -42,6 +45,8 @@ fun SshRoute(
 fun SshScreen(
     uiState: SshUiState,
     onConnectClick: () -> Unit,
+    onConfirmHostKeyClick: () -> Unit,
+    onCancelHostKeyReviewClick: () -> Unit,
     onNavigateBack: () -> Unit,
     modifier: Modifier = Modifier,
 ) {
@@ -93,14 +98,37 @@ fun SshScreen(
             color = MaterialTheme.colorScheme.onSurfaceVariant,
         )
 
+        uiState.hostKeyReview?.let { review ->
+            Spacer(modifier = Modifier.height(16.dp))
+            HostKeyReviewContent(review)
+        }
+
         Spacer(modifier = Modifier.height(24.dp))
 
-        Button(
-            onClick = onConnectClick,
-            enabled = uiState.status != SshConnectionStatus.Connecting,
-            modifier = Modifier.fillMaxWidth(),
-        ) {
-            Text(text = "Connect")
+        if (uiState.isHostKeyReviewRequired) {
+            Button(
+                onClick = onConfirmHostKeyClick,
+                modifier = Modifier.fillMaxWidth(),
+            ) {
+                Text(text = "Trust server identity")
+            }
+
+            Spacer(modifier = Modifier.height(8.dp))
+
+            Button(
+                onClick = onCancelHostKeyReviewClick,
+                modifier = Modifier.fillMaxWidth(),
+            ) {
+                Text(text = "Cancel identity review")
+            }
+        } else {
+            Button(
+                onClick = onConnectClick,
+                enabled = uiState.status != SshConnectionStatus.Connecting,
+                modifier = Modifier.fillMaxWidth(),
+            ) {
+                Text(text = "Connect")
+            }
         }
 
         Spacer(modifier = Modifier.height(8.dp))
@@ -112,4 +140,25 @@ fun SshScreen(
             Text(text = "Back")
         }
     }
+}
+
+@Composable
+private fun HostKeyReviewContent(
+    review: SshHostKeyReviewUiState,
+) {
+    Text(
+        text = "Host: ${review.host}:${review.port}",
+        style = MaterialTheme.typography.bodySmall,
+        textAlign = TextAlign.Center,
+        color = MaterialTheme.colorScheme.onSurfaceVariant,
+    )
+
+    Spacer(modifier = Modifier.height(4.dp))
+
+    Text(
+        text = "Fingerprint: ${review.displayFingerprint}",
+        style = MaterialTheme.typography.bodySmall,
+        textAlign = TextAlign.Center,
+        color = MaterialTheme.colorScheme.onSurfaceVariant,
+    )
 }

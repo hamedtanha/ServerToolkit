@@ -7,4 +7,9 @@ data class SshUiState(
     val statusLabel: String = "Not connected",
     val message: String = "SSH connectivity is not implemented yet.",
     val detail: String = "This placeholder prepares the navigation and UI boundary for the future SSH workflow.",
-)
+    val hostKeyReview: SshHostKeyReviewUiState? = null,
+) {
+
+    val isHostKeyReviewRequired: Boolean
+        get() = hostKeyReview != null
+}
