@@ -1,7 +1,5 @@
 package de.hamedtanha.servertoolkit.feature.ssh.data.service
 
-import de.hamedtanha.servertoolkit.feature.ssh.domain.model.SshCommandExecutionError
-import de.hamedtanha.servertoolkit.feature.ssh.domain.model.SshCommandExecutionResult
 import de.hamedtanha.servertoolkit.feature.ssh.domain.model.SshConnectionError
 import de.hamedtanha.servertoolkit.feature.ssh.domain.model.SshConnectionRequest
 import de.hamedtanha.servertoolkit.feature.ssh.domain.model.SshSessionHandle
@@ -43,6 +41,7 @@ internal sealed interface SshjTrustedConnectionExecutionResult {
 internal class SshjNetworkTrustedConnectionExecutor(
     private val trustedHostKeyVerifierFactory: SshjTrustedHostKeyVerifierFactory,
     private val authenticationExecutor: SshjAuthenticationExecutor,
+    private val commandChannelExecutor: SshjCommandChannelExecutor = SshjNetworkCommandChannelExecutor(),
 ) : SshjTrustedConnectionExecutor {
 
     override fun connectAndAuthenticate(
@@ -73,9 +72,10 @@ internal class SshjNetworkTrustedConnectionExecutor(
                         closeAction = {
                             client.close()
                         },
-                        commandExecutionAction = {
-                            SshCommandExecutionResult.Failed(
-                                SshCommandExecutionError.UnsupportedConfiguration,
+                        commandExecutionAction = { commandRequest ->
+                            commandChannelExecutor.execute(
+                                commandClient = SshjCommandChannelClientAdapter(client),
+                                request = commandRequest,
                             )
                         },
                     )
