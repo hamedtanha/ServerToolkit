@@ -35,7 +35,12 @@ internal data class SshjCommandChannelPlan(
     val sessionHandle: SshSessionHandle,
     val command: String,
     val timeoutMillis: Long,
-)
+) {
+
+    override fun toString(): String {
+        return "SshjCommandChannelPlan(sessionHandle=$sessionHandle, command=REDACTED, timeoutMillis=$timeoutMillis)"
+    }
+}
 
 internal class SshjSessionRegistryCommandChannelPlanner(
     private val sessionOwnerRegistry: SshjSessionOwnerRegistry,

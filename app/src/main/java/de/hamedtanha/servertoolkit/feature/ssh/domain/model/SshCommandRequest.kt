@@ -23,4 +23,8 @@ data class SshCommandRequest(
             "SSH command timeout must be between 1 and $MAX_SSH_COMMAND_TIMEOUT_MILLIS milliseconds."
         }
     }
+
+    override fun toString(): String {
+        return "SshCommandRequest(sessionHandle=$sessionHandle, command=REDACTED, timeoutMillis=$timeoutMillis)"
+    }
 }

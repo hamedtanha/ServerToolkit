@@ -291,7 +291,7 @@ Room is the accepted persistence technology for local structured data.
 
 ### Current Scope
 
-The initial persistence scope is server inventory data.
+The current persistence scope includes server inventory data and SSH trusted host key material.
 
 The Room persistence skeleton currently includes:
 
@@ -299,13 +299,19 @@ The Room persistence skeleton currently includes:
 - `ServerEntity`.
 - `ServerDao`.
 - `RoomServerRepository`.
-- Entity/domain mapping.
-- Hilt providers for the database and DAO.
+- Server entity/domain mapping.
+- SSH trusted host entity.
+- SSH trusted host DAO.
+- Room-backed SSH host trust repository.
+- SSH trusted host entity/domain mapping.
+- Hilt providers for the database, DAOs, and repositories.
 - KSP schema export configuration.
 
 The database version is `2`.
 
-The initial Room table stores server metadata only. It must not store credentials, private keys, passphrases, access tokens, certificates, or other secrets.
+The server inventory table stores server metadata only. It must not store credentials, private keys, passphrases, access tokens, certificates, or other secrets.
+
+Trusted SSH host key material is stored separately from generic server inventory metadata.
 
 ### Persistence Rules
 

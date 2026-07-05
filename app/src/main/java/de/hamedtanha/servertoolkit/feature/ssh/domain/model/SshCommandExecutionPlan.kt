@@ -20,4 +20,8 @@ data class SshCommandExecutionPlan(
             "SSH command plan timeout must be between 1 and $MAX_SSH_COMMAND_TIMEOUT_MILLIS milliseconds."
         }
     }
+
+    override fun toString(): String {
+        return "SshCommandExecutionPlan(sessionHandle=$sessionHandle, command=REDACTED, timeoutMillis=$timeoutMillis)"
+    }
 }

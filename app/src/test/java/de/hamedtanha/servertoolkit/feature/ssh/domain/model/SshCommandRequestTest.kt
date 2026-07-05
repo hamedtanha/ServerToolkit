@@ -33,6 +33,33 @@ class SshCommandRequestTest {
     }
 
     @Test
+    fun `redacts command request command from string representation`() {
+        val request = SshCommandRequest(
+            sessionHandle = sshSessionHandle(),
+            command = "export TOKEN=secret && uptime",
+        )
+
+        assertEquals(
+            "SshCommandRequest(sessionHandle=${sshSessionHandle()}, command=REDACTED, timeoutMillis=30000)",
+            request.toString(),
+        )
+    }
+
+    @Test
+    fun `redacts command execution plan command from string representation`() {
+        val plan = SshCommandExecutionPlan(
+            sessionHandle = sshSessionHandle(),
+            command = "export TOKEN=secret && uptime",
+            timeoutMillis = 10_000,
+        )
+
+        assertEquals(
+            "SshCommandExecutionPlan(sessionHandle=${sshSessionHandle()}, command=REDACTED, timeoutMillis=10000)",
+            plan.toString(),
+        )
+    }
+
+    @Test
     fun `rejects blank command request`() {
         expectInvalid("SSH command must not be blank.") {
             SshCommandRequest(

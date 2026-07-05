@@ -44,6 +44,20 @@ class SshjCommandExecutionPlanningServiceTest {
     }
 
     @Test
+    fun `redacts data-layer command channel plan command from string representation`() {
+        val plan = SshjCommandChannelPlan(
+            sessionHandle = sshSessionHandle(),
+            command = "export TOKEN=secret && uptime",
+            timeoutMillis = 5_000,
+        )
+
+        assertEquals(
+            "SshjCommandChannelPlan(sessionHandle=${sshSessionHandle()}, command=REDACTED, timeoutMillis=5000)",
+            plan.toString(),
+        )
+    }
+
+    @Test
     fun `fails planning when session owner does not exist`() = runBlocking {
         val service = SshjCommandExecutionPlanningService(SshjSessionOwnerRegistry())
 
