@@ -8,10 +8,12 @@ sealed interface SshConnectionResult {
     /**
      * The connection attempt reached the domain-level connected state.
      *
-     * No session object is exposed yet because session lifecycle handling is not part of this
-     * implementation slice.
+     * The exposed handle is project-owned metadata only. It must not expose SSHJ session objects,
+     * sockets, credentials, private keys, passphrases, or command execution channels.
      */
-    data object Connected : SshConnectionResult
+    data class Connected(
+        val sessionHandle: SshSessionHandle,
+    ) : SshConnectionResult
 
     /**
      * The connection attempt failed with a stable domain-level error category.

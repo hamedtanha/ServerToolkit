@@ -6,6 +6,7 @@ import de.hamedtanha.servertoolkit.feature.ssh.domain.model.SshConnectionResult
 import kotlinx.coroutines.runBlocking
 import org.junit.Assert.assertEquals
 import org.junit.Test
+import de.hamedtanha.servertoolkit.feature.ssh.test.sshConnectedResult
 
 class FakeSshConnectionServiceTest {
 
@@ -27,7 +28,7 @@ class FakeSshConnectionServiceTest {
     @Test
     fun `stores last connection request`() = runBlocking {
         val service = FakeSshConnectionService(
-            result = SshConnectionResult.Connected,
+            result = sshConnectedResult(),
         )
         val request = connectionRequest()
 

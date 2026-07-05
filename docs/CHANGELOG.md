@@ -118,6 +118,10 @@ The project follows Conventional Commits and Semantic Versioning principles.
 - Added host-trust gating before SSH connection service execution.
 - Added SSHJ host-key observation adapter mapping.
 - Added tests for observed, unavailable, and failed SSHJ host-key observation mapping.
+- Added project-owned SSH session handle model.
+- Added SSH session close result model.
+- Added SSH session lifecycle service contract.
+- Added SSHJ session lifecycle shell.
 
 ### Changed
 

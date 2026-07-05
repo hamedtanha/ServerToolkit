@@ -25,12 +25,13 @@ import org.junit.Assert.assertFalse
 import org.junit.Assert.assertTrue
 import org.junit.Assert.fail
 import org.junit.Test
+import de.hamedtanha.servertoolkit.feature.ssh.test.sshConnectedResult
 
 class SshConnectionAttemptUseCaseTest {
 
     @Test
     fun `connects using resolved target metadata when observed host key is trusted`() = runBlocking {
-        val service = FakeSshConnectionService(SshConnectionResult.Connected)
+        val service = FakeSshConnectionService(sshConnectedResult())
         val useCase = createUseCase(
             resolver = FakeConnectionTargetResolver(resolvedTarget()),
             service = service,
@@ -44,7 +45,7 @@ class SshConnectionAttemptUseCaseTest {
 
         val outcome = useCase("server-1")
 
-        assertConnectionResult(SshConnectionResult.Connected, outcome)
+        assertConnectionResult(sshConnectedResult(), outcome)
         assertEquals("server-1", service.lastRequest?.serverId)
         assertEquals("example.com", service.lastRequest?.host)
         assertEquals(2222, service.lastRequest?.port)
@@ -58,7 +59,7 @@ class SshConnectionAttemptUseCaseTest {
             var observedPassword = ""
             val authenticationInput = SshAuthenticationInput.Password("secret-password")
             val service = FakeSshConnectionService(
-                result = SshConnectionResult.Connected,
+                result = sshConnectedResult(),
                 onConnect = { request ->
                     val passwordInput = request.authenticationInput as SshAuthenticationInput.Password
                     observedSensitiveInput = passwordInput.hasSensitiveValue
@@ -82,7 +83,7 @@ class SshConnectionAttemptUseCaseTest {
                 authenticationInput = authenticationInput,
             )
 
-            assertConnectionResult(SshConnectionResult.Connected, outcome)
+            assertConnectionResult(sshConnectedResult(), outcome)
             assertTrue(observedSensitiveInput)
             assertEquals("secret-password", observedPassword)
             assertFalse(authenticationInput.hasSensitiveValue)
@@ -92,7 +93,7 @@ class SshConnectionAttemptUseCaseTest {
     @Test
     fun `returns review decision and does not connect when observed host key is unknown`() =
         runBlocking {
-            val service = FakeSshConnectionService(SshConnectionResult.Connected)
+            val service = FakeSshConnectionService(sshConnectedResult())
             val useCase = createUseCase(
                 resolver = FakeConnectionTargetResolver(resolvedTarget()),
                 service = service,
@@ -111,7 +112,7 @@ class SshConnectionAttemptUseCaseTest {
     @Test
     fun `returns changed host key decision and does not connect when observed host key changed`() =
         runBlocking {
-            val service = FakeSshConnectionService(SshConnectionResult.Connected)
+            val service = FakeSshConnectionService(sshConnectedResult())
             val useCase = createUseCase(
                 resolver = FakeConnectionTargetResolver(resolvedTarget()),
                 service = service,
@@ -139,7 +140,7 @@ class SshConnectionAttemptUseCaseTest {
     @Test
     fun `maps unavailable host key observation to unsupported configuration without connecting`() =
         runBlocking {
-            val service = FakeSshConnectionService(SshConnectionResult.Connected)
+            val service = FakeSshConnectionService(sshConnectedResult())
             val useCase = createUseCase(
                 resolver = FakeConnectionTargetResolver(resolvedTarget()),
                 service = service,
@@ -156,7 +157,7 @@ class SshConnectionAttemptUseCaseTest {
 
     @Test
     fun `maps missing target to target not found failure`() = runBlocking {
-        val service = FakeSshConnectionService(SshConnectionResult.Connected)
+        val service = FakeSshConnectionService(sshConnectedResult())
         val useCase = createUseCase(
             resolver = FakeConnectionTargetResolver(ConnectionTargetResolution.NotFound),
             service = service,
@@ -170,7 +171,7 @@ class SshConnectionAttemptUseCaseTest {
 
     @Test
     fun `maps invalid target to missing metadata failure`() = runBlocking {
-        val service = FakeSshConnectionService(SshConnectionResult.Connected)
+        val service = FakeSshConnectionService(sshConnectedResult())
         val useCase = createUseCase(
             resolver = FakeConnectionTargetResolver(
                 ConnectionTargetResolution.Invalid(ConnectionTargetInvalidReason.MissingUsername),
@@ -187,7 +188,7 @@ class SshConnectionAttemptUseCaseTest {
     @Test
     fun `maps timeout to connection timeout failure`() = runBlocking {
         val service = FakeSshConnectionService(
-            result = SshConnectionResult.Connected,
+            result = sshConnectedResult(),
             onConnect = {
                 delay(100)
             },
@@ -212,7 +213,7 @@ class SshConnectionAttemptUseCaseTest {
     @Test
     fun `maps unexpected exception to unknown failure`() = runBlocking {
         val service = FakeSshConnectionService(
-            result = SshConnectionResult.Connected,
+            result = sshConnectedResult(),
             onConnect = {
                 throw IllegalStateException("Unexpected failure")
             },
@@ -236,7 +237,7 @@ class SshConnectionAttemptUseCaseTest {
     @Test
     fun `preserves coroutine cancellation`() = runBlocking {
         val service = FakeSshConnectionService(
-            result = SshConnectionResult.Connected,
+            result = sshConnectedResult(),
             onConnect = {
                 throw CancellationException("Connection cancelled")
             },
