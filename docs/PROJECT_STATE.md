@@ -23,6 +23,8 @@ The Server Inventory 0.3.0 baseline is accepted.
 
 ADR-009 is accepted as the SSH host trust and authentication input strategy.
 
+Android backup and data extraction are disabled for the alpha release to avoid backing up infrastructure inventory or future SSH trust material before a reviewed restore model exists.
+
 The current focus is defining the remaining security and integration gates before any real SSH connection behavior.
 
 ---

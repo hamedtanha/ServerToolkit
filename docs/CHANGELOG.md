@@ -88,6 +88,8 @@ The project follows Conventional Commits and Semantic Versioning principles.
 
 ### Changed
 
+- Disabled Android backup and data extraction for the alpha release to protect infrastructure inventory metadata.
+
 - Aligned package structure with the current implementation.
 - Replaced obsolete `feature/servers` package scaffolding with `feature/serverinventory`.
 - Removed obsolete placeholder navigation packages.
