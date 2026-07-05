@@ -60,6 +60,8 @@ private class SshjNetworkHostKeyObserver : SshjHostKeyObserver {
 
         try {
             SSHClient().use { client ->
+                client.connectTimeout = SSHJ_HOST_KEY_OBSERVATION_TIMEOUT_MILLIS
+                client.timeout = SSHJ_HOST_KEY_OBSERVATION_TIMEOUT_MILLIS
                 client.addHostKeyVerifier(
                     object : HostKeyVerifier {
 
@@ -106,3 +108,4 @@ private fun PublicKey.toObservedHostKey(request: SshConnectionRequest): SshObser
 }
 
 private const val SSHJ_FINGERPRINT_ALGORITHM = "MD5"
+private const val SSHJ_HOST_KEY_OBSERVATION_TIMEOUT_MILLIS = 10_000
