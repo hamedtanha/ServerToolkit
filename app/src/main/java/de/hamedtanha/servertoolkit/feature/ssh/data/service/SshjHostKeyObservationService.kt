@@ -2,7 +2,6 @@ package de.hamedtanha.servertoolkit.feature.ssh.data.service
 
 import de.hamedtanha.servertoolkit.feature.ssh.domain.model.SshConnectionRequest
 import de.hamedtanha.servertoolkit.feature.ssh.domain.model.SshHostEndpoint
-import de.hamedtanha.servertoolkit.feature.ssh.domain.model.SshHostKeyFingerprint
 import de.hamedtanha.servertoolkit.feature.ssh.domain.model.SshHostKeyObservationResult
 import de.hamedtanha.servertoolkit.feature.ssh.domain.model.SshObservedHostKey
 import de.hamedtanha.servertoolkit.feature.ssh.domain.service.SshHostKeyObservationService
@@ -12,7 +11,6 @@ import kotlinx.coroutines.CancellationException
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
 import net.schmizz.sshj.SSHClient
-import net.schmizz.sshj.common.SecurityUtils
 import net.schmizz.sshj.transport.verification.HostKeyVerifier
 
 /**
@@ -100,12 +98,8 @@ private fun PublicKey.toObservedHostKey(request: SshConnectionRequest): SshObser
             host = request.host,
             port = request.port,
         ),
-        fingerprint = SshHostKeyFingerprint(
-            algorithm = SSHJ_FINGERPRINT_ALGORITHM,
-            value = SecurityUtils.getFingerprint(this),
-        ),
+        fingerprint = toSshjHostKeyFingerprint(),
     )
 }
 
-private const val SSHJ_FINGERPRINT_ALGORITHM = "MD5"
 private const val SSHJ_HOST_KEY_OBSERVATION_TIMEOUT_MILLIS = 10_000
