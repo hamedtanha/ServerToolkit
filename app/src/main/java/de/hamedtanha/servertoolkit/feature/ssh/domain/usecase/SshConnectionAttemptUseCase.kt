@@ -3,6 +3,7 @@ package de.hamedtanha.servertoolkit.feature.ssh.domain.usecase
 import de.hamedtanha.servertoolkit.core.connection.domain.model.ConnectionTargetResolution
 import de.hamedtanha.servertoolkit.core.connection.domain.model.RemoteConnectionTarget
 import de.hamedtanha.servertoolkit.core.connection.domain.resolver.ConnectionTargetResolver
+import de.hamedtanha.servertoolkit.feature.ssh.domain.model.SshAuthenticationInput
 import de.hamedtanha.servertoolkit.feature.ssh.domain.model.SshConnectionError
 import de.hamedtanha.servertoolkit.feature.ssh.domain.model.SshConnectionRequest
 import de.hamedtanha.servertoolkit.feature.ssh.domain.model.SshConnectionResult
@@ -30,10 +31,16 @@ class SshConnectionAttemptUseCase @Inject constructor(
         this.timeoutMillis = timeoutMillis
     }
 
-    suspend operator fun invoke(serverId: String): SshConnectionResult {
+    suspend operator fun invoke(
+        serverId: String,
+        authenticationInput: SshAuthenticationInput = SshAuthenticationInput.None,
+    ): SshConnectionResult {
         return try {
             withTimeout(timeoutMillis) {
-                executeConnectionAttempt(serverId)
+                executeConnectionAttempt(
+                    serverId = serverId,
+                    authenticationInput = authenticationInput,
+                )
             }
         } catch (error: TimeoutCancellationException) {
             SshConnectionResult.Failed(SshConnectionError.ConnectionTimeout)
@@ -41,12 +48,20 @@ class SshConnectionAttemptUseCase @Inject constructor(
             throw error
         } catch (error: Exception) {
             SshConnectionResult.Failed(SshConnectionError.Unknown)
+        } finally {
+            authenticationInput.clearSensitiveValues()
         }
     }
 
-    private suspend fun executeConnectionAttempt(serverId: String): SshConnectionResult {
+    private suspend fun executeConnectionAttempt(
+        serverId: String,
+        authenticationInput: SshAuthenticationInput,
+    ): SshConnectionResult {
         return when (val resolution = connectionTargetResolver.resolve(serverId)) {
-            is ConnectionTargetResolution.Resolved -> connectToResolvedTarget(resolution.target)
+            is ConnectionTargetResolution.Resolved -> connectToResolvedTarget(
+                target = resolution.target,
+                authenticationInput = authenticationInput,
+            )
 
             ConnectionTargetResolution.NotFound -> SshConnectionResult.Failed(
                 SshConnectionError.TargetNotFound,
@@ -60,6 +75,7 @@ class SshConnectionAttemptUseCase @Inject constructor(
 
     private suspend fun connectToResolvedTarget(
         target: RemoteConnectionTarget,
+        authenticationInput: SshAuthenticationInput,
     ): SshConnectionResult {
         return connectionService.connect(
             SshConnectionRequest(
@@ -67,6 +83,7 @@ class SshConnectionAttemptUseCase @Inject constructor(
                 host = target.host,
                 port = target.port,
                 username = target.username,
+                authenticationInput = authenticationInput,
             ),
         )
     }

@@ -4,6 +4,7 @@ import androidx.lifecycle.SavedStateHandle
 import de.hamedtanha.servertoolkit.core.connection.domain.model.ConnectionTargetInvalidReason
 import de.hamedtanha.servertoolkit.core.connection.domain.model.ConnectionTargetResolution
 import de.hamedtanha.servertoolkit.core.connection.domain.model.RemoteConnectionTarget
+import de.hamedtanha.servertoolkit.feature.ssh.domain.model.SshAuthenticationInput
 import de.hamedtanha.servertoolkit.feature.ssh.domain.model.SshAuthenticationMethod
 import de.hamedtanha.servertoolkit.feature.ssh.domain.model.SshConnectionError
 import de.hamedtanha.servertoolkit.feature.ssh.domain.model.SshConnectionRequest
@@ -22,6 +23,7 @@ import de.hamedtanha.servertoolkit.feature.ssh.test.FakeConnectionTargetResolver
 import de.hamedtanha.servertoolkit.feature.ssh.test.FakeSshConnectionService
 import de.hamedtanha.servertoolkit.feature.ssh.test.FakeSshHostTrustRepository
 import de.hamedtanha.servertoolkit.navigation.SshDestination
+import kotlinx.coroutines.CancellationException
 import kotlinx.coroutines.CompletableDeferred
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.runBlocking
@@ -29,6 +31,7 @@ import org.junit.Assert.assertEquals
 import org.junit.Assert.assertFalse
 import org.junit.Assert.assertNull
 import org.junit.Assert.assertTrue
+import org.junit.Assert.fail
 import org.junit.Test
 
 class SshViewModelTest {
@@ -366,6 +369,57 @@ class SshViewModelTest {
             viewModel.uiState.value.authenticationInput.selectedMethod,
         )
         assertFalse(viewModel.uiState.value.authenticationInput.hasSensitiveInput)
+    }
+
+    @Test
+    fun `connect passes password authentication input through request boundary without exposing secret`() = runBlocking {
+        var observedPassword = ""
+        val service = FakeSshConnectionService(
+            result = SshConnectionResult.Connected,
+            onConnect = { request ->
+                val passwordInput = request.authenticationInput as SshAuthenticationInput.Password
+                observedPassword = passwordInput.password
+                assertFalse(request.toString().contains("secret-password"))
+            },
+        )
+        val viewModel = createViewModel(
+            serverId = "server-1",
+            service = service,
+        )
+
+        viewModel.onPasswordChanged("secret-password")
+        viewModel.connect()
+
+        assertEquals("secret-password", observedPassword)
+        assertFalse(viewModel.uiState.value.authenticationInput.hasSensitiveInput)
+        assertFalse(viewModel.uiState.value.toString().contains("secret-password"))
+        assertFalse(service.lastRequest.toString().contains("secret-password"))
+    }
+
+    @Test
+    fun `connect clears authentication input state when cancelled`() = runBlocking {
+        val service = FakeSshConnectionService(
+            result = SshConnectionResult.Connected,
+            onConnect = {
+                throw CancellationException("Connection cancelled")
+            },
+        )
+        val viewModel = createViewModel(
+            serverId = "server-1",
+            service = service,
+        )
+
+        viewModel.onPasswordChanged("secret-password")
+
+        try {
+            viewModel.connect()
+            fail("Expected CancellationException")
+        } catch (error: CancellationException) {
+            assertEquals("Connection cancelled", error.message)
+        }
+
+        assertFalse(viewModel.uiState.value.authenticationInput.hasSensitiveInput)
+        assertFalse(viewModel.uiState.value.toString().contains("secret-password"))
     }
 
     @Test
