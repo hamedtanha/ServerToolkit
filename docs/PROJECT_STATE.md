@@ -139,6 +139,7 @@ The following application-level items are implemented:
 - SSH session close result model.
 - SSH session lifecycle service contract.
 - SSHJ session lifecycle shell.
+- SSHJ authentication adapter mapping.
 - SSH ViewModel dependency injection for the connection attempt use case.
 - SSH user-triggered connect event shell.
 - SSH placeholder Connect button.
@@ -178,7 +179,7 @@ The following application-level items are implemented:
 The following items are intentionally not implemented yet:
 
 - Real SSH connection behavior.
-- SSH authentication handling.
+- Real SSH authentication execution.
 - SSH host key verification implementation.
 - Real SSH session lifecycle execution.
 - Persistent credential storage.
@@ -194,7 +195,7 @@ The following items are intentionally not implemented yet:
 
 The current implementation area is:
 
-- SSHJ authentication adapter planning.
+- SSHJ authentication execution planning.
 - SSH session lifecycle execution planning.
 
 ---
@@ -203,7 +204,7 @@ The current implementation area is:
 
 The next safe development steps are:
 
-1. Add SSHJ authentication adapter mapping behind the existing authentication boundary.
+1. Add real SSH authentication execution behind the existing adapter and authentication boundary.
 2. Add real SSH session open and close execution behind the lifecycle boundary.
 3. Keep command execution disabled until all remaining ADR-009 implementation gates are satisfied.
 

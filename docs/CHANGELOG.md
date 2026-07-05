@@ -122,6 +122,7 @@ The project follows Conventional Commits and Semantic Versioning principles.
 - Added SSH session close result model.
 - Added SSH session lifecycle service contract.
 - Added SSHJ session lifecycle shell.
+- Added SSHJ authentication adapter mapping.
 
 ### Changed
 
