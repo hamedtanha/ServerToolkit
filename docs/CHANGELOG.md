@@ -98,6 +98,10 @@ The project follows Conventional Commits and Semantic Versioning principles.
 - Added SSH trusted host DAO, mapper, repository, and dependency injection binding.
 - Added Server Toolkit database migration from version 1 to version 2 for trusted host keys.
 - Added trusted host persistence and migration tests.
+- Added SSH host trust decision model.
+- Added SSH host trust decision use case.
+- Added explicit unknown-host trust confirmation use case.
+- Added changed-host-key blocking decision-flow tests.
 
 ### Changed
 
