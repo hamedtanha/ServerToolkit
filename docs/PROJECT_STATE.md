@@ -111,6 +111,11 @@ The following application-level items are implemented:
 - SSH observed and trusted host key models.
 - SSH host trust status model for unknown, trusted, and changed host keys.
 - SSH trusted host storage contract.
+- SSH trusted host Room entity and DAO.
+- SSH trusted host entity/domain mapper.
+- SSH trusted host Room-backed repository implementation.
+- SSH trusted host repository dependency injection binding.
+- Server Toolkit database version 2 with trusted-host migration.
 - SSH host trust evaluator.
 - SSH ViewModel dependency injection for the connection attempt use case.
 - SSH user-triggered connect event shell.
@@ -158,8 +163,8 @@ The following items are intentionally not implemented yet:
 - Monitoring workflow.
 - Command execution workflow.
 - Xray or x-ui management workflow.
-- Room migration beyond database version 1.
-- Migration tests.
+- Room migrations beyond database version 2.
+- Migration tests beyond the trusted-host v1-to-v2 migration.
 
 ---
 
@@ -167,7 +172,7 @@ The following items are intentionally not implemented yet:
 
 The current implementation area is:
 
-- SSH host trust persistence planning.
+- SSH changed-host-key confirmation flow planning.
 - Ephemeral authentication input planning.
 
 ---
@@ -176,7 +181,7 @@ The current implementation area is:
 
 The next safe development steps are:
 
-1. Add trusted-host persistence and changed-host-key confirmation flow before real SSH network behavior.
+1. Add changed-host-key confirmation flow before real SSH network behavior.
 2. Add ephemeral authentication input models before real SSH network behavior.
 3. Keep real SSH behavior disabled until all remaining ADR-009 implementation gates are satisfied.
 

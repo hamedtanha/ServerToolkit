@@ -4,7 +4,9 @@ import dagger.Binds
 import dagger.Module
 import dagger.hilt.InstallIn
 import dagger.hilt.components.SingletonComponent
+import de.hamedtanha.servertoolkit.feature.ssh.data.repository.RoomSshHostTrustRepository
 import de.hamedtanha.servertoolkit.feature.ssh.data.service.SshjConnectionService
+import de.hamedtanha.servertoolkit.feature.ssh.domain.repository.SshHostTrustRepository
 import de.hamedtanha.servertoolkit.feature.ssh.domain.service.SshConnectionService
 import javax.inject.Singleton
 
@@ -17,4 +19,10 @@ abstract class SshModule {
     abstract fun bindSshConnectionService(
         service: SshjConnectionService,
     ): SshConnectionService
+
+    @Binds
+    @Singleton
+    abstract fun bindSshHostTrustRepository(
+        repository: RoomSshHostTrustRepository,
+    ): SshHostTrustRepository
 }
