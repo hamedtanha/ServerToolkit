@@ -106,6 +106,12 @@ The following application-level items are implemented:
 - SSH connection attempt timeout boundary.
 - SSH connection attempt exception mapping and cancellation preservation.
 - SSH duplicate-attempt prevention at the ViewModel boundary.
+- SSH host key fingerprint model.
+- SSH host endpoint trust lookup model.
+- SSH observed and trusted host key models.
+- SSH host trust status model for unknown, trusted, and changed host keys.
+- SSH trusted host storage contract.
+- SSH host trust evaluator.
 - SSH ViewModel dependency injection for the connection attempt use case.
 - SSH user-triggered connect event shell.
 - SSH placeholder Connect button.
@@ -161,7 +167,7 @@ The following items are intentionally not implemented yet:
 
 The current implementation area is:
 
-- SSH host trust model planning.
+- SSH host trust persistence planning.
 - Ephemeral authentication input planning.
 
 ---
@@ -170,7 +176,7 @@ The current implementation area is:
 
 The next safe development steps are:
 
-1. Add host trust persistence and changed-host-key handling before real SSH network behavior.
+1. Add trusted-host persistence and changed-host-key confirmation flow before real SSH network behavior.
 2. Add ephemeral authentication input models before real SSH network behavior.
 3. Keep real SSH behavior disabled until all remaining ADR-009 implementation gates are satisfied.
 
