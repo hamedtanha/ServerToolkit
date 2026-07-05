@@ -119,13 +119,16 @@ The current implementation includes:
 - SSH command execution service contract.
 - SSHJ-backed command execution service.
 - SSH command execution service dependency injection binding.
+- SSH command execution use case.
+- SSH command execution presentation state and UI mapper.
+- SSH ViewModel command execution wiring through a private active session handle.
+- SSH command input, Run command control, and output rendering for non-interactive commands.
 - SSH ViewModel injection of the connection attempt use case.
 - SSH user-triggered connect event shell and placeholder Connect button.
 - SSH tests for domain models, presentation state, fake results, SSHJ adapter boundaries, host trust, authentication input, session ownership, command planning, and command execution lifecycle boundaries.
 
 The following items are intentionally not implemented yet:
 
-- User-facing SSH command execution workflow.
 - Interactive terminal workflow for owned sessions.
 - Full SSH host key verification hardening beyond the current trusted verifier shell.
 - Persistent credential storage.

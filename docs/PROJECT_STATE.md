@@ -25,7 +25,7 @@ ADR-009 is accepted as the SSH host trust and authentication input strategy.
 
 Android backup and data extraction are disabled for the alpha release to avoid backing up infrastructure inventory or future SSH trust material before a reviewed restore model exists.
 
-The current focus is SSH command/channel lifecycle execution behind owned SSH sessions while keeping terminal UI, saved command workflows, and persistent credentials out of scope.
+The SSH command/channel lifecycle boundary is accepted, and the user-facing non-interactive SSH command execution workflow is now implemented behind owned SSH sessions while keeping terminal UI, saved command workflows, background monitoring, and persistent credentials out of scope.
 
 ---
 
@@ -155,6 +155,11 @@ The following application-level items are implemented:
 - SSH command execution service contract.
 - SSHJ-backed command execution service.
 - SSH command execution service dependency injection binding.
+- SSH command execution use case.
+- SSH command execution presentation state and UI mapper.
+- SSH ViewModel command execution wiring through an active project-owned session handle.
+- SSH command input and Run command UI controls.
+- SSH command output rendering for stdout, stderr, and exit status.
 - SSH ViewModel dependency injection for the connection attempt use case.
 - SSH user-triggered connect event shell.
 - SSH placeholder Connect button.
@@ -193,7 +198,6 @@ The following application-level items are implemented:
 
 The following items are intentionally not implemented yet:
 
-- User-facing SSH command execution workflow.
 - Interactive terminal workflow for owned sessions.
 - Full SSH host key verification hardening beyond the current trusted verifier shell.
 - Persistent credential storage.
@@ -209,8 +213,8 @@ The following items are intentionally not implemented yet:
 
 The current implementation area is:
 
-- SSH command/channel lifecycle execution behind owned SSH sessions.
-- SSH documentation synchronization after command execution service wiring.
+- SSH command execution workflow verification and stabilization.
+- SSH documentation synchronization after the first user-facing command execution workflow.
 
 ---
 
@@ -218,9 +222,9 @@ The current implementation area is:
 
 The next safe development steps are:
 
-1. Add a reviewed user-facing command execution workflow only after the current headless execution boundary is accepted.
-2. Keep terminal UI, saved command history, and persistent credentials out of scope.
-3. Continue hardening timeout, cancellation, cleanup, and failure mapping behavior before expanding the UX surface.
+1. Harden timeout, cancellation, cleanup, and failure mapping behavior around command execution.
+2. Keep terminal UI, saved command history, background monitoring, and persistent credentials out of scope.
+3. Consider saved command workflows only after a separate reviewed design and documentation update.
 
 ---
 
