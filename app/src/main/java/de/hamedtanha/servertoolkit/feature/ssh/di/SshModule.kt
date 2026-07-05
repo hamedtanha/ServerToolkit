@@ -6,11 +6,13 @@ import dagger.hilt.InstallIn
 import dagger.hilt.components.SingletonComponent
 import de.hamedtanha.servertoolkit.feature.ssh.data.repository.RoomSshHostTrustRepository
 import de.hamedtanha.servertoolkit.feature.ssh.data.service.SshjCommandExecutionPlanningService
+import de.hamedtanha.servertoolkit.feature.ssh.data.service.SshjCommandExecutionService
 import de.hamedtanha.servertoolkit.feature.ssh.data.service.SshjConnectionService
 import de.hamedtanha.servertoolkit.feature.ssh.data.service.SshjHostKeyObservationService
 import de.hamedtanha.servertoolkit.feature.ssh.data.service.SshjSessionLifecycleService
 import de.hamedtanha.servertoolkit.feature.ssh.domain.repository.SshHostTrustRepository
 import de.hamedtanha.servertoolkit.feature.ssh.domain.service.SshCommandExecutionPlanningService
+import de.hamedtanha.servertoolkit.feature.ssh.domain.service.SshCommandExecutionService
 import de.hamedtanha.servertoolkit.feature.ssh.domain.service.SshConnectionService
 import de.hamedtanha.servertoolkit.feature.ssh.domain.service.SshHostKeyObservationService
 import de.hamedtanha.servertoolkit.feature.ssh.domain.service.SshSessionLifecycleService
@@ -42,6 +44,12 @@ abstract class SshModule {
     abstract fun bindSshCommandExecutionPlanningService(
         service: SshjCommandExecutionPlanningService,
     ): SshCommandExecutionPlanningService
+
+    @Binds
+    @Singleton
+    abstract fun bindSshCommandExecutionService(
+        service: SshjCommandExecutionService,
+    ): SshCommandExecutionService
 
     @Binds
     @Singleton
