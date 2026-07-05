@@ -125,6 +125,10 @@ The following application-level items are implemented:
 - SSH host-key review UI mapper.
 - SSH host-key review confirmation and cancellation ViewModel events.
 - SSH host-key review screen actions.
+- SSH authentication method model.
+- SSH authentication input UI-safe presentation state.
+- SSH ephemeral authentication input ViewModel events.
+- SSH authentication input clearing behavior.
 - SSH ViewModel dependency injection for the connection attempt use case.
 - SSH user-triggered connect event shell.
 - SSH placeholder Connect button.
@@ -167,7 +171,7 @@ The following items are intentionally not implemented yet:
 - SSH authentication handling.
 - SSH host key verification implementation.
 - SSH session lifecycle model.
-- Credential input.
+- Persistent credential storage.
 - Monitoring workflow.
 - Command execution workflow.
 - Xray or x-ui management workflow.
@@ -180,7 +184,7 @@ The following items are intentionally not implemented yet:
 
 The current implementation area is:
 
-- Ephemeral authentication input planning.
+- SSH connection request authentication boundary planning.
 - SSH host-key review integration planning.
 
 ---
@@ -189,7 +193,7 @@ The current implementation area is:
 
 The next safe development steps are:
 
-1. Add ephemeral authentication input models before real SSH network behavior.
+1. Add credential-bearing SSH connection request boundary without persistent credential storage.
 2. Integrate observed host-key review with the future SSH connection boundary.
 3. Keep real SSH behavior disabled until all remaining ADR-009 implementation gates are satisfied.
 

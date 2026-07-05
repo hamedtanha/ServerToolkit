@@ -4,6 +4,7 @@ import androidx.lifecycle.SavedStateHandle
 import de.hamedtanha.servertoolkit.core.connection.domain.model.ConnectionTargetInvalidReason
 import de.hamedtanha.servertoolkit.core.connection.domain.model.ConnectionTargetResolution
 import de.hamedtanha.servertoolkit.core.connection.domain.model.RemoteConnectionTarget
+import de.hamedtanha.servertoolkit.feature.ssh.domain.model.SshAuthenticationMethod
 import de.hamedtanha.servertoolkit.feature.ssh.domain.model.SshConnectionError
 import de.hamedtanha.servertoolkit.feature.ssh.domain.model.SshConnectionRequest
 import de.hamedtanha.servertoolkit.feature.ssh.domain.model.SshConnectionResult
@@ -25,7 +26,9 @@ import kotlinx.coroutines.CompletableDeferred
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.runBlocking
 import org.junit.Assert.assertEquals
+import org.junit.Assert.assertFalse
 import org.junit.Assert.assertNull
+import org.junit.Assert.assertTrue
 import org.junit.Test
 
 class SshViewModelTest {
@@ -291,6 +294,89 @@ class SshViewModelTest {
             "trusted-fingerprint",
             repository.trustedHostKey?.fingerprint?.value,
         )
+    }
+
+    @Test
+    fun `updates authentication username without sensitive input`() {
+        val viewModel = createViewModel(serverId = "server-1")
+
+        viewModel.onAuthenticationUsernameChanged("admin")
+
+        assertEquals("admin", viewModel.uiState.value.authenticationInput.username)
+        assertFalse(viewModel.uiState.value.authenticationInput.hasSensitiveInput)
+    }
+
+    @Test
+    fun `password input updates presence flag without exposing secret in ui state`() {
+        val viewModel = createViewModel(serverId = "server-1")
+
+        viewModel.onPasswordChanged("secret-password")
+
+        assertEquals(
+            SshAuthenticationMethod.PASSWORD,
+            viewModel.uiState.value.authenticationInput.selectedMethod,
+        )
+        assertTrue(viewModel.uiState.value.authenticationInput.hasPasswordInput)
+        assertFalse(viewModel.uiState.value.authenticationInput.hasPrivateKeyPassphraseInput)
+        assertFalse(viewModel.uiState.value.toString().contains("secret-password"))
+    }
+
+    @Test
+    fun `private key passphrase input updates presence flag without exposing secret in ui state`() {
+        val viewModel = createViewModel(serverId = "server-1")
+
+        viewModel.onPrivateKeyPassphraseChanged("secret-passphrase")
+
+        assertEquals(
+            SshAuthenticationMethod.PRIVATE_KEY,
+            viewModel.uiState.value.authenticationInput.selectedMethod,
+        )
+        assertFalse(viewModel.uiState.value.authenticationInput.hasPasswordInput)
+        assertTrue(viewModel.uiState.value.authenticationInput.hasPrivateKeyPassphraseInput)
+        assertFalse(viewModel.uiState.value.toString().contains("secret-passphrase"))
+    }
+
+    @Test
+    fun `selecting authentication method clears sensitive input flags`() {
+        val viewModel = createViewModel(serverId = "server-1")
+
+        viewModel.onPasswordChanged("secret-password")
+        viewModel.onAuthenticationMethodSelected(SshAuthenticationMethod.PRIVATE_KEY)
+
+        assertEquals(
+            SshAuthenticationMethod.PRIVATE_KEY,
+            viewModel.uiState.value.authenticationInput.selectedMethod,
+        )
+        assertFalse(viewModel.uiState.value.authenticationInput.hasPasswordInput)
+        assertFalse(viewModel.uiState.value.authenticationInput.hasPrivateKeyPassphraseInput)
+        assertFalse(viewModel.uiState.value.authenticationInput.hasSensitiveInput)
+    }
+
+    @Test
+    fun `clears authentication input state`() {
+        val viewModel = createViewModel(serverId = "server-1")
+
+        viewModel.onAuthenticationUsernameChanged("admin")
+        viewModel.onPasswordChanged("secret-password")
+        viewModel.onAuthenticationInputCleared()
+
+        assertEquals("", viewModel.uiState.value.authenticationInput.username)
+        assertEquals(
+            SshAuthenticationMethod.PASSWORD,
+            viewModel.uiState.value.authenticationInput.selectedMethod,
+        )
+        assertFalse(viewModel.uiState.value.authenticationInput.hasSensitiveInput)
+    }
+
+    @Test
+    fun `connection result clears authentication input state`() {
+        val viewModel = createViewModel(serverId = "server-1")
+
+        viewModel.onPasswordChanged("secret-password")
+        viewModel.onConnectionResultReceived(SshConnectionResult.Connected)
+
+        assertFalse(viewModel.uiState.value.authenticationInput.hasSensitiveInput)
+        assertFalse(viewModel.uiState.value.toString().contains("secret-password"))
     }
 
     private fun createViewModel(
