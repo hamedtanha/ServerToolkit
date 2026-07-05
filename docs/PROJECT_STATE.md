@@ -160,6 +160,8 @@ The following application-level items are implemented:
 - SSH ViewModel command execution wiring through an active project-owned session handle.
 - SSH command input and Run command UI controls.
 - SSH command output rendering for stdout, stderr, and exit status.
+- SSH command output clearing when the active session becomes unavailable.
+- SSH stale command result suppression after session invalidation.
 - SSH ViewModel dependency injection for the connection attempt use case.
 - SSH user-triggered connect event shell.
 - SSH placeholder Connect button.
@@ -214,7 +216,7 @@ The following items are intentionally not implemented yet:
 The current implementation area is:
 
 - SSH command execution workflow verification and stabilization.
-- SSH documentation synchronization after the first user-facing command execution workflow.
+- SSH command execution session-invalidation behavior hardening.
 
 ---
 

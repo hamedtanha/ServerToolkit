@@ -145,6 +145,7 @@ The project follows Conventional Commits and Semantic Versioning principles.
 
 ### Changed
 
+- Stabilized SSH command execution UI state when an active SSH session becomes unavailable.
 - Updated the SSH screen from placeholder-only connection UI to include non-interactive command execution controls.
 - Disabled Android backup and data extraction for the alpha release to protect infrastructure inventory metadata.
 - Replaced SSH placeholder connection metadata with resolved inventory-backed connection targets.
@@ -207,6 +208,11 @@ The project follows Conventional Commits and Semantic Versioning principles.
 - Recorded successful automated and manual verification after Edit Server implementation.
 - Recorded successful automated verification after shared Server Form naming cleanup.
 - Recorded successful manual and automated verification after SSH placeholder implementation.
+
+### Fixed
+
+- Cleared stale SSH command stdout, stderr, and exit status when the active session is invalidated.
+- Ignored stale SSH command results that complete after the active session has changed or become unavailable.
 
 ### Removed
 
