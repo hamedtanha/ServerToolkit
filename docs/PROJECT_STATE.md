@@ -183,8 +183,8 @@ The following application-level items are implemented:
 The following items are intentionally not implemented yet:
 
 - Fully authenticated SSH connection behavior.
-- Real SSH authentication execution with network connection setup and trusted host-key verification.
-- SSH host key verification implementation.
+- Real SSH authentication execution after trusted transport connection.
+- Full SSH host key verification hardening beyond the current trusted verifier shell.
 - Real SSH session lifecycle execution.
 - Persistent credential storage.
 - Monitoring workflow.
