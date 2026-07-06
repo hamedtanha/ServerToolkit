@@ -132,7 +132,7 @@ class SshViewModel @Inject constructor(
     }
 
     internal suspend fun connect() {
-        if (isConnectionAttemptInProgress) {
+        if (isConnectionAttemptInProgress || activeSessionHandle != null) {
             return
         }
 

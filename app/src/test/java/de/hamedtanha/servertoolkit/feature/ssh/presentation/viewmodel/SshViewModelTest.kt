@@ -112,6 +112,23 @@ class SshViewModelTest {
     }
 
     @Test
+    fun `ignores connection attempt while active session is already connected`() = runBlocking {
+        val service = FakeSshConnectionService(
+            result = sshConnectedResult(),
+        )
+        val viewModel = createViewModel(
+            serverId = "server-1",
+            service = service,
+        )
+
+        viewModel.connect()
+        viewModel.connect()
+
+        assertEquals(1, service.connectCallCount)
+        assertEquals(SshConnectionStatus.Connected, viewModel.uiState.value.status)
+    }
+
+    @Test
     fun `uses resolved target metadata for connection request`() = runBlocking {
         val service = FakeSshConnectionService(sshConnectedResult())
         val viewModel = createViewModel(
@@ -260,7 +277,7 @@ class SshViewModelTest {
     }
 
     @Test
-    fun `clears previous command output when starting a new connection attempt`() = runBlocking {
+    fun `keeps command output when reconnect attempt is ignored while active session is connected`() = runBlocking {
         val commandExecutionService = FakeSshCommandExecutionService(
             result = SshCommandExecutionResult.Completed(
                 SshCommandExecutionOutput(
@@ -285,11 +302,11 @@ class SshViewModelTest {
 
         assertEquals(SshConnectionStatus.Connected, viewModel.uiState.value.status)
         assertEquals("uptime", viewModel.uiState.value.commandExecution.command)
-        assertEquals(SshCommandExecutionStatus.Idle, viewModel.uiState.value.commandExecution.status)
-        assertEquals("", viewModel.uiState.value.commandExecution.stdout)
+        assertEquals(SshCommandExecutionStatus.Completed, viewModel.uiState.value.commandExecution.status)
+        assertEquals("old output", viewModel.uiState.value.commandExecution.stdout)
         assertEquals("", viewModel.uiState.value.commandExecution.stderr)
-        assertNull(viewModel.uiState.value.commandExecution.exitStatus)
-        assertFalse(viewModel.uiState.value.commandExecution.hasOutput)
+        assertEquals(0, viewModel.uiState.value.commandExecution.exitStatus)
+        assertTrue(viewModel.uiState.value.commandExecution.hasOutput)
     }
 
     @Test

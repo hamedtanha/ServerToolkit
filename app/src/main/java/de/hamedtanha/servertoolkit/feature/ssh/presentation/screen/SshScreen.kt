@@ -133,7 +133,7 @@ fun SshScreen(
         } else {
             Button(
                 onClick = onConnectClick,
-                enabled = uiState.status != SshConnectionStatus.Connecting,
+                enabled = uiState.canStartConnection,
                 modifier = Modifier.fillMaxWidth(),
             ) {
                 Text(text = "Connect")

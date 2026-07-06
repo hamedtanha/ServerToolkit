@@ -4,6 +4,7 @@ import de.hamedtanha.servertoolkit.feature.ssh.domain.model.SshAuthenticationMet
 import org.junit.Assert.assertEquals
 import org.junit.Assert.assertFalse
 import org.junit.Assert.assertNull
+import org.junit.Assert.assertTrue
 import org.junit.Test
 
 class SshUiStateTest {
@@ -19,5 +20,13 @@ class SshUiStateTest {
         assertFalse(uiState.isHostKeyReviewRequired)
         assertEquals(SshAuthenticationMethod.PASSWORD, uiState.authenticationInput.selectedMethod)
         assertFalse(uiState.authenticationInput.hasSensitiveInput)
+    }
+
+    @Test
+    fun `allows starting connection only before active connection exists`() {
+        assertTrue(SshUiState(status = SshConnectionStatus.NotStarted).canStartConnection)
+        assertFalse(SshUiState(status = SshConnectionStatus.Connecting).canStartConnection)
+        assertFalse(SshUiState(status = SshConnectionStatus.Connected).canStartConnection)
+        assertTrue(SshUiState(status = SshConnectionStatus.Failed).canStartConnection)
     }
 }
