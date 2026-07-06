@@ -1,9 +1,9 @@
 # Roadmap
 
-**Project:** Server Toolkit  
-**Version:** 0.3.0-baseline  
-**Status:** Active  
-**Last Updated:** 2026-07-04
+**Project:** Server Toolkit
+**Version:** 0.4.0-alpha
+**Status:** Active Implementation
+**Last Updated:** 2026-07-06
 
 ---
 
@@ -162,16 +162,23 @@ Introduce secure SSH connectivity.
 
 Entry condition:
 
-The Server Inventory 0.3.0 baseline has been accepted. Credential storage still requires a separate security decision before implementation.
+The Server Inventory 0.3.0 baseline has been accepted. Credential storage still requires a separate reviewed implementation before persistent credential storage is added.
+
+In progress:
+
+- SSH architecture and security ADRs.
+- SSHJ integration through data-layer boundaries.
+- Authentication boundary definition without persistent credential storage.
+- Host key verification and trust decision flow.
+- Project-owned session management boundary.
+- Non-interactive command execution workflow.
+- Command execution session-invalidation and cancellation hardening.
 
 Planned:
 
-- SSH architecture and security ADR.
-- SSH client integration.
-- Authentication boundary definition.
-- Host key verification.
-- Session management.
-- Connection history.
+- Full SSH host key verification hardening beyond the current trusted verifier shell.
+- Persistent credential storage only after reviewed secure storage implementation.
+- Connection history only after a separate reviewed design.
 
 Deliverable:
 
@@ -179,7 +186,7 @@ Reliable SSH connections to managed servers.
 
 Status:
 
-Planned.
+Active implementation.
 
 ---
 

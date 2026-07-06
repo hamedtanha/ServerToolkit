@@ -3,7 +3,7 @@
 **Project:** Server Toolkit  
 **Version:** 0.4.0-alpha  
 **Status:** Active Implementation  
-**Last Updated:** 2026-07-05
+**Last Updated:** 2026-07-06
 
 ---
 
@@ -162,6 +162,8 @@ The following application-level items are implemented:
 - SSH command output rendering for stdout, stderr, and exit status.
 - SSH command output clearing when the active session becomes unavailable.
 - SSH stale command result suppression after session invalidation.
+- SSH stale command cancellation suppression after session invalidation.
+- SSH command channel cancellation preservation with command-channel cleanup.
 - SSH ViewModel dependency injection for the connection attempt use case.
 - SSH user-triggered connect event shell.
 - SSH placeholder Connect button.
@@ -216,7 +218,7 @@ The following items are intentionally not implemented yet:
 The current implementation area is:
 
 - SSH command execution workflow verification and stabilization.
-- SSH command execution session-invalidation behavior hardening.
+- SSH command execution timeout, cleanup, and failure-mapping behavior hardening.
 
 ---
 
@@ -224,7 +226,7 @@ The current implementation area is:
 
 The next safe development steps are:
 
-1. Harden timeout, cancellation, cleanup, and failure mapping behavior around command execution.
+1. Continue hardening timeout, cleanup, and failure-mapping behavior around command execution.
 2. Keep terminal UI, saved command history, background monitoring, and persistent credentials out of scope.
 3. Consider saved command workflows only after a separate reviewed design and documentation update.
 

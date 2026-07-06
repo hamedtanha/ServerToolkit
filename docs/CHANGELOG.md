@@ -213,6 +213,8 @@ The project follows Conventional Commits and Semantic Versioning principles.
 
 - Cleared stale SSH command stdout, stderr, and exit status when the active session is invalidated.
 - Ignored stale SSH command results that complete after the active session has changed or become unavailable.
+- Ignored stale SSH command cancellation updates after the active session has changed or become unavailable.
+- Preserved SSH command channel cancellation semantics while keeping command-channel cleanup.
 
 ### Removed
 
