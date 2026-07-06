@@ -3,7 +3,6 @@ package de.hamedtanha.servertoolkit.feature.ssh.presentation.viewmodel
 import androidx.lifecycle.SavedStateHandle
 import de.hamedtanha.servertoolkit.core.connection.domain.model.ConnectionTargetResolution
 import de.hamedtanha.servertoolkit.core.connection.domain.model.RemoteConnectionTarget
-import de.hamedtanha.servertoolkit.feature.ssh.domain.model.SshCommandExecutionOutput
 import de.hamedtanha.servertoolkit.feature.ssh.domain.model.SshCommandExecutionResult
 import de.hamedtanha.servertoolkit.feature.ssh.domain.model.SshCommandRequest
 import de.hamedtanha.servertoolkit.feature.ssh.domain.model.SshConnectionError
