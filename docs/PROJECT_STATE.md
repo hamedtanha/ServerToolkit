@@ -135,6 +135,7 @@ The following application-level items are implemented:
 - SSH connection attempt outcome model for connection results and host-trust decisions.
 - SSH connection attempt host-trust gating before connection service execution.
 - SSHJ host-key observation adapter mapping.
+- SSH host-key fingerprints use SHA256 values for observation and trusted verification.
 - SSH project-owned session handle model.
 - SSH session close result model.
 - SSH session lifecycle service contract.

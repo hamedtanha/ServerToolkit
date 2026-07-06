@@ -25,7 +25,7 @@ class SshjHostKeyObservationServiceTest {
         assertEquals("server-1", observed.observedHostKey.endpoint.serverId)
         assertEquals("example.com", observed.observedHostKey.endpoint.host)
         assertEquals(22, observed.observedHostKey.endpoint.port)
-        assertEquals("MD5", observed.observedHostKey.fingerprint.algorithm)
+        assertEquals("SHA256", observed.observedHostKey.fingerprint.algorithm)
         assertTrue(observed.observedHostKey.fingerprint.value.isNotBlank())
     }
 
