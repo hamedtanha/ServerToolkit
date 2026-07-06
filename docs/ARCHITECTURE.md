@@ -319,6 +319,8 @@ The database version is `2`.
 
 The server inventory table stores server metadata only. It must not store credentials, private keys, passphrases, access tokens, certificates, or other secrets.
 
+SSH credential ownership is separate from server inventory. Server inventory may store a non-sensitive username hint, but persistent credential metadata and secret material require a separate reviewed implementation. Secret material must be stored only through a dedicated secure storage boundary.
+
 Trusted SSH host key material is stored separately from generic server inventory metadata.
 
 ### Persistence Rules

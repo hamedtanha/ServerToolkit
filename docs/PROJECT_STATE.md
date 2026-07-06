@@ -150,6 +150,7 @@ The following application-level items are implemented:
 - SSHJ password authentication execution shell.
 - SSHJ session ownership execution shell.
 - SSH command channel execution strategy decision.
+- SSH credential ownership and secure storage strategy decision.
 - SSH command execution planning boundary.
 - SSH command execution result model.
 - SSHJ command channel planning shell.
@@ -207,7 +208,7 @@ The following items are intentionally not implemented yet:
 
 - Interactive terminal workflow for owned sessions.
 - Full SSH host key verification hardening beyond the current trusted verifier shell.
-- Persistent credential storage.
+- Persistent credential storage implementation.
 - Monitoring workflow.
 - Saved command workflow.
 - Xray or x-ui management workflow.

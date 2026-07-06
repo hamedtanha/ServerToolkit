@@ -71,6 +71,10 @@ Planned secure storage mechanisms include:
 
 Credential storage architecture must be documented in an ADR before implementation.
 
+SSH credential ownership is separate from server inventory. Passwords, private keys, private key passphrases, access tokens, certificates, and complete credential-bearing connection strings must not be stored in the server inventory Room table.
+
+Persistent credential storage requires a separate reviewed implementation with a secure storage abstraction before any secret material is saved.
+
 ---
 
 # Network Security
