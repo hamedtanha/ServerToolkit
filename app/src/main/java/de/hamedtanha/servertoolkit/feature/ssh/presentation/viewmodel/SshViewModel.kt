@@ -89,14 +89,6 @@ class SshViewModel @Inject constructor(
         )
     }
 
-    fun onAuthenticationUsernameChanged(username: String) {
-        _uiState.value = _uiState.value.copy(
-            authenticationInput = _uiState.value.authenticationInput.copy(
-                username = username,
-            ),
-        )
-    }
-
     fun onPasswordChanged(password: String) {
         pendingAuthenticationSecrets.password = password
         pendingAuthenticationSecrets.privateKeyPassphrase = ""

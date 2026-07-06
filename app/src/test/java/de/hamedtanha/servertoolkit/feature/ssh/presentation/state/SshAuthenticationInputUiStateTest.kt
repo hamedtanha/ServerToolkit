@@ -13,7 +13,6 @@ class SshAuthenticationInputUiStateTest {
         val state = SshAuthenticationInputUiState()
 
         assertEquals(SshAuthenticationMethod.PASSWORD, state.selectedMethod)
-        assertEquals("", state.username)
         assertFalse(state.hasPasswordInput)
         assertFalse(state.hasPrivateKeyPassphraseInput)
         assertFalse(state.hasSensitiveInput)

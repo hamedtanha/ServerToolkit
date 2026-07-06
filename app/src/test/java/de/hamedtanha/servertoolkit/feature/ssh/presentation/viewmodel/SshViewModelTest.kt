@@ -586,16 +586,6 @@ class SshViewModelTest {
     }
 
     @Test
-    fun `updates authentication username without sensitive input`() {
-        val viewModel = createViewModel(serverId = "server-1")
-
-        viewModel.onAuthenticationUsernameChanged("admin")
-
-        assertEquals("admin", viewModel.uiState.value.authenticationInput.username)
-        assertFalse(viewModel.uiState.value.authenticationInput.hasSensitiveInput)
-    }
-
-    @Test
     fun `password input updates presence flag without exposing secret in ui state`() {
         val viewModel = createViewModel(serverId = "server-1")
 
@@ -645,11 +635,9 @@ class SshViewModelTest {
     fun `clears authentication input state`() {
         val viewModel = createViewModel(serverId = "server-1")
 
-        viewModel.onAuthenticationUsernameChanged("admin")
         viewModel.onPasswordChanged("secret-password")
         viewModel.onAuthenticationInputCleared()
 
-        assertEquals("", viewModel.uiState.value.authenticationInput.username)
         assertEquals(
             SshAuthenticationMethod.PASSWORD,
             viewModel.uiState.value.authenticationInput.selectedMethod,
