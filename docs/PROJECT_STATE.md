@@ -140,6 +140,7 @@ The following application-level items are implemented:
 - SSH session lifecycle service contract.
 - SSHJ session lifecycle shell.
 - SSHJ session owner registry boundary.
+- SSH session close cancellation preservation.
 - SSHJ authentication adapter mapping.
 - SSHJ authentication executor boundary.
 - SSHJ trusted host-key verifier boundary.
@@ -218,7 +219,7 @@ The following items are intentionally not implemented yet:
 The current implementation area is:
 
 - SSH command execution workflow verification and stabilization.
-- SSH command execution timeout, cleanup, and failure-mapping behavior hardening.
+- SSH session lifecycle and command execution timeout, cleanup, cancellation, and failure-mapping behavior hardening.
 
 ---
 
@@ -226,7 +227,7 @@ The current implementation area is:
 
 The next safe development steps are:
 
-1. Continue hardening timeout, cleanup, and failure-mapping behavior around command execution.
+1. Continue hardening timeout, cleanup, cancellation, and failure-mapping behavior around SSH session lifecycle and command execution.
 2. Keep terminal UI, saved command history, background monitoring, and persistent credentials out of scope.
 3. Consider saved command workflows only after a separate reviewed design and documentation update.
 

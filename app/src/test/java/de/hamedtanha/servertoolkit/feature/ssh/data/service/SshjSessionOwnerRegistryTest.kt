@@ -2,9 +2,11 @@ package de.hamedtanha.servertoolkit.feature.ssh.data.service
 
 import de.hamedtanha.servertoolkit.feature.ssh.domain.model.SshSessionCloseResult
 import de.hamedtanha.servertoolkit.feature.ssh.test.sshSessionHandle
+import kotlinx.coroutines.CancellationException
 import org.junit.Assert.assertEquals
 import org.junit.Assert.assertFalse
 import org.junit.Assert.assertTrue
+import org.junit.Assert.fail
 import org.junit.Test
 
 class SshjSessionOwnerRegistryTest {
@@ -106,5 +108,29 @@ class SshjSessionOwnerRegistryTest {
         assertEquals(SshSessionCloseResult.Closed, closedResult)
         assertEquals(2, closeAttempts)
         assertFalse(registry.contains(handle))
+    }
+
+    @Test
+    fun `preserves cancellation when close action is cancelled`() {
+        val registry = SshjSessionOwnerRegistry()
+        val handle = sshSessionHandle()
+
+        registry.register(
+            SshjSessionOwner(
+                sessionHandle = handle,
+                closeAction = {
+                    throw CancellationException("cancelled")
+                },
+            ),
+        )
+
+        try {
+            registry.close(handle)
+            fail("Expected CancellationException")
+        } catch (error: CancellationException) {
+            assertEquals("cancelled", error.message)
+        }
+
+        assertTrue(registry.contains(handle))
     }
 }

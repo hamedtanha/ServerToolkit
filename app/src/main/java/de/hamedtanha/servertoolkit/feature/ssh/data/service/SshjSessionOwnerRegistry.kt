@@ -7,6 +7,7 @@ import de.hamedtanha.servertoolkit.feature.ssh.domain.model.SshSessionCloseResul
 import de.hamedtanha.servertoolkit.feature.ssh.domain.model.SshSessionHandle
 import javax.inject.Inject
 import javax.inject.Singleton
+import kotlinx.coroutines.CancellationException
 
 /**
  * Owns data-layer SSH session resources by project-owned session id.
@@ -59,6 +60,8 @@ class SshjSessionOwnerRegistry @Inject constructor() {
                 }
             }
             SshSessionCloseResult.Closed
+        } catch (error: CancellationException) {
+            throw error
         } catch (error: Exception) {
             SshSessionCloseResult.Failed
         }

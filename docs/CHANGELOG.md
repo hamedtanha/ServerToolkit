@@ -215,6 +215,7 @@ The project follows Conventional Commits and Semantic Versioning principles.
 - Ignored stale SSH command results that complete after the active session has changed or become unavailable.
 - Ignored stale SSH command cancellation updates after the active session has changed or become unavailable.
 - Preserved SSH command channel cancellation semantics while keeping command-channel cleanup.
+- Preserved SSH session close cancellation semantics while keeping failed-close containment.
 
 ### Removed
 
