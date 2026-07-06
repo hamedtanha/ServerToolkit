@@ -33,6 +33,18 @@ internal fun SshCommandExecutionUiState.asRunning(): SshCommandExecutionUiState 
     )
 }
 
+internal fun SshCommandExecutionUiState.asSessionUnavailable(): SshCommandExecutionUiState {
+    return copy(
+        status = SshCommandExecutionStatus.Idle,
+        statusLabel = "No command executed",
+        message = "Connect to an SSH session before running a command.",
+        detail = "Command execution is non-interactive and does not provide terminal emulation.",
+        stdout = "",
+        stderr = "",
+        exitStatus = null,
+    )
+}
+
 internal fun SshCommandExecutionUiState.withExecutionResult(
     result: SshCommandExecutionResult,
 ): SshCommandExecutionUiState {

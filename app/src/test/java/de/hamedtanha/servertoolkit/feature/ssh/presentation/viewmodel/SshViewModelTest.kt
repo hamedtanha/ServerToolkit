@@ -226,6 +226,107 @@ class SshViewModelTest {
     }
 
     @Test
+    fun `clears previous command output when connection fails`() = runBlocking {
+        val commandExecutionService = FakeSshCommandExecutionService(
+            result = SshCommandExecutionResult.Completed(
+                SshCommandExecutionOutput(
+                    stdout = "old output",
+                    stderr = "",
+                    exitStatus = 0,
+                ),
+            ),
+        )
+        val viewModel = createViewModel(
+            serverId = "server-1",
+            commandExecutionService = commandExecutionService,
+        )
+
+        viewModel.onConnectionResultReceived(sshConnectedResult())
+        viewModel.onCommandChanged("uptime")
+        viewModel.executeCommand()
+
+        assertEquals("old output", viewModel.uiState.value.commandExecution.stdout)
+
+        viewModel.onConnectionResultReceived(
+            SshConnectionResult.Failed(SshConnectionError.AuthenticationRequired),
+        )
+
+        assertEquals("uptime", viewModel.uiState.value.commandExecution.command)
+        assertEquals(SshCommandExecutionStatus.Idle, viewModel.uiState.value.commandExecution.status)
+        assertEquals("", viewModel.uiState.value.commandExecution.stdout)
+        assertEquals("", viewModel.uiState.value.commandExecution.stderr)
+        assertNull(viewModel.uiState.value.commandExecution.exitStatus)
+        assertFalse(viewModel.uiState.value.commandExecution.hasOutput)
+    }
+
+    @Test
+    fun `clears previous command output when starting a new connection attempt`() = runBlocking {
+        val commandExecutionService = FakeSshCommandExecutionService(
+            result = SshCommandExecutionResult.Completed(
+                SshCommandExecutionOutput(
+                    stdout = "old output",
+                    stderr = "",
+                    exitStatus = 0,
+                ),
+            ),
+        )
+        val viewModel = createViewModel(
+            serverId = "server-1",
+            commandExecutionService = commandExecutionService,
+        )
+
+        viewModel.onConnectionResultReceived(sshConnectedResult())
+        viewModel.onCommandChanged("uptime")
+        viewModel.executeCommand()
+
+        assertEquals("old output", viewModel.uiState.value.commandExecution.stdout)
+
+        viewModel.connect()
+
+        assertEquals(SshConnectionStatus.Connected, viewModel.uiState.value.status)
+        assertEquals("uptime", viewModel.uiState.value.commandExecution.command)
+        assertEquals(SshCommandExecutionStatus.Idle, viewModel.uiState.value.commandExecution.status)
+        assertEquals("", viewModel.uiState.value.commandExecution.stdout)
+        assertEquals("", viewModel.uiState.value.commandExecution.stderr)
+        assertNull(viewModel.uiState.value.commandExecution.exitStatus)
+        assertFalse(viewModel.uiState.value.commandExecution.hasOutput)
+    }
+
+    @Test
+    fun `clears previous command output when host key review is required`() = runBlocking {
+        val commandExecutionService = FakeSshCommandExecutionService(
+            result = SshCommandExecutionResult.Completed(
+                SshCommandExecutionOutput(
+                    stdout = "old output",
+                    stderr = "",
+                    exitStatus = 0,
+                ),
+            ),
+        )
+        val viewModel = createViewModel(
+            serverId = "server-1",
+            commandExecutionService = commandExecutionService,
+        )
+
+        viewModel.onConnectionResultReceived(sshConnectedResult())
+        viewModel.onCommandChanged("uptime")
+        viewModel.executeCommand()
+
+        assertEquals("old output", viewModel.uiState.value.commandExecution.stdout)
+
+        viewModel.onHostTrustDecisionReceived(
+            SshHostTrustDecision.ReviewRequired(observedHostKey()),
+        )
+
+        assertEquals("uptime", viewModel.uiState.value.commandExecution.command)
+        assertEquals(SshCommandExecutionStatus.Idle, viewModel.uiState.value.commandExecution.status)
+        assertEquals("", viewModel.uiState.value.commandExecution.stdout)
+        assertEquals("", viewModel.uiState.value.commandExecution.stderr)
+        assertNull(viewModel.uiState.value.commandExecution.exitStatus)
+        assertFalse(viewModel.uiState.value.commandExecution.hasOutput)
+    }
+
+    @Test
     fun `maps command execution without active session to failed state`() = runBlocking {
         val commandExecutionService = FakeSshCommandExecutionService()
         val viewModel = createViewModel(
@@ -310,6 +411,52 @@ class SshViewModelTest {
         firstExecution.join()
 
         assertEquals(SshCommandExecutionStatus.Completed, viewModel.uiState.value.commandExecution.status)
+    }
+
+    @Test
+    fun `ignores command result when session is invalidated before command completes`() = runBlocking {
+        val commandStarted = CompletableDeferred<Unit>()
+        val releaseCommand = CompletableDeferred<Unit>()
+        val commandExecutionService = FakeSshCommandExecutionService(
+            result = SshCommandExecutionResult.Completed(
+                SshCommandExecutionOutput(
+                    stdout = "stale output",
+                    stderr = "",
+                    exitStatus = 0,
+                ),
+            ),
+            onExecute = {
+                commandStarted.complete(Unit)
+                releaseCommand.await()
+            },
+        )
+        val viewModel = createViewModel(
+            serverId = "server-1",
+            commandExecutionService = commandExecutionService,
+        )
+
+        viewModel.onConnectionResultReceived(sshConnectedResult())
+        viewModel.onCommandChanged("uptime")
+
+        val execution = launch {
+            viewModel.executeCommand()
+        }
+
+        commandStarted.await()
+
+        viewModel.onConnectionResultReceived(
+            SshConnectionResult.Failed(SshConnectionError.AuthenticationRequired),
+        )
+
+        releaseCommand.complete(Unit)
+        execution.join()
+
+        assertEquals(1, commandExecutionService.executeCallCount)
+        assertEquals(SshCommandExecutionStatus.Idle, viewModel.uiState.value.commandExecution.status)
+        assertEquals("", viewModel.uiState.value.commandExecution.stdout)
+        assertEquals("", viewModel.uiState.value.commandExecution.stderr)
+        assertNull(viewModel.uiState.value.commandExecution.exitStatus)
+        assertFalse(viewModel.uiState.value.commandExecution.hasOutput)
     }
 
     @Test
