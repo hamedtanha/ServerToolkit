@@ -6,6 +6,7 @@ import de.hamedtanha.servertoolkit.feature.ssh.domain.model.SshCommandExecutionR
 import de.hamedtanha.servertoolkit.feature.ssh.domain.model.SshCommandRequest
 import de.hamedtanha.servertoolkit.feature.ssh.test.sshSessionHandle
 import java.io.ByteArrayInputStream
+import java.io.IOException
 import java.io.InputStream
 import kotlinx.coroutines.CancellationException
 import org.junit.Assert.assertEquals
@@ -151,6 +152,45 @@ class SshjCommandChannelExecutorTest {
     }
 
     @Test
+    fun `returns command execution failure and closes channel when stdout cannot be read`() {
+        val channel = FakeCommandChannel(
+            stdoutReadError = IOException("stdout failed"),
+        )
+        val executor = SshjNetworkCommandChannelExecutor()
+
+        val result = executor.execute(
+            commandClient = FakeCommandClient(channel = channel),
+            request = commandRequest(),
+        )
+
+        assertEquals(
+            SshCommandExecutionResult.Failed(SshCommandExecutionError.CommandExecutionFailed),
+            result,
+        )
+        assertTrue(channel.closed)
+    }
+
+    @Test
+    fun `returns command execution failure and closes channel when stderr cannot be read`() {
+        val channel = FakeCommandChannel(
+            stdoutText = "ok",
+            stderrReadError = IOException("stderr failed"),
+        )
+        val executor = SshjNetworkCommandChannelExecutor()
+
+        val result = executor.execute(
+            commandClient = FakeCommandClient(channel = channel),
+            request = commandRequest(),
+        )
+
+        assertEquals(
+            SshCommandExecutionResult.Failed(SshCommandExecutionError.CommandExecutionFailed),
+            result,
+        )
+        assertTrue(channel.closed)
+    }
+
+    @Test
     fun `preserves cancellation and closes channel when execution is cancelled after opening`() {
         val channel = FakeCommandChannel(
             joinError = CancellationException("cancelled"),
@@ -209,14 +249,22 @@ class SshjCommandChannelExecutorTest {
     private class FakeCommandChannel(
         stdoutText: String = "",
         stderrText: String = "",
+        stdoutReadError: IOException? = null,
+        stderrReadError: IOException? = null,
         private val exitStatusValue: Int? = 0,
         private val joinError: Exception? = null,
         private val closeError: Exception? = null,
     ) : SshjCommandChannel {
 
-        override val stdout: InputStream = ByteArrayInputStream(stdoutText.toByteArray())
+        override val stdout: InputStream = inputStreamFor(
+            text = stdoutText,
+            readError = stdoutReadError,
+        )
 
-        override val stderr: InputStream = ByteArrayInputStream(stderrText.toByteArray())
+        override val stderr: InputStream = inputStreamFor(
+            text = stderrText,
+            readError = stderrReadError,
+        )
 
         override val exitStatus: Int?
             get() = exitStatusValue
@@ -235,6 +283,29 @@ class SshjCommandChannelExecutorTest {
         override fun close() {
             closed = true
             closeError?.let { throw it }
+        }
+    }
+
+    private companion object {
+
+        fun inputStreamFor(
+            text: String,
+            readError: IOException?,
+        ): InputStream {
+            return if (readError == null) {
+                ByteArrayInputStream(text.toByteArray())
+            } else {
+                FailingInputStream(readError)
+            }
+        }
+    }
+
+    private class FailingInputStream(
+        private val error: IOException,
+    ) : InputStream() {
+
+        override fun read(): Int {
+            throw error
         }
     }
 }
