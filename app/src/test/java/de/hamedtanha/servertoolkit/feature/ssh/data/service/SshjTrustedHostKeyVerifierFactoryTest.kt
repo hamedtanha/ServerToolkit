@@ -99,8 +99,8 @@ class SshjTrustedHostKeyVerifierFactoryTest {
 
     private fun trustedHostKey(
         fingerprint: SshHostKeyFingerprint = SshHostKeyFingerprint(
-            algorithm = "MD5",
-            value = "MD5:fingerprint",
+            algorithm = "SHA256",
+            value = "fingerprint",
         ),
     ): SshTrustedHostKey {
         return SshTrustedHostKey(
