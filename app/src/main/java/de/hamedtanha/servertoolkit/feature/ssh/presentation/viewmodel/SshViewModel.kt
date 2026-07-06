@@ -257,11 +257,13 @@ class SshViewModel @Inject constructor(
                 )
             }
         } catch (error: CancellationException) {
-            _uiState.value = _uiState.value.copy(
-                commandExecution = _uiState.value.commandExecution.withExecutionResult(
-                    SshCommandExecutionResult.Failed(SshCommandExecutionError.CommandCancelled),
-                ),
-            )
+            if (activeSessionHandle == sessionHandle) {
+                _uiState.value = _uiState.value.copy(
+                    commandExecution = _uiState.value.commandExecution.withExecutionResult(
+                        SshCommandExecutionResult.Failed(SshCommandExecutionError.CommandCancelled),
+                    ),
+                )
+            }
             throw error
         } finally {
             isCommandExecutionInProgress = false
