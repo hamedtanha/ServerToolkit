@@ -10,9 +10,9 @@
 
 The Server Toolkit project has introduced an SSH workflow shell, an SSHJ adapter shell, a connection service contract, dependency injection wiring, and a user-triggered connect event shell.
 
-The application still intentionally does not implement real SSH connection behavior, credential input, authentication handling, host key verification, command execution, or SSH session lifecycle management.
+At the time of this decision, the application intentionally did not implement real SSH connection behavior, credential input, authentication handling, host key verification, command execution, or SSH session lifecycle management.
 
-Before any real SSH connection behavior is added, the project must define how SSH host trust and authentication input are handled.
+Before real SSH connection behavior could be added, the project had to define how SSH host trust and authentication input would be handled.
 
 This decision is necessary because SSH security cannot be treated as a UI detail or adapter implementation detail. Host trust, credential handling, and session boundaries affect the domain model, presentation flow, data layer, secure storage strategy, and user experience.
 

@@ -16,7 +16,7 @@ Server Toolkit now has the foundations required for real SSH connection ownershi
 - Authenticated SSHJ clients are owned by the data-layer session owner registry.
 - Domain and presentation layers only receive project-owned session handles.
 
-The next SSH milestone is command and channel execution planning behind owned SSH sessions.
+At the time of this decision, the next SSH milestone was command and channel execution planning behind owned SSH sessions.
 
 This decision is necessary because command execution introduces a new resource lifecycle. SSH command channels can hold streams, exit status, remote process state, timeout behavior, and cleanup requirements. If command channels leak into ViewModels, UI state, or domain models, the project will quickly become a fragile terminal client instead of a maintainable infrastructure management application.
 
@@ -26,9 +26,17 @@ The project must support future operational workflows such as predefined mainten
 
 # Decision
 
-Server Toolkit will introduce SSH command execution through project-owned command execution contracts and data-layer SSHJ channel ownership.
+Server Toolkit introduces SSH command execution through project-owned command execution contracts and data-layer SSHJ channel ownership.
 
-The first implementation step will add command/channel execution planning only. Real command execution must remain disabled until the planning boundary, lifecycle rules, timeout behavior, result model, and tests are in place.
+Real command execution may only be enabled through the accepted planning boundary, lifecycle rules, timeout behavior, result model, and tests. The command workflow remains non-interactive and must not expose SSHJ channels, streams, sessions, sockets, or terminal behavior outside the data layer.
+
+## Implementation Status
+
+This decision has been implemented for the current non-interactive SSH command execution workflow.
+
+The implementation includes project-owned command request, result, error, planning, and execution contracts; session-handle based execution; SSHJ command channel ownership inside the data layer; timeout, cleanup, cancellation, and failure-mapping boundaries; and presentation-layer stabilization for command input and output state.
+
+The original gates remain active guardrails for future command execution changes.
 
 ## Command Execution Scope
 
@@ -189,14 +197,14 @@ Introduce command execution through project-owned request, result, error, and se
 - Supports future operational workflows.
 - Keeps SSHJ details isolated.
 - Keeps terminal UI out of scope.
-- Enables focused tests before real execution.
+- Enabled focused tests before real execution and continues to preserve a clear planning boundary.
 - Aligns with owned SSH session boundaries.
 
 ### Cons
 
 - Slower than directly executing commands.
 - Requires additional models and tests.
-- Real command execution remains gated until lifecycle behavior is implemented.
+- Required additional implementation slices before real execution could be enabled.
 
 Accepted.
 
@@ -204,7 +212,7 @@ Accepted.
 
 # Implementation Gates
 
-Before real SSH command execution is enabled, the project must:
+Real SSH command execution is enabled only while the implementation continues to satisfy these gates:
 
 - Define project-owned command request, result, error, and execution service contracts.
 - Define command/channel lifecycle ownership inside the SSHJ data layer.
@@ -230,13 +238,13 @@ Before real SSH command execution is enabled, the project must:
 - ViewModels remain responsible for presentation state, not SSH resource ownership.
 - Future saved commands and quick actions can use stable domain contracts.
 - Persistent credentials remain outside the current security surface.
-- Command/channel lifecycle can be tested before real execution is enabled.
+- Command/channel lifecycle remains testable independently of UI interaction.
 
 ## Negative
 
-- More implementation steps are required before users can run commands.
+- More implementation steps were required before users could run commands.
 - Non-interactive command execution does not satisfy full terminal use cases.
-- Additional lifecycle tests are required before the feature is safe.
+- Additional lifecycle tests remain required as the feature evolves.
 - Future terminal support will require a separate decision and implementation path.
 
 ---
@@ -258,4 +266,4 @@ Before real SSH command execution is enabled, the project must:
 
 This ADR intentionally separates command execution from terminal interaction.
 
-The next implementation slice should add command execution planning models and contracts without enabling real command execution.
+The planning boundary has since been implemented and is now used by the non-interactive command execution workflow. Future work must continue to keep terminal interaction, saved commands, background monitoring, and persistent credentials outside this ADR unless a new reviewed decision expands the scope.
