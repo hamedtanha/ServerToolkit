@@ -132,6 +132,7 @@ The project follows Conventional Commits and Semantic Versioning principles.
 - Added SSH command channel execution strategy decision.
 - Added SSH credential ownership and secure storage strategy decision.
 - Added SSH command execution planning boundary.
+- Added current SSH architecture guardrails to the project state documentation.
 - Added SSH command execution result model.
 - Added SSHJ command channel planning shell.
 - Added SSH command execution routing through the data-layer session owner registry.
