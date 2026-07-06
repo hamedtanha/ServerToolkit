@@ -27,7 +27,7 @@ ADR-009 is accepted as the SSH host trust and authentication input strategy.
 
 Android backup and data extraction are disabled for the alpha release to avoid backing up infrastructure inventory or future SSH trust material before a reviewed restore model exists.
 
-The SSH command/channel lifecycle boundary is accepted, and the user-facing non-interactive SSH command execution workflow is now implemented behind owned SSH sessions while keeping terminal UI, saved command workflows, background monitoring, and persistent credentials out of scope.
+The SSH command/channel lifecycle boundary is accepted, and the user-facing non-interactive SSH command execution workflow is now implemented behind owned SSH sessions. The SSH screen supports ephemeral password input for a single connection attempt while keeping terminal UI, saved command workflows, background monitoring, and persistent credentials out of scope.
 
 ---
 
@@ -145,6 +145,7 @@ The following application-level items are implemented:
 - SSH authentication input UI-safe presentation state.
 - SSH ephemeral authentication input ViewModel events.
 - SSH authentication input clearing behavior.
+- SSH ephemeral password input on the SSH screen.
 - SSH credential-bearing connection request boundary.
 - SSH authentication input redaction and clearing at the connection attempt boundary.
 - SSH host-key observation service boundary.
@@ -189,7 +190,7 @@ The following application-level items are implemented:
 - SSH command channel cancellation preservation with command-channel cleanup.
 - SSH ViewModel dependency injection for the connection attempt use case.
 - SSH user-triggered connect event shell.
-- SSH placeholder Connect button.
+- SSH Connect button with ephemeral password input.
 - SSH connect event shell ViewModel tests.
 - SSHJ adapter shell unit test.
 - SSH domain connection request model.

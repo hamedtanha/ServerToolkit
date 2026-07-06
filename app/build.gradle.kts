@@ -59,6 +59,7 @@ dependencies {
     implementation(libs.androidx.room.ktx)
     implementation(libs.hilt.android)
     implementation(libs.sshj)
+    implementation(libs.bouncycastle.bcprov)
     ksp(libs.androidx.room.compiler)
     ksp(libs.hilt.compiler)
     testImplementation(libs.junit)
