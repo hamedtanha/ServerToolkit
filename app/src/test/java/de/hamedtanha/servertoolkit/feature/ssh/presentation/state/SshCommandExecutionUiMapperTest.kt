@@ -30,6 +30,28 @@ class SshCommandExecutionUiMapperTest {
     }
 
     @Test
+    fun `maps blank command text into non executable idle state`() {
+        val state = SshCommandExecutionUiState(
+            stdout = "old output",
+            stderr = "old error",
+            exitStatus = 1,
+        )
+
+        val mapped = state.withCommandText("   ")
+
+        assertEquals("   ", mapped.command)
+        assertEquals(SshCommandExecutionStatus.Idle, mapped.status)
+        assertEquals("No command entered", mapped.statusLabel)
+        assertEquals("Enter a command before running it.", mapped.message)
+        assertEquals("Command execution requires a non-blank command.", mapped.detail)
+        assertEquals("", mapped.stdout)
+        assertEquals("", mapped.stderr)
+        assertEquals(null, mapped.exitStatus)
+        assertFalse(mapped.canExecute)
+        assertFalse(mapped.hasOutput)
+    }
+
+    @Test
     fun `maps running state and clears previous output`() {
         val state = SshCommandExecutionUiState(
             command = "uptime",

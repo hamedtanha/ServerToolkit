@@ -9,16 +9,29 @@ import de.hamedtanha.servertoolkit.feature.ssh.domain.model.SshCommandExecutionR
 internal fun SshCommandExecutionUiState.withCommandText(
     command: String,
 ): SshCommandExecutionUiState {
-    return copy(
-        command = command,
-        status = SshCommandExecutionStatus.Idle,
-        statusLabel = "Command ready",
-        message = "Command is ready to run.",
-        detail = "Output will be shown only for this active screen state.",
-        stdout = "",
-        stderr = "",
-        exitStatus = null,
-    )
+    return if (command.isBlank()) {
+        copy(
+            command = command,
+            status = SshCommandExecutionStatus.Idle,
+            statusLabel = "No command entered",
+            message = "Enter a command before running it.",
+            detail = "Command execution requires a non-blank command.",
+            stdout = "",
+            stderr = "",
+            exitStatus = null,
+        )
+    } else {
+        copy(
+            command = command,
+            status = SshCommandExecutionStatus.Idle,
+            statusLabel = "Command ready",
+            message = "Command is ready to run.",
+            detail = "Output will be shown only for this active screen state.",
+            stdout = "",
+            stderr = "",
+            exitStatus = null,
+        )
+    }
 }
 
 internal fun SshCommandExecutionUiState.asRunning(): SshCommandExecutionUiState {
