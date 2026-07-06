@@ -215,6 +215,10 @@ class SshViewModel @Inject constructor(
             return
         }
 
+        if (!_uiState.value.commandExecution.canExecute) {
+            return
+        }
+
         val sessionHandle = activeSessionHandle
         if (sessionHandle == null) {
             _uiState.value = _uiState.value.copy(
