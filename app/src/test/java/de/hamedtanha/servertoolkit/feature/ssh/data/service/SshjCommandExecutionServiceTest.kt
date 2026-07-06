@@ -5,8 +5,10 @@ import de.hamedtanha.servertoolkit.feature.ssh.domain.model.SshCommandExecutionO
 import de.hamedtanha.servertoolkit.feature.ssh.domain.model.SshCommandExecutionResult
 import de.hamedtanha.servertoolkit.feature.ssh.domain.model.SshCommandRequest
 import de.hamedtanha.servertoolkit.feature.ssh.test.sshSessionHandle
+import kotlinx.coroutines.CancellationException
 import kotlinx.coroutines.runBlocking
 import org.junit.Assert.assertEquals
+import org.junit.Assert.fail
 import org.junit.Test
 
 class SshjCommandExecutionServiceTest {
@@ -57,5 +59,32 @@ class SshjCommandExecutionServiceTest {
             SshCommandExecutionResult.Failed(SshCommandExecutionError.SessionNotFound),
             result,
         )
+    }
+
+    @Test
+    fun `preserves cancellation from registered session owner`() = runBlocking {
+        val sessionHandle = sshSessionHandle()
+        val registry = SshjSessionOwnerRegistry()
+        val request = SshCommandRequest(
+            sessionHandle = sessionHandle,
+            command = "uptime",
+        )
+        registry.register(
+            SshjSessionOwner(
+                sessionHandle = sessionHandle,
+                closeAction = {},
+                commandExecutionAction = {
+                    throw CancellationException("cancelled")
+                },
+            ),
+        )
+        val service = SshjCommandExecutionService(registry)
+
+        try {
+            service.execute(request)
+            fail("Expected CancellationException")
+        } catch (error: CancellationException) {
+            assertEquals("cancelled", error.message)
+        }
     }
 }
