@@ -6,6 +6,7 @@ import de.hamedtanha.servertoolkit.feature.ssh.domain.model.SshCommandExecutionR
 import de.hamedtanha.servertoolkit.feature.ssh.domain.model.SshCommandRequest
 import java.io.InputStream
 import java.util.concurrent.TimeUnit
+import kotlinx.coroutines.CancellationException
 import net.schmizz.sshj.SSHClient
 import net.schmizz.sshj.connection.channel.direct.Session
 
@@ -76,6 +77,8 @@ internal class SshjNetworkCommandChannelExecutor : SshjCommandChannelExecutor {
                     exitStatus = exitStatus,
                 ),
             )
+        } catch (error: CancellationException) {
+            throw error
         } catch (error: Exception) {
             if (channelOpened) {
                 SshCommandExecutionResult.Failed(SshCommandExecutionError.CommandExecutionFailed)
