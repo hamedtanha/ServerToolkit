@@ -7,8 +7,10 @@ import de.hamedtanha.servertoolkit.feature.ssh.domain.model.SshCommandRequest
 import de.hamedtanha.servertoolkit.feature.ssh.test.sshSessionHandle
 import java.io.ByteArrayInputStream
 import java.io.InputStream
+import kotlinx.coroutines.CancellationException
 import org.junit.Assert.assertEquals
 import org.junit.Assert.assertTrue
+import org.junit.Assert.fail
 import org.junit.Test
 
 class SshjCommandChannelExecutorTest {
@@ -98,6 +100,36 @@ class SshjCommandChannelExecutorTest {
         assertTrue(channel.closed)
     }
 
+    @Test
+    fun `preserves cancellation and closes channel when execution is cancelled after opening`() {
+        val channel = FakeCommandChannel(
+            joinError = CancellationException("cancelled"),
+        )
+        val executor = SshjNetworkCommandChannelExecutor()
+
+        try {
+            executor.execute(
+                commandClient = FakeCommandClient(channel = channel),
+                request = commandRequest(),
+            )
+            fail("Expected CancellationException")
+        } catch (error: CancellationException) {
+            assertEquals("cancelled", error.message)
+        }
+
+        assertTrue(channel.closed)
+    }
+
+    @Test(expected = CancellationException::class)
+    fun `preserves cancellation when command channel opening is cancelled`() {
+        val executor = SshjNetworkCommandChannelExecutor()
+
+        executor.execute(
+            commandClient = FakeCommandClient(openError = CancellationException("cancelled")),
+            request = commandRequest(),
+        )
+    }
+
     private fun commandRequest(
         command: String = "uptime",
         timeoutMillis: Long = 30_000,
@@ -111,7 +143,7 @@ class SshjCommandChannelExecutorTest {
 
     private class FakeCommandClient(
         private val channel: SshjCommandChannel? = null,
-        private val openError: RuntimeException? = null,
+        private val openError: Exception? = null,
     ) : SshjCommandChannelClient {
 
         var lastCommand: String? = null
@@ -128,7 +160,7 @@ class SshjCommandChannelExecutorTest {
         stdoutText: String = "",
         stderrText: String = "",
         private val exitStatusValue: Int? = 0,
-        private val joinError: RuntimeException? = null,
+        private val joinError: Exception? = null,
     ) : SshjCommandChannel {
 
         override val stdout: InputStream = ByteArrayInputStream(stdoutText.toByteArray())
