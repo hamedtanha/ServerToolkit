@@ -42,6 +42,7 @@ internal class SshjNetworkTrustedConnectionExecutor(
     private val trustedHostKeyVerifierFactory: SshjTrustedHostKeyVerifierFactory,
     private val authenticationExecutor: SshjAuthenticationExecutor,
     private val commandChannelExecutor: SshjCommandChannelExecutor = SshjNetworkCommandChannelExecutor(),
+    private val clientFactory: SshjClientFactory = SshjClientFactory(),
 ) : SshjTrustedConnectionExecutor {
 
     override fun connectAndAuthenticate(
@@ -49,7 +50,7 @@ internal class SshjNetworkTrustedConnectionExecutor(
         trustedHostKey: SshTrustedHostKey,
         authenticationMapping: SshjAuthenticationMapping,
     ): SshjTrustedConnectionExecutionResult {
-        val client = SSHClient()
+        val client = clientFactory.createClient()
         var ownershipTransferred = false
 
         return try {

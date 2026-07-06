@@ -10,15 +10,14 @@ import javax.inject.Inject
 import kotlinx.coroutines.CancellationException
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
-import net.schmizz.sshj.SSHClient
 import net.schmizz.sshj.transport.verification.HostKeyVerifier
 
 /**
  * SSHJ-backed host-key observation adapter.
  *
- * This adapter observes the remote host key before authentication. The verifier intentionally
- * rejects the observed key so SSHJ does not continue into authentication or long-lived session
- * ownership in this implementation gate.
+ * This adapter observes the remote host key before authentication. The verifier allows the
+ * transport handshake to continue only long enough to capture the public host key. No
+ * authentication is performed and the SSHJ client is closed immediately after observation.
  */
 class SshjHostKeyObservationService @Inject constructor() : SshHostKeyObservationService {
 
@@ -51,13 +50,15 @@ internal fun interface SshjHostKeyObserver {
     fun observeHostKey(request: SshConnectionRequest): PublicKey?
 }
 
-private class SshjNetworkHostKeyObserver : SshjHostKeyObserver {
+private class SshjNetworkHostKeyObserver(
+    private val clientFactory: SshjClientFactory = SshjClientFactory(),
+) : SshjHostKeyObserver {
 
     override fun observeHostKey(request: SshConnectionRequest): PublicKey? {
         var observedHostKey: PublicKey? = null
 
         try {
-            SSHClient().use { client ->
+            clientFactory.createClient().use { client ->
                 client.connectTimeout = SSHJ_HOST_KEY_OBSERVATION_TIMEOUT_MILLIS
                 client.timeout = SSHJ_HOST_KEY_OBSERVATION_TIMEOUT_MILLIS
                 client.addHostKeyVerifier(
@@ -69,7 +70,7 @@ private class SshjNetworkHostKeyObserver : SshjHostKeyObserver {
                             key: PublicKey,
                         ): Boolean {
                             observedHostKey = key
-                            return false
+                            return true
                         }
 
                         override fun findExistingAlgorithms(
@@ -86,7 +87,7 @@ private class SshjNetworkHostKeyObserver : SshjHostKeyObserver {
         } catch (error: CancellationException) {
             throw error
         } catch (error: Exception) {
-            // A rejected host-key verifier is expected to stop the SSH handshake after observation.
+            // Observation failures are contained so connection attempts can surface stable errors.
         }
 
         return observedHostKey

@@ -169,6 +169,7 @@ In progress:
 - SSH architecture and security ADRs.
 - SSHJ integration through data-layer boundaries.
 - Authentication boundary definition without persistent credential storage.
+- Ephemeral password input for single-attempt SSH authentication.
 - Host key verification and trust decision flow.
 - Project-owned session management boundary.
 - Non-interactive command execution workflow.

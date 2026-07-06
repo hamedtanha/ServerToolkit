@@ -94,6 +94,7 @@ The current implementation includes:
 - SSH UI connection status model and connection result mapper.
 - Test-only fake SSH connection service.
 - SSHJ dependency declaration through the Gradle version catalog.
+- SSHJ Android-compatible client factory with explicit Bouncy Castle provider registration and constrained key exchange defaults.
 - SSHJ-backed data-layer adapter boundary.
 - SSH connection service dependency injection binding.
 - SSH host trust persistence boundary.
@@ -101,6 +102,7 @@ The current implementation includes:
 - SSH explicit unknown-host trust confirmation workflow.
 - SSH changed-host-key blocking decision flow.
 - SSH ephemeral authentication input boundary.
+- SSH screen password input that forwards secrets through transient ViewModel events without storing them in UI state.
 - SSH credential-bearing connection request boundary.
 - SSH authentication input clearing behavior.
 - SSHJ trusted host-key verifier boundary.
@@ -127,7 +129,7 @@ The current implementation includes:
 - SSH command text edit suppression while command execution is running.
 - SSH command input disabling while command execution is running.
 - SSH ViewModel injection of the connection attempt use case.
-- SSH user-triggered connect event shell and placeholder Connect button.
+- SSH user-triggered connect event shell and Connect button with ephemeral password input.
 - SSH tests for domain models, presentation state, fake results, SSHJ adapter boundaries, host trust, authentication input, session ownership, command planning, and command execution lifecycle boundaries.
 
 The following items are intentionally not implemented yet:

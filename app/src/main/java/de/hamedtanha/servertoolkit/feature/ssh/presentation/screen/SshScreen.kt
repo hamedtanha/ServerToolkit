@@ -15,8 +15,14 @@ import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.foundation.text.KeyboardOptions
+import androidx.compose.ui.text.input.KeyboardType
+import androidx.compose.ui.text.input.PasswordVisualTransformation
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.hilt.lifecycle.viewmodel.compose.hiltViewModel
@@ -41,6 +47,7 @@ fun SshRoute(
         onConnectClick = viewModel::onConnectClicked,
         onConfirmHostKeyClick = viewModel::onConfirmHostKeyClicked,
         onCancelHostKeyReviewClick = viewModel::onCancelHostKeyReviewClicked,
+        onPasswordChange = viewModel::onPasswordChanged,
         onCommandChange = viewModel::onCommandChanged,
         onExecuteCommandClick = viewModel::onExecuteCommandClicked,
         onNavigateBack = onNavigateBack,
@@ -54,11 +61,14 @@ fun SshScreen(
     onConnectClick: () -> Unit,
     onConfirmHostKeyClick: () -> Unit,
     onCancelHostKeyReviewClick: () -> Unit,
+    onPasswordChange: (String) -> Unit,
     onCommandChange: (String) -> Unit,
     onExecuteCommandClick: () -> Unit,
     onNavigateBack: () -> Unit,
     modifier: Modifier = Modifier,
 ) {
+    var password by remember { mutableStateOf("") }
+
     Column(
         modifier = modifier
             .fillMaxSize()
@@ -132,8 +142,31 @@ fun SshScreen(
                 Text(text = "Cancel identity review")
             }
         } else {
+            OutlinedTextField(
+                value = password,
+                onValueChange = { value ->
+                    password = value
+                    onPasswordChange(value)
+                },
+                label = {
+                    Text(text = "Password")
+                },
+                singleLine = true,
+                visualTransformation = PasswordVisualTransformation(),
+                keyboardOptions = KeyboardOptions(
+                    keyboardType = KeyboardType.Password,
+                ),
+                enabled = uiState.canStartConnection,
+                modifier = Modifier.fillMaxWidth(),
+            )
+
+            Spacer(modifier = Modifier.height(8.dp))
+
             Button(
-                onClick = onConnectClick,
+                onClick = {
+                    onConnectClick()
+                    password = ""
+                },
                 enabled = uiState.canStartConnection,
                 modifier = Modifier.fillMaxWidth(),
             ) {
