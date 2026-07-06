@@ -77,6 +77,47 @@ class SshViewModelCommandCancellationTest {
         assertFalse(viewModel.uiState.value.commandExecution.hasOutput)
     }
 
+    @Test
+    fun `maps command cancellation to failed state while active session remains available`() = runBlocking {
+        val commandStarted = CompletableDeferred<Unit>()
+        val releaseCommand = CompletableDeferred<Unit>()
+        val commandExecutionService = CancellingSshCommandExecutionService(
+            onExecute = {
+                commandStarted.complete(Unit)
+                releaseCommand.await()
+            },
+        )
+        val viewModel = createViewModel(commandExecutionService)
+
+        viewModel.onConnectionResultReceived(sshConnectedResult())
+        viewModel.onCommandChanged("uptime")
+
+        val execution = launch {
+            try {
+                viewModel.executeCommand()
+                fail("Expected CancellationException")
+            } catch (error: CancellationException) {
+                assertEquals("Command cancelled", error.message)
+            }
+        }
+
+        commandStarted.await()
+        releaseCommand.complete(Unit)
+        execution.join()
+
+        val commandExecution = viewModel.uiState.value.commandExecution
+
+        assertEquals(1, commandExecutionService.executeCallCount)
+        assertEquals(SshCommandExecutionStatus.Failed, commandExecution.status)
+        assertEquals("Command failed", commandExecution.statusLabel)
+        assertEquals("The command was cancelled.", commandExecution.message)
+        assertEquals("No terminal session was opened.", commandExecution.detail)
+        assertEquals("", commandExecution.stdout)
+        assertEquals("", commandExecution.stderr)
+        assertNull(commandExecution.exitStatus)
+        assertFalse(commandExecution.hasOutput)
+    }
+
     private class CancellingSshCommandExecutionService(
         private val onExecute: suspend (SshCommandRequest) -> Unit,
     ) : SshCommandExecutionService {
