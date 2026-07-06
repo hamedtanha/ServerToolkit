@@ -83,6 +83,8 @@ private class SshjNetworkHostKeyObserver : SshjHostKeyObserver {
 
                 client.connect(request.host, request.port)
             }
+        } catch (error: CancellationException) {
+            throw error
         } catch (error: Exception) {
             // A rejected host-key verifier is expected to stop the SSH handshake after observation.
         }
