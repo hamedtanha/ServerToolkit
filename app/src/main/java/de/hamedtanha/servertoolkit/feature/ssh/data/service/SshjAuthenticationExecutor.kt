@@ -2,6 +2,7 @@ package de.hamedtanha.servertoolkit.feature.ssh.data.service
 
 import de.hamedtanha.servertoolkit.feature.ssh.domain.model.SshConnectionError
 import javax.inject.Inject
+import kotlinx.coroutines.CancellationException
 
 /**
  * Executes SSHJ authentication against an already-connected and already-verified SSHJ client.
@@ -33,6 +34,8 @@ class SshjAuthenticationExecutor @Inject constructor() {
                         SshjAuthenticationExecutionResult.Authenticated
                     } catch (error: SshjAuthenticationFailedException) {
                         SshjAuthenticationExecutionResult.Failed(SshConnectionError.AuthenticationRequired)
+                    } catch (error: CancellationException) {
+                        throw error
                     } catch (error: Exception) {
                         SshjAuthenticationExecutionResult.Failed(SshConnectionError.Unknown)
                     }

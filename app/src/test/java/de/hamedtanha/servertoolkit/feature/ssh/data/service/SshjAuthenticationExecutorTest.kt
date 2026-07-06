@@ -3,8 +3,10 @@ package de.hamedtanha.servertoolkit.feature.ssh.data.service
 import de.hamedtanha.servertoolkit.feature.ssh.domain.model.SshAuthenticationInput
 import de.hamedtanha.servertoolkit.feature.ssh.domain.model.SshConnectionError
 import de.hamedtanha.servertoolkit.feature.ssh.domain.model.SshConnectionRequest
+import kotlinx.coroutines.CancellationException
 import org.junit.Assert.assertEquals
 import org.junit.Assert.assertTrue
+import org.junit.Assert.fail
 import org.junit.Test
 
 class SshjAuthenticationExecutorTest {
@@ -85,6 +87,27 @@ class SshjAuthenticationExecutorTest {
         val result = executor.authenticate(client, mapping)
 
         assertFailed(SshConnectionError.Unknown, result)
+    }
+
+    @Test
+    fun `preserves password authentication cancellation`() {
+        val client = FakeAuthenticatedClient(
+            authPasswordError = CancellationException("cancelled"),
+        )
+        val mapping = adapter.map(
+            connectionRequest(
+                authenticationInput = SshAuthenticationInput.Password("secret-password"),
+            ),
+        )
+
+        try {
+            executor.authenticate(client, mapping)
+            fail("Expected CancellationException")
+        } catch (error: CancellationException) {
+            assertEquals("cancelled", error.message)
+        }
+
+        assertEquals(1, client.authPasswordCallCount)
     }
 
     @Test
