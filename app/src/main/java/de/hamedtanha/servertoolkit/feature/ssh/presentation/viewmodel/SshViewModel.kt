@@ -120,6 +120,10 @@ class SshViewModel @Inject constructor(
     }
 
     fun onCommandChanged(command: String) {
+        if (isCommandExecutionInProgress) {
+            return
+        }
+
         _uiState.value = _uiState.value.copy(
             commandExecution = _uiState.value.commandExecution.withCommandText(command),
         )

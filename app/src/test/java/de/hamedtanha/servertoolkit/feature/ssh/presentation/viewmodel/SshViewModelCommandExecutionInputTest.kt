@@ -24,6 +24,8 @@ import de.hamedtanha.servertoolkit.feature.ssh.test.FakeSshHostKeyObservationSer
 import de.hamedtanha.servertoolkit.feature.ssh.test.FakeSshHostTrustRepository
 import de.hamedtanha.servertoolkit.feature.ssh.test.sshConnectedResult
 import de.hamedtanha.servertoolkit.navigation.SshDestination
+import kotlinx.coroutines.CompletableDeferred
+import kotlinx.coroutines.launch
 import kotlinx.coroutines.runBlocking
 import org.junit.Assert.assertEquals
 import org.junit.Assert.assertFalse
@@ -52,20 +54,74 @@ class SshViewModelCommandExecutionInputTest {
         assertFalse(viewModel.uiState.value.commandExecution.canExecute)
     }
 
-    private class FakeSshCommandExecutionService : SshCommandExecutionService {
+    @Test
+    fun `ignores command text changes while command execution is running`() = runBlocking {
+        val commandStarted = CompletableDeferred<Unit>()
+        val releaseCommand = CompletableDeferred<Unit>()
+        val commandExecutionService = FakeSshCommandExecutionService(
+            result = SshCommandExecutionResult.Completed(
+                SshCommandExecutionOutput(
+                    stdout = "ok",
+                    stderr = "",
+                    exitStatus = 0,
+                ),
+            ),
+            onExecute = { request ->
+                assertEquals("uptime", request.command)
+                commandStarted.complete(Unit)
+                releaseCommand.await()
+            },
+        )
+        val viewModel = createViewModel(
+            serverId = "server-1",
+            commandExecutionService = commandExecutionService,
+        )
+
+        viewModel.onConnectionResultReceived(sshConnectedResult())
+        viewModel.onCommandChanged("uptime")
+
+        val execution = launch {
+            viewModel.executeCommand()
+        }
+
+        commandStarted.await()
+
+        viewModel.onCommandChanged("whoami")
+
+        assertEquals("uptime", viewModel.uiState.value.commandExecution.command)
+
+        releaseCommand.complete(Unit)
+        execution.join()
+
+        assertEquals(1, commandExecutionService.executeCallCount)
+        assertEquals("uptime", commandExecutionService.lastRequest?.command)
+        assertEquals("uptime", viewModel.uiState.value.commandExecution.command)
+        assertEquals(SshCommandExecutionStatus.Completed, viewModel.uiState.value.commandExecution.status)
+        assertEquals("ok", viewModel.uiState.value.commandExecution.stdout)
+    }
+
+    private class FakeSshCommandExecutionService(
+        private val result: SshCommandExecutionResult = SshCommandExecutionResult.Completed(
+            SshCommandExecutionOutput(
+                stdout = "",
+                stderr = "",
+                exitStatus = 0,
+            ),
+        ),
+        private val onExecute: suspend (SshCommandRequest) -> Unit = {},
+    ) : SshCommandExecutionService {
+
+        var lastRequest: SshCommandRequest? = null
+            private set
 
         var executeCallCount: Int = 0
             private set
 
         override suspend fun execute(request: SshCommandRequest): SshCommandExecutionResult {
             executeCallCount += 1
-            return SshCommandExecutionResult.Completed(
-                SshCommandExecutionOutput(
-                    stdout = "",
-                    stderr = "",
-                    exitStatus = 0,
-                ),
-            )
+            lastRequest = request
+            onExecute(request)
+            return result
         }
     }
 
