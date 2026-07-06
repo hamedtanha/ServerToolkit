@@ -180,6 +180,9 @@ The following application-level items are implemented:
 - SSH ViewModel command execution wiring through an active project-owned session handle.
 - SSH command input and Run command UI controls.
 - SSH command output rendering for stdout, stderr, and exit status.
+- SSH blank command idle-state handling and execution guard.
+- SSH command text edit suppression while command execution is running.
+- SSH command input disabling while command execution is running.
 - SSH command output clearing when the active session becomes unavailable.
 - SSH stale command result suppression after session invalidation.
 - SSH stale command cancellation suppression after session invalidation.
