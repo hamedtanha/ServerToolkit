@@ -14,7 +14,7 @@ class SshUiStateTest {
 
         assertEquals(SshConnectionStatus.NotStarted, uiState.status)
         assertEquals("Not connected", uiState.statusLabel)
-        assertEquals("SSH connectivity is not implemented yet.", uiState.message)
+        assertEquals("Ready to start an SSH connection attempt.", uiState.message)
         assertNull(uiState.hostKeyReview)
         assertFalse(uiState.isHostKeyReviewRequired)
         assertEquals(SshAuthenticationMethod.PASSWORD, uiState.authenticationInput.selectedMethod)
