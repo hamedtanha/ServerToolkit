@@ -29,6 +29,20 @@ The SSH command/channel lifecycle boundary is accepted, and the user-facing non-
 
 ---
 
+## Current SSH Guardrails
+
+The current SSH implementation must continue from the accepted architecture on `main`.
+
+- SSH username ownership belongs to Server Inventory and inventory-backed connection target resolution.
+- SSH authentication input state must not own a separate username value.
+- SSH authentication input state may expose only the selected authentication method and secret presence flags.
+- Persistent credential metadata and persistent secret storage are not implemented.
+- Credential persistence requires a separate reviewed implementation slice with a secure storage boundary.
+- SSH command execution remains non-interactive and must continue to use project-owned session handles.
+- Terminal UI, saved commands, background monitoring, and persistent credentials remain out of scope.
+
+---
+
 ## Implemented
 
 The following application-level items are implemented:
