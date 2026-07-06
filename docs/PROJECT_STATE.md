@@ -15,6 +15,8 @@ It summarizes what is implemented, what is intentionally not implemented yet, an
 
 This document must stay short, current, and factual.
 
+Engineering task selection and delivery rules are defined in [Engineering Strategy](ENGINEERING_STRATEGY.md).
+
 ---
 
 ## Current Phase
