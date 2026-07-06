@@ -15,6 +15,10 @@ data class SshUiState(
     val isHostKeyReviewRequired: Boolean
         get() = hostKeyReview != null
 
+    val canStartConnection: Boolean
+        get() = status != SshConnectionStatus.Connecting &&
+            status != SshConnectionStatus.Connected
+
     val canExecuteCommand: Boolean
         get() = status == SshConnectionStatus.Connected && commandExecution.canExecute
 }
