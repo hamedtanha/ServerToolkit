@@ -4,7 +4,7 @@ const val DEFAULT_SSH_COMMAND_TIMEOUT_MILLIS: Long = 30_000
 const val MAX_SSH_COMMAND_TIMEOUT_MILLIS: Long = 300_000
 
 /**
- * Project-owned request for planning non-interactive SSH command execution.
+ * Project-owned request for non-interactive SSH command execution.
  *
  * The command text must not be logged or persisted casually because users may accidentally include
  * sensitive values in operational commands.
