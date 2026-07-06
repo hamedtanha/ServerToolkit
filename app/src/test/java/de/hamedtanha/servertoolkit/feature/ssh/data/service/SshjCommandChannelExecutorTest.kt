@@ -67,6 +67,56 @@ class SshjCommandChannelExecutorTest {
     }
 
     @Test
+    fun `keeps completed result when cleanup fails after successful completion`() {
+        val channel = FakeCommandChannel(
+            stdoutText = "ok",
+            stderrText = "",
+            exitStatusValue = 0,
+            closeError = IllegalStateException("close failed"),
+        )
+        val executor = SshjNetworkCommandChannelExecutor()
+
+        val result = executor.execute(
+            commandClient = FakeCommandClient(channel = channel),
+            request = commandRequest(),
+        )
+
+        assertEquals(
+            SshCommandExecutionResult.Completed(
+                SshCommandExecutionOutput(
+                    stdout = "ok",
+                    stderr = "",
+                    exitStatus = 0,
+                ),
+            ),
+            result,
+        )
+        assertTrue(channel.closed)
+    }
+
+    @Test
+    fun `keeps timed out result when cleanup fails after timeout`() {
+        val channel = FakeCommandChannel(
+            stdoutText = "partial",
+            stderrText = "",
+            exitStatusValue = null,
+            closeError = IllegalStateException("close failed"),
+        )
+        val executor = SshjNetworkCommandChannelExecutor()
+
+        val result = executor.execute(
+            commandClient = FakeCommandClient(channel = channel),
+            request = commandRequest(),
+        )
+
+        assertEquals(
+            SshCommandExecutionResult.Failed(SshCommandExecutionError.CommandTimedOut),
+            result,
+        )
+        assertTrue(channel.closed)
+    }
+
+    @Test
     fun `returns channel open failure when channel cannot be opened`() {
         val executor = SshjNetworkCommandChannelExecutor()
 
@@ -161,6 +211,7 @@ class SshjCommandChannelExecutorTest {
         stderrText: String = "",
         private val exitStatusValue: Int? = 0,
         private val joinError: Exception? = null,
+        private val closeError: Exception? = null,
     ) : SshjCommandChannel {
 
         override val stdout: InputStream = ByteArrayInputStream(stdoutText.toByteArray())
@@ -183,6 +234,7 @@ class SshjCommandChannelExecutorTest {
 
         override fun close() {
             closed = true
+            closeError?.let { throw it }
         }
     }
 }
