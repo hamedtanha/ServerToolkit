@@ -5,12 +5,12 @@ import de.hamedtanha.servertoolkit.feature.ssh.domain.model.SshAuthenticationMet
 /**
  * UI-safe authentication input state.
  *
- * Secret values are intentionally excluded. The UI state only exposes non-sensitive metadata and
- * presence flags so passwords and passphrases do not appear in StateFlow snapshots, logs, or tests.
+ * Secret values are intentionally excluded. The UI state only exposes authentication method
+ * selection and presence flags so passwords and passphrases do not appear in StateFlow snapshots,
+ * logs, or tests.
  */
 data class SshAuthenticationInputUiState(
     val selectedMethod: SshAuthenticationMethod = SshAuthenticationMethod.PASSWORD,
-    val username: String = "",
     val hasPasswordInput: Boolean = false,
     val hasPrivateKeyPassphraseInput: Boolean = false,
 ) {

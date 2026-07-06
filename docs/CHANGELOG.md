@@ -147,6 +147,7 @@ The project follows Conventional Commits and Semantic Versioning principles.
 ### Changed
 
 - Changed SSH host-key fingerprint generation from MD5 to SHA256 for host-key observation and trusted verification.
+- Removed unused SSH authentication username presentation state because SSH username ownership belongs to inventory-backed connection target resolution.
 - Stabilized SSH command execution UI state when an active SSH session becomes unavailable.
 - Updated the SSH screen from placeholder-only connection UI to include non-interactive command execution controls.
 - Disabled Android backup and data extraction for the alpha release to protect infrastructure inventory metadata.
