@@ -21,6 +21,7 @@ import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.hilt.lifecycle.viewmodel.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
+import de.hamedtanha.servertoolkit.feature.ssh.presentation.state.SshCommandExecutionStatus
 import de.hamedtanha.servertoolkit.feature.ssh.presentation.state.SshCommandExecutionUiState
 import de.hamedtanha.servertoolkit.feature.ssh.presentation.state.SshConnectionStatus
 import de.hamedtanha.servertoolkit.feature.ssh.presentation.state.SshHostKeyReviewUiState
@@ -195,7 +196,7 @@ private fun CommandExecutionContent(
         placeholder = {
             Text(text = "uptime")
         },
-        enabled = isConnected,
+        enabled = isConnected && commandExecution.status != SshCommandExecutionStatus.Running,
         singleLine = true,
         modifier = Modifier.fillMaxWidth(),
     )
