@@ -9,8 +9,8 @@ import javax.inject.Inject
 /**
  * SSHJ-backed command execution planning service.
  *
- * Real command execution remains disabled. This service only verifies that a project-owned session
- * handle resolves to a data-layer owned SSH session before producing a command execution plan.
+ * This service verifies that a project-owned session handle resolves to a data-layer owned SSH
+ * session before execution opens a short-lived command channel.
  */
 class SshjCommandExecutionPlanningService @Inject constructor(
     sessionOwnerRegistry: SshjSessionOwnerRegistry,

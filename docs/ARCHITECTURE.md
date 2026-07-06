@@ -123,6 +123,9 @@ The current implementation includes:
 - SSH command execution presentation state and UI mapper.
 - SSH ViewModel command execution wiring through a private active session handle.
 - SSH command input, Run command control, and output rendering for non-interactive commands.
+- SSH blank command idle-state handling and execution guard.
+- SSH command text edit suppression while command execution is running.
+- SSH command input disabling while command execution is running.
 - SSH ViewModel injection of the connection attempt use case.
 - SSH user-triggered connect event shell and placeholder Connect button.
 - SSH tests for domain models, presentation state, fake results, SSHJ adapter boundaries, host trust, authentication input, session ownership, command planning, and command execution lifecycle boundaries.

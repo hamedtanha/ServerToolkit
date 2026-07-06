@@ -216,6 +216,9 @@ The project follows Conventional Commits and Semantic Versioning principles.
 
 ### Fixed
 
+- Clarified blank SSH command idle-state behavior and prevented blank command execution from reaching session validation.
+- Prevented SSH command text changes while command execution is running.
+- Disabled the SSH command input while command execution is running.
 - Cleared stale SSH command stdout, stderr, and exit status when the active session is invalidated.
 - Ignored stale SSH command results that complete after the active session has changed or become unavailable.
 - Ignored stale SSH command cancellation updates after the active session has changed or become unavailable.

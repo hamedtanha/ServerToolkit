@@ -1,10 +1,10 @@
 package de.hamedtanha.servertoolkit.feature.ssh.domain.model
 
 /**
- * Result of planning SSH command execution.
+ * Result of validating whether a non-interactive SSH command can be executed.
  *
- * This is intentionally a planning result. Real command execution remains disabled until the command
- * channel lifecycle implementation is introduced and tested.
+ * Planning remains separate from execution so session-handle validation and failure mapping stay
+ * project-owned instead of leaking SSHJ objects outside the data layer.
  */
 sealed interface SshCommandExecutionPlanningResult {
 
