@@ -177,7 +177,7 @@ In progress:
 
 Planned:
 
-- Full SSH host key verification hardening beyond the current trusted verifier shell.
+- Additional SSH host key verification hardening, if future runtime testing identifies gaps.
 - Persistent credential storage only after reviewed secure storage implementation.
 - Connection history only after a separate reviewed design.
 
