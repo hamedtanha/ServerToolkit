@@ -62,23 +62,8 @@ private class SshjNetworkHostKeyObserver(
                 client.connectTimeout = SSHJ_HOST_KEY_OBSERVATION_TIMEOUT_MILLIS
                 client.timeout = SSHJ_HOST_KEY_OBSERVATION_TIMEOUT_MILLIS
                 client.addHostKeyVerifier(
-                    object : HostKeyVerifier {
-
-                        override fun verify(
-                            hostname: String,
-                            port: Int,
-                            key: PublicKey,
-                        ): Boolean {
-                            observedHostKey = key
-                            return true
-                        }
-
-                        override fun findExistingAlgorithms(
-                            hostname: String,
-                            port: Int,
-                        ): MutableList<String> {
-                            return mutableListOf()
-                        }
+                    SshjHostKeyCapturingVerifier { key ->
+                        observedHostKey = key
                     },
                 )
 
@@ -91,6 +76,34 @@ private class SshjNetworkHostKeyObserver(
         }
 
         return observedHostKey
+    }
+}
+
+/**
+ * Captures the server host key during the SSH transport handshake.
+ *
+ * This verifier is intentionally limited to the host-key observation phase. Returning true here is
+ * not a trust decision and must not be reused for authenticated SSH connections. Real SSH sessions
+ * must use SshjTrustedHostKeyVerifierFactory with a previously accepted trusted host key.
+ */
+private class SshjHostKeyCapturingVerifier(
+    private val onHostKeyObserved: (PublicKey) -> Unit,
+) : HostKeyVerifier {
+
+    override fun verify(
+        hostname: String,
+        port: Int,
+        key: PublicKey,
+    ): Boolean {
+        onHostKeyObserved(key)
+        return true
+    }
+
+    override fun findExistingAlgorithms(
+        hostname: String,
+        port: Int,
+    ): MutableList<String> {
+        return mutableListOf()
     }
 }
 
