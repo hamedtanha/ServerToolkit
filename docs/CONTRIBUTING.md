@@ -1,9 +1,9 @@
 # Contributing Guide
 
-**Project:** Server Toolkit  
-**Version:** 0.1.0  
-**Status:** Frozen  
-**Last Updated:** 2026-07-02
+**Project:** Server Toolkit
+**Document Baseline:** 0.1.0
+**Status:** Foundational
+**Last Updated:** 2026-07-07
 
 ---
 

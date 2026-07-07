@@ -1,9 +1,9 @@
 # Development Process
 
-**Project:** Server Toolkit  
-**Version:** 0.2.0-alpha  
-**Status:** Frozen  
-**Last Updated:** 2026-07-03
+**Project:** Server Toolkit
+**Document Baseline:** 0.2.0-alpha
+**Status:** Foundational
+**Last Updated:** 2026-07-07
 
 ---
 

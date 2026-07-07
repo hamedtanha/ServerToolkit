@@ -10,6 +10,7 @@ The project follows Conventional Commits and Semantic Versioning principles.
 
 ### Added
 
+- Added documentation governance rules for version metadata, source-of-truth ordering, changelog usage, and ADR documentation boundaries.
 - Added ADR-012 for Android backup and data extraction policy.
 - Added Hilt-enabled application setup.
 - Added Dashboard ViewModel.
