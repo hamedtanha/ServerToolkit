@@ -3,7 +3,7 @@
 **Project:** Server Toolkit  
 **Version:** 0.4.0-alpha  
 **Status:** Active Implementation  
-**Last Updated:** 2026-07-06
+**Last Updated:** 2026-07-07
 
 ---
 
@@ -25,7 +25,7 @@ The Server Inventory 0.3.0 baseline is accepted.
 
 ADR-009 is accepted as the SSH host trust and authentication input strategy.
 
-Android backup and data extraction are disabled for the alpha release to avoid backing up infrastructure inventory or future SSH trust material before a reviewed restore model exists.
+ADR-012 is accepted as the Android backup and data extraction policy. Android backup, cloud backup, and device transfer remain disabled for the alpha release to avoid backing up infrastructure inventory, trusted host keys, or future credential-related data before a reviewed restore model exists.
 
 The SSH command/channel lifecycle boundary is accepted, and the user-facing non-interactive SSH command execution workflow is now implemented behind owned SSH sessions. The SSH screen supports ephemeral password input for a single connection attempt while keeping terminal UI, saved command workflows, background monitoring, and persistent credentials out of scope.
 
@@ -168,6 +168,7 @@ The following application-level items are implemented:
 - SSHJ session ownership execution shell.
 - SSH command channel execution strategy decision.
 - SSH credential ownership and secure storage strategy decision.
+- Android backup and data extraction policy decision.
 - SSH command execution planning boundary.
 - SSH command execution result model.
 - SSHJ command channel planning shell.
