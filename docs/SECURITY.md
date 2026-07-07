@@ -1,9 +1,9 @@
 # Security Policy
 
-**Project:** Server Toolkit  
-**Version:** 0.1.0  
-**Status:** Frozen  
-**Last Updated:** 2026-07-02
+**Project:** Server Toolkit
+**Version:** 0.4.0-alpha
+**Status:** Foundational
+**Last Updated:** 2026-07-07
 
 ---
 
@@ -74,6 +74,25 @@ Credential storage architecture must be documented in an ADR before implementati
 SSH credential ownership is separate from server inventory. Passwords, private keys, private key passphrases, access tokens, certificates, and complete credential-bearing connection strings must not be stored in the server inventory Room table.
 
 Persistent credential storage requires a separate reviewed implementation with a secure storage abstraction before any secret material is saved.
+
+---
+
+# Android Backup and Data Extraction Policy
+
+Android backup and data extraction are disabled for the alpha release.
+
+Current policy:
+
+- Android backup is disabled through the application manifest.
+- Cloud backup is excluded for all app-managed data.
+- Device transfer is excluded for all app-managed data.
+- Infrastructure inventory metadata must not be automatically backed up.
+- Trusted SSH host key material must not be automatically backed up.
+- Future credential metadata and secret material must not be added to automatic backup.
+
+This policy protects server inventory metadata, trusted host keys, and future credential-related data from unreviewed backup, restore, transfer, or synchronization behavior.
+
+Backup, restore, device transfer, encrypted export, or synchronization support requires a separate reviewed ADR before implementation.
 
 ---
 
@@ -180,7 +199,6 @@ The following features are planned candidates and are not guaranteed to exist un
 
 - Biometric authentication
 - Certificate pinning
-- Android backup is disabled for the alpha release until a reviewed restore model exists.
 - Secure backup
 - Encrypted export
 - Automatic session lock
@@ -222,3 +240,4 @@ Changes are allowed only when:
 - RELEASES.md
 - CHANGELOG.md
 - PROJECT_STATE.md
+- adr/ADR-012-android-backup-and-data-extraction-policy.md

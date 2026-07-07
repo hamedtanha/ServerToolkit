@@ -6,7 +6,7 @@
 
 **Status:** Active
 
-**Last Updated:** 2026-07-05
+**Last Updated:** 2026-07-07
 
 ---
 
@@ -31,6 +31,7 @@ This directory contains all Architecture Decision Records for the Server Toolkit
 | ADR-009 | SSH Host Trust and Authentication Input Strategy | Accepted |
 | ADR-010 | SSH Command Channel Execution Strategy | Accepted |
 | ADR-011 | SSH Credential Ownership and Secure Storage Strategy | Accepted |
+| ADR-012 | Android Backup and Data Extraction Policy | Accepted |
 
 ---
 

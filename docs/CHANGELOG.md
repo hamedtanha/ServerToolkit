@@ -10,6 +10,7 @@ The project follows Conventional Commits and Semantic Versioning principles.
 
 ### Added
 
+- Added ADR-012 for Android backup and data extraction policy.
 - Added Hilt-enabled application setup.
 - Added Dashboard ViewModel.
 - Added Dashboard UI state.
