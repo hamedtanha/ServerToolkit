@@ -1,8 +1,8 @@
 # Project State
 
-**Project:** Server Toolkit  
-**Version:** 0.4.0-alpha  
-**Status:** Active Implementation  
+**Project:** Server Toolkit
+**Version:** 0.4.0-alpha
+**Status:** Active Implementation
 **Last Updated:** 2026-07-07
 
 ---
@@ -169,6 +169,7 @@ The following application-level items are implemented:
 - SSH command channel execution strategy decision.
 - SSH credential ownership and secure storage strategy decision.
 - Android backup and data extraction policy decision.
+- Documentation governance rules for source-of-truth ordering, version metadata, changelog usage, and ADR documentation boundaries.
 - SSH command execution planning boundary.
 - SSH command execution result model.
 - SSHJ command channel planning shell.
