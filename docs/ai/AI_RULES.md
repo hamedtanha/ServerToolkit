@@ -47,6 +47,18 @@ Code examples must remain aligned with the existing project architecture and sho
 
 ---
 
+## Repository Source of Truth
+
+The current files in the Git repository are the authoritative source of truth.
+
+When repository documentation conflicts with previous chat context, uploaded documentation snapshots, assistant memory, or earlier recommendations, the repository documentation takes precedence.
+
+Before making architecture, implementation, or documentation recommendations, AI assistants should inspect the relevant current repository files whenever possible.
+
+Do not rely on stale project documentation, previous conversation summaries, or uploaded snapshots when current repository files are available.
+
+If the current repository state is unknown, ask the maintainer to provide the relevant files or command output before making project-changing recommendations.
+
 ## Architecture
 
 Preserve the existing architecture unless there is a clear technical reason to change it.
