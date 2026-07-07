@@ -115,6 +115,25 @@ This model must stay synchronized with `ROADMAP.md`.
 
 ---
 
+## Android Application Version Metadata
+
+Android application version metadata is defined in `app/build.gradle.kts`.
+
+Rules:
+
+- `versionName` must match the current project milestone version without the leading `v`.
+- `versionName` may include a pre-release suffix during alpha development.
+- `versionCode` is the Android monotonic install and upgrade ordering value.
+- `versionCode` must not be derived mechanically from the project milestone number.
+- `versionCode` should be incremented only when preparing a distributed Android artifact that must upgrade over a previous installed artifact.
+
+Current alpha metadata:
+
+- `versionName`: `0.4.0-alpha`
+- `versionCode`: `1`
+
+---
+
 ## Release Workflow
 
 Every release follows this process:
