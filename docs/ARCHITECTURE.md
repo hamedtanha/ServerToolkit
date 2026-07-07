@@ -131,11 +131,11 @@ The current implementation includes:
 - SSH ViewModel injection of the connection attempt use case.
 - SSH user-triggered connect event shell and Connect button with ephemeral password input.
 - SSH tests for domain models, presentation state, fake results, SSHJ adapter boundaries, host trust, authentication input, session ownership, command planning, and command execution lifecycle boundaries.
+- SSH host key observation verifier clarity hardening.
 
 The following items are intentionally not implemented yet:
 
 - Interactive terminal workflow for owned sessions.
-- Full SSH host key verification hardening beyond the current trusted verifier shell.
 - Persistent credential storage.
 - Monitoring workflow.
 - Saved command workflow.

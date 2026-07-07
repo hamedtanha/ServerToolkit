@@ -227,7 +227,7 @@ The following application-level items are implemented:
 The following items are intentionally not implemented yet:
 
 - Interactive terminal workflow for owned sessions.
-- Full SSH host key verification hardening beyond the current trusted verifier shell.
+- Additional SSH host key verification hardening, if future runtime testing identifies gaps.
 - Persistent credential storage implementation.
 - Monitoring workflow.
 - Saved command workflow.
