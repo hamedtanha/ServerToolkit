@@ -131,3 +131,18 @@ The initial application skeleton validates the architectural baseline before fea
 The skeleton intentionally contains only the minimum executable structure required to support future development.
 
 Feature-specific architecture decisions should be documented only when implementation requires them.
+
+# Lesson 011
+
+The current Git repository state is the authoritative project context.
+
+Previous chat context, uploaded documentation snapshots, assistant memory, and earlier recommendations may become stale because the documentation is living and changes over time.
+
+When making architecture, implementation, or documentation decisions, always prefer the current repository files over older context.
+
+If there is a conflict, the repository wins.
+
+Reason
+
+Server Toolkit documentation evolves continuously. Decisions based on stale documentation can duplicate ADRs, corrupt documentation indexes, or recommend obsolete implementation paths.
+
