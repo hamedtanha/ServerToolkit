@@ -170,6 +170,7 @@ The following application-level items are implemented:
 - SSH credential ownership and secure storage strategy decision.
 - Android backup and data extraction policy decision.
 - Documentation governance rules for source-of-truth ordering, version metadata, changelog usage, and ADR documentation boundaries.
+- Android application version metadata synchronized with the current project milestone.
 - SSH command execution planning boundary.
 - SSH command execution result model.
 - SSHJ command channel planning shell.

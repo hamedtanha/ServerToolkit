@@ -150,6 +150,7 @@ The project follows Conventional Commits and Semantic Versioning principles.
 
 ### Changed
 
+- Synchronized Android application `versionName` with the current project milestone.
 - Changed SSH host-key fingerprint generation from MD5 to SHA256 for host-key observation and trusted verification.
 - Removed unused SSH authentication username presentation state because SSH username ownership belongs to inventory-backed connection target resolution.
 - Stabilized SSH command execution UI state when an active SSH session becomes unavailable.
