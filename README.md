@@ -12,9 +12,9 @@ The application is designed for system administrators, DevOps engineers, and inf
 - Server inventory.
 - Local Room-backed server persistence.
 - Server search and filtering.
-- SSH connection planning and security boundaries.
-- SSH command execution planning boundary.
-- Headless SSH command/channel lifecycle execution boundary.
+- SSH host-key trust review and Room-backed trusted-host persistence.
+- Ephemeral password-based SSH connections.
+- Project-owned SSH session management.
 - User-facing non-interactive SSH command execution workflow.
 - SSH command output display for stdout, stderr, and exit status.
 

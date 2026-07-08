@@ -3,7 +3,7 @@
 **Project:** Server Toolkit  
 **Version:** 0.4.0-alpha
 **Status:** Active  
-**Last Updated:** 2026-07-05
+**Last Updated:** 2026-07-08
 
 ---
 
@@ -55,6 +55,8 @@ The current architecture is governed by the following ADRs:
 | ADR-008 | SSH Client Library Selection | Accepted |
 | ADR-009 | SSH Host Trust and Authentication Input Strategy | Accepted |
 | ADR-010 | SSH Command Channel Execution Strategy | Accepted |
+| ADR-011 | SSH Credential Ownership and Secure Storage Strategy | Accepted |
+| ADR-012 | Android Backup and Data Extraction Policy | Accepted |
 
 Accepted ADRs are the source of truth for architectural decisions. This document explains how those decisions are applied in the codebase.
 
@@ -108,6 +110,7 @@ The current implementation includes:
 - SSHJ trusted host-key verifier boundary.
 - SSHJ trusted connection execution shell.
 - SSHJ password authentication execution shell.
+- Real ephemeral password-based SSH connection workflow.
 - SSHJ session ownership execution shell.
 - SSH project-owned session handle model.
 - SSH session lifecycle service contract.
@@ -125,6 +128,7 @@ The current implementation includes:
 - SSH command execution presentation state and UI mapper.
 - SSH ViewModel command execution wiring through a private active session handle.
 - SSH command input, Run command control, and output rendering for non-interactive commands.
+- Android backup, cloud backup, and device transfer disabled for the alpha release.
 - SSH blank command idle-state handling and execution guard.
 - SSH command text edit suppression while command execution is running.
 - SSH command input disabling while command execution is running.

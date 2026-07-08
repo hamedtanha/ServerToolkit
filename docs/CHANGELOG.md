@@ -150,6 +150,7 @@ The project follows Conventional Commits and Semantic Versioning principles.
 
 ### Changed
 
+- Synchronized architecture and README documentation with the accepted SSH credential ownership, Android backup policy, host trust persistence, and ephemeral password SSH connection status.
 - Synchronized Android application `versionName` with the current project milestone.
 - Changed SSH host-key fingerprint generation from MD5 to SHA256 for host-key observation and trusted verification.
 - Removed unused SSH authentication username presentation state because SSH username ownership belongs to inventory-backed connection target resolution.
@@ -241,12 +242,14 @@ The project follows Conventional Commits and Semantic Versioning principles.
 
 The following items are intentionally not implemented yet:
 
-- Real SSH connection behavior beyond the currently implemented connection and command execution boundaries.
 - Interactive terminal workflow.
 - Saved command history.
-- Persistent sensitive connection storage.
+- Persistent sensitive credential storage.
+- Private-key authentication.
 - Monitoring workflow.
-- Migration tests.
+- Xray or x-ui management workflow.
+- Room migrations beyond database version 2.
+- Migration tests beyond the trusted-host v1-to-v2 migration.
 
 ---
 
