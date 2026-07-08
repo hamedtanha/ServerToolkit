@@ -8,8 +8,6 @@ import java.io.IOException
 import java.net.SocketTimeoutException
 import java.net.UnknownHostException
 import java.util.UUID
-import net.schmizz.sshj.SSHClient
-import net.schmizz.sshj.userauth.UserAuthException
 
 /**
  * Opens an SSHJ transport connection only with a trusted host-key verifier installed.
@@ -42,7 +40,8 @@ internal class SshjNetworkTrustedConnectionExecutor(
     private val trustedHostKeyVerifierFactory: SshjTrustedHostKeyVerifierFactory,
     private val authenticationExecutor: SshjAuthenticationExecutor,
     private val commandChannelExecutor: SshjCommandChannelExecutor = SshjNetworkCommandChannelExecutor(),
-    private val clientFactory: SshjClientFactory = SshjClientFactory(),
+    private val clientFactory: SshjTrustedConnectionClientFactory =
+        SshjDefaultTrustedConnectionClientFactory(),
 ) : SshjTrustedConnectionExecutor {
 
     override fun connectAndAuthenticate(
@@ -63,7 +62,7 @@ internal class SshjNetworkTrustedConnectionExecutor(
 
             when (
                 val result = authenticationExecutor.authenticate(
-                    client = SshjAuthenticatedClientAdapter(client),
+                    client = client,
                     mapping = authenticationMapping,
                 )
             ) {
@@ -75,7 +74,7 @@ internal class SshjNetworkTrustedConnectionExecutor(
                         },
                         commandExecutionAction = { commandRequest ->
                             commandChannelExecutor.execute(
-                                commandClient = SshjCommandChannelClientAdapter(client),
+                                commandClient = client.asCommandChannelClient(),
                                 request = commandRequest,
                             )
                         },
@@ -103,23 +102,6 @@ internal class SshjNetworkTrustedConnectionExecutor(
         }
     }
 }
-
-private class SshjAuthenticatedClientAdapter(
-    private val client: SSHClient,
-) : SshjAuthenticatedClient {
-
-    override fun authPassword(
-        username: String,
-        password: String,
-    ) {
-        try {
-            client.authPassword(username, password)
-        } catch (error: UserAuthException) {
-            throw SshjAuthenticationFailedException(error)
-        }
-    }
-}
-
 private fun SshConnectionRequest.toSessionHandle(): SshSessionHandle {
     return SshSessionHandle(
         sessionId = UUID.randomUUID().toString(),
