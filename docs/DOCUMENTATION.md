@@ -221,7 +221,8 @@ Before committing documentation changes, verify:
 
 - README.md
 - PROJECT_STATE.md
-- state/
+- state/SERVER_INVENTORY_STATUS.md
+- state/SSH_STATUS.md
 - ROADMAP.md
 - CHANGELOG.md
 - ARCHITECTURE.md

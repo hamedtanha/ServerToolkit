@@ -57,6 +57,10 @@ v0.4.0-alpha (Development)
 
 Project documentation can be found inside the **docs** directory.
 
+- PROJECT_STATE.md
+- DOCUMENTATION.md
+- state/SERVER_INVENTORY_STATUS.md
+- state/SSH_STATUS.md
 - DEVELOPMENT.md
 - ARCHITECTURE.md
 - ROADMAP.md
