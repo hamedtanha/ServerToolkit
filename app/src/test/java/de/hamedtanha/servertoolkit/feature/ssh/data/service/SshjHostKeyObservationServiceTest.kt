@@ -3,6 +3,7 @@ package de.hamedtanha.servertoolkit.feature.ssh.data.service
 import de.hamedtanha.servertoolkit.feature.ssh.domain.model.SshConnectionRequest
 import de.hamedtanha.servertoolkit.feature.ssh.domain.model.SshHostKeyObservationResult
 import java.security.KeyPairGenerator
+import kotlinx.coroutines.CancellationException
 import kotlinx.coroutines.runBlocking
 import org.junit.Assert.assertEquals
 import org.junit.Assert.assertTrue
@@ -53,6 +54,22 @@ class SshjHostKeyObservationServiceTest {
         val result = service.observeHostKey(connectionRequest())
 
         assertEquals(SshHostKeyObservationResult.Unavailable, result)
+    }
+
+    @Test
+    fun `preserves cancellation when sshj host key observer is cancelled`() = runBlocking {
+        val service = SshjHostKeyObservationService(
+            hostKeyObserver = SshjHostKeyObserver {
+                throw CancellationException("Observation cancelled")
+            },
+        )
+
+        try {
+            service.observeHostKey(connectionRequest())
+            throw AssertionError("Expected CancellationException to be thrown.")
+        } catch (error: CancellationException) {
+            assertEquals("Observation cancelled", error.message)
+        }
     }
 
     private fun connectionRequest(): SshConnectionRequest {

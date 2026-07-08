@@ -16,8 +16,9 @@ import kotlinx.coroutines.withContext
  *
  * This service opens an SSHJ transport connection only after a trusted host key has been resolved,
  * executes password authentication inside that trusted boundary, and registers the authenticated
- * SSHJ client in the data-layer session owner registry. Command execution and terminal interaction
- * remain disabled.
+ * SSHJ client in the data-layer session owner registry. Command execution remains
+ * non-interactive and is routed through project-owned session handles. Terminal interaction remains
+ * out of scope.
  */
 class SshjConnectionService @Inject constructor(
     private val authenticationAdapter: SshjAuthenticationAdapter,
