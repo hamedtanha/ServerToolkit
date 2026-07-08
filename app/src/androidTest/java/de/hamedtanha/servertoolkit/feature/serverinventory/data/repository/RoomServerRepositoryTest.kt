@@ -5,6 +5,7 @@ import androidx.test.ext.junit.runners.AndroidJUnit4
 import androidx.test.platform.app.InstrumentationRegistry
 import de.hamedtanha.servertoolkit.core.database.ServerToolkitDatabase
 import de.hamedtanha.servertoolkit.feature.serverinventory.domain.model.Server
+import de.hamedtanha.servertoolkit.feature.ssh.data.local.entity.SshTrustedHostKeyEntity
 import de.hamedtanha.servertoolkit.feature.serverinventory.domain.model.ServerEnvironment
 import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.runBlocking
@@ -74,6 +75,33 @@ class RoomServerRepositoryTest {
 
         assertNull(repository.getServerById("server-1"))
         assertTrue(repository.observeServers().first().isEmpty())
+    }
+
+    @Test
+    fun deleteServer_whenServerHasTrustedHostKey_cascadesTrustedHostKey() = runBlocking {
+        val server = testServer(id = "server-1", name = "Production Alpha")
+
+        repository.saveServer(server)
+        database.sshTrustedHostKeyDao().insertTrustedHostKey(
+            SshTrustedHostKeyEntity(
+                serverId = "server-1",
+                host = "alpha.example.com",
+                port = 22,
+                fingerprintAlgorithm = "SHA256",
+                fingerprintValue = "abc123",
+            ),
+        )
+
+        repository.deleteServer("server-1")
+
+        assertNull(repository.getServerById("server-1"))
+        assertNull(
+            database.sshTrustedHostKeyDao().getTrustedHostKey(
+                serverId = "server-1",
+                host = "alpha.example.com",
+                port = 22,
+            ),
+        )
     }
 
     private fun testServer(

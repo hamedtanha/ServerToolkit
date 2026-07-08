@@ -37,6 +37,12 @@ android {
     buildFeatures {
         compose = true
     }
+
+    sourceSets {
+        getByName("androidTest") {
+            assets.srcDir("$projectDir/schemas")
+        }
+    }
 }
 
 ksp {
@@ -46,6 +52,7 @@ ksp {
 
 dependencies {
     implementation(platform(libs.androidx.compose.bom))
+    implementation(platform(libs.kotlinx.serialization.bom))
     implementation(libs.androidx.activity.compose)
     implementation(libs.androidx.compose.material3)
     implementation(libs.androidx.compose.ui)
@@ -57,6 +64,7 @@ dependencies {
     implementation(libs.androidx.hilt.navigation.compose)
     implementation(libs.androidx.room.runtime)
     implementation(libs.androidx.room.ktx)
+    implementation(libs.kotlinx.serialization.core)
     implementation(libs.hilt.android)
     implementation(libs.sshj)
     implementation(libs.bouncycastle.bcprov)
@@ -64,10 +72,12 @@ dependencies {
     ksp(libs.hilt.compiler)
     testImplementation(libs.junit)
     androidTestImplementation(platform(libs.androidx.compose.bom))
+    androidTestImplementation(platform(libs.kotlinx.serialization.bom))
     androidTestImplementation(libs.androidx.compose.ui.test.junit4)
     androidTestImplementation(libs.androidx.espresso.core)
     androidTestImplementation(libs.androidx.junit)
     androidTestImplementation(libs.androidx.room.testing)
+    androidTestImplementation(libs.kotlinx.serialization.json)
     debugImplementation(libs.androidx.compose.ui.test.manifest)
     debugImplementation(libs.androidx.compose.ui.tooling)
 }

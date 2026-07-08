@@ -5,6 +5,7 @@ import androidx.room.Room
 import androidx.test.ext.junit.runners.AndroidJUnit4
 import androidx.test.platform.app.InstrumentationRegistry
 import de.hamedtanha.servertoolkit.core.database.ServerToolkitDatabase
+import de.hamedtanha.servertoolkit.feature.serverinventory.data.local.entity.ServerEntity
 import de.hamedtanha.servertoolkit.feature.ssh.domain.model.SshHostEndpoint
 import de.hamedtanha.servertoolkit.feature.ssh.domain.model.SshHostKeyFingerprint
 import de.hamedtanha.servertoolkit.feature.ssh.domain.model.SshTrustedHostKey
@@ -31,6 +32,10 @@ class RoomSshHostTrustRepositoryTest {
             ServerToolkitDatabase::class.java,
         ).build()
         repository = RoomSshHostTrustRepository(database.sshTrustedHostKeyDao())
+
+        runBlocking {
+            database.serverDao().upsertServer(testServerEntity())
+        }
     }
 
     @After
@@ -76,6 +81,21 @@ class RoomSshHostTrustRepositoryTest {
         repository.removeTrustedHostKey(endpoint())
 
         assertNull(repository.getTrustedHostKey(endpoint()))
+    }
+
+    private fun testServerEntity(): ServerEntity {
+        return ServerEntity(
+            id = "server-1",
+            name = "Production",
+            host = "example.com",
+            sshPort = 22,
+            sshUsername = "admin",
+            environment = "PRODUCTION",
+            category = "Linux",
+            tags = "production",
+            isFavorite = true,
+            description = "Primary server",
+        )
     }
 
     private fun endpoint(): SshHostEndpoint {

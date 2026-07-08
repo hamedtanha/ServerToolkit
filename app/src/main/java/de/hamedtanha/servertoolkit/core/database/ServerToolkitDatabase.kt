@@ -12,7 +12,7 @@ import de.hamedtanha.servertoolkit.feature.ssh.data.local.entity.SshTrustedHostK
         ServerEntity::class,
         SshTrustedHostKeyEntity::class,
     ],
-    version = 2,
+    version = 3,
     exportSchema = true,
 )
 abstract class ServerToolkitDatabase : RoomDatabase() {

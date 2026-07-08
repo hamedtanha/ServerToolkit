@@ -8,6 +8,7 @@ import dagger.hilt.InstallIn
 import dagger.hilt.android.qualifiers.ApplicationContext
 import dagger.hilt.components.SingletonComponent
 import de.hamedtanha.servertoolkit.core.database.MIGRATION_1_2
+import de.hamedtanha.servertoolkit.core.database.MIGRATION_2_3
 import de.hamedtanha.servertoolkit.core.database.ServerToolkitDatabase
 import javax.inject.Singleton
 
@@ -25,7 +26,7 @@ object DatabaseModule {
             ServerToolkitDatabase::class.java,
             DATABASE_NAME,
         )
-            .addMigrations(MIGRATION_1_2)
+            .addMigrations(MIGRATION_1_2, MIGRATION_2_3)
             .build()
     }
 

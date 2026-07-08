@@ -5,6 +5,7 @@ import androidx.room.Room
 import androidx.test.ext.junit.runners.AndroidJUnit4
 import androidx.test.platform.app.InstrumentationRegistry
 import de.hamedtanha.servertoolkit.core.database.ServerToolkitDatabase
+import de.hamedtanha.servertoolkit.feature.serverinventory.data.local.entity.ServerEntity
 import de.hamedtanha.servertoolkit.feature.ssh.data.local.entity.SshTrustedHostKeyEntity
 import kotlinx.coroutines.runBlocking
 import org.junit.After
@@ -29,6 +30,10 @@ class SshTrustedHostKeyDaoTest {
             ServerToolkitDatabase::class.java,
         ).build()
         trustedHostKeyDao = database.sshTrustedHostKeyDao()
+
+        runBlocking {
+            database.serverDao().upsertServer(testServerEntity())
+        }
     }
 
     @After
@@ -91,6 +96,21 @@ class SshTrustedHostKeyDaoTest {
                 host = "example.com",
                 port = 22,
             ),
+        )
+    }
+
+    private fun testServerEntity(): ServerEntity {
+        return ServerEntity(
+            id = "server-1",
+            name = "Production",
+            host = "example.com",
+            sshPort = 22,
+            sshUsername = "admin",
+            environment = "PRODUCTION",
+            category = "Linux",
+            tags = "production",
+            isFavorite = true,
+            description = "Primary server",
         )
     }
 
