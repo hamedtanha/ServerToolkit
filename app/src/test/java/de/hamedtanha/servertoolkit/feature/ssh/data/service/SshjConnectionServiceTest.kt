@@ -10,6 +10,7 @@ import de.hamedtanha.servertoolkit.feature.ssh.domain.model.SshSessionCloseResul
 import de.hamedtanha.servertoolkit.feature.ssh.domain.model.SshSessionHandle
 import de.hamedtanha.servertoolkit.feature.ssh.domain.model.SshTrustedHostKey
 import de.hamedtanha.servertoolkit.feature.ssh.test.FakeSshHostTrustRepository
+import kotlinx.coroutines.CancellationException
 import kotlinx.coroutines.runBlocking
 import org.junit.Assert.assertEquals
 import org.junit.Assert.assertFalse
@@ -141,6 +142,51 @@ class SshjConnectionServiceTest {
         assertEquals("", authenticationInput.password)
     }
 
+    @Test
+    fun `maps unexpected trusted executor exception to unknown and clears authentication input`() = runBlocking {
+        val authenticationInput = SshAuthenticationInput.Password("secret-password")
+        val service = sshjConnectionService(
+            hostTrustRepository = FakeSshHostTrustRepository(trustedHostKey()),
+            trustedConnectionExecutor = FakeTrustedConnectionExecutor(
+                error = IllegalStateException("unexpected executor failure"),
+            ),
+        )
+
+        val result = service.connect(
+            connectionRequest(authenticationInput = authenticationInput),
+        )
+
+        assertEquals(
+            SshConnectionResult.Failed(SshConnectionError.Unknown),
+            result,
+        )
+        assertFalse(authenticationInput.hasSensitiveValue)
+        assertEquals("", authenticationInput.password)
+    }
+
+    @Test
+    fun `preserves trusted executor cancellation and clears authentication input`() = runBlocking {
+        val authenticationInput = SshAuthenticationInput.Password("secret-password")
+        val service = sshjConnectionService(
+            hostTrustRepository = FakeSshHostTrustRepository(trustedHostKey()),
+            trustedConnectionExecutor = FakeTrustedConnectionExecutor(
+                error = CancellationException("cancelled connection"),
+            ),
+        )
+
+        try {
+            service.connect(
+                connectionRequest(authenticationInput = authenticationInput),
+            )
+            throw AssertionError("Expected CancellationException to be thrown.")
+        } catch (error: CancellationException) {
+            assertEquals("cancelled connection", error.message)
+        }
+
+        assertFalse(authenticationInput.hasSensitiveValue)
+        assertEquals("", authenticationInput.password)
+    }
+
     private fun sshjConnectionService(
         hostTrustRepository: FakeSshHostTrustRepository = FakeSshHostTrustRepository(),
         trustedConnectionExecutor: SshjTrustedConnectionExecutor = FakeTrustedConnectionExecutor(),
@@ -194,6 +240,7 @@ class SshjConnectionServiceTest {
 
     private class FakeTrustedConnectionExecutor(
         private val result: SshjTrustedConnectionExecutionResult? = null,
+        private val error: RuntimeException? = null,
         val ownerHandle: SshSessionHandle = SshSessionHandle(
             sessionId = "session-1",
             serverId = "server-1",
@@ -227,6 +274,8 @@ class SshjConnectionServiceTest {
             lastRequest = request
             lastTrustedHostKey = trustedHostKey
             lastAuthenticationMapping = authenticationMapping
+
+            error?.let { throw it }
 
             return result ?: SshjTrustedConnectionExecutionResult.Connected(
                 SshjSessionOwner(
