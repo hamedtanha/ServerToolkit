@@ -150,6 +150,7 @@ The project follows Conventional Commits and Semantic Versioning principles.
 
 ### Changed
 
+- Split detailed project state into focused current-state documents for Server Inventory and SSH while keeping `PROJECT_STATE.md` as the source-of-truth entry point.
 - Synchronized architecture and README documentation with the accepted SSH credential ownership, Android backup policy, host trust persistence, and ephemeral password SSH connection status.
 - Synchronized Android application `versionName` with the current project milestone.
 - Changed SSH host-key fingerprint generation from MD5 to SHA256 for host-key observation and trusted verification.

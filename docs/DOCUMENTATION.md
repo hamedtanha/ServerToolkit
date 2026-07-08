@@ -2,7 +2,7 @@
 
 **Project:** Server Toolkit
 **Status:** Active
-**Last Updated:** 2026-07-07
+**Last Updated:** 2026-07-08
 
 ---
 
@@ -33,16 +33,19 @@ Documentation must follow these principles:
 
 ## Source of Truth
 
-`PROJECT_STATE.md` is the source of truth for the current implementation state.
+`PROJECT_STATE.md` is the primary source-of-truth entry point for the current implementation state.
+
+Detailed feature state may be maintained in focused documents under `docs/state/`.
 
 When documentation conflicts exist, resolve them in this order:
 
 1. `PROJECT_STATE.md`
-2. Accepted ADRs
-3. `ROADMAP.md`
-4. `CHANGELOG.md`
-5. Feature-specific documents
-6. `README.md`
+2. Focused current-state documents under `docs/state/`
+3. Accepted ADRs
+4. `ROADMAP.md`
+5. `CHANGELOG.md`
+6. Feature-specific documents
+7. `README.md`
 
 `README.md` should summarize the current public-facing state. It must not replace detailed project documentation.
 
@@ -181,6 +184,7 @@ When a document changes, check related documents for consistency.
 At minimum:
 
 - Current implementation changes should update `PROJECT_STATE.md`.
+- Detailed feature-state changes should update the relevant documents under `docs/state/`.
 - Notable changes should update `CHANGELOG.md`.
 - Roadmap changes should update `ROADMAP.md`.
 - Architecture decisions should update ADR files and `docs/adr/README.md`.
@@ -217,6 +221,7 @@ Before committing documentation changes, verify:
 
 - README.md
 - PROJECT_STATE.md
+- state/
 - ROADMAP.md
 - CHANGELOG.md
 - ARCHITECTURE.md
