@@ -47,6 +47,8 @@ class SshViewModel @Inject constructor(
 
     private var isCommandExecutionInProgress: Boolean = false
 
+    private var isHostKeyConfirmationInProgress: Boolean = false
+
     private var activeSessionHandle: SshSessionHandle? = null
 
     private var pendingObservedHostKey: SshObservedHostKey? = null
@@ -271,10 +273,20 @@ class SshViewModel @Inject constructor(
     }
 
     internal suspend fun confirmPendingHostKey() {
+        if (isHostKeyConfirmationInProgress) {
+            return
+        }
+
         val observedHostKey = pendingObservedHostKey ?: return
 
-        val decision = confirmHostTrustUseCase(observedHostKey)
-        onHostTrustDecisionReceived(decision)
+        isHostKeyConfirmationInProgress = true
+
+        try {
+            val decision = confirmHostTrustUseCase(observedHostKey)
+            onHostTrustDecisionReceived(decision)
+        } finally {
+            isHostKeyConfirmationInProgress = false
+        }
     }
 
     private fun clearPendingHostKeyReview(
