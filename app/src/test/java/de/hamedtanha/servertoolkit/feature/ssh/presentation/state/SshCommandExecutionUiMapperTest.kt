@@ -156,4 +156,75 @@ class SshCommandExecutionUiMapperTest {
 
         assertEquals("Command execution failed.", mapped.message)
     }
+
+    @Test
+    fun `maps all command failure states to user-facing copy`() {
+        val cases = listOf(
+            ExpectedCommandFailure(
+                error = SshCommandExecutionError.SessionNotFound,
+                statusLabel = "No active SSH session",
+                message = "No active SSH session was found.",
+                detail = "Connect to the server again before running a command.",
+            ),
+            ExpectedCommandFailure(
+                error = SshCommandExecutionError.ChannelOpenFailed,
+                statusLabel = "Command channel unavailable",
+                message = "The SSH command channel could not be opened.",
+                detail = "The active SSH session could not open a non-interactive command channel.",
+            ),
+            ExpectedCommandFailure(
+                error = SshCommandExecutionError.CommandExecutionFailed,
+                statusLabel = "Command execution failed",
+                message = "The command could not be executed.",
+                detail = "The command channel opened, but command execution did not complete successfully.",
+            ),
+            ExpectedCommandFailure(
+                error = SshCommandExecutionError.CommandTimedOut,
+                statusLabel = "Command timed out",
+                message = "The command timed out.",
+                detail = "The command did not complete before the configured timeout elapsed.",
+            ),
+            ExpectedCommandFailure(
+                error = SshCommandExecutionError.CommandCancelled,
+                statusLabel = "Command cancelled",
+                message = "The command was cancelled.",
+                detail = "The command was cancelled and the command channel was cleaned up.",
+            ),
+            ExpectedCommandFailure(
+                error = SshCommandExecutionError.UnsupportedConfiguration,
+                statusLabel = "Unsupported command configuration",
+                message = "This command configuration is not supported.",
+                detail = "Use a supported non-interactive command execution configuration.",
+            ),
+            ExpectedCommandFailure(
+                error = SshCommandExecutionError.Unknown,
+                statusLabel = "Command failed",
+                message = "Command execution failed.",
+                detail = "The command did not complete successfully.",
+            ),
+        )
+
+        cases.forEach { expected ->
+            val mapped = SshCommandExecutionUiState(command = "uptime")
+                .withExecutionResult(SshCommandExecutionResult.Failed(expected.error))
+
+            assertEquals(SshCommandExecutionStatus.Failed, mapped.status)
+            assertEquals(expected.statusLabel, mapped.statusLabel)
+            assertEquals(expected.message, mapped.message)
+            assertEquals(expected.detail, mapped.detail)
+            assertEquals("", mapped.stdout)
+            assertEquals("", mapped.stderr)
+            assertEquals(null, mapped.exitStatus)
+            assertTrue(mapped.canExecute)
+            assertFalse(mapped.hasOutput)
+        }
+    }
+
+    private data class ExpectedCommandFailure(
+        val error: SshCommandExecutionError,
+        val statusLabel: String,
+        val message: String,
+        val detail: String,
+    )
+
 }

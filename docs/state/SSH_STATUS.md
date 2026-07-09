@@ -160,6 +160,7 @@ Persistent credentials, terminal UI, saved command workflows, background monitor
 - Test-only fake SSH connection service.
 - SSH ViewModel result handling seam for tests.
 - SSH ViewModel fake result unit tests.
+- SSH failure UI mapper state coverage.
 - SSH host trust domain and connection attempt unit tests.
 - SSH host-key observation and trusted verifier unit tests.
 - SSH trusted connection cancellation cleanup-failure regression test.
