@@ -109,9 +109,9 @@ class SshViewModelCommandCancellationTest {
 
         assertEquals(1, commandExecutionService.executeCallCount)
         assertEquals(SshCommandExecutionStatus.Failed, commandExecution.status)
-        assertEquals("Command failed", commandExecution.statusLabel)
+        assertEquals("Command cancelled", commandExecution.statusLabel)
         assertEquals("The command was cancelled.", commandExecution.message)
-        assertEquals("No terminal session was opened.", commandExecution.detail)
+        assertEquals("The command was cancelled and the command channel was cleaned up.", commandExecution.detail)
         assertEquals("", commandExecution.stdout)
         assertEquals("", commandExecution.stderr)
         assertNull(commandExecution.exitStatus)

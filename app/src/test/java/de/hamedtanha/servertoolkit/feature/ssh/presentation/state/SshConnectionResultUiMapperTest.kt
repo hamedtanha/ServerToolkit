@@ -31,9 +31,9 @@ class SshConnectionResultUiMapperTest {
             )
 
         assertEquals(SshConnectionStatus.Failed, uiState.status)
-        assertEquals("Connection failed", uiState.statusLabel)
+        assertEquals("Connection timed out", uiState.statusLabel)
         assertEquals("The connection attempt timed out.", uiState.message)
-        assertEquals("No SSH session was opened.", uiState.detail)
+        assertEquals("The SSH session was not opened before the connection timeout elapsed.", uiState.detail)
         assertEquals("server-1", uiState.serverId)
     }
 
@@ -45,6 +45,11 @@ class SshConnectionResultUiMapperTest {
             )
 
         assertEquals(SshConnectionStatus.Failed, uiState.status)
-        assertEquals("Server identity review is required before connecting.", uiState.message)
+        assertEquals("Server identity review required", uiState.statusLabel)
+        assertEquals("Review and trust the server identity before connecting.", uiState.message)
+        assertEquals(
+            "No SSH session was opened because the server identity must be reviewed first.",
+            uiState.detail,
+        )
     }
 }

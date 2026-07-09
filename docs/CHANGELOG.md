@@ -224,6 +224,7 @@ The project follows Conventional Commits and Semantic Versioning principles.
 
 ### Fixed
 
+- Improved SSH connection and command execution failure-state messages with specific non-interactive SSH guidance.
 - Clarified blank SSH command idle-state behavior and prevented blank command execution from reaching session validation.
 - Prevented SSH command text changes while command execution is running.
 - Disabled the SSH command input while command execution is running.

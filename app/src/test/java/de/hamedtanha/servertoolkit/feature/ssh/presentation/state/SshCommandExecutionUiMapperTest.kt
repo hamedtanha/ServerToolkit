@@ -129,8 +129,9 @@ class SshCommandExecutionUiMapperTest {
         )
 
         assertEquals(SshCommandExecutionStatus.Failed, mapped.status)
-        assertEquals("Command failed", mapped.statusLabel)
+        assertEquals("No active SSH session", mapped.statusLabel)
         assertEquals("No active SSH session was found.", mapped.message)
+        assertEquals("Connect to the server again before running a command.", mapped.detail)
         assertEquals("", mapped.stdout)
         assertEquals("", mapped.stderr)
         assertEquals(null, mapped.exitStatus)
