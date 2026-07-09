@@ -68,6 +68,27 @@ class SshjCommandChannelExecutorTest {
     }
 
     @Test
+    fun `does not read command streams when command times out`() {
+        val channel = FakeCommandChannel(
+            stdoutReadError = IOException("stdout should not be read after timeout"),
+            stderrReadError = IOException("stderr should not be read after timeout"),
+            exitStatusValue = null,
+        )
+        val executor = SshjNetworkCommandChannelExecutor()
+
+        val result = executor.execute(
+            commandClient = FakeCommandClient(channel = channel),
+            request = commandRequest(),
+        )
+
+        assertEquals(
+            SshCommandExecutionResult.Failed(SshCommandExecutionError.CommandTimedOut),
+            result,
+        )
+        assertTrue(channel.closed)
+    }
+
+    @Test
     fun `keeps completed result when cleanup fails after successful completion`() {
         val channel = FakeCommandChannel(
             stdoutText = "ok",
