@@ -82,11 +82,17 @@ internal class SshjSessionOwner(
     },
 ) {
 
+    private val lifecycleLock = Any()
+
     fun execute(request: SshCommandRequest): SshCommandExecutionResult {
-        return commandExecutionAction(request)
+        return synchronized(lifecycleLock) {
+            commandExecutionAction(request)
+        }
     }
 
     fun close() {
-        closeAction()
+        synchronized(lifecycleLock) {
+            closeAction()
+        }
     }
 }

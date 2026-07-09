@@ -224,6 +224,7 @@ The project follows Conventional Commits and Semantic Versioning principles.
 
 ### Fixed
 
+- Serialized SSH session close cleanup and command execution at the SSHJ session-owner boundary.
 - Improved SSH connection and command execution failure-state messages with specific non-interactive SSH guidance.
 - Clarified blank SSH command idle-state behavior and prevented blank command execution from reaching session validation.
 - Prevented SSH command text changes while command execution is running.
