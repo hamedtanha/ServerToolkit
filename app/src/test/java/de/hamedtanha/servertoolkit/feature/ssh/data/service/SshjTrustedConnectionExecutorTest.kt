@@ -8,6 +8,7 @@ import de.hamedtanha.servertoolkit.feature.ssh.domain.model.SshHostKeyFingerprin
 import de.hamedtanha.servertoolkit.feature.ssh.domain.model.SshTrustedHostKey
 import java.net.SocketTimeoutException
 import java.net.UnknownHostException
+import kotlinx.coroutines.CancellationException
 import net.schmizz.sshj.transport.verification.HostKeyVerifier
 import org.junit.Assert.assertEquals
 import org.junit.Assert.assertFalse
@@ -198,6 +199,32 @@ class SshjTrustedConnectionExecutorTest {
             SshjTrustedConnectionExecutionResult.Failed(SshConnectionError.UnknownHost),
             result,
         )
+        assertEquals(1, client.closeCallCount)
+    }
+
+    @Test
+    fun `preserves cancellation when trusted connection cleanup fails`() {
+        val client = FakeTrustedConnectionClient(
+            connectError = CancellationException("cancelled connection"),
+            closeError = IllegalStateException("close failed"),
+        )
+        val executor = trustedConnectionExecutor(client)
+
+        try {
+            executor.connectAndAuthenticate(
+                request = connectionRequest(),
+                trustedHostKey = trustedHostKey(),
+                authenticationMapping = authenticationAdapter.map(
+                    connectionRequest(
+                        authenticationInput = SshAuthenticationInput.Password("secret-password"),
+                    ),
+                ),
+            )
+            throw AssertionError("Expected CancellationException to be thrown.")
+        } catch (error: CancellationException) {
+            assertEquals("cancelled connection", error.message)
+        }
+
         assertEquals(1, client.closeCallCount)
     }
 
