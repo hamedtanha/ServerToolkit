@@ -74,13 +74,25 @@ internal fun SshCommandExecutionUiState.withExecutionResult(
 
         is SshCommandExecutionResult.Failed -> copy(
             status = SshCommandExecutionStatus.Failed,
-            statusLabel = "Command failed",
+            statusLabel = result.error.toStatusLabel(),
             message = result.error.toUserMessage(),
-            detail = "No terminal session was opened.",
+            detail = result.error.toUserDetail(),
             stdout = "",
             stderr = "",
             exitStatus = null,
         )
+    }
+}
+
+private fun SshCommandExecutionError.toStatusLabel(): String {
+    return when (this) {
+        SshCommandExecutionError.SessionNotFound -> "No active SSH session"
+        SshCommandExecutionError.ChannelOpenFailed -> "Command channel unavailable"
+        SshCommandExecutionError.CommandExecutionFailed -> "Command execution failed"
+        SshCommandExecutionError.CommandTimedOut -> "Command timed out"
+        SshCommandExecutionError.CommandCancelled -> "Command cancelled"
+        SshCommandExecutionError.UnsupportedConfiguration -> "Unsupported command configuration"
+        SshCommandExecutionError.Unknown -> "Command failed"
     }
 }
 
@@ -93,5 +105,17 @@ private fun SshCommandExecutionError.toUserMessage(): String {
         SshCommandExecutionError.CommandCancelled -> "The command was cancelled."
         SshCommandExecutionError.UnsupportedConfiguration -> "This command configuration is not supported."
         SshCommandExecutionError.Unknown -> "Command execution failed."
+    }
+}
+
+private fun SshCommandExecutionError.toUserDetail(): String {
+    return when (this) {
+        SshCommandExecutionError.SessionNotFound -> "Connect to the server again before running a command."
+        SshCommandExecutionError.ChannelOpenFailed -> "The active SSH session could not open a non-interactive command channel."
+        SshCommandExecutionError.CommandExecutionFailed -> "The command channel opened, but command execution did not complete successfully."
+        SshCommandExecutionError.CommandTimedOut -> "The command did not complete before the configured timeout elapsed."
+        SshCommandExecutionError.CommandCancelled -> "The command was cancelled and the command channel was cleaned up."
+        SshCommandExecutionError.UnsupportedConfiguration -> "Use a supported non-interactive command execution configuration."
+        SshCommandExecutionError.Unknown -> "The command did not complete successfully."
     }
 }

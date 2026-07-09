@@ -490,8 +490,8 @@ class SshViewModelTest {
         viewModel.onConnectionResultReceived(result)
 
         assertEquals(SshConnectionStatus.Failed, viewModel.uiState.value.status)
-        assertEquals("Connection failed", viewModel.uiState.value.statusLabel)
-        assertEquals("Authentication is required before connecting.", viewModel.uiState.value.message)
+        assertEquals("Authentication required", viewModel.uiState.value.statusLabel)
+        assertEquals("Enter valid SSH authentication details before connecting.", viewModel.uiState.value.message)
     }
 
     @Test
