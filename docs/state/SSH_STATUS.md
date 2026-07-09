@@ -162,6 +162,7 @@ Persistent credentials, terminal UI, saved command workflows, background monitor
 - SSH ViewModel fake result unit tests.
 - SSH host trust domain and connection attempt unit tests.
 - SSH host-key observation and trusted verifier unit tests.
+- SSH trusted connection cancellation cleanup-failure regression test.
 - SSH command execution service tests.
 - SSH command channel lifecycle tests.
 - SSH command timeout stream-suppression regression test.
