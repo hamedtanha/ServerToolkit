@@ -18,7 +18,7 @@ internal fun SshUiState.withHostTrustDecision(
             status = SshConnectionStatus.NotStarted,
             statusLabel = "Server identity trusted",
             message = "Server identity has been trusted.",
-            detail = "You can continue with the SSH workflow when the remaining implementation gates are complete.",
+            detail = "Start the SSH connection again to use the trusted server identity.",
             hostKeyReview = null,
         )
 
