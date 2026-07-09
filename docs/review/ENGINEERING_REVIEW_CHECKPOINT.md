@@ -36,14 +36,15 @@ Recent resolved pull requests:
 - PR `#83`: `docs: sync ssh current state`
 - PR `#84`: `docs: update engineering review checkpoint`
 - PR `#85`: `docs: record ssh secret cleanup review`
+- PR `#86`: `docs: finalize engineering review checkpoint`
 
-Current `main` state after PR `#85`:
+Current `main` state after PR `#86`:
 
 - Trusted SSH host keys are lifecycle-bound to their owning server inventory entries.
 - Duplicate SSH host key confirmation attempts are guarded at the ViewModel boundary.
 - The trusted-host accepted message no longer references obsolete implementation gates.
 - Current-state SSH documentation is synchronized with the implemented ephemeral password connection and non-interactive command execution workflow.
-- The open review backlog has been reduced to the future SSH session close-vs-execute concurrency review item.
+- The open review backlog contains only the future SSH session close-vs-execute concurrency review item.
 
 Recent validation completed:
 
@@ -385,31 +386,25 @@ Before recommending implementation or architecture changes:
 
 ---
 
-## Next Suggested Checkpoint
+## Checkpoint Closure
 
-The next focused engineering checkpoint is P6.
+This engineering review checkpoint is closed.
 
-Suggested next branch:
+Closed scope:
 
-    review/ssh-secret-cleanup
+- P1 was resolved by PR `#79`.
+- P2 was resolved by PR `#81`.
+- P3 was resolved by PR `#82`.
+- P4 was addressed by PR `#83`.
+- P6 was reviewed by PR `#85` and finalized by PR `#86`.
 
-Expected checkpoint for P6:
+Remaining backlog:
 
-- Inspect current SSH authentication input handling.
-- Confirm which sensitive values are retained in UI state, ViewModel fields, domain request objects, and service boundaries.
-- Verify whether existing cleanup paths clear password and passphrase values after connection attempts.
-- Do not add broad cleanup logic before identifying a concrete retained value or lifecycle gap.
-- Keep terminal UI, saved commands, persistent credentials, and private-key authentication out of scope.
+- P5 remains recorded as a future review item only.
 
-Recommended inspection commands:
+P5 must not be implemented speculatively. Revisit it only when a concrete trigger appears, such as overlapping command execution, command cancellation, expanded session reuse, user-controllable disconnect behavior, or a failing concurrency case.
 
-    grep -RIn "password\|passphrase\|privateKey\|authenticationInput\|AuthenticationInput" app/src/main/java app/src/test/java
+Next planning rule:
 
-Recommended validation if code changes become necessary:
-
-    ./gradlew testDebugUnitTest
-    ./gradlew :app:assembleDebug
-    git diff --check
-
-If no code change is needed, record the review outcome in documentation only.
+Select the next implementation slice from the project roadmap or current product priorities. Do not continue this checkpoint unless a new review finding is discovered from current repository inspection.
 
