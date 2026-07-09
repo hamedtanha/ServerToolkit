@@ -127,6 +127,7 @@ Persistent credentials, terminal UI, saved command workflows, background monitor
 - SSH session lifecycle service contract.
 - SSHJ session lifecycle boundary.
 - SSHJ session owner registry boundary.
+- SSH session owner serialization between command execution and close cleanup.
 - SSH session close cancellation preservation.
 
 ### Command Execution
