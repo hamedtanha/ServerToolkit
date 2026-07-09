@@ -37,14 +37,21 @@ Recent resolved pull requests:
 - PR `#84`: `docs: update engineering review checkpoint`
 - PR `#85`: `docs: record ssh secret cleanup review`
 - PR `#86`: `docs: finalize engineering review checkpoint`
+- PR `#87`: `docs: close engineering review checkpoint`
+- PR `#88`: `fix: improve ssh failure state messages`
+- PR `#89`: `docs: record ssh runtime failure mapping review`
+- PR `#90`: `fix: serialize ssh session close and command execution`
 
-Current `main` state after PR `#86`:
+Current `main` state after PR `#90`:
 
 - Trusted SSH host keys are lifecycle-bound to their owning server inventory entries.
 - Duplicate SSH host key confirmation attempts are guarded at the ViewModel boundary.
 - The trusted-host accepted message no longer references obsolete implementation gates.
 - Current-state SSH documentation is synchronized with the implemented ephemeral password connection and non-interactive command execution workflow.
-- The open review backlog contains only the future SSH session close-vs-execute concurrency review item.
+- SSH connection and command execution failure states use more specific non-interactive SSH guidance.
+- SSH runtime failure mapping was reviewed; no additional domain error category is required without runtime evidence.
+- SSH session close cleanup and command execution are serialized at the SSHJ session-owner boundary.
+- The reviewed SSH hardening backlog is closed with no open review findings.
 
 Recent validation completed:
 
@@ -71,6 +78,22 @@ For PR `#82`:
 
 For PR `#83`:
 
+    git diff --check
+    ./gradlew :app:assembleDebug
+
+For PR `#88`:
+
+    ./gradlew testDebugUnitTest
+    git diff --check
+    ./gradlew :app:assembleDebug
+
+For PR `#89`:
+
+    git diff --check HEAD~1..HEAD
+
+For PR `#90`:
+
+    ./gradlew testDebugUnitTest
     git diff --check
     ./gradlew :app:assembleDebug
 
@@ -242,27 +265,36 @@ Reopen this review only if the project adds private-key material, persistent cre
 
 ---
 
-## Open Review Backlog
+### P5 — SSH session close-vs-execute concurrency needed review
 
-### P5 — SSH session close-vs-execute concurrency needs future review
-
-Status: Future review item.
+Status: Resolved by PR `#90`.
 
 Risk:
 
-As SSH execution behavior grows, race conditions may appear between command execution, session closing, and disconnect handling.
+Command execution and session close cleanup could race on the same SSHJ-backed session owner if close and execute were invoked concurrently.
 
-Current recommendation:
+Resolution:
 
-Do not add speculative concurrency infrastructure yet.
+The SSHJ session owner now serializes command execution and close cleanup through a shared owner-level lifecycle lock.
 
-Revisit this when:
+Implemented changes:
 
-- multiple commands can overlap,
-- command cancellation is introduced,
-- session reuse expands,
-- disconnect behavior becomes user-controllable,
-- a concrete failing case appears.
+- Added owner-level serialization between `SshjSessionOwner.execute()` and `SshjSessionOwner.close()`.
+- Kept SSHJ client/session ownership inside the data-layer boundary.
+- Added focused regression coverage for close requests while command execution is running.
+- Updated SSH status and changelog documentation.
+
+Engineering rationale:
+
+The SSHJ client is a concrete data-layer resource owned by `SshjSessionOwner`. Serializing close cleanup and command execution at that owner boundary keeps concurrency control close to the resource without leaking SSHJ lifecycle concerns into domain, presentation, or ViewModel code.
+
+---
+
+## Open Review Backlog
+
+No open review findings are currently tracked.
+
+Future runtime testing may still identify new SSH hardening work, but it should be recorded as a new finding rather than continuing the closed P1-P6 checkpoint scope.
 
 ---
 
@@ -331,6 +363,9 @@ PR `#81` stayed focused on duplicate host-key confirmation interaction safety.
 PR `#82` stayed focused on a single user-facing trusted-host accepted message.
 
 PR `#83` stayed focused on documentation synchronization after focused implementation fixes were merged.
+PR `#88` stayed focused on presentation-layer SSH failure-state wording.
+PR `#89` stayed focused on recording runtime failure-mapping review findings without speculative implementation.
+PR `#90` stayed focused on SSHJ session-owner close-vs-execute serialization and its regression coverage.
 
 That was the correct scope.
 
@@ -396,13 +431,14 @@ Closed scope:
 - P2 was resolved by PR `#81`.
 - P3 was resolved by PR `#82`.
 - P4 was addressed by PR `#83`.
+- P5 was resolved by PR `#90`.
 - P6 was reviewed by PR `#85` and finalized by PR `#86`.
+- SSH failure-state wording was improved by PR `#88`.
+- SSH runtime failure mapping was reviewed by PR `#89`.
 
 Remaining backlog:
 
-- P5 remains recorded as a future review item only.
-
-P5 must not be implemented speculatively. Revisit it only when a concrete trigger appears, such as overlapping command execution, command cancellation, expanded session reuse, user-controllable disconnect behavior, or a failing concurrency case.
+- No open review findings are currently tracked for this checkpoint.
 
 Next planning rule:
 
