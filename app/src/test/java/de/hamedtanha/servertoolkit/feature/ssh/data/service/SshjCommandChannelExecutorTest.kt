@@ -231,6 +231,27 @@ class SshjCommandChannelExecutorTest {
         assertTrue(channel.closed)
     }
 
+    @Test
+    fun `preserves cancellation when cleanup fails after execution is cancelled`() {
+        val channel = FakeCommandChannel(
+            joinError = CancellationException("cancelled"),
+            closeError = IllegalStateException("close failed"),
+        )
+        val executor = SshjNetworkCommandChannelExecutor()
+
+        try {
+            executor.execute(
+                commandClient = FakeCommandClient(channel = channel),
+                request = commandRequest(),
+            )
+            fail("Expected CancellationException")
+        } catch (error: CancellationException) {
+            assertEquals("cancelled", error.message)
+        }
+
+        assertTrue(channel.closed)
+    }
+
     @Test(expected = CancellationException::class)
     fun `preserves cancellation when command channel opening is cancelled`() {
         val executor = SshjNetworkCommandChannelExecutor()
