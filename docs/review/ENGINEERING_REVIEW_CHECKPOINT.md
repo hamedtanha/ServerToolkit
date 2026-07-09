@@ -229,19 +229,35 @@ Revisit this when:
 
 ---
 
-### P6 — Secret cleanup should be reviewed
+### P6 — SSH authentication secret cleanup review
 
-Status: Future security hygiene item.
+Status: Reviewed. No implementation change required.
 
-Risk:
+Risk reviewed:
 
-Sensitive values may remain in UI state or ViewModel memory longer than necessary.
+Sensitive SSH authentication values could remain in UI state, ViewModel memory, domain request objects, or service-layer mappings longer than necessary.
 
-Current recommendation:
+Review outcome:
 
-Review lifecycle cleanup for screens that handle secrets, credentials, passphrases, private keys, or SSH authentication inputs.
+The current SSH authentication flow already keeps secret handling bounded and ephemeral.
 
-Do not add broad cleanup logic before confirming which values are actually retained.
+Confirmed behavior:
+
+- `SshAuthenticationInputUiState` exposes only authentication method selection and presence flags.
+- Passwords and passphrases are not stored in UI state snapshots.
+- `SshScreen` clears its local password input after the Connect action.
+- `SshViewModel` clears pending authentication secrets in the connection attempt `finally` block.
+- `SshConnectionAttemptUseCase` clears authentication input in its `finally` block.
+- Host-trust review and changed-host-key paths clear authentication input before returning a host-trust decision outcome.
+- Authentication input models redact sensitive values from string representations.
+
+Decision:
+
+No Kotlin implementation change is required for the current reviewed flow.
+
+Follow-up trigger:
+
+Reopen this review only if the project adds private-key material, persistent credentials, saved authentication profiles, background reconnect, terminal sessions with credential prompts, or another workflow that stores or reuses authentication secrets beyond one connection attempt.
 
 ---
 
