@@ -4,7 +4,7 @@
 **Feature Area:** SSH
 **Status:** Active Implementation
 **Related Milestone:** Version 0.4.0 — SSH
-**Last Updated:** 2026-07-08
+**Last Updated:** 2026-07-09
 
 ---
 
@@ -41,14 +41,14 @@ Persistent credentials, terminal UI, saved command workflows, background monitor
 ### Navigation and Presentation
 
 - SSH navigation destination.
-- SSH placeholder screen.
-- SSH placeholder ViewModel and UI state.
+- SSH screen with ephemeral password input, host-key review actions, connection status, and non-interactive command controls.
+- SSH ViewModel and UI state for connection attempts, host-key review, authentication input, and command execution.
 - Server Inventory Connect action to open the SSH route.
 - SSH UI connection status model.
 - SSH UI state alignment with domain connection result.
 - SSH connection result UI mapper.
 - SSH presentation state unit tests.
-- SSH user-triggered connect event shell.
+- SSH user-triggered connect event handling.
 - SSH Connect button with ephemeral password input.
 
 ### Target Resolution and Connection Boundary
@@ -77,7 +77,7 @@ Persistent credentials, terminal UI, saved command workflows, background monitor
 - SSH trusted host entity/domain mapper.
 - SSH trusted host Room-backed repository implementation.
 - SSH trusted host repository dependency injection binding.
-- Server Toolkit database version 2 with trusted-host migration.
+- Server Toolkit database version 2 trusted-host migration and version 3 trusted-host cascade-delete migration.
 - SSH host trust evaluator.
 - SSH host trust decision model.
 - SSH host trust decision use case.
@@ -89,6 +89,9 @@ Persistent credentials, terminal UI, saved command workflows, background monitor
 - SSH host-key review screen actions.
 - SSH host-key fingerprints use SHA256 values for observation and trusted verification.
 - SSH host key observation verifier clarity hardening.
+- SSH trusted-host cascade delete behavior when the owning server is deleted.
+- SSH duplicate host-key confirmation guard at the ViewModel boundary.
+- SSH trusted-host accepted message aligned with the current connection workflow.
 
 ### Authentication Input
 
@@ -105,16 +108,16 @@ Persistent credentials, terminal UI, saved command workflows, background monitor
 
 - SSHJ dependency declaration through the Gradle version catalog.
 - SSH data-layer adapter shell.
-- SSHJ-backed connection service shell.
+- SSHJ-backed connection service boundary.
 - SSHJ Android-compatible client factory with explicit Bouncy Castle provider registration and constrained key exchange defaults.
 - SSHJ adapter shell unit test.
 - SSHJ host-key observation adapter mapping.
 - SSHJ authentication adapter mapping.
 - SSHJ authentication executor boundary.
 - SSHJ trusted host-key verifier boundary.
-- SSHJ trusted connection execution shell.
-- SSHJ password authentication execution shell.
-- SSHJ session ownership execution shell.
+- SSHJ trusted connection execution boundary.
+- SSHJ password authentication execution boundary.
+- SSHJ session ownership execution boundary.
 - Real ephemeral password-based SSH connection workflow.
 
 ### Session Lifecycle
@@ -122,7 +125,7 @@ Persistent credentials, terminal UI, saved command workflows, background monitor
 - SSH project-owned session handle model.
 - SSH session close result model.
 - SSH session lifecycle service contract.
-- SSHJ session lifecycle shell.
+- SSHJ session lifecycle boundary.
 - SSHJ session owner registry boundary.
 - SSH session close cancellation preservation.
 
@@ -130,7 +133,7 @@ Persistent credentials, terminal UI, saved command workflows, background monitor
 
 - SSH command execution planning boundary.
 - SSH command execution result model.
-- SSHJ command channel planning shell.
+- SSHJ command channel planning boundary.
 - SSH command execution routed through the data-layer session owner registry.
 - SSHJ command channel lifecycle executor.
 - SSH command execution service contract.
@@ -161,8 +164,9 @@ Persistent credentials, terminal UI, saved command workflows, background monitor
 - SSH command execution service tests.
 - SSH command channel lifecycle tests.
 - SSH command cancellation tests.
-- Manual SSH placeholder route verification.
-- Automated SSH placeholder verification through unit tests and debug build.
+- SSH duplicate host-key confirmation regression test.
+- Manual SSH route verification.
+- Automated SSH route verification through unit tests and debug build.
 - Manual runtime test against macOS Remote Login through the Android emulator host address.
 - Verified successful SSH connection and non-interactive `whoami` command execution.
 
@@ -191,8 +195,8 @@ The following items are intentionally not implemented yet:
 - Saved command workflow.
 - Xray or x-ui management workflow.
 - Connection history.
-- Room migrations beyond database version 2.
-- Migration tests beyond the trusted-host v1-to-v2 migration.
+- Room migrations beyond database version 3.
+- Migration tests beyond the trusted-host v1-to-v2 and v2-to-v3 migrations.
 
 ---
 

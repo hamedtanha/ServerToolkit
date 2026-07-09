@@ -90,7 +90,7 @@ This keeps responsibilities clean:
 
 ### P2 — Duplicate SSH host key confirmation can still be submitted
 
-Status: Open.
+Status: Resolved by PR #81.
 
 Risk:
 
@@ -114,7 +114,7 @@ Expected validation:
 
 ### P3 — Trusted-host accepted message contains stale placeholder wording
 
-Status: Open.
+Status: Resolved by PR #82.
 
 Problem:
 
@@ -142,7 +142,7 @@ Expected validation:
 
 ### P4 — Documentation is behind the current SSH implementation state
 
-Status: Open.
+Status: Addressed by the SSH current-state documentation synchronization.
 
 Known risk:
 

@@ -3,7 +3,7 @@
 **Project:** Server Toolkit  
 **Version:** 0.4.0-alpha
 **Status:** Active  
-**Last Updated:** 2026-07-08
+**Last Updated:** 2026-07-09
 
 ---
 
@@ -90,8 +90,8 @@ The current implementation includes:
 - Hilt database, DAO, and repository wiring.
 - DAO, repository, mapper, and filter matcher tests.
 - Manual and automated verification for add, edit, delete, search, filtering, and shared server form naming cleanup.
-- SSH navigation destination, placeholder screen, placeholder ViewModel, and UI state.
-- Server Inventory Connect action that opens the SSH placeholder route.
+- SSH navigation destination, screen, ViewModel, and UI state.
+- Server Inventory Connect action that opens the SSH route.
 - SSH domain connection request, result, error, and service contract models.
 - SSH UI connection status model and connection result mapper.
 - Test-only fake SSH connection service.
@@ -108,17 +108,17 @@ The current implementation includes:
 - SSH credential-bearing connection request boundary.
 - SSH authentication input clearing behavior.
 - SSHJ trusted host-key verifier boundary.
-- SSHJ trusted connection execution shell.
-- SSHJ password authentication execution shell.
+- SSHJ trusted connection execution boundary.
+- SSHJ password authentication execution boundary.
 - Real ephemeral password-based SSH connection workflow.
-- SSHJ session ownership execution shell.
+- SSHJ session ownership execution boundary.
 - SSH project-owned session handle model.
 - SSH session lifecycle service contract.
 - SSHJ session owner registry boundary.
 - SSH command channel execution strategy.
 - SSH command execution planning boundary.
 - SSH command execution result model.
-- SSHJ command channel planning shell.
+- SSHJ command channel planning boundary.
 - SSH command execution routing through the data-layer session owner registry.
 - SSHJ command channel lifecycle executor.
 - SSH command execution service contract.
@@ -144,8 +144,8 @@ The following items are intentionally not implemented yet:
 - Monitoring workflow.
 - Saved command workflow.
 - Xray or x-ui management workflow.
-- Room migrations beyond database version 2.
-- Migration tests beyond the trusted-host v1-to-v2 migration.
+- Room migrations beyond database version 3.
+- Migration tests beyond the trusted-host v1-to-v2 and v2-to-v3 migrations.
 
 ---
 
