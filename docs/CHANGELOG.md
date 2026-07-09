@@ -148,6 +148,7 @@ The project follows Conventional Commits and Semantic Versioning principles.
 - Added SSH command timeout stream-suppression regression coverage.
 - Added SSH command cancellation cleanup-failure regression coverage.
 - Added SSH command execution presentation state and UI mapper.
+- Added SSH failure UI mapper state coverage.
 - Added SSH ViewModel command execution wiring through active project-owned session handles.
 - Added SSH command input and Run command UI controls.
 - Added SSH command output rendering for stdout, stderr, and exit status.
