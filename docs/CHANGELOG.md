@@ -93,6 +93,7 @@ The project follows Conventional Commits and Semantic Versioning principles.
 - Added SSH ViewModel target-resolution tests.
 - Added SSH connection attempt use case with timeout, exception mapping, and cancellation preservation.
 - Added SSH connection history domain model and repository contract.
+- Added Room-backed SSH connection history persistence.
 - Added SSH duplicate-attempt prevention at the ViewModel boundary.
 - Added SSH failure-containment unit tests.
 - Added SSH host trust domain models.

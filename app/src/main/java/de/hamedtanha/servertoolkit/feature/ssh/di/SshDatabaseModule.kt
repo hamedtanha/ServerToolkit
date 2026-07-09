@@ -5,6 +5,7 @@ import dagger.Provides
 import dagger.hilt.InstallIn
 import dagger.hilt.components.SingletonComponent
 import de.hamedtanha.servertoolkit.core.database.ServerToolkitDatabase
+import de.hamedtanha.servertoolkit.feature.ssh.data.local.dao.SshConnectionHistoryDao
 import de.hamedtanha.servertoolkit.feature.ssh.data.local.dao.SshTrustedHostKeyDao
 
 @Module
@@ -16,5 +17,12 @@ object SshDatabaseModule {
         database: ServerToolkitDatabase,
     ): SshTrustedHostKeyDao {
         return database.sshTrustedHostKeyDao()
+    }
+
+    @Provides
+    fun provideSshConnectionHistoryDao(
+        database: ServerToolkitDatabase,
+    ): SshConnectionHistoryDao {
+        return database.sshConnectionHistoryDao()
     }
 }

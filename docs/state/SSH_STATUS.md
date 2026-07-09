@@ -67,6 +67,7 @@ Persistent credentials, terminal UI, saved command workflows, background monitor
 - SSH connection attempt exception mapping and cancellation preservation.
 - SSH connection history domain model.
 - SSH connection history repository contract.
+- SSH connection history Room persistence.
 - SSH duplicate-attempt prevention at the ViewModel boundary.
 - SSH ViewModel dependency injection for the connection attempt use case.
 
@@ -162,6 +163,7 @@ Persistent credentials, terminal UI, saved command workflows, background monitor
 - SSH connect event shell ViewModel tests.
 - SSH domain model unit tests.
 - SSH connection history domain model tests.
+- SSH connection history mapper, DAO, repository, and migration tests.
 - Test-only fake SSH connection service.
 - SSH ViewModel result handling seam for tests.
 - SSH ViewModel fake result unit tests.
@@ -204,9 +206,9 @@ The following items are intentionally not implemented yet:
 - Monitoring workflow.
 - Saved command workflow.
 - Xray or x-ui management workflow.
-- Connection history persistence, recording workflow, and UI.
-- Room migrations beyond database version 3.
-- Migration tests beyond the trusted-host v1-to-v2 and v2-to-v3 migrations.
+- Connection history recording workflow and UI.
+- Room migrations beyond database version 4.
+- Migration tests beyond the trusted-host v1-to-v2, trusted-host v2-to-v3, and connection-history v3-to-v4 migrations.
 
 ---
 
