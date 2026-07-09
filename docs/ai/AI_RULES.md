@@ -59,6 +59,25 @@ Do not rely on stale project documentation, previous conversation summaries, or 
 
 If the current repository state is unknown, ask the maintainer to provide the relevant files or command output before making project-changing recommendations.
 
+## Change Impact Workflow
+
+Before recommending or applying any source, test, or documentation change, AI assistants must follow this workflow:
+
+1. Define the scope.
+2. Identify affected source and test files.
+3. Identify affected documentation.
+4. Decide explicitly which documents change and which documents do not change.
+5. Implement only inside the agreed scope.
+6. Run validation appropriate to the change.
+7. Run a documentation synchronization gate.
+8. Commit only after all decisions are recorded.
+
+For each relevant document, the assistant must state whether it changes or remains unchanged and why.
+
+Do not treat documentation synchronization as an afterthought.
+
+Do not proceed directly to implementation when the repository state, affected files, affected documentation, or validation scope is unclear.
+
 ## Architecture
 
 Preserve the existing architecture unless there is a clear technical reason to change it.
