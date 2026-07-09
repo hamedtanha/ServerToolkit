@@ -25,24 +25,55 @@ Do not use this document to describe planned functionality as implemented behavi
 
 ## Current Review Checkpoint
 
-Date: 2026-07-08
+Date: 2026-07-09
 
-Resolved pull request:
+Recent resolved pull requests:
 
-- PR: `#79`
-- Branch: `fix/cascade-delete-ssh-trusted-host-keys`
-- Commit: `49876a9 fix: cascade delete ssh trusted host keys`
+- PR `#79`: `fix: cascade delete ssh trusted host keys`
+- PR `#80`: `docs: add engineering review checkpoint`
+- PR `#81`: `fix: prevent duplicate ssh host key confirmation`
+- PR `#82`: `fix: update trusted host accepted message`
+- PR `#83`: `docs: sync ssh current state`
 
-Local validation completed:
+Current `main` state after PR `#83`:
+
+- Trusted SSH host keys are lifecycle-bound to their owning server inventory entries.
+- Duplicate SSH host key confirmation attempts are guarded at the ViewModel boundary.
+- The trusted-host accepted message no longer references obsolete implementation gates.
+- Current-state SSH documentation is synchronized with the implemented ephemeral password connection and non-interactive command execution workflow.
+- The open review backlog has been reduced to future concurrency and security-hygiene review items.
+
+Recent validation completed:
+
+For PR `#79`:
 
     ./gradlew connectedDebugAndroidTest
     ./gradlew testDebugUnitTest
     ./gradlew :app:assembleDebug
     git diff --check
 
+For PR `#81`:
+
+    ./gradlew testDebugUnitTest --tests "de.hamedtanha.servertoolkit.feature.ssh.presentation.viewmodel.SshViewModelHostTrustConfirmationTest"
+    ./gradlew testDebugUnitTest
+    ./gradlew :app:assembleDebug
+    git diff --check
+
+For PR `#82`:
+
+    ./gradlew testDebugUnitTest --tests "de.hamedtanha.servertoolkit.feature.ssh.presentation.state.SshHostTrustDecisionUiMapperTest"
+    ./gradlew testDebugUnitTest
+    ./gradlew :app:assembleDebug
+    git diff --check
+
+For PR `#83`:
+
+    git diff --check
+    ./gradlew :app:assembleDebug
+
 GitHub status:
 
-- No GitHub CI checks were reported for PR `#79`.
+- No GitHub CI checks were reported for these pull requests.
 - Validation was performed locally.
 
 ---
@@ -51,7 +82,7 @@ GitHub status:
 
 ### P1 — SSH trusted host keys were not lifecycle-bound to deleted servers
 
-Status: Resolved.
+Status: Resolved by PR `#79`.
 
 Problem:
 
@@ -86,90 +117,95 @@ This keeps responsibilities clean:
 
 ---
 
-## Open Review Backlog
+### P2 — Duplicate SSH host key confirmation could be submitted
 
-### P2 — Duplicate SSH host key confirmation can still be submitted
-
-Status: Resolved by PR #81.
-
-Risk:
-
-A user may trigger SSH host key confirmation more than once before the first confirmation operation finishes.
-
-Recommended direction:
-
-Add a ViewModel-level guard that prevents duplicate confirmation while confirmation is already in progress.
-
-Suggested branch:
-
-    fix/prevent-duplicate-ssh-host-key-confirmation
-
-Expected validation:
-
-- Add a ViewModel test for duplicate confirmation attempts.
-- Verify that a second confirmation action is ignored or blocked while the first one is running.
-- Keep the fix focused on interaction safety, not SSH transport behavior.
-
----
-
-### P3 — Trusted-host accepted message contains stale placeholder wording
-
-Status: Resolved by PR #82.
+Status: Resolved by PR `#81`.
 
 Problem:
 
-The accepted trusted-host UI message still references remaining implementation gates. That wording is stale and no longer matches the current SSH workflow.
+A user could trigger SSH host key confirmation more than once before the first confirmation operation finished.
 
-Expected location:
+Resolution:
 
-    SshHostTrustDecisionUiMapper.kt
+The SSH ViewModel now guards host-key confirmation while confirmation is already running.
 
-Recommended replacement text:
+Implemented changes:
+
+- Added a ViewModel-level host-key confirmation in-progress guard.
+- Ignored duplicate confirmation attempts while the first confirmation is running.
+- Reset the guard with `finally` so failed or cancelled confirmation paths do not permanently block later attempts.
+- Added focused ViewModel regression coverage for duplicate confirmation attempts.
+
+Engineering rationale:
+
+This is an interaction-safety issue at the presentation coordination boundary. The ViewModel owns the user action sequencing, while the domain use case remains responsible for the trust decision itself.
+
+---
+
+### P3 — Trusted-host accepted message contained stale placeholder wording
+
+Status: Resolved by PR `#82`.
+
+Problem:
+
+The trusted-host accepted UI message still referenced remaining implementation gates. That wording no longer matched the current SSH workflow.
+
+Resolution:
+
+The accepted trusted-host detail message now tells the user to start the SSH connection again to use the trusted server identity.
+
+Implemented change:
+
+- Replaced the stale detail text in `SshHostTrustDecisionUiMapper.kt`.
+
+Final user-facing detail text:
 
     Start the SSH connection again to use the trusted server identity.
 
-Suggested branch:
+Engineering rationale:
 
-    fix/update-trusted-host-accepted-message
-
-Expected validation:
-
-- Run unit tests.
-- Check affected UI mapper tests if present.
-- Keep the PR small and focused.
+The message is a UI copy correction only. It should not change SSH trust, connection, or retry behavior.
 
 ---
 
-### P4 — Documentation is behind the current SSH implementation state
+### P4 — Documentation was behind the current SSH implementation state
 
-Status: Addressed by the SSH current-state documentation synchronization.
+Status: Addressed by PR `#83`.
 
-Known risk:
+Problem:
 
-Some documentation may still describe placeholder screens, shell behavior, or planned SSH behavior as if it were current.
+Some current-state documentation still described placeholder screens, shell behavior, planned SSH behavior, or older migration status as if they were current.
 
-Recommended direction:
+Resolution:
 
-Create a dedicated documentation synchronization PR after the focused fix PRs are merged.
+Current-state documentation was synchronized with the implemented SSH workflow.
 
-Suggested branch:
+Documents updated:
 
-    docs/sync-ssh-current-state
+- `docs/ARCHITECTURE.md`
+- `docs/state/SSH_STATUS.md`
+- `docs/state/SERVER_INVENTORY_STATUS.md`
+- `docs/PROJECT_STATE.md`
+- `docs/ROADMAP.md`
+- `docs/CHANGELOG.md`
+- `docs/review/ENGINEERING_REVIEW_CHECKPOINT.md`
 
-Documents to review:
+Implemented documentation corrections:
 
-- Architecture documentation.
-- SSH status documentation.
-- Server inventory status documentation.
-- Project state documentation.
-- Roadmap documentation.
-- Changelog or release notes, if applicable.
+- Replaced stale SSH placeholder route and screen wording in current-state documents.
+- Replaced current-state `shell` wording with `boundary` wording where the behavior has moved beyond placeholder shells.
+- Documented database version `3` and the trusted-host cascade-delete migration.
+- Documented duplicate host-key confirmation protection.
+- Documented the trusted-host accepted message cleanup.
+- Kept ADR history unchanged.
 
-Documentation rule:
+Documentation rationale:
 
-Only document behavior that exists in the current codebase and has been validated.
+Current-state documentation must describe behavior that exists in the current codebase. ADRs may retain historical decision context and should not be rewritten merely to remove older implementation-step wording.
 
 ---
+
+## Open Review Backlog
 
 ### P5 — SSH session close-vs-execute concurrency needs future review
 
@@ -269,6 +305,12 @@ This is a test-environment requirement, not a production workaround.
 
 PR `#79` stayed focused on database referential integrity and related validation.
 
+PR `#81` stayed focused on duplicate host-key confirmation interaction safety.
+
+PR `#82` stayed focused on a single user-facing trusted-host accepted message.
+
+PR `#83` stayed focused on documentation synchronization after focused implementation fixes were merged.
+
 That was the correct scope.
 
 Do not mix the following into the same PR unless they are directly required:
@@ -278,6 +320,28 @@ Do not mix the following into the same PR unless they are directly required:
 - unrelated concurrency guards,
 - broad refactors,
 - future security cleanup.
+
+---
+
+### Interaction guards belong at the user-action coordination boundary
+
+The duplicate host-key confirmation fix belongs in the ViewModel because the ViewModel coordinates user actions and UI state transitions.
+
+The domain use case should remain focused on evaluating and saving the trust decision.
+
+Avoid moving user-action deduplication into persistence or domain logic unless the duplicate action creates a true domain invariant.
+
+---
+
+### Documentation synchronization should happen after focused fixes
+
+PR `#83` synchronized current-state documentation only after PR `#81` and PR `#82` were merged.
+
+This avoided mixing broad documentation edits with focused behavior and copy fixes.
+
+Review rule:
+
+When multiple small implementation issues are already identified, fix them in focused PRs first, then synchronize broad current-state documentation in a dedicated documentation PR.
 
 ---
 
@@ -293,35 +357,39 @@ Before recommending implementation or architecture changes:
 6. Validate migrations with instrumentation tests.
 7. Keep data-integrity rules in the database when the invariant is relational.
 8. Avoid solving persistence invariants in ViewModels.
-9. Keep documentation in professional English.
-10. Keep code comments in English.
-11. Use Conventional Commits.
-12. Keep `main` releasable.
+9. Keep interaction-safety guards at the ViewModel boundary when the issue is user-action coordination.
+10. Keep documentation in professional English.
+11. Keep code comments in English.
+12. Use Conventional Commits.
+13. Keep `main` releasable.
 
 ---
 
 ## Next Suggested Checkpoint
 
-After PR `#79` is merged into `main`, the next focused engineering item is P2.
+The next focused engineering checkpoint is P6.
 
 Suggested next branch:
 
-    fix/prevent-duplicate-ssh-host-key-confirmation
+    review/ssh-secret-cleanup
 
-Expected checkpoint for P2:
+Expected checkpoint for P6:
 
-- Add duplicate-confirmation guard.
-- Add ViewModel-level tests.
-- Run local validation.
-- Open a focused PR.
-- Do not combine P2 with broad documentation synchronization.
+- Inspect current SSH authentication input handling.
+- Confirm which sensitive values are retained in UI state, ViewModel fields, domain request objects, and service boundaries.
+- Verify whether existing cleanup paths clear password and passphrase values after connection attempts.
+- Do not add broad cleanup logic before identifying a concrete retained value or lifecycle gap.
+- Keep terminal UI, saved commands, persistent credentials, and private-key authentication out of scope.
 
-Recommended validation:
+Recommended inspection commands:
+
+    grep -RIn "password\|passphrase\|privateKey\|authenticationInput\|AuthenticationInput" app/src/main/java app/src/test/java
+
+Recommended validation if code changes become necessary:
 
     ./gradlew testDebugUnitTest
     ./gradlew :app:assembleDebug
     git diff --check
 
-If instrumentation coverage is affected:
+If no code change is needed, record the review outcome in documentation only.
 
-    ./gradlew connectedDebugAndroidTest
