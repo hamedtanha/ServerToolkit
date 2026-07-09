@@ -66,3 +66,34 @@ val MIGRATION_2_3 = object : Migration(2, 3) {
         )
     }
 }
+
+val MIGRATION_3_4 = object : Migration(3, 4) {
+
+    override fun migrate(db: SupportSQLiteDatabase) {
+        db.execSQL(
+            """
+            CREATE TABLE IF NOT EXISTS `ssh_connection_history` (
+                `id` TEXT NOT NULL,
+                `server_id` TEXT NOT NULL,
+                `host` TEXT NOT NULL,
+                `port` INTEGER NOT NULL,
+                `username` TEXT NOT NULL,
+                `status` TEXT NOT NULL,
+                `attempted_at_epoch_millis` INTEGER NOT NULL,
+                `completed_at_epoch_millis` INTEGER,
+                `connection_error` TEXT,
+                PRIMARY KEY(`id`),
+                FOREIGN KEY(`server_id`) REFERENCES `servers`(`id`) ON UPDATE NO ACTION ON DELETE CASCADE
+            )
+            """.trimIndent(),
+        )
+        db.execSQL(
+            "CREATE INDEX IF NOT EXISTS `index_ssh_connection_history_server_id` " +
+                "ON `ssh_connection_history` (`server_id`)",
+        )
+        db.execSQL(
+            "CREATE INDEX IF NOT EXISTS `index_ssh_connection_history_attempted_at_epoch_millis` " +
+                "ON `ssh_connection_history` (`attempted_at_epoch_millis`)",
+        )
+    }
+}

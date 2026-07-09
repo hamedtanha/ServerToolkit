@@ -4,12 +4,14 @@ import dagger.Binds
 import dagger.Module
 import dagger.hilt.InstallIn
 import dagger.hilt.components.SingletonComponent
+import de.hamedtanha.servertoolkit.feature.ssh.data.repository.RoomSshConnectionHistoryRepository
 import de.hamedtanha.servertoolkit.feature.ssh.data.repository.RoomSshHostTrustRepository
 import de.hamedtanha.servertoolkit.feature.ssh.data.service.SshjCommandExecutionPlanningService
 import de.hamedtanha.servertoolkit.feature.ssh.data.service.SshjCommandExecutionService
 import de.hamedtanha.servertoolkit.feature.ssh.data.service.SshjConnectionService
 import de.hamedtanha.servertoolkit.feature.ssh.data.service.SshjHostKeyObservationService
 import de.hamedtanha.servertoolkit.feature.ssh.data.service.SshjSessionLifecycleService
+import de.hamedtanha.servertoolkit.feature.ssh.domain.repository.SshConnectionHistoryRepository
 import de.hamedtanha.servertoolkit.feature.ssh.domain.repository.SshHostTrustRepository
 import de.hamedtanha.servertoolkit.feature.ssh.domain.service.SshCommandExecutionPlanningService
 import de.hamedtanha.servertoolkit.feature.ssh.domain.service.SshCommandExecutionService
@@ -56,4 +58,10 @@ abstract class SshModule {
     abstract fun bindSshHostTrustRepository(
         repository: RoomSshHostTrustRepository,
     ): SshHostTrustRepository
+
+    @Binds
+    @Singleton
+    abstract fun bindSshConnectionHistoryRepository(
+        repository: RoomSshConnectionHistoryRepository,
+    ): SshConnectionHistoryRepository
 }

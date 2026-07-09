@@ -97,6 +97,49 @@ class ServerToolkitDatabaseMigrationTest {
         }
     }
 
+
+    @Test
+    fun migrate3To4_createsConnectionHistoryTableAndCascadesWithServerDeletion() {
+        helper.createDatabase(TEST_DATABASE_NAME, 3).apply {
+            insertServer(
+                serverId = "server-1",
+                host = "example.com",
+            )
+            close()
+        }
+
+        helper.runMigrationsAndValidate(
+            TEST_DATABASE_NAME,
+            4,
+            true,
+            MIGRATION_3_4,
+        ).apply {
+            insertConnectionHistoryEntry(
+                entryId = "history-1",
+                serverId = "server-1",
+                host = "example.com",
+            )
+
+            query("SELECT COUNT(*) FROM ssh_connection_history").use { cursor ->
+                cursor.moveToFirst()
+                check(cursor.getInt(0) == 1) {
+                    "Expected connection history row to be inserted after migration."
+                }
+            }
+
+            setForeignKeyConstraintsEnabled(true)
+            execSQL("DELETE FROM servers WHERE id = 'server-1'")
+
+            query("SELECT COUNT(*) FROM ssh_connection_history").use { cursor ->
+                cursor.moveToFirst()
+                check(cursor.getInt(0) == 0) {
+                    "Expected connection history to be cascade-deleted with its server."
+                }
+            }
+            close()
+        }
+    }
+
     private fun androidx.sqlite.db.SupportSQLiteDatabase.insertServer(
         serverId: String,
         host: String,
@@ -149,6 +192,39 @@ class ServerToolkitDatabaseMigrationTest {
                 22,
                 'SHA256',
                 '$fingerprintValue'
+            )
+            """.trimIndent(),
+        )
+    }
+
+
+    private fun androidx.sqlite.db.SupportSQLiteDatabase.insertConnectionHistoryEntry(
+        entryId: String,
+        serverId: String,
+        host: String,
+    ) {
+        execSQL(
+            """
+            INSERT INTO ssh_connection_history (
+                id,
+                server_id,
+                host,
+                port,
+                username,
+                status,
+                attempted_at_epoch_millis,
+                completed_at_epoch_millis,
+                connection_error
+            ) VALUES (
+                '$entryId',
+                '$serverId',
+                '$host',
+                22,
+                'admin',
+                'Connected',
+                1000,
+                2000,
+                NULL
             )
             """.trimIndent(),
         )
