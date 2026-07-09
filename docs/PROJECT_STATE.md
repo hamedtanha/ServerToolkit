@@ -76,8 +76,8 @@ The following items are intentionally not implemented yet:
 
 The current implementation area is:
 
-- SSH command execution workflow verification and stabilization.
-- SSH connection, session lifecycle, and command execution timeout, cleanup, cancellation, and failure-mapping behavior hardening.
+- SSH 0.4.0-alpha runtime verification and evidence-driven stabilization.
+- Reviewed planning for the next SSH implementation slice.
 
 ---
 
@@ -85,9 +85,10 @@ The current implementation area is:
 
 The next safe development steps are:
 
-1. Continue hardening timeout, cleanup, cancellation, and failure-mapping behavior around SSH connection, session lifecycle, and command execution.
-2. Keep terminal UI, saved command history, background monitoring, and persistent credentials out of scope.
-3. Consider saved command workflows only after a separate reviewed design and documentation update.
+1. Add more SSH hardening only when current repository inspection or runtime testing identifies a concrete gap.
+2. Select the next SSH implementation slice through a separate reviewed design and documentation update.
+3. Keep terminal UI, saved command history, background monitoring, and persistent credentials out of scope.
+4. Consider saved command workflows only after a separate reviewed design and documentation update.
 
 ---
 
