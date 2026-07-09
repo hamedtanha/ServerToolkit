@@ -34,14 +34,16 @@ Recent resolved pull requests:
 - PR `#81`: `fix: prevent duplicate ssh host key confirmation`
 - PR `#82`: `fix: update trusted host accepted message`
 - PR `#83`: `docs: sync ssh current state`
+- PR `#84`: `docs: update engineering review checkpoint`
+- PR `#85`: `docs: record ssh secret cleanup review`
 
-Current `main` state after PR `#83`:
+Current `main` state after PR `#85`:
 
 - Trusted SSH host keys are lifecycle-bound to their owning server inventory entries.
 - Duplicate SSH host key confirmation attempts are guarded at the ViewModel boundary.
 - The trusted-host accepted message no longer references obsolete implementation gates.
 - Current-state SSH documentation is synchronized with the implemented ephemeral password connection and non-interactive command execution workflow.
-- The open review backlog has been reduced to future concurrency and security-hygiene review items.
+- The open review backlog has been reduced to the future SSH session close-vs-execute concurrency review item.
 
 Recent validation completed:
 
@@ -205,29 +207,7 @@ Current-state documentation must describe behavior that exists in the current co
 
 ---
 
-## Open Review Backlog
-
-### P5 — SSH session close-vs-execute concurrency needs future review
-
-Status: Future review item.
-
-Risk:
-
-As SSH execution behavior grows, race conditions may appear between command execution, session closing, and disconnect handling.
-
-Current recommendation:
-
-Do not add speculative concurrency infrastructure yet.
-
-Revisit this when:
-
-- multiple commands can overlap,
-- command cancellation is introduced,
-- session reuse expands,
-- disconnect behavior becomes user-controllable,
-- a concrete failing case appears.
-
----
+## Reviewed Findings
 
 ### P6 — SSH authentication secret cleanup review
 
@@ -258,6 +238,30 @@ No Kotlin implementation change is required for the current reviewed flow.
 Follow-up trigger:
 
 Reopen this review only if the project adds private-key material, persistent credentials, saved authentication profiles, background reconnect, terminal sessions with credential prompts, or another workflow that stores or reuses authentication secrets beyond one connection attempt.
+
+---
+
+## Open Review Backlog
+
+### P5 — SSH session close-vs-execute concurrency needs future review
+
+Status: Future review item.
+
+Risk:
+
+As SSH execution behavior grows, race conditions may appear between command execution, session closing, and disconnect handling.
+
+Current recommendation:
+
+Do not add speculative concurrency infrastructure yet.
+
+Revisit this when:
+
+- multiple commands can overlap,
+- command cancellation is introduced,
+- session reuse expands,
+- disconnect behavior becomes user-controllable,
+- a concrete failing case appears.
 
 ---
 
