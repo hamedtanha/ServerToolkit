@@ -164,6 +164,7 @@ Persistent credentials, terminal UI, saved command workflows, background monitor
 - SSH host-key observation and trusted verifier unit tests.
 - SSH command execution service tests.
 - SSH command channel lifecycle tests.
+- SSH command timeout stream-suppression regression test.
 - SSH command cancellation tests.
 - SSH duplicate host-key confirmation regression test.
 - Manual SSH route verification.
