@@ -145,6 +145,7 @@ The project follows Conventional Commits and Semantic Versioning principles.
 - Added SSHJ-backed command execution service and dependency injection binding.
 - Added SSH command execution use case.
 - Added SSH command timeout stream-suppression regression coverage.
+- Added SSH command cancellation cleanup-failure regression coverage.
 - Added SSH command execution presentation state and UI mapper.
 - Added SSH ViewModel command execution wiring through active project-owned session handles.
 - Added SSH command input and Run command UI controls.
