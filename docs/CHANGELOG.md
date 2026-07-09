@@ -150,6 +150,8 @@ The project follows Conventional Commits and Semantic Versioning principles.
 
 ### Changed
 
+- Synchronized SSH current-state documentation with trusted-host cascade deletion, duplicate host-key confirmation protection, trusted-host accepted copy, and current non-interactive command execution behavior.
+
 - Synchronized README and Documentation Governance indexes with the focused `docs/state/` documents.
 - Split detailed project state into focused current-state documents for Server Inventory and SSH while keeping `PROJECT_STATE.md` as the source-of-truth entry point.
 - Synchronized architecture and README documentation with the accepted SSH credential ownership, Android backup policy, host trust persistence, and ephemeral password SSH connection status.

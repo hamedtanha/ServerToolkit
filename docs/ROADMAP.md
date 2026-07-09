@@ -3,7 +3,7 @@
 **Project:** Server Toolkit
 **Version:** 0.4.0-alpha
 **Status:** Active Implementation
-**Last Updated:** 2026-07-06
+**Last Updated:** 2026-07-09
 
 ---
 
@@ -97,7 +97,7 @@ Completed:
 - Server Inventory screen structure refinement.
 - Server Inventory UI state semantic clarification.
 - Server Inventory empty-state action.
-- Add Server placeholder screen.
+- Add Server route backed by the shared Server Form screen.
 - Shared Server Form UI state.
 - Add Server ViewModel.
 - Shared Server Form screen.
@@ -174,6 +174,7 @@ In progress:
 - Project-owned session management boundary.
 - Non-interactive command execution workflow.
 - Command execution session-invalidation and cancellation hardening.
+- Trusted-host persistence lifecycle hardening and host-key confirmation interaction safety.
 
 Planned:
 

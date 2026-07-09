@@ -3,7 +3,7 @@
 **Project:** Server Toolkit
 **Version:** 0.4.0-alpha
 **Status:** Active Implementation
-**Last Updated:** 2026-07-08
+**Last Updated:** 2026-07-09
 
 ---
 
@@ -67,8 +67,8 @@ The following items are intentionally not implemented yet:
 - Monitoring workflow.
 - Saved command workflow.
 - Xray or x-ui management workflow.
-- Room migrations beyond database version 2.
-- Migration tests beyond the trusted-host v1-to-v2 migration.
+- Room migrations beyond database version 3.
+- Migration tests beyond the trusted-host v1-to-v2 and v2-to-v3 migrations.
 
 ---
 

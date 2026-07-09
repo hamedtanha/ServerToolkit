@@ -4,7 +4,7 @@
 **Feature Area:** Server Inventory
 **Status:** Accepted Baseline
 **Related Milestone:** Version 0.3.0 — Server Inventory Foundation
-**Last Updated:** 2026-07-08
+**Last Updated:** 2026-07-09
 
 ---
 
@@ -39,7 +39,7 @@ The feature provides local server inventory management backed by Room persistenc
 ### Server Form Workflows
 
 - Add Server navigation destination.
-- Add Server placeholder screen.
+- Add Server route backed by the shared Server Form screen.
 - Add Server ViewModel.
 - Add Server form fields.
 - Add Server validation state.
