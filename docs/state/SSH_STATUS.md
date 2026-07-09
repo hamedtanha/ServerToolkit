@@ -22,6 +22,8 @@ SSH is in active implementation for version 0.4.0-alpha.
 
 The current implementation supports real ephemeral password-based SSH connections and user-facing non-interactive command execution behind project-owned SSH session handles.
 
+The current timeout, cleanup, cancellation, and failure-mapping hardening coverage pass is complete. Future SSH hardening must be driven by concrete runtime evidence, current repository inspection, or a newly recorded focused review finding.
+
 Persistent credentials, terminal UI, saved command workflows, background monitoring, and Xray or x-ui management remain intentionally out of scope.
 
 ---
@@ -209,9 +211,10 @@ The following items are intentionally not implemented yet:
 
 The next safe development steps are:
 
-1. Continue runtime verification and hardening around SSH connection, session lifecycle, command execution timeout, cleanup, cancellation, and failure mapping.
-2. Improve user-facing failure states for authentication failure, connection failure, host trust review, changed host key, and command failure.
-3. Keep terminal UI, saved command history, background monitoring, persistent credentials, and Xray or x-ui management out of scope.
+1. Continue SSH runtime verification and record any concrete runtime gap as a new focused review finding.
+2. Add more timeout, cleanup, cancellation, or failure-mapping hardening only when current evidence identifies a specific gap.
+3. Change user-facing SSH failure states only when a specific copy or state-mapping issue is identified.
+4. Keep terminal UI, saved command history, background monitoring, persistent credentials, and Xray or x-ui management out of scope.
 
 ---
 

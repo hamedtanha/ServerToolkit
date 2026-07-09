@@ -41,17 +41,28 @@ Recent resolved pull requests:
 - PR `#88`: `fix: improve ssh failure state messages`
 - PR `#89`: `docs: record ssh runtime failure mapping review`
 - PR `#90`: `fix: serialize ssh session close and command execution`
+- PR `#91`: `docs: update engineering review checkpoint after ssh hardening`
+- PR `#92`: `docs: add AI change impact workflow rules`
+- PR `#93`: `test: cover ssh command timeout stream suppression`
+- PR `#94`: `test: cover ssh command cancellation cleanup failure`
+- PR `#95`: `test: cover trusted ssh connection cancellation cleanup`
+- PR `#96`: `test: cover ssh failure ui mapper states`
 
-Current `main` state after PR `#90`:
+Current `main` state after PR `#96`:
 
 - Trusted SSH host keys are lifecycle-bound to their owning server inventory entries.
 - Duplicate SSH host key confirmation attempts are guarded at the ViewModel boundary.
 - The trusted-host accepted message no longer references obsolete implementation gates.
 - Current-state SSH documentation is synchronized with the implemented ephemeral password connection and non-interactive command execution workflow.
-- SSH connection and command execution failure states use more specific non-interactive SSH guidance.
+- SSH connection and command execution failure states use specific non-interactive SSH guidance.
 - SSH runtime failure mapping was reviewed; no additional domain error category is required without runtime evidence.
 - SSH session close cleanup and command execution are serialized at the SSHJ session-owner boundary.
-- The reviewed SSH hardening backlog is closed with no open review findings.
+- SSH command timeout stream suppression is covered by regression tests.
+- SSH command cancellation remains preserved when command-channel cleanup fails.
+- Trusted SSH connection cancellation remains preserved when client cleanup fails.
+- SSH connection and command failure UI mapper states are covered by regression tests.
+- The current SSH timeout, cleanup, cancellation, and failure-mapping hardening coverage pass is complete.
+- No generic SSH hardening backlog remains open without new runtime evidence or a new focused review finding.
 
 Recent validation completed:
 
@@ -96,6 +107,18 @@ For PR `#90`:
     ./gradlew testDebugUnitTest
     git diff --check
     ./gradlew :app:assembleDebug
+
+For PR `#92`:
+
+    git diff --check
+
+For PR `#93` through PR `#96`:
+
+    ./gradlew testDebugUnitTest
+    ./gradlew :app:assembleDebug
+    git diff --check
+
+Each regression-coverage pull request also ran the relevant targeted unit test for the changed boundary before full validation.
 
 GitHub status:
 
@@ -290,6 +313,33 @@ The SSHJ client is a concrete data-layer resource owned by `SshjSessionOwner`. S
 
 ---
 
+### P7 — SSH hardening coverage pass required closure
+
+Status: Reviewed and closed after PRs `#93` through `#96`.
+
+Risk reviewed:
+
+After the original SSH engineering checkpoint was closed, current-state documents still pointed to broad timeout, cleanup, cancellation, and failure-mapping hardening. That could keep the project in an open-ended hardening loop instead of moving to evidence-driven work selection.
+
+Review outcome:
+
+The current hardening coverage pass is complete for the reviewed SSH boundaries.
+
+Confirmed coverage:
+
+- SSH command timeout stream suppression.
+- SSH command cancellation preservation when command-channel cleanup fails.
+- Trusted SSH connection cancellation preservation when client cleanup fails.
+- SSH connection and command failure UI mapper states.
+
+Decision:
+
+No additional generic SSH hardening work is currently tracked.
+
+Future SSH hardening must come from concrete runtime evidence, current repository inspection, or a newly recorded focused review finding.
+
+---
+
 ## Open Review Backlog
 
 No open review findings are currently tracked.
@@ -366,6 +416,11 @@ PR `#83` stayed focused on documentation synchronization after focused implement
 PR `#88` stayed focused on presentation-layer SSH failure-state wording.
 PR `#89` stayed focused on recording runtime failure-mapping review findings without speculative implementation.
 PR `#90` stayed focused on SSHJ session-owner close-vs-execute serialization and its regression coverage.
+PR `#92` stayed focused on AI change-impact workflow rules.
+PR `#93` stayed focused on SSH command timeout stream-suppression regression coverage.
+PR `#94` stayed focused on SSH command cancellation cleanup-failure regression coverage.
+PR `#95` stayed focused on trusted SSH connection cancellation cleanup regression coverage.
+PR `#96` stayed focused on SSH failure UI mapper state coverage.
 
 That was the correct scope.
 
@@ -435,12 +490,22 @@ Closed scope:
 - P6 was reviewed by PR `#85` and finalized by PR `#86`.
 - SSH failure-state wording was improved by PR `#88`.
 - SSH runtime failure mapping was reviewed by PR `#89`.
+- SSH session close and command execution serialization was resolved by PR `#90`.
+
+Post-closure hardening coverage pass:
+
+- AI change-impact workflow rules were added by PR `#92`.
+- SSH command timeout stream suppression was covered by PR `#93`.
+- SSH command cancellation cleanup-failure behavior was covered by PR `#94`.
+- Trusted SSH connection cancellation cleanup behavior was covered by PR `#95`.
+- SSH failure UI mapper states were covered by PR `#96`.
 
 Remaining backlog:
 
 - No open review findings are currently tracked for this checkpoint.
+- No generic SSH timeout, cleanup, cancellation, or failure-mapping hardening backlog remains open without new runtime evidence.
 
 Next planning rule:
 
-Select the next implementation slice from the project roadmap or current product priorities. Do not continue this checkpoint unless a new review finding is discovered from current repository inspection.
+Select the next implementation slice from the project roadmap or current product priorities. Do not continue this checkpoint unless a new review finding is discovered from current repository inspection or runtime verification.
 

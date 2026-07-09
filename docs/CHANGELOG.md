@@ -155,6 +155,7 @@ The project follows Conventional Commits and Semantic Versioning principles.
 
 ### Changed
 
+- Synchronized SSH current-state and review documentation after completing the current timeout, cleanup, cancellation, and failure-mapping hardening coverage pass.
 - Synchronized SSH current-state documentation with trusted-host cascade deletion, duplicate host-key confirmation protection, trusted-host accepted copy, and current non-interactive command execution behavior.
 
 - Synchronized README and Documentation Governance indexes with the focused `docs/state/` documents.
