@@ -11,6 +11,7 @@ The project follows Conventional Commits and Semantic Versioning principles.
 ### Added
 
 - Added documentation governance rules for version metadata, source-of-truth ordering, changelog usage, and ADR documentation boundaries.
+- Added AI change-impact workflow rules for scoped implementation, affected-file review, validation, and documentation synchronization gates.
 - Added ADR-012 for Android backup and data extraction policy.
 - Added Hilt-enabled application setup.
 - Added Dashboard ViewModel.
