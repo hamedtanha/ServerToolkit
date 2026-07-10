@@ -59,6 +59,27 @@ Do not rely on stale project documentation, previous conversation summaries, or 
 
 If the current repository state is unknown, ask the maintainer to provide the relevant files or command output before making project-changing recommendations.
 
+## Project Context Reconstruction
+
+Before recommending the next project step, a new ADR, a new project document, or an architecture change, AI assistants must reconstruct the current project context from the repository.
+
+At minimum, inspect:
+
+1. `docs/PROJECT_STATE.md`.
+2. The relevant focused documents under `docs/state/`.
+3. `docs/adr/README.md` and the relevant accepted or draft ADRs.
+4. Recent merged pull requests and commits that changed the affected area.
+5. Relevant engineering review records under `docs/review/`.
+6. `docs/ai/AI_RULES.md` and `docs/ai/AI_MEMORY.md` when the recommendation affects project workflow, continuity, or AI collaboration.
+
+Before recommending a new ADR or document, verify that the proposed content is not already covered by an accepted decision, focused state document, closed review finding, or existing implementation boundary.
+
+Before reopening a closed review area, identify the concrete trigger, runtime evidence, repository change, or new scope that justifies reopening it.
+
+Do not infer the current project phase from one document, one pull request, a conversation summary, or assistant memory alone.
+
+State the reconstructed current phase and the evidence that supports the recommendation before proposing project-changing work.
+
 ## Change Impact Workflow
 
 Before recommending or applying any source, test, or documentation change, AI assistants must follow this workflow:

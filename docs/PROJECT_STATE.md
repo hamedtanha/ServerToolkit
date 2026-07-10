@@ -27,6 +27,8 @@ Version 0.4.0-alpha is focused on SSH.
 
 The current SSH implementation supports real ephemeral password-based SSH connections and user-facing non-interactive command execution behind project-owned SSH session handles.
 
+Ephemeral private-key authentication is now under focused design review through Draft ADR-013. No private-key authentication implementation is authorized until that ADR is accepted.
+
 Persistent credentials, terminal UI, saved command workflows, background monitoring, and Xray or x-ui management remain intentionally out of scope.
 
 ---
@@ -64,6 +66,7 @@ The following items are intentionally not implemented yet:
 - Interactive terminal workflow for owned sessions.
 - Additional SSH host key verification hardening, if future runtime testing identifies gaps.
 - Persistent credential storage implementation.
+- Ephemeral private-key authentication implementation.
 - Monitoring workflow.
 - Saved command workflow.
 - Xray or x-ui management workflow.
@@ -76,7 +79,7 @@ The following items are intentionally not implemented yet:
 
 The current implementation area is:
 
-- SSH 0.4.0-alpha runtime verification and preparation for the next authentication slice.
+- SSH 0.4.0-alpha private-key authentication design review through Draft ADR-013.
 - Connection history domain, Room persistence, automatic recording, and per-server presentation are complete and runtime-verified.
 
 ---
@@ -85,9 +88,9 @@ The current implementation area is:
 
 The next safe development steps are:
 
-1. Define ephemeral private-key authentication input and execution boundaries through a focused reviewed design.
-2. Keep private-key material and passphrases ephemeral, outside UI state and persistent storage.
-3. Add more SSH hardening only when current repository inspection or runtime testing identifies a concrete gap.
+1. Review Draft ADR-013 for the ephemeral private-key authentication boundary.
+2. Do not start private-key authentication implementation until ADR-013 is accepted.
+3. After acceptance, implement the smallest safe slice with bounded document access, one-attempt secret ownership, cancellation preservation, and focused verification.
 4. Keep terminal UI, saved command workflows, background monitoring, and persistent credentials out of scope.
 
 ---
