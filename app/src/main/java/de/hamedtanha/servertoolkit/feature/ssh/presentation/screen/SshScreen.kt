@@ -37,6 +37,7 @@ import de.hamedtanha.servertoolkit.feature.ssh.presentation.viewmodel.SshViewMod
 @Composable
 fun SshRoute(
     onNavigateBack: () -> Unit,
+    onOpenConnectionHistory: () -> Unit,
     modifier: Modifier = Modifier,
     viewModel: SshViewModel = hiltViewModel(),
 ) {
@@ -50,6 +51,7 @@ fun SshRoute(
         onPasswordChange = viewModel::onPasswordChanged,
         onCommandChange = viewModel::onCommandChanged,
         onExecuteCommandClick = viewModel::onExecuteCommandClicked,
+        onOpenConnectionHistory = onOpenConnectionHistory,
         onNavigateBack = onNavigateBack,
         modifier = modifier,
     )
@@ -64,6 +66,7 @@ fun SshScreen(
     onPasswordChange: (String) -> Unit,
     onCommandChange: (String) -> Unit,
     onExecuteCommandClick: () -> Unit,
+    onOpenConnectionHistory: () -> Unit,
     onNavigateBack: () -> Unit,
     modifier: Modifier = Modifier,
 ) {
@@ -185,6 +188,15 @@ fun SshScreen(
         )
 
         Spacer(modifier = Modifier.height(24.dp))
+
+        Button(
+            onClick = onOpenConnectionHistory,
+            modifier = Modifier.fillMaxWidth(),
+        ) {
+            Text(text = "Connection history")
+        }
+
+        Spacer(modifier = Modifier.height(8.dp))
 
         Button(
             onClick = onNavigateBack,

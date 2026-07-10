@@ -96,6 +96,9 @@ The project follows Conventional Commits and Semantic Versioning principles.
 - Added Room-backed SSH connection history persistence.
 - Added failure-contained automatic SSH connection history recording for resolved connection attempts.
 - Added SSH connection history recording coverage for connected, failed, timed-out, cancelled, unrecorded, and persistence-failure paths.
+- Added per-server SSH connection history destination, screen, ViewModel, UI state, and mapper.
+- Added repository-backed loading, error, empty, and newest-first connection history presentation.
+- Added connection history mapper and ViewModel tests plus manual runtime navigation verification.
 - Added SSH duplicate-attempt prevention at the ViewModel boundary.
 - Added SSH failure-containment unit tests.
 - Added SSH host trust domain models.
@@ -159,7 +162,7 @@ The project follows Conventional Commits and Semantic Versioning principles.
 
 ### Changed
 
-- Synchronized current-state documentation with the SSH connection history domain and Room persistence implementation.
+- Synchronized current-state documentation with the complete SSH connection history domain, persistence, recording, and presentation workflow.
 - Synchronized SSH current-state and review documentation after completing the current timeout, cleanup, cancellation, and failure-mapping hardening coverage pass.
 - Synchronized SSH current-state documentation with trusted-host cascade deletion, duplicate host-key confirmation protection, trusted-host accepted copy, and current non-interactive command execution behavior.
 

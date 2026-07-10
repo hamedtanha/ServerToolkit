@@ -43,8 +43,11 @@ Persistent credentials, terminal UI, saved command workflows, background monitor
 ### Navigation and Presentation
 
 - SSH navigation destination.
-- SSH screen with ephemeral password input, host-key review actions, connection status, and non-interactive command controls.
+- SSH screen with ephemeral password input, host-key review actions, connection status, non-interactive command controls, and connection history navigation.
 - SSH ViewModel and UI state for connection attempts, host-key review, authentication input, and command execution.
+- Per-server SSH connection history destination and read-only screen.
+- Connection history ViewModel and UI state backed by repository observation.
+- Connection history loading, error, empty, and newest-first entry presentation.
 - Server Inventory Connect action to open the SSH route.
 - SSH UI connection status model.
 - SSH UI state alignment with domain connection result.
@@ -68,6 +71,7 @@ Persistent credentials, terminal UI, saved command workflows, background monitor
 - SSH connection history domain model.
 - SSH connection history repository contract.
 - SSH connection history Room persistence.
+- Per-server connection history observation through the repository boundary without presentation-layer DAO access.
 - Automatic SSH connection attempt history recording for resolved targets.
 - SSH connection history persistence failure containment that preserves primary connection outcomes and cancellation.
 - SSH duplicate-attempt prevention at the ViewModel boundary.
@@ -167,6 +171,8 @@ Persistent credentials, terminal UI, saved command workflows, background monitor
 - SSH connection history domain model tests.
 - SSH connection history mapper, DAO, repository, and migration tests.
 - SSH connection history recording tests for connected, failed, timed-out, cancelled, unrecorded, and persistence-failure paths.
+- SSH connection history UI mapper and ViewModel unit tests.
+- Manual runtime verification of history navigation, newest-first presentation, entry details, and back navigation using recorded SSH attempts.
 - Test-only fake SSH connection service.
 - SSH ViewModel result handling seam for tests.
 - SSH ViewModel fake result unit tests.
@@ -212,7 +218,6 @@ The following items are intentionally not implemented yet:
 - Monitoring workflow.
 - Saved command workflow.
 - Xray or x-ui management workflow.
-- Connection history UI.
 - Room migrations beyond database version 4.
 - Migration tests beyond the trusted-host v1-to-v2, trusted-host v2-to-v3, and connection-history v3-to-v4 migrations.
 
@@ -222,8 +227,8 @@ The following items are intentionally not implemented yet:
 
 The next safe development steps are:
 
-1. Select connection history presentation as the next focused implementation slice.
-2. Consume connection history through repository observation contracts without direct DAO access from presentation code.
+1. Define the ephemeral private-key authentication input, parsing, passphrase, and execution boundaries through a focused reviewed design.
+2. Keep private-key material and passphrases ephemeral, outside UI state, logs, connection history, and persistent storage.
 3. Add more timeout, cleanup, cancellation, or failure-mapping hardening only when current evidence identifies a specific gap.
 4. Keep terminal UI, saved command workflows, background monitoring, persistent credentials, and Xray or x-ui management out of scope.
 

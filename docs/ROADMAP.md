@@ -177,10 +177,13 @@ Implemented in the current milestone:
 - SSH connection history domain model and repository contract.
 - Room-backed SSH connection history persistence with database migration to version 4.
 - Automatic recording of resolved SSH connection attempt outcomes.
+- Per-server connection history presentation using repository observation contracts.
+- Runtime verification of recorded history navigation, ordering, and entry details.
 
 Next:
 
-- Connection history presentation using the existing repository observation contracts.
+- Reviewed design for ephemeral private-key authentication without persistent key material or passphrases.
+- Implementation and runtime verification of the accepted private-key authentication slice.
 
 Planned:
 

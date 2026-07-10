@@ -28,7 +28,7 @@ internal fun SshUiState.withConnectionResult(
     }
 }
 
-private fun SshConnectionError.toStatusLabel(): String {
+internal fun SshConnectionError.toStatusLabel(): String {
     return when (this) {
         SshConnectionError.TargetNotFound -> "Server unavailable"
         SshConnectionError.MissingConnectionMetadata -> "Connection details missing"
