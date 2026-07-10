@@ -3,7 +3,7 @@
 **Project:** Server Toolkit  
 **Version:** 0.4.0-alpha
 **Status:** Active  
-**Last Updated:** 2026-07-09
+**Last Updated:** 2026-07-10
 
 ---
 
@@ -144,8 +144,8 @@ The following items are intentionally not implemented yet:
 - Monitoring workflow.
 - Saved command workflow.
 - Xray or x-ui management workflow.
-- Room migrations beyond database version 3.
-- Migration tests beyond the trusted-host v1-to-v2 and v2-to-v3 migrations.
+- Room migrations beyond database version 4.
+- Migration tests beyond the trusted-host v1-to-v2, trusted-host v2-to-v3, and connection-history v3-to-v4 migrations.
 
 ---
 
@@ -308,29 +308,34 @@ Room is the accepted persistence technology for local structured data.
 
 ### Current Scope
 
-The current persistence scope includes server inventory data and SSH trusted host key material.
+The current persistence scope includes server inventory data, SSH trusted host key material, and the storage foundation for SSH connection history.
 
-The Room persistence skeleton currently includes:
+The Room persistence implementation currently includes:
 
 - `ServerToolkitDatabase`.
 - `ServerEntity`.
 - `ServerDao`.
 - `RoomServerRepository`.
 - Server entity/domain mapping.
-- SSH trusted host entity.
-- SSH trusted host DAO.
+- SSH trusted host entity and DAO.
 - Room-backed SSH host trust repository.
 - SSH trusted host entity/domain mapping.
+- SSH connection history entity and DAO.
+- Room-backed SSH connection history repository.
+- SSH connection history entity/domain mapping.
+- Database migrations from version 1 through version 4.
 - Hilt providers for the database, DAOs, and repositories.
 - KSP schema export configuration.
 
-The database version is `2`.
+The database version is `4`.
 
 The server inventory table stores server metadata only. It must not store credentials, private keys, passphrases, access tokens, certificates, or other secrets.
 
 SSH credential ownership is separate from server inventory. Server inventory may store a non-sensitive username hint, but persistent credential metadata and secret material require a separate reviewed implementation. Secret material must be stored only through a dedicated secure storage boundary.
 
 Trusted SSH host key material is stored separately from generic server inventory metadata.
+
+SSH connection history records are stored separately and are lifecycle-bound to their owning server inventory entries through database referential integrity.
 
 ### Persistence Rules
 

@@ -3,7 +3,7 @@
 **Project:** Server Toolkit
 **Version:** 0.4.0-alpha
 **Status:** Active Implementation
-**Last Updated:** 2026-07-09
+**Last Updated:** 2026-07-10
 
 ---
 
@@ -164,23 +164,28 @@ Entry condition:
 
 The Server Inventory 0.3.0 baseline has been accepted. Credential storage still requires a separate reviewed implementation before persistent credential storage is added.
 
-In progress:
+Implemented in the current milestone:
 
 - SSH architecture and security ADRs.
 - SSHJ integration through data-layer boundaries.
 - Authentication boundary definition without persistent credential storage.
 - Ephemeral password input for single-attempt SSH authentication.
-- Host key verification and trust decision flow.
+- Host key verification and trusted-host persistence.
 - Project-owned session management boundary.
 - Non-interactive command execution workflow.
-- Command execution session-invalidation and cancellation hardening.
-- Trusted-host persistence lifecycle hardening and host-key confirmation interaction safety.
+- Evidence-driven timeout, cleanup, cancellation, and failure-mapping hardening.
+- SSH connection history domain model and repository contract.
+- Room-backed SSH connection history persistence with database migration to version 4.
+
+Next:
+
+- Automatic recording of SSH connection attempt outcomes.
+- Connection history presentation after the recording workflow is implemented and verified.
 
 Planned:
 
 - Additional SSH host key verification hardening, if future runtime testing identifies gaps.
 - Persistent credential storage only after reviewed secure storage implementation.
-- Connection history only after a separate reviewed design.
 
 Deliverable:
 
