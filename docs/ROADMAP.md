@@ -176,11 +176,11 @@ Implemented in the current milestone:
 - Evidence-driven timeout, cleanup, cancellation, and failure-mapping hardening.
 - SSH connection history domain model and repository contract.
 - Room-backed SSH connection history persistence with database migration to version 4.
+- Automatic recording of resolved SSH connection attempt outcomes.
 
 Next:
 
-- Automatic recording of SSH connection attempt outcomes.
-- Connection history presentation after the recording workflow is implemented and verified.
+- Connection history presentation using the existing repository observation contracts.
 
 Planned:
 
