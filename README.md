@@ -17,7 +17,7 @@ The application is designed for system administrators, DevOps engineers, and inf
 - Project-owned SSH session management.
 - User-facing non-interactive SSH command execution workflow.
 - SSH command output display for stdout, stderr, and exit status.
-- SSH connection history domain and Room-backed persistence foundation.
+- Automatic Room-backed SSH connection attempt history recording.
 
 ## Planned Direction
 

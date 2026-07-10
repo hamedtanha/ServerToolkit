@@ -4,7 +4,7 @@
 **Feature Area:** SSH
 **Status:** Active Implementation
 **Related Milestone:** Version 0.4.0 — SSH
-**Last Updated:** 2026-07-09
+**Last Updated:** 2026-07-10
 
 ---
 
@@ -68,6 +68,8 @@ Persistent credentials, terminal UI, saved command workflows, background monitor
 - SSH connection history domain model.
 - SSH connection history repository contract.
 - SSH connection history Room persistence.
+- Automatic SSH connection attempt history recording for resolved targets.
+- SSH connection history persistence failure containment that preserves primary connection outcomes and cancellation.
 - SSH duplicate-attempt prevention at the ViewModel boundary.
 - SSH ViewModel dependency injection for the connection attempt use case.
 
@@ -164,6 +166,7 @@ Persistent credentials, terminal UI, saved command workflows, background monitor
 - SSH domain model unit tests.
 - SSH connection history domain model tests.
 - SSH connection history mapper, DAO, repository, and migration tests.
+- SSH connection history recording tests for connected, failed, timed-out, cancelled, unrecorded, and persistence-failure paths.
 - Test-only fake SSH connection service.
 - SSH ViewModel result handling seam for tests.
 - SSH ViewModel fake result unit tests.
@@ -192,6 +195,9 @@ Persistent credentials, terminal UI, saved command workflows, background monitor
 - Persistent credential metadata and persistent secret storage are not implemented.
 - Credential persistence requires a separate reviewed implementation slice with a secure storage boundary.
 - SSH command execution remains non-interactive and must continue to use project-owned session handles.
+- SSH connection history must contain non-sensitive resolved target metadata and result classification only.
+- Target-resolution failures and host-trust decision outcomes must not create incomplete connection history entries.
+- Connection history persistence failures must not replace the primary SSH outcome or cancellation.
 - Terminal UI, saved commands, background monitoring, and persistent credentials remain out of scope.
 
 ---
@@ -206,7 +212,7 @@ The following items are intentionally not implemented yet:
 - Monitoring workflow.
 - Saved command workflow.
 - Xray or x-ui management workflow.
-- Connection history recording workflow and UI.
+- Connection history UI.
 - Room migrations beyond database version 4.
 - Migration tests beyond the trusted-host v1-to-v2, trusted-host v2-to-v3, and connection-history v3-to-v4 migrations.
 
@@ -216,10 +222,10 @@ The following items are intentionally not implemented yet:
 
 The next safe development steps are:
 
-1. Continue SSH runtime verification and record any concrete runtime gap as a new focused review finding.
-2. Add more timeout, cleanup, cancellation, or failure-mapping hardening only when current evidence identifies a specific gap.
-3. Change user-facing SSH failure states only when a specific copy or state-mapping issue is identified.
-4. Keep terminal UI, saved command history, background monitoring, persistent credentials, and Xray or x-ui management out of scope.
+1. Select connection history presentation as the next focused implementation slice.
+2. Consume connection history through repository observation contracts without direct DAO access from presentation code.
+3. Add more timeout, cleanup, cancellation, or failure-mapping hardening only when current evidence identifies a specific gap.
+4. Keep terminal UI, saved command workflows, background monitoring, persistent credentials, and Xray or x-ui management out of scope.
 
 ---
 

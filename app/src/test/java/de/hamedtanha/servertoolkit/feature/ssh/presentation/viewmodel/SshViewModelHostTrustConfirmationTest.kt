@@ -20,6 +20,7 @@ import de.hamedtanha.servertoolkit.feature.ssh.domain.usecase.SshConnectionAttem
 import de.hamedtanha.servertoolkit.feature.ssh.domain.usecase.SshHostTrustDecisionUseCase
 import de.hamedtanha.servertoolkit.feature.ssh.domain.usecase.SshHostTrustEvaluator
 import de.hamedtanha.servertoolkit.feature.ssh.test.FakeConnectionTargetResolver
+import de.hamedtanha.servertoolkit.feature.ssh.test.FakeSshConnectionHistoryRepository
 import de.hamedtanha.servertoolkit.feature.ssh.test.FakeSshConnectionService
 import de.hamedtanha.servertoolkit.feature.ssh.test.FakeSshHostKeyObservationService
 import de.hamedtanha.servertoolkit.feature.ssh.test.sshConnectedResult
@@ -140,6 +141,7 @@ class SshViewModelHostTrustConfirmationTest {
                     SshHostKeyObservationResult.Observed(observedHostKey()),
                 ),
                 hostTrustDecisionUseCase = hostTrustDecisionUseCase,
+                connectionHistoryRepository = FakeSshConnectionHistoryRepository(),
                 timeoutMillis = 1_000,
             ),
             confirmHostTrustUseCase = ConfirmSshHostTrustUseCase(
