@@ -32,7 +32,7 @@ This directory contains all Architecture Decision Records for the Server Toolkit
 | ADR-010 | SSH Command Channel Execution Strategy | Accepted |
 | ADR-011 | SSH Credential Ownership and Secure Storage Strategy | Accepted |
 | ADR-012 | Android Backup and Data Extraction Policy | Accepted |
-| ADR-013 | Ephemeral SSH Private-Key Authentication Boundary | Draft |
+| ADR-013 | Ephemeral SSH Private-Key Authentication Boundary | Accepted |
 
 ---
 

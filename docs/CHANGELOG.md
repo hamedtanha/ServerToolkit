@@ -13,7 +13,7 @@ The project follows Conventional Commits and Semantic Versioning principles.
 - Added documentation governance rules for version metadata, source-of-truth ordering, changelog usage, and ADR documentation boundaries.
 - Added AI change-impact workflow rules for scoped implementation, affected-file review, validation, and documentation synchronization gates.
 - Added ADR-012 for Android backup and data extraction policy.
-- Added Draft ADR-013 for the ephemeral SSH private-key authentication boundary.
+- Added ADR-013 for the accepted ephemeral SSH private-key authentication boundary.
 - Added Hilt-enabled application setup.
 - Added Dashboard ViewModel.
 - Added Dashboard UI state.
@@ -164,7 +164,7 @@ The project follows Conventional Commits and Semantic Versioning principles.
 ### Changed
 
 - Strengthened AI project-context reconstruction rules and synchronized AI Memory with the current documentation source-of-truth hierarchy.
-- Synchronized current-state SSH planning with Draft ADR-013 while keeping private-key authentication explicitly unimplemented.
+- Synchronized current-state SSH planning with accepted ADR-013 while keeping private-key authentication explicitly unimplemented.
 - Synchronized current-state documentation with the complete SSH connection history domain, persistence, recording, and presentation workflow.
 - Synchronized SSH current-state and review documentation after completing the current timeout, cleanup, cancellation, and failure-mapping hardening coverage pass.
 - Synchronized SSH current-state documentation with trusted-host cascade deletion, duplicate host-key confirmation protection, trusted-host accepted copy, and current non-interactive command execution behavior.

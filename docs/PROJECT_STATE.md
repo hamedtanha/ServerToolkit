@@ -27,7 +27,7 @@ Version 0.4.0-alpha is focused on SSH.
 
 The current SSH implementation supports real ephemeral password-based SSH connections and user-facing non-interactive command execution behind project-owned SSH session handles.
 
-Ephemeral private-key authentication is now under focused design review through Draft ADR-013. No private-key authentication implementation is authorized until that ADR is accepted.
+The ephemeral private-key authentication boundary is accepted through ADR-013. Private-key authentication remains unimplemented and must follow the accepted one-attempt, non-persistent design.
 
 Persistent credentials, terminal UI, saved command workflows, background monitoring, and Xray or x-ui management remain intentionally out of scope.
 
@@ -79,7 +79,7 @@ The following items are intentionally not implemented yet:
 
 The current implementation area is:
 
-- SSH 0.4.0-alpha private-key authentication design review through Draft ADR-013.
+- SSH 0.4.0-alpha preparation for the first implementation slice against accepted ADR-013.
 - Connection history domain, Room persistence, automatic recording, and per-server presentation are complete and runtime-verified.
 
 ---
@@ -88,9 +88,9 @@ The current implementation area is:
 
 The next safe development steps are:
 
-1. Review Draft ADR-013 for the ephemeral private-key authentication boundary.
-2. Do not start private-key authentication implementation until ADR-013 is accepted.
-3. After acceptance, implement the smallest safe slice with bounded document access, one-attempt secret ownership, cancellation preservation, and focused verification.
+1. Implement the smallest safe private-key authentication slice against accepted ADR-013.
+2. Begin with the project-owned one-shot source, bounded Android content access, and lifecycle tests.
+3. Add SSHJ parsing and authentication only behind the verified source and failure-mapping boundaries.
 4. Keep terminal UI, saved command workflows, background monitoring, and persistent credentials out of scope.
 
 ---

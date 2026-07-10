@@ -1,6 +1,6 @@
 # ADR-013: Ephemeral SSH Private-Key Authentication Boundary
 
-**Status:** Draft
+**Status:** Accepted
 
 **Date:** 2026-07-10
 
@@ -70,7 +70,11 @@ The contract will:
 - return project-owned failure categories;
 - support explicit invalidation before consumption.
 
-The Android implementation will use `ContentResolver` to open the selected content.
+The Android implementation will open the selected content with `ContentResolver.openAssetFileDescriptor(uri, "r", cancellationSignal)` and read through the returned descriptor.
+
+Coroutine cancellation and timeout must cancel the associated Android `CancellationSignal`. The descriptor and derived stream are application-owned resources and must be closed in every outcome.
+
+`ContentResolver.openInputStream()` must not be used for the cancellable provider-opening path because it has no `CancellationSignal` overload. Cancellation remains best-effort after a stream is open because a provider may ignore cancellation or block inside a read operation.
 
 ## Ownership and Transfer
 
@@ -106,8 +110,9 @@ The implementation must:
 - reject empty documents;
 - reject documents larger than the configured limit;
 - avoid unbounded `readBytes()` behavior;
-- apply timeout and cancellation handling to provider access;
-- handle providers that fail, block, disappear, or change content between metadata lookup and stream reading;
+- bridge coroutine cancellation and timeout to the Android `CancellationSignal` used for provider metadata queries and descriptor opening;
+- check cancellation between bounded read operations and close owned descriptors and streams promptly;
+- handle providers that fail, block, ignore cancellation, disappear, or change content between metadata lookup and stream reading;
 - use a mutable byte buffer for application-owned key material;
 - clear application-owned mutable buffers on a best-effort basis after parsing or failure;
 - release references promptly.
@@ -154,7 +159,32 @@ The data layer must:
 - preserve coroutine cancellation;
 - close and clean up temporary resources even when authentication fails.
 
-The exact supported key-format matrix must be recorded in the implementation pull request and synchronized into SSH current-state documentation after runtime verification.
+The exact supported key-format matrix must be recorded in the implementation pull request and synchronized into SSH current-state documentation after automated and Android runtime verification.
+
+Because the matrix depends on implementation evidence, it is an implementation acceptance output rather than a prerequisite for accepting this design decision.
+
+## Key-Format Verification Plan
+
+The implementation will use dedicated test-only private keys that have no operational use and are clearly identified as fixtures.
+
+The initial fixture set will include:
+
+- unencrypted OpenSSH Ed25519;
+- passphrase-protected OpenSSH Ed25519;
+- unencrypted OpenSSH RSA;
+- passphrase-protected OpenSSH RSA;
+- unencrypted PKCS#8 RSA;
+- passphrase-protected PKCS#8 RSA;
+- malformed and truncated key documents;
+- a valid encrypted key with an incorrect passphrase.
+
+The first implementation must successfully support both unencrypted and passphrase-protected OpenSSH Ed25519 and OpenSSH RSA fixtures.
+
+PKCS#8 outcomes must be tested and documented. PKCS#8 support may be included only when automated tests and Android runtime verification succeed; otherwise it must map to a stable unsupported-format outcome.
+
+The final supported key-format matrix must list only formats that pass automated adapter tests and Android runtime verification. Algorithms and containers outside the verified matrix remain unsupported rather than implicitly accepted.
+
+Empty, oversized, unavailable, cancelled, and hostile-provider cases belong to the one-shot source test plan rather than the cryptographic key-format fixture set.
 
 ## Failure Model
 
@@ -302,7 +332,7 @@ Accepted for the initial private-key authentication implementation.
 
 # Implementation Gates
 
-Before this ADR may move from Draft to Accepted, review must confirm:
+The design review accepted this ADR after confirming:
 
 - the project-owned one-shot source contract;
 - the Android `GetContent` integration boundary;
@@ -312,8 +342,8 @@ Before this ADR may move from Draft to Accepted, review must confirm:
 - the authentication input ownership model;
 - host-key review invalidation behavior;
 - stable failure categories;
-- the initial supported key-format matrix;
-- cancellation and cleanup tests;
+- the key-format verification plan and initial test-fixture set;
+- the cancellation and cleanup test plan;
 - documentation impact for implementation.
 
 Before private-key authentication implementation may merge, validation must include:
@@ -338,7 +368,7 @@ Before private-key authentication implementation may merge, validation must incl
 - ADR-012: Android Backup and Data Extraction Policy
 - [Android Developers: Access documents and other files from shared storage](https://developer.android.com/training/data-storage/shared/documents-files)
 - [Android Developers: ActivityResultContracts.GetContent](https://developer.android.com/reference/androidx/activity/result/contract/ActivityResultContracts.GetContent)
-- [Android Developers: ContentResolver.openInputStream](https://developer.android.com/reference/android/content/ContentResolver#openInputStream(android.net.Uri))
+- [Android Developers: ContentResolver.openAssetFileDescriptor](https://developer.android.com/reference/android/content/ContentResolver#openAssetFileDescriptor(android.net.Uri,%20java.lang.String,%20android.os.CancellationSignal))
 - [SSHJ](https://github.com/hierynomus/sshj)
 - PROJECT_STATE.md
 - state/SSH_STATUS.md
@@ -347,6 +377,6 @@ Before private-key authentication implementation may merge, validation must incl
 
 # Notes
 
-This ADR is a design record only.
+This ADR accepts the design boundary for a future ephemeral private-key authentication implementation.
 
 It does not describe private-key authentication as implemented and does not authorize persistent credential storage.

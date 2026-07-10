@@ -22,7 +22,7 @@ SSH is in active implementation for version 0.4.0-alpha.
 
 The current implementation supports real ephemeral password-based SSH connections and user-facing non-interactive command execution behind project-owned SSH session handles.
 
-Ephemeral private-key authentication is under focused design review through Draft ADR-013. The draft does not describe private-key authentication as implemented and must be accepted before implementation begins.
+The ephemeral private-key authentication boundary is accepted through ADR-013. Private-key authentication remains unimplemented and must follow the accepted one-attempt, non-persistent design.
 
 The current timeout, cleanup, cancellation, and failure-mapping hardening coverage pass is complete. Future SSH hardening must be driven by concrete runtime evidence, current repository inspection, or a newly recorded focused review finding.
 
@@ -30,9 +30,9 @@ Persistent credentials, terminal UI, saved command workflows, background monitor
 
 ---
 
-## Current Design Review
+## Accepted Private-Key Authentication Design
 
-Draft ADR-013 proposes the following private-key authentication boundaries:
+ADR-013 defines the following private-key authentication boundaries:
 
 - User-selected private-key documents through the Android system document picker.
 - Immediate conversion of the selected Android document reference into a project-owned one-shot source.
@@ -43,7 +43,7 @@ Draft ADR-013 proposes the following private-key authentication boundaries:
 - Secret invalidation when an attempt enters host-key review.
 - Stable project-owned failure mapping, cancellation preservation, and best-effort cleanup.
 
-These boundaries remain proposed until ADR-013 is reviewed and accepted.
+These boundaries are accepted for the next focused implementation slices. They do not describe private-key authentication as implemented.
 
 ---
 
@@ -246,9 +246,9 @@ The following items are intentionally not implemented yet:
 
 The next safe development steps are:
 
-1. Review and either accept or revise Draft ADR-013.
-2. Do not start private-key authentication implementation while ADR-013 remains Draft.
-3. After acceptance, implement the smallest safe private-key slice with focused tests and Android runtime verification.
+1. Implement the project-owned one-shot private-key source and bounded Android content-access boundary.
+2. Add lifecycle, invalidation, cancellation, cleanup, provider-failure, and size-limit tests.
+3. Add SSHJ private-key parsing and authentication behind project-owned error mapping, then verify the supported format matrix on Android.
 4. Keep terminal UI, saved command workflows, background monitoring, persistent credentials, and Xray or x-ui management out of scope.
 
 ---
@@ -260,6 +260,6 @@ The next safe development steps are:
 - [Roadmap](../ROADMAP.md)
 - [Changelog](../CHANGELOG.md)
 - [ADR Index](../adr/README.md)
-- [Draft ADR-013: Ephemeral SSH Private-Key Authentication Boundary](../adr/ADR-013-ephemeral-ssh-private-key-authentication-strategy.md)
+- [ADR-013: Ephemeral SSH Private-Key Authentication Boundary](../adr/ADR-013-ephemeral-ssh-private-key-authentication-strategy.md)
 
 ---
