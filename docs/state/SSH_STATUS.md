@@ -22,9 +22,28 @@ SSH is in active implementation for version 0.4.0-alpha.
 
 The current implementation supports real ephemeral password-based SSH connections and user-facing non-interactive command execution behind project-owned SSH session handles.
 
+The ephemeral private-key authentication boundary is accepted through ADR-013. Private-key authentication remains unimplemented and must follow the accepted one-attempt, non-persistent design.
+
 The current timeout, cleanup, cancellation, and failure-mapping hardening coverage pass is complete. Future SSH hardening must be driven by concrete runtime evidence, current repository inspection, or a newly recorded focused review finding.
 
 Persistent credentials, terminal UI, saved command workflows, background monitoring, and Xray or x-ui management remain intentionally out of scope.
+
+---
+
+## Accepted Private-Key Authentication Design
+
+ADR-013 defines the following private-key authentication boundaries:
+
+- User-selected private-key documents through the Android system document picker.
+- Immediate conversion of the selected Android document reference into a project-owned one-shot source.
+- No persistent URI permission, key import, key copy, credential profile, or secret persistence.
+- Bounded key-document reading with an initial `256 KiB` limit.
+- Private-key parsing and SSHJ authentication inside the SSH data layer.
+- Optional passphrase handling outside observable UI state and saved state.
+- Secret invalidation when an attempt enters host-key review.
+- Stable project-owned failure mapping, cancellation preservation, and best-effort cleanup.
+
+These boundaries are accepted for the next focused implementation slices. They do not describe private-key authentication as implemented.
 
 ---
 
@@ -214,7 +233,7 @@ The following items are intentionally not implemented yet:
 
 - Interactive terminal workflow for owned sessions.
 - Persistent credential storage implementation.
-- Private-key authentication.
+- Ephemeral private-key authentication implementation.
 - Monitoring workflow.
 - Saved command workflow.
 - Xray or x-ui management workflow.
@@ -227,9 +246,9 @@ The following items are intentionally not implemented yet:
 
 The next safe development steps are:
 
-1. Define the ephemeral private-key authentication input, parsing, passphrase, and execution boundaries through a focused reviewed design.
-2. Keep private-key material and passphrases ephemeral, outside UI state, logs, connection history, and persistent storage.
-3. Add more timeout, cleanup, cancellation, or failure-mapping hardening only when current evidence identifies a specific gap.
+1. Implement the project-owned one-shot private-key source and bounded Android content-access boundary.
+2. Add lifecycle, invalidation, cancellation, cleanup, provider-failure, and size-limit tests.
+3. Add SSHJ private-key parsing and authentication behind project-owned error mapping, then verify the supported format matrix on Android.
 4. Keep terminal UI, saved command workflows, background monitoring, persistent credentials, and Xray or x-ui management out of scope.
 
 ---
@@ -241,5 +260,6 @@ The next safe development steps are:
 - [Roadmap](../ROADMAP.md)
 - [Changelog](../CHANGELOG.md)
 - [ADR Index](../adr/README.md)
+- [ADR-013: Ephemeral SSH Private-Key Authentication Boundary](../adr/ADR-013-ephemeral-ssh-private-key-authentication-strategy.md)
 
 ---

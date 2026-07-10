@@ -48,11 +48,21 @@ The project follows Living Documentation.
 
 # Lesson 004
 
-PROJECT_STATE.md is the Single Source of Truth.
+`docs/PROJECT_STATE.md` is the primary source-of-truth entry point for current implementation state.
 
-Whenever inconsistencies exist
+Detailed feature state belongs in focused documents under `docs/state/`.
+
+When current-state documentation conflicts, use this order:
 
 PROJECT_STATE
+
+↓
+
+Focused documents under docs/state
+
+↓
+
+Accepted ADRs
 
 ↓
 
@@ -61,6 +71,16 @@ ROADMAP
 ↓
 
 CHANGELOG
+
+↓
+
+Feature-specific documents
+
+↓
+
+README
+
+The authoritative ordering is defined by `docs/DOCUMENTATION.md`.
 
 ---
 
@@ -132,6 +152,8 @@ The skeleton intentionally contains only the minimum executable structure requir
 
 Feature-specific architecture decisions should be documented only when implementation requires them.
 
+---
+
 # Lesson 011
 
 The current Git repository state is the authoritative project context.
@@ -146,3 +168,16 @@ Reason
 
 Server Toolkit documentation evolves continuously. Decisions based on stale documentation can duplicate ADRs, corrupt documentation indexes, or recommend obsolete implementation paths.
 
+---
+
+# Lesson 012
+
+Before proposing the next implementation slice, a new ADR, or a new project document, reconstruct the current project context from the repository rather than reading only one apparently relevant document.
+
+The operational checklist is maintained in `AI_RULES.md` under Project Context Reconstruction and should not be duplicated here.
+
+A new ADR should document only the unresolved decision delta. It should not repeat accepted guardrails or create a parallel design document without measurable engineering value.
+
+Reason
+
+Living documentation and focused pull requests can close, supersede, or narrow earlier planning. A technically plausible recommendation is still wrong when it ignores the current repository history and governance.

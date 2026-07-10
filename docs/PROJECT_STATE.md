@@ -27,6 +27,8 @@ Version 0.4.0-alpha is focused on SSH.
 
 The current SSH implementation supports real ephemeral password-based SSH connections and user-facing non-interactive command execution behind project-owned SSH session handles.
 
+The ephemeral private-key authentication boundary is accepted through ADR-013. Private-key authentication remains unimplemented and must follow the accepted one-attempt, non-persistent design.
+
 Persistent credentials, terminal UI, saved command workflows, background monitoring, and Xray or x-ui management remain intentionally out of scope.
 
 ---
@@ -64,6 +66,7 @@ The following items are intentionally not implemented yet:
 - Interactive terminal workflow for owned sessions.
 - Additional SSH host key verification hardening, if future runtime testing identifies gaps.
 - Persistent credential storage implementation.
+- Ephemeral private-key authentication implementation.
 - Monitoring workflow.
 - Saved command workflow.
 - Xray or x-ui management workflow.
@@ -76,7 +79,7 @@ The following items are intentionally not implemented yet:
 
 The current implementation area is:
 
-- SSH 0.4.0-alpha runtime verification and preparation for the next authentication slice.
+- SSH 0.4.0-alpha preparation for the first implementation slice against accepted ADR-013.
 - Connection history domain, Room persistence, automatic recording, and per-server presentation are complete and runtime-verified.
 
 ---
@@ -85,9 +88,9 @@ The current implementation area is:
 
 The next safe development steps are:
 
-1. Define ephemeral private-key authentication input and execution boundaries through a focused reviewed design.
-2. Keep private-key material and passphrases ephemeral, outside UI state and persistent storage.
-3. Add more SSH hardening only when current repository inspection or runtime testing identifies a concrete gap.
+1. Implement the smallest safe private-key authentication slice against accepted ADR-013.
+2. Begin with the project-owned one-shot source, bounded Android content access, and lifecycle tests.
+3. Add SSHJ parsing and authentication only behind the verified source and failure-mapping boundaries.
 4. Keep terminal UI, saved command workflows, background monitoring, and persistent credentials out of scope.
 
 ---
