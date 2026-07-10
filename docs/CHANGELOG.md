@@ -157,6 +157,7 @@ The project follows Conventional Commits and Semantic Versioning principles.
 
 ### Changed
 
+- Synchronized current-state documentation with the SSH connection history domain and Room persistence implementation.
 - Synchronized SSH current-state and review documentation after completing the current timeout, cleanup, cancellation, and failure-mapping hardening coverage pass.
 - Synchronized SSH current-state documentation with trusted-host cascade deletion, duplicate host-key confirmation protection, trusted-host accepted copy, and current non-interactive command execution behavior.
 
@@ -262,8 +263,8 @@ The following items are intentionally not implemented yet:
 - Private-key authentication.
 - Monitoring workflow.
 - Xray or x-ui management workflow.
-- Room migrations beyond database version 2.
-- Migration tests beyond the trusted-host v1-to-v2 migration.
+- Room migrations beyond database version 4.
+- Migration tests beyond the trusted-host v1-to-v2, trusted-host v2-to-v3, and connection-history v3-to-v4 migrations.
 
 ---
 

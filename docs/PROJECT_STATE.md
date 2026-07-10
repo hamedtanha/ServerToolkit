@@ -3,7 +3,7 @@
 **Project:** Server Toolkit
 **Version:** 0.4.0-alpha
 **Status:** Active Implementation
-**Last Updated:** 2026-07-09
+**Last Updated:** 2026-07-10
 
 ---
 
@@ -67,8 +67,9 @@ The following items are intentionally not implemented yet:
 - Monitoring workflow.
 - Saved command workflow.
 - Xray or x-ui management workflow.
-- Room migrations beyond database version 3.
-- Migration tests beyond the trusted-host v1-to-v2 and v2-to-v3 migrations.
+- Connection history recording workflow and UI.
+- Room migrations beyond database version 4.
+- Migration tests beyond the trusted-host v1-to-v2, trusted-host v2-to-v3, and connection-history v3-to-v4 migrations.
 
 ---
 
@@ -76,8 +77,8 @@ The following items are intentionally not implemented yet:
 
 The current implementation area is:
 
-- SSH 0.4.0-alpha runtime verification and evidence-driven stabilization.
-- Reviewed planning for the next SSH implementation slice.
+- SSH 0.4.0-alpha connection history implementation.
+- Connection history domain and Room persistence are complete; automatic recording and UI remain pending.
 
 ---
 
@@ -85,10 +86,10 @@ The current implementation area is:
 
 The next safe development steps are:
 
-1. Add more SSH hardening only when current repository inspection or runtime testing identifies a concrete gap.
-2. Select the next SSH implementation slice through a separate reviewed design and documentation update.
-3. Keep terminal UI, saved command history, background monitoring, and persistent credentials out of scope.
-4. Consider saved command workflows only after a separate reviewed design and documentation update.
+1. Record SSH connection attempt outcomes through the existing connection history repository.
+2. Design connection history presentation only after the recording workflow is implemented and verified.
+3. Add more SSH hardening only when current repository inspection or runtime testing identifies a concrete gap.
+4. Keep terminal UI, saved command workflows, background monitoring, and persistent credentials out of scope.
 
 ---
 
