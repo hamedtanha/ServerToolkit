@@ -67,7 +67,6 @@ The following items are intentionally not implemented yet:
 - Monitoring workflow.
 - Saved command workflow.
 - Xray or x-ui management workflow.
-- Connection history UI.
 - Room migrations beyond database version 4.
 - Migration tests beyond the trusted-host v1-to-v2, trusted-host v2-to-v3, and connection-history v3-to-v4 migrations.
 
@@ -77,8 +76,8 @@ The following items are intentionally not implemented yet:
 
 The current implementation area is:
 
-- SSH 0.4.0-alpha connection history implementation.
-- Connection history domain, Room persistence, and automatic attempt recording are complete; UI remains pending.
+- SSH 0.4.0-alpha runtime verification and preparation for the next authentication slice.
+- Connection history domain, Room persistence, automatic recording, and per-server presentation are complete and runtime-verified.
 
 ---
 
@@ -86,8 +85,8 @@ The current implementation area is:
 
 The next safe development steps are:
 
-1. Select connection history presentation as the next focused implementation slice.
-2. Build connection history presentation on the existing repository observation contracts without direct DAO access.
+1. Define ephemeral private-key authentication input and execution boundaries through a focused reviewed design.
+2. Keep private-key material and passphrases ephemeral, outside UI state and persistent storage.
 3. Add more SSH hardening only when current repository inspection or runtime testing identifies a concrete gap.
 4. Keep terminal UI, saved command workflows, background monitoring, and persistent credentials out of scope.
 

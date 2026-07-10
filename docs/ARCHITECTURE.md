@@ -90,8 +90,9 @@ The current implementation includes:
 - Hilt database, DAO, and repository wiring.
 - DAO, repository, mapper, and filter matcher tests.
 - Manual and automated verification for add, edit, delete, search, filtering, and shared server form naming cleanup.
-- SSH navigation destination, screen, ViewModel, and UI state.
+- SSH connection and per-server connection history navigation destinations, screens, ViewModels, and UI state.
 - Server Inventory Connect action that opens the SSH route.
+- Repository-backed per-server SSH connection history presentation without direct DAO access.
 - SSH domain connection request, result, error, and service contract models.
 - SSH UI connection status model and connection result mapper.
 - Test-only fake SSH connection service.

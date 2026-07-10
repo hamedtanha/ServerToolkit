@@ -31,3 +31,13 @@ object SshDestination : NavigationDestination {
         return "ssh/$serverId"
     }
 }
+
+object SshConnectionHistoryDestination : NavigationDestination {
+    const val SERVER_ID_ARGUMENT: String = "serverId"
+
+    override val route: String = "ssh_history/{$SERVER_ID_ARGUMENT}"
+
+    fun createRoute(serverId: String): String {
+        return "ssh_history/$serverId"
+    }
+}

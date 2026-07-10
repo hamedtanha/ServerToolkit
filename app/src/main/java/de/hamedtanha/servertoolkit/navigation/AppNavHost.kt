@@ -8,6 +8,7 @@ import de.hamedtanha.servertoolkit.feature.dashboard.presentation.screen.Dashboa
 import de.hamedtanha.servertoolkit.feature.serverinventory.presentation.screen.AddServerRoute
 import de.hamedtanha.servertoolkit.feature.serverinventory.presentation.screen.EditServerRoute
 import de.hamedtanha.servertoolkit.feature.serverinventory.presentation.screen.ServerInventoryRoute
+import de.hamedtanha.servertoolkit.feature.ssh.presentation.screen.SshConnectionHistoryRoute
 import de.hamedtanha.servertoolkit.feature.ssh.presentation.screen.SshRoute
 
 @Composable
@@ -64,8 +65,28 @@ fun AppNavHost() {
             )
         }
 
-        composable(route = SshDestination.route) {
+        composable(route = SshDestination.route) { backStackEntry ->
             SshRoute(
+                onNavigateBack = {
+                    navController.navigateUp()
+                },
+                onOpenConnectionHistory = {
+                    val serverId = checkNotNull(
+                        backStackEntry.arguments?.getString(
+                            SshDestination.SERVER_ID_ARGUMENT,
+                        ),
+                    )
+                    navController.navigate(
+                        SshConnectionHistoryDestination.createRoute(serverId),
+                    ) {
+                        launchSingleTop = true
+                    }
+                },
+            )
+        }
+
+        composable(route = SshConnectionHistoryDestination.route) {
+            SshConnectionHistoryRoute(
                 onNavigateBack = {
                     navController.navigateUp()
                 },
