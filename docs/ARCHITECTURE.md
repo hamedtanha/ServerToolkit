@@ -3,7 +3,7 @@
 **Project:** Server Toolkit  
 **Version:** 0.4.0-alpha
 **Status:** Active  
-**Last Updated:** 2026-07-10
+**Last Updated:** 2026-07-11
 
 ---
 
@@ -57,6 +57,7 @@ The current architecture is governed by the following ADRs:
 | ADR-010 | SSH Command Channel Execution Strategy | Accepted |
 | ADR-011 | SSH Credential Ownership and Secure Storage Strategy | Accepted |
 | ADR-012 | Android Backup and Data Extraction Policy | Accepted |
+| ADR-013 | Ephemeral SSH Private-Key Authentication Boundary | Accepted |
 
 Accepted ADRs are the source of truth for architectural decisions. This document explains how those decisions are applied in the codebase.
 
@@ -108,6 +109,11 @@ The current implementation includes:
 - SSH screen password input that forwards secrets through transient ViewModel events without storing them in UI state.
 - SSH credential-bearing connection request boundary.
 - SSH authentication input clearing behavior.
+- SSH project-owned one-shot private-key source and bounded content-reading boundary.
+- SSH Android cancellable private-key document content factory.
+- SSH system content-picker integration with immediate conversion to a project-owned source.
+- SSH ViewModel ownership of at most one pending private-key source outside observable and saved state.
+- SSH private-key source replacement, cancellation, workflow-exit, host-review, and one-attempt transfer handling.
 - SSHJ trusted host-key verifier boundary.
 - SSHJ trusted connection execution boundary.
 - SSHJ password authentication execution boundary.

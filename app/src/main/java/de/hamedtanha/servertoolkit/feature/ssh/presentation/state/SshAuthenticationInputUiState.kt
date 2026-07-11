@@ -12,9 +12,12 @@ import de.hamedtanha.servertoolkit.feature.ssh.domain.model.SshAuthenticationMet
 data class SshAuthenticationInputUiState(
     val selectedMethod: SshAuthenticationMethod = SshAuthenticationMethod.PASSWORD,
     val hasPasswordInput: Boolean = false,
+    val hasPrivateKeySource: Boolean = false,
     val hasPrivateKeyPassphraseInput: Boolean = false,
 ) {
 
     val hasSensitiveInput: Boolean
-        get() = hasPasswordInput || hasPrivateKeyPassphraseInput
+        get() = hasPasswordInput ||
+            hasPrivateKeySource ||
+            hasPrivateKeyPassphraseInput
 }

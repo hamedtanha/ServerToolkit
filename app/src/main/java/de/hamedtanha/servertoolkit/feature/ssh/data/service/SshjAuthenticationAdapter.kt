@@ -3,6 +3,7 @@ package de.hamedtanha.servertoolkit.feature.ssh.data.service
 import de.hamedtanha.servertoolkit.feature.ssh.domain.model.SshAuthenticationInput
 import de.hamedtanha.servertoolkit.feature.ssh.domain.model.SshAuthenticationMethod
 import de.hamedtanha.servertoolkit.feature.ssh.domain.model.SshConnectionRequest
+import de.hamedtanha.servertoolkit.feature.ssh.domain.service.SshPrivateKeySource
 import javax.inject.Inject
 
 /**
@@ -24,7 +25,7 @@ class SshjAuthenticationAdapter @Inject constructor() {
                 input = input,
             )
 
-            is SshAuthenticationInput.PrivateKeyPassphrase -> SshjAuthenticationMapping.PrivateKeyPassphrase(
+            is SshAuthenticationInput.PrivateKey -> SshjAuthenticationMapping.PrivateKey(
                 username = request.username,
                 input = input,
             )
@@ -82,25 +83,32 @@ internal sealed interface SshjAuthenticationMapping {
         }
     }
 
-    class PrivateKeyPassphrase(
+    class PrivateKey(
         override val username: String,
-        private val input: SshAuthenticationInput.PrivateKeyPassphrase,
+        private val input: SshAuthenticationInput.PrivateKey,
     ) : SshjAuthenticationMapping {
 
         val passphrase: String
             get() = input.passphrase
+
+        val hasPrivateKeySource: Boolean
+            get() = input.hasPrivateKeySource
 
         override val method: SshAuthenticationMethod = SshAuthenticationMethod.PRIVATE_KEY
 
         override val hasSensitiveValue: Boolean
             get() = input.hasSensitiveValue
 
+        fun takePrivateKeySource(): SshPrivateKeySource? {
+            return input.takePrivateKeySource()
+        }
+
         override fun clearSensitiveValues() {
             input.clearSensitiveValues()
         }
 
         override fun toString(): String {
-            return "SshjAuthenticationMapping.PrivateKeyPassphrase(REDACTED)"
+            return "SshjAuthenticationMapping.PrivateKey(REDACTED)"
         }
     }
 }

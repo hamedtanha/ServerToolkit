@@ -1,5 +1,7 @@
 package de.hamedtanha.servertoolkit.feature.ssh.presentation.state
 
+import de.hamedtanha.servertoolkit.feature.ssh.domain.model.SshAuthenticationMethod
+
 data class SshUiState(
     val title: String = "SSH connection",
     val serverId: String = "",
@@ -15,9 +17,16 @@ data class SshUiState(
     val isHostKeyReviewRequired: Boolean
         get() = hostKeyReview != null
 
-    val canStartConnection: Boolean
+    val canEditAuthenticationInput: Boolean
         get() = status != SshConnectionStatus.Connecting &&
             status != SshConnectionStatus.Connected
+
+    val canStartConnection: Boolean
+        get() = canEditAuthenticationInput &&
+            (
+                authenticationInput.selectedMethod != SshAuthenticationMethod.PRIVATE_KEY ||
+                    authenticationInput.hasPrivateKeySource
+                )
 
     val canExecuteCommand: Boolean
         get() = status == SshConnectionStatus.Connected && commandExecution.canExecute

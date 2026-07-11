@@ -14,6 +14,7 @@ class SshAuthenticationInputUiStateTest {
 
         assertEquals(SshAuthenticationMethod.PASSWORD, state.selectedMethod)
         assertFalse(state.hasPasswordInput)
+        assertFalse(state.hasPrivateKeySource)
         assertFalse(state.hasPrivateKeyPassphraseInput)
         assertFalse(state.hasSensitiveInput)
     }
@@ -22,6 +23,16 @@ class SshAuthenticationInputUiStateTest {
     fun `reports sensitive input when password is present`() {
         val state = SshAuthenticationInputUiState(
             hasPasswordInput = true,
+        )
+
+        assertTrue(state.hasSensitiveInput)
+    }
+
+    @Test
+    fun `reports sensitive input when private key source is present`() {
+        val state = SshAuthenticationInputUiState(
+            selectedMethod = SshAuthenticationMethod.PRIVATE_KEY,
+            hasPrivateKeySource = true,
         )
 
         assertTrue(state.hasSensitiveInput)

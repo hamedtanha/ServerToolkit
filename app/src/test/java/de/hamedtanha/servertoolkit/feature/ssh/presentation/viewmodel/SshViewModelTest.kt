@@ -33,6 +33,7 @@ import de.hamedtanha.servertoolkit.feature.ssh.test.FakeSshConnectionHistoryRepo
 import de.hamedtanha.servertoolkit.feature.ssh.test.FakeSshConnectionService
 import de.hamedtanha.servertoolkit.feature.ssh.test.FakeSshHostKeyObservationService
 import de.hamedtanha.servertoolkit.feature.ssh.test.FakeSshHostTrustRepository
+import de.hamedtanha.servertoolkit.feature.ssh.test.TrackingSshPrivateKeySource
 import de.hamedtanha.servertoolkit.navigation.SshDestination
 import kotlinx.coroutines.CancellationException
 import kotlinx.coroutines.CompletableDeferred
@@ -614,6 +615,7 @@ class SshViewModelTest {
             viewModel.uiState.value.authenticationInput.selectedMethod,
         )
         assertTrue(viewModel.uiState.value.authenticationInput.hasPasswordInput)
+        assertFalse(viewModel.uiState.value.authenticationInput.hasPrivateKeySource)
         assertFalse(viewModel.uiState.value.authenticationInput.hasPrivateKeyPassphraseInput)
         assertFalse(viewModel.uiState.value.toString().contains("secret-password"))
     }
@@ -629,6 +631,7 @@ class SshViewModelTest {
             viewModel.uiState.value.authenticationInput.selectedMethod,
         )
         assertFalse(viewModel.uiState.value.authenticationInput.hasPasswordInput)
+        assertFalse(viewModel.uiState.value.authenticationInput.hasPrivateKeySource)
         assertTrue(viewModel.uiState.value.authenticationInput.hasPrivateKeyPassphraseInput)
         assertFalse(viewModel.uiState.value.toString().contains("secret-passphrase"))
     }
@@ -645,6 +648,7 @@ class SshViewModelTest {
             viewModel.uiState.value.authenticationInput.selectedMethod,
         )
         assertFalse(viewModel.uiState.value.authenticationInput.hasPasswordInput)
+        assertFalse(viewModel.uiState.value.authenticationInput.hasPrivateKeySource)
         assertFalse(viewModel.uiState.value.authenticationInput.hasPrivateKeyPassphraseInput)
         assertFalse(viewModel.uiState.value.authenticationInput.hasSensitiveInput)
     }
@@ -723,6 +727,185 @@ class SshViewModelTest {
 
         assertFalse(viewModel.uiState.value.authenticationInput.hasSensitiveInput)
         assertFalse(viewModel.uiState.value.toString().contains("secret-password"))
+    }
+
+    @Test
+    fun `private key selection exposes only a non-sensitive presence flag`() {
+        val source = TrackingSshPrivateKeySource()
+        val viewModel = createViewModel(serverId = "server-1")
+
+        viewModel.onPrivateKeySourceSelected(source)
+
+        assertEquals(
+            SshAuthenticationMethod.PRIVATE_KEY,
+            viewModel.uiState.value.authenticationInput.selectedMethod,
+        )
+        assertTrue(viewModel.uiState.value.authenticationInput.hasPrivateKeySource)
+        assertEquals(0, source.invalidateCallCount)
+        assertFalse(viewModel.uiState.value.toString().contains(source.toString()))
+    }
+
+    @Test
+    fun `replacing private key invalidates the previous pending source`() {
+        val firstSource = TrackingSshPrivateKeySource()
+        val secondSource = TrackingSshPrivateKeySource()
+        val viewModel = createViewModel(serverId = "server-1")
+
+        viewModel.onPrivateKeySourceSelected(firstSource)
+        viewModel.onPrivateKeySourceSelected(secondSource)
+
+        assertEquals(1, firstSource.invalidateCallCount)
+        assertEquals(0, secondSource.invalidateCallCount)
+        assertTrue(viewModel.uiState.value.authenticationInput.hasPrivateKeySource)
+    }
+
+    @Test
+    fun `cancelling private key selection invalidates pending source`() {
+        val source = TrackingSshPrivateKeySource()
+        val viewModel = createViewModel(serverId = "server-1")
+
+        viewModel.onPrivateKeySourceSelected(source)
+        viewModel.onPrivateKeySelectionCancelled()
+
+        assertEquals(1, source.invalidateCallCount)
+        assertEquals(
+            SshAuthenticationMethod.PRIVATE_KEY,
+            viewModel.uiState.value.authenticationInput.selectedMethod,
+        )
+        assertFalse(viewModel.uiState.value.authenticationInput.hasPrivateKeySource)
+        assertFalse(viewModel.uiState.value.authenticationInput.hasSensitiveInput)
+    }
+
+    @Test
+    fun `switching to password invalidates pending private key source`() {
+        val source = TrackingSshPrivateKeySource()
+        val viewModel = createViewModel(serverId = "server-1")
+
+        viewModel.onPrivateKeySourceSelected(source)
+        viewModel.onAuthenticationMethodSelected(SshAuthenticationMethod.PASSWORD)
+
+        assertEquals(1, source.invalidateCallCount)
+        assertEquals(
+            SshAuthenticationMethod.PASSWORD,
+            viewModel.uiState.value.authenticationInput.selectedMethod,
+        )
+        assertFalse(viewModel.uiState.value.authenticationInput.hasPrivateKeySource)
+    }
+
+    @Test
+    fun `workflow exit invalidates pending private key source`() {
+        val source = TrackingSshPrivateKeySource()
+        val viewModel = createViewModel(serverId = "server-1")
+
+        viewModel.onPrivateKeySourceSelected(source)
+        viewModel.onWorkflowExit()
+
+        assertEquals(1, source.invalidateCallCount)
+        assertFalse(viewModel.uiState.value.authenticationInput.hasSensitiveInput)
+    }
+
+    @Test
+    fun `host key review invalidates pending private key source`() {
+        val source = TrackingSshPrivateKeySource()
+        val viewModel = createViewModel(serverId = "server-1")
+
+        viewModel.onPrivateKeySourceSelected(source)
+        viewModel.onHostTrustDecisionReceived(
+            SshHostTrustDecision.ReviewRequired(observedHostKey()),
+        )
+
+        assertEquals(1, source.invalidateCallCount)
+        assertFalse(viewModel.uiState.value.authenticationInput.hasSensitiveInput)
+    }
+
+    @Test
+    fun `connect transfers private key source exactly once`() = runBlocking {
+        val source = TrackingSshPrivateKeySource()
+        val service = FakeSshConnectionService(
+            result = sshConnectedResult(),
+            onConnect = { request ->
+                val input = request.authenticationInput as SshAuthenticationInput.PrivateKey
+                assertTrue(input.hasPrivateKeySource)
+                val transferredSource = input.takePrivateKeySource()
+                assertTrue(transferredSource === source)
+                assertNull(input.takePrivateKeySource())
+                transferredSource?.invalidate()
+            },
+        )
+        val viewModel = createViewModel(
+            serverId = "server-1",
+            service = service,
+        )
+
+        viewModel.onPrivateKeySourceSelected(source)
+        viewModel.onPrivateKeyPassphraseChanged("secret-passphrase")
+        viewModel.connect()
+
+        assertEquals(1, source.invalidateCallCount)
+        assertFalse(viewModel.uiState.value.authenticationInput.hasSensitiveInput)
+    }
+
+    @Test
+    fun `connection cancellation invalidates transferred private key source`() = runBlocking {
+        val source = TrackingSshPrivateKeySource()
+        val service = FakeSshConnectionService(
+            result = sshConnectedResult(),
+            onConnect = {
+                throw CancellationException("Connection cancelled")
+            },
+        )
+        val viewModel = createViewModel(
+            serverId = "server-1",
+            service = service,
+        )
+
+        viewModel.onPrivateKeySourceSelected(source)
+        viewModel.onPrivateKeyPassphraseChanged("secret-passphrase")
+
+        try {
+            viewModel.connect()
+            fail("Expected CancellationException")
+        } catch (error: CancellationException) {
+            assertEquals("Connection cancelled", error.message)
+        }
+
+        assertEquals(1, source.invalidateCallCount)
+        assertFalse(viewModel.uiState.value.authenticationInput.hasSensitiveInput)
+    }
+
+    @Test
+    fun `authentication ui disposal clears password input`() {
+        val viewModel = createViewModel(serverId = "server-1")
+
+        viewModel.onPasswordChanged("secret-password")
+        viewModel.onAuthenticationInputUiDisposed()
+
+        assertEquals(
+            SshAuthenticationMethod.PASSWORD,
+            viewModel.uiState.value.authenticationInput.selectedMethod,
+        )
+        assertFalse(viewModel.uiState.value.authenticationInput.hasPasswordInput)
+        assertFalse(viewModel.uiState.value.authenticationInput.hasSensitiveInput)
+    }
+
+    @Test
+    fun `authentication ui disposal clears passphrase without invalidating pending source`() {
+        val source = TrackingSshPrivateKeySource()
+        val viewModel = createViewModel(serverId = "server-1")
+
+        viewModel.onPrivateKeySourceSelected(source)
+        viewModel.onPrivateKeyPassphraseChanged("secret-passphrase")
+        viewModel.onAuthenticationInputUiDisposed()
+
+        assertEquals(
+            SshAuthenticationMethod.PRIVATE_KEY,
+            viewModel.uiState.value.authenticationInput.selectedMethod,
+        )
+        assertTrue(viewModel.uiState.value.authenticationInput.hasPrivateKeySource)
+        assertFalse(
+            viewModel.uiState.value.authenticationInput.hasPrivateKeyPassphraseInput,
+        )
+        assertEquals(0, source.invalidateCallCount)
     }
 
     private class FakeSshCommandExecutionService(

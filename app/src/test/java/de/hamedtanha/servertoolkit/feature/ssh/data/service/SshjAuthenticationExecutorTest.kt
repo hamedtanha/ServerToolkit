@@ -3,6 +3,7 @@ package de.hamedtanha.servertoolkit.feature.ssh.data.service
 import de.hamedtanha.servertoolkit.feature.ssh.domain.model.SshAuthenticationInput
 import de.hamedtanha.servertoolkit.feature.ssh.domain.model.SshConnectionError
 import de.hamedtanha.servertoolkit.feature.ssh.domain.model.SshConnectionRequest
+import de.hamedtanha.servertoolkit.feature.ssh.test.TrackingSshPrivateKeySource
 import kotlinx.coroutines.CancellationException
 import org.junit.Assert.assertEquals
 import org.junit.Assert.assertTrue
@@ -111,11 +112,15 @@ class SshjAuthenticationExecutorTest {
     }
 
     @Test
-    fun `returns unsupported configuration for private key passphrase without private key material`() {
+    fun `returns unsupported configuration for private key input until parsing is implemented`() {
         val client = FakeAuthenticatedClient()
+        val source = TrackingSshPrivateKeySource()
         val mapping = adapter.map(
             connectionRequest(
-                authenticationInput = SshAuthenticationInput.PrivateKeyPassphrase("secret-passphrase"),
+                authenticationInput = SshAuthenticationInput.PrivateKey(
+                    privateKeySource = source,
+                    passphrase = "secret-passphrase",
+                ),
             ),
         )
 
@@ -123,6 +128,10 @@ class SshjAuthenticationExecutorTest {
 
         assertFailed(SshConnectionError.UnsupportedConfiguration, result)
         assertEquals(0, client.authPasswordCallCount)
+
+        mapping.clearSensitiveValues()
+
+        assertEquals(1, source.invalidateCallCount)
     }
 
     private fun assertFailed(
