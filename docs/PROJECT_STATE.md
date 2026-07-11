@@ -3,7 +3,7 @@
 **Project:** Server Toolkit
 **Version:** 0.4.0-alpha
 **Status:** Active Implementation
-**Last Updated:** 2026-07-10
+**Last Updated:** 2026-07-11
 
 ---
 
@@ -27,7 +27,7 @@ Version 0.4.0-alpha is focused on SSH.
 
 The current SSH implementation supports real ephemeral password-based SSH connections and user-facing non-interactive command execution behind project-owned SSH session handles.
 
-The ephemeral private-key authentication boundary is accepted through ADR-013. Private-key authentication remains unimplemented and must follow the accepted one-attempt, non-persistent design.
+The ephemeral private-key authentication boundary is accepted through ADR-013. The project-owned one-shot private-key source and bounded in-memory reading primitive are implemented, while Android document access and private-key authentication remain unimplemented.
 
 Persistent credentials, terminal UI, saved command workflows, background monitoring, and Xray or x-ui management remain intentionally out of scope.
 
@@ -79,7 +79,7 @@ The following items are intentionally not implemented yet:
 
 The current implementation area is:
 
-- SSH 0.4.0-alpha preparation for the first implementation slice against accepted ADR-013.
+- SSH 0.4.0-alpha implementation of the Android private-key content-access boundary against accepted ADR-013.
 - Connection history domain, Room persistence, automatic recording, and per-server presentation are complete and runtime-verified.
 
 ---
@@ -88,10 +88,11 @@ The current implementation area is:
 
 The next safe development steps are:
 
-1. Implement the smallest safe private-key authentication slice against accepted ADR-013.
-2. Begin with the project-owned one-shot source, bounded Android content access, and lifecycle tests.
-3. Add SSHJ parsing and authentication only behind the verified source and failure-mapping boundaries.
-4. Keep terminal UI, saved command workflows, background monitoring, and persistent credentials out of scope.
+1. Add the Android private-key content factory using the system picker and cancellable descriptor ownership defined by ADR-013.
+2. Keep Android `Uri`, `ContentResolver`, descriptors, and streams behind the data-layer factory boundary.
+3. Wire source ownership into the SSH workflow only after the Android content boundary is tested.
+4. Add SSHJ parsing and authentication only behind the verified source and failure-mapping boundaries.
+5. Keep terminal UI, saved command workflows, background monitoring, and persistent credentials out of scope.
 
 ---
 
