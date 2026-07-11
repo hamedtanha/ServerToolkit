@@ -16,6 +16,7 @@ The project follows Conventional Commits and Semantic Versioning principles.
 - Added ADR-013 for the accepted ephemeral SSH private-key authentication boundary.
 - Added the project-owned one-shot SSH private-key source with atomic lifecycle transitions, bounded reading, stable failures, scoped cleanup, and focused unit coverage.
 - Added the Android SSH private-key content factory with cancellable descriptor opening, joint descriptor-stream ownership, and instrumentation coverage.
+- Added ephemeral SSH private-key document selection with immediate source conversion, private ViewModel ownership, lifecycle invalidation, configuration-safe secret clearing, one-attempt transfer coverage, and manual Android workflow verification.
 - Added Hilt-enabled application setup.
 - Added Dashboard ViewModel.
 - Added Dashboard UI state.

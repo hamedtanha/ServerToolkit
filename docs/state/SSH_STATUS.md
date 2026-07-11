@@ -22,7 +22,7 @@ SSH is in active implementation for version 0.4.0-alpha.
 
 The current implementation supports real ephemeral password-based SSH connections and user-facing non-interactive command execution behind project-owned SSH session handles.
 
-The ephemeral private-key authentication boundary is accepted through ADR-013. The project-owned one-shot source, bounded in-memory reading primitive, and Android cancellable descriptor content factory are implemented, while picker workflow ownership, key parsing, and private-key authentication remain unimplemented.
+The ephemeral private-key authentication boundary is accepted through ADR-013. The one-shot source, bounded reading primitive, Android content factory, system-picker integration, and private ViewModel pending-source ownership are implemented. Source lifecycle and ViewModel ownership have automated coverage, and manual system-picker runtime verification is complete. Key parsing and private-key authentication remain incomplete.
 
 The current timeout, cleanup, cancellation, and failure-mapping hardening coverage pass is complete. Future SSH hardening must be driven by concrete runtime evidence, current repository inspection, or a newly recorded focused review finding.
 
@@ -74,6 +74,10 @@ These boundaries are accepted for the next focused implementation slices. They d
 - SSH presentation state unit tests.
 - SSH user-triggered connect event handling.
 - SSH Connect button with ephemeral password input.
+- SSH authentication-method selection for password and ephemeral private-key workflows.
+- SSH system content-picker action with no retained Android document reference.
+- SSH private-key selection and optional passphrase presentation with non-sensitive presence state only.
+- Authentication UI disposal clears password and passphrase text while retaining only the pending project-owned source across configuration changes.
 
 ### Target Resolution and Connection Boundary
 
@@ -140,6 +144,10 @@ These boundaries are accepted for the next focused implementation slices. They d
 - Callback-scoped key-material access with redacted string representations and best-effort buffer clearing.
 - Android private-key source factory backed by cancellable descriptor opening on an I/O dispatcher.
 - Joint descriptor-stream ownership with prompt-cancellation cleanup.
+- Immediate conversion of each picker result into a project-owned one-shot source.
+- Private ViewModel ownership of at most one pending source outside observable and saved state.
+- Pending-source invalidation on replacement, picker cancellation, method change, workflow exit, and host-key review.
+- One-attempt source transfer into connection-attempt orchestration.
 
 ### SSHJ Integration
 
@@ -216,6 +224,8 @@ These boundaries are accepted for the next focused implementation slices. They d
 - Automated SSH route verification through unit tests and debug build.
 - One-shot private-key source lifecycle, concurrency, size-limit, failure-mapping, resource-closing, redaction, cancellation, and buffer-clearing unit tests.
 - Android private-key content factory instrumentation tests for successful reads, unavailable content, descriptor cleanup, and cancellation bridging.
+- Private-key picker ownership tests for presence-only state, replacement, cancellation, workflow exit, host review, one-attempt transfer, and connection cancellation.
+- Manual Android verification of private-key picker cancellation, selection, replacement, configuration-change behavior, navigation cleanup, process-death reset, host-key review cleanup, and the controlled unsupported-authentication outcome.
 - Manual runtime test against macOS Remote Login through the Android emulator host address.
 - Verified successful SSH connection and non-interactive `whoami` command execution.
 
@@ -255,11 +265,10 @@ The following items are intentionally not implemented yet:
 
 The next safe development steps are:
 
-1. Convert each `GetContent` picker result immediately into a project-owned source without retaining the Android `Uri`.
-2. Wire one pending source into the SSH ViewModel without placing the source, URI, bytes, or passphrase in observable or saved state.
-3. Invalidate pending sources on replacement, cancellation, workflow exit, and host-key review, then transfer ownership exactly once per attempt.
-4. Add SSHJ private-key parsing and authentication behind project-owned error mapping, then verify the supported format matrix on Android.
-5. Keep terminal UI, saved command workflows, background monitoring, persistent credentials, and Xray or x-ui management out of scope.
+1. Add SSHJ private-key parsing and authentication behind the transferred one-shot source boundary.
+2. Map parser, passphrase, and authentication failures into stable project-owned outcomes.
+3. Verify and document the supported private-key format matrix on Android.
+4. Keep terminal UI, saved command workflows, background monitoring, persistent credentials, and Xray or x-ui management out of scope.
 
 ---
 

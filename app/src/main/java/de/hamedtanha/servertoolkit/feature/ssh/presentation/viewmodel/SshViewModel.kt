@@ -13,6 +13,7 @@ import de.hamedtanha.servertoolkit.feature.ssh.domain.model.SshConnectionResult
 import de.hamedtanha.servertoolkit.feature.ssh.domain.model.SshHostTrustDecision
 import de.hamedtanha.servertoolkit.feature.ssh.domain.model.SshObservedHostKey
 import de.hamedtanha.servertoolkit.feature.ssh.domain.model.SshSessionHandle
+import de.hamedtanha.servertoolkit.feature.ssh.domain.service.SshPrivateKeySource
 import de.hamedtanha.servertoolkit.feature.ssh.domain.usecase.ConfirmSshHostTrustUseCase
 import de.hamedtanha.servertoolkit.feature.ssh.domain.usecase.SshCommandExecutionUseCase
 import de.hamedtanha.servertoolkit.feature.ssh.domain.usecase.SshConnectionAttemptUseCase
@@ -53,6 +54,8 @@ class SshViewModel @Inject constructor(
 
     private var pendingObservedHostKey: SshObservedHostKey? = null
 
+    private var pendingPrivateKeySource: SshPrivateKeySource? = null
+
     private val pendingAuthenticationSecrets = PendingAuthenticationSecrets()
 
     private val _uiState = MutableStateFlow(
@@ -80,18 +83,17 @@ class SshViewModel @Inject constructor(
     }
 
     fun onAuthenticationMethodSelected(method: SshAuthenticationMethod) {
-        pendingAuthenticationSecrets.clear()
+        clearAuthenticationInputState()
 
         _uiState.value = _uiState.value.copy(
-            authenticationInput = _uiState.value.authenticationInput.copy(
+            authenticationInput = SshAuthenticationInputUiState(
                 selectedMethod = method,
-                hasPasswordInput = false,
-                hasPrivateKeyPassphraseInput = false,
             ),
         )
     }
 
     fun onPasswordChanged(password: String) {
+        clearPendingPrivateKeySource()
         pendingAuthenticationSecrets.password = password
         pendingAuthenticationSecrets.privateKeyPassphrase = ""
 
@@ -99,7 +101,37 @@ class SshViewModel @Inject constructor(
             authenticationInput = _uiState.value.authenticationInput.copy(
                 selectedMethod = SshAuthenticationMethod.PASSWORD,
                 hasPasswordInput = password.isNotEmpty(),
+                hasPrivateKeySource = false,
                 hasPrivateKeyPassphraseInput = false,
+            ),
+        )
+    }
+
+    fun onPrivateKeySourceSelected(source: SshPrivateKeySource) {
+        if (isConnectionAttemptInProgress || activeSessionHandle != null) {
+            source.invalidate()
+            return
+        }
+
+        replacePendingPrivateKeySource(source)
+        pendingAuthenticationSecrets.password = ""
+
+        _uiState.value = _uiState.value.copy(
+            authenticationInput = _uiState.value.authenticationInput.copy(
+                selectedMethod = SshAuthenticationMethod.PRIVATE_KEY,
+                hasPasswordInput = false,
+                hasPrivateKeySource = true,
+            ),
+        )
+    }
+
+    fun onPrivateKeySelectionCancelled() {
+        clearPendingPrivateKeySource()
+        pendingAuthenticationSecrets.privateKeyPassphrase = ""
+
+        _uiState.value = _uiState.value.copy(
+            authenticationInput = SshAuthenticationInputUiState(
+                selectedMethod = SshAuthenticationMethod.PRIVATE_KEY,
             ),
         )
     }
@@ -112,12 +144,29 @@ class SshViewModel @Inject constructor(
             authenticationInput = _uiState.value.authenticationInput.copy(
                 selectedMethod = SshAuthenticationMethod.PRIVATE_KEY,
                 hasPasswordInput = false,
+                hasPrivateKeySource = pendingPrivateKeySource != null,
                 hasPrivateKeyPassphraseInput = passphrase.isNotEmpty(),
             ),
         )
     }
 
     fun onAuthenticationInputCleared() {
+        clearAuthenticationInputState()
+    }
+
+    fun onAuthenticationInputUiDisposed() {
+        pendingAuthenticationSecrets.clear()
+
+        _uiState.value = _uiState.value.copy(
+            authenticationInput = _uiState.value.authenticationInput.copy(
+                hasPasswordInput = false,
+                hasPrivateKeySource = pendingPrivateKeySource != null,
+                hasPrivateKeyPassphraseInput = false,
+            ),
+        )
+    }
+
+    fun onWorkflowExit() {
         clearAuthenticationInputState()
     }
 
@@ -155,19 +204,18 @@ class SshViewModel @Inject constructor(
                 commandExecution = _uiState.value.commandExecution.asSessionUnavailable(),
             )
 
-            val authenticationInput = pendingAuthenticationSecrets.toAuthenticationInput(
-                method = _uiState.value.authenticationInput.selectedMethod,
+            val authenticationInput = takeAuthenticationInput()
+            _uiState.value = _uiState.value.copy(
+                authenticationInput = SshAuthenticationInputUiState(),
             )
+
             val outcome = connectionAttemptUseCase(
                 serverId = serverId,
                 authenticationInput = authenticationInput,
             )
             onConnectionAttemptOutcomeReceived(outcome)
         } finally {
-            pendingAuthenticationSecrets.clear()
-            _uiState.value = _uiState.value.copy(
-                authenticationInput = SshAuthenticationInputUiState(),
-            )
+            clearAuthenticationInputState()
             isConnectionAttemptInProgress = false
         }
     }
@@ -196,7 +244,6 @@ class SshViewModel @Inject constructor(
             )
 
             is SshConnectionAttemptOutcome.HostTrustDecisionRequired -> {
-                clearAuthenticationInputState()
                 onHostTrustDecisionReceived(outcome.decision)
             }
         }
@@ -204,6 +251,7 @@ class SshViewModel @Inject constructor(
 
     internal fun onHostTrustDecisionReceived(decision: SshHostTrustDecision) {
         activeSessionHandle = null
+        clearAuthenticationInputState()
 
         pendingObservedHostKey = when (decision) {
             is SshHostTrustDecision.ReviewRequired -> decision.observedHostKey
@@ -289,12 +337,18 @@ class SshViewModel @Inject constructor(
         }
     }
 
+    override fun onCleared() {
+        clearAuthenticationInputState()
+        super.onCleared()
+    }
+
     private fun clearPendingHostKeyReview(
         message: String,
         detail: String,
     ) {
         activeSessionHandle = null
         pendingObservedHostKey = null
+        clearAuthenticationInputState()
 
         _uiState.value = _uiState.value.copy(
             status = SshConnectionStatus.Failed,
@@ -306,7 +360,41 @@ class SshViewModel @Inject constructor(
         )
     }
 
+    private fun takeAuthenticationInput(): SshAuthenticationInput {
+        return when (_uiState.value.authenticationInput.selectedMethod) {
+            SshAuthenticationMethod.PASSWORD -> SshAuthenticationInput.Password(
+                pendingAuthenticationSecrets.takePassword(),
+            )
+
+            SshAuthenticationMethod.PRIVATE_KEY -> {
+                val source = pendingPrivateKeySource
+                pendingPrivateKeySource = null
+
+                if (source == null) {
+                    pendingAuthenticationSecrets.clear()
+                    SshAuthenticationInput.None
+                } else {
+                    SshAuthenticationInput.PrivateKey(
+                        privateKeySource = source,
+                        passphrase = pendingAuthenticationSecrets.takePrivateKeyPassphrase(),
+                    )
+                }
+            }
+        }
+    }
+
+    private fun replacePendingPrivateKeySource(source: SshPrivateKeySource) {
+        pendingPrivateKeySource?.invalidate()
+        pendingPrivateKeySource = source
+    }
+
+    private fun clearPendingPrivateKeySource() {
+        pendingPrivateKeySource?.invalidate()
+        pendingPrivateKeySource = null
+    }
+
     private fun clearAuthenticationInputState() {
+        clearPendingPrivateKeySource()
         pendingAuthenticationSecrets.clear()
 
         _uiState.value = _uiState.value.copy(
@@ -321,13 +409,16 @@ private class PendingAuthenticationSecrets {
 
     var privateKeyPassphrase: String = ""
 
-    fun toAuthenticationInput(method: SshAuthenticationMethod): SshAuthenticationInput {
-        return when (method) {
-            SshAuthenticationMethod.PASSWORD -> SshAuthenticationInput.Password(password)
-            SshAuthenticationMethod.PRIVATE_KEY -> SshAuthenticationInput.PrivateKeyPassphrase(
-                privateKeyPassphrase,
-            )
-        }
+    fun takePassword(): String {
+        val currentPassword = password
+        clear()
+        return currentPassword
+    }
+
+    fun takePrivateKeyPassphrase(): String {
+        val currentPassphrase = privateKeyPassphrase
+        clear()
+        return currentPassphrase
     }
 
     fun clear() {

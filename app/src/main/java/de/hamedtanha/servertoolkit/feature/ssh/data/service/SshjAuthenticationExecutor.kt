@@ -42,7 +42,7 @@ class SshjAuthenticationExecutor @Inject constructor() {
                 }
             }
 
-            is SshjAuthenticationMapping.PrivateKeyPassphrase -> {
+            is SshjAuthenticationMapping.PrivateKey -> {
                 SshjAuthenticationExecutionResult.Failed(SshConnectionError.UnsupportedConfiguration)
             }
         }

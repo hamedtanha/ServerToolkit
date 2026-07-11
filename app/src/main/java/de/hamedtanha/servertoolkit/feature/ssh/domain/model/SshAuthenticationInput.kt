@@ -1,5 +1,7 @@
 package de.hamedtanha.servertoolkit.feature.ssh.domain.model
 
+import de.hamedtanha.servertoolkit.feature.ssh.domain.service.SshPrivateKeySource
+
 /**
  * Authentication input for a single SSH connection attempt.
  *
@@ -44,24 +46,38 @@ sealed interface SshAuthenticationInput {
         }
     }
 
-    class PrivateKeyPassphrase(
+    class PrivateKey(
+        privateKeySource: SshPrivateKeySource,
         passphrase: String,
     ) : SshAuthenticationInput {
+
+        private var source: SshPrivateKeySource? = privateKeySource
 
         var passphrase: String = passphrase
             private set
 
         override val method: SshAuthenticationMethod = SshAuthenticationMethod.PRIVATE_KEY
 
+        val hasPrivateKeySource: Boolean
+            get() = source != null
+
         override val hasSensitiveValue: Boolean
-            get() = passphrase.isNotEmpty()
+            get() = hasPrivateKeySource || passphrase.isNotEmpty()
+
+        internal fun takePrivateKeySource(): SshPrivateKeySource? {
+            val currentSource = source
+            source = null
+            return currentSource
+        }
 
         override fun clearSensitiveValues() {
+            source?.invalidate()
+            source = null
             passphrase = ""
         }
 
         override fun toString(): String {
-            return "SshAuthenticationInput.PrivateKeyPassphrase(REDACTED)"
+            return "SshAuthenticationInput.PrivateKey(REDACTED)"
         }
     }
 }
