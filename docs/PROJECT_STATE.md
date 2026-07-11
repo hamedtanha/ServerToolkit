@@ -42,6 +42,7 @@ Persistent credentials, terminal UI, saved command workflows, background monitor
 | SSH | Active implementation | See [SSH Status](state/SSH_STATUS.md). |
 | Documentation Governance | Active | Source-of-truth ordering, version metadata rules, changelog usage, and ADR documentation boundaries are documented. |
 | Android Version Metadata | Current | Android `versionName` is synchronized with the current project milestone. |
+| Continuous Integration | Implemented | GitHub Actions validates Kotlin compilation, Android test compilation, unit tests, lint, and debug builds for pull requests and `main`. |
 
 ---
 
@@ -100,6 +101,8 @@ The next safe development steps are:
 Main branch must remain releasable.
 
 Implementation and documentation changes must happen on short-lived GitHub Flow branches and be merged through pull requests.
+
+The Android validation workflow runs for pull requests targeting `main` and for pushes to `main`. Failed validation must be resolved before merge.
 
 ---
 

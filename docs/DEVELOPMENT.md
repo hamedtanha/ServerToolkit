@@ -3,7 +3,7 @@
 **Project:** Server Toolkit
 **Document Baseline:** 0.2.0-alpha
 **Status:** Foundational
-**Last Updated:** 2026-07-07
+**Last Updated:** 2026-07-11
 
 ---
 
@@ -169,6 +169,33 @@ Commit messages should be concise, descriptive, and written in English.
 - Every feature is developed in a dedicated branch.
 - Every feature is merged only after review.
 - The branch must build successfully before merge.
+
+---
+
+## Continuous Integration
+
+GitHub Actions validates every pull request targeting `main` and every push to `main`.
+
+The validation workflow is:
+
+```text
+.github/workflows/android-validation.yml
+```
+
+The workflow uses the committed Gradle Wrapper and the project's Java 17 toolchain to run:
+
+```text
+:app:compileDebugKotlin
+:app:compileDebugAndroidTestKotlin
+:app:testDebugUnitTest
+:app:lintDebug
+:app:assembleDebug
+:app:assembleDebugAndroidTest
+```
+
+A failed validation must be resolved before merge.
+
+Continuous integration complements local validation and manual Android runtime verification. It does not replace device- or emulator-based testing for user-facing workflows.
 
 ---
 

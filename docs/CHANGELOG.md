@@ -12,6 +12,7 @@ The project follows Conventional Commits and Semantic Versioning principles.
 
 - Added documentation governance rules for version metadata, source-of-truth ordering, changelog usage, and ADR documentation boundaries.
 - Added AI change-impact workflow rules for scoped implementation, affected-file review, validation, and documentation synchronization gates.
+- Added GitHub Actions validation for Kotlin compilation, Android test compilation, unit tests, lint, and debug builds.
 - Added ADR-012 for Android backup and data extraction policy.
 - Added ADR-013 for the accepted ephemeral SSH private-key authentication boundary.
 - Added the project-owned one-shot SSH private-key source with atomic lifecycle transitions, bounded reading, stable failures, scoped cleanup, and focused unit coverage.
