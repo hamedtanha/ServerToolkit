@@ -4,7 +4,7 @@
 **Feature Area:** SSH
 **Status:** Active Implementation
 **Related Milestone:** Version 0.4.0 — SSH
-**Last Updated:** 2026-07-10
+**Last Updated:** 2026-07-11
 
 ---
 
@@ -22,7 +22,7 @@ SSH is in active implementation for version 0.4.0-alpha.
 
 The current implementation supports real ephemeral password-based SSH connections and user-facing non-interactive command execution behind project-owned SSH session handles.
 
-The ephemeral private-key authentication boundary is accepted through ADR-013. Private-key authentication remains unimplemented and must follow the accepted one-attempt, non-persistent design.
+The ephemeral private-key authentication boundary is accepted through ADR-013. The project-owned one-shot source and bounded in-memory reading primitive are implemented, while Android document access, workflow ownership, key parsing, and private-key authentication remain unimplemented.
 
 The current timeout, cleanup, cancellation, and failure-mapping hardening coverage pass is complete. Future SSH hardening must be driven by concrete runtime evidence, current repository inspection, or a newly recorded focused review finding.
 
@@ -133,6 +133,11 @@ These boundaries are accepted for the next focused implementation slices. They d
 - SSH credential-bearing connection request boundary.
 - SSH authentication input redaction and clearing at the connection attempt boundary.
 - SSH password authentication cancellation preservation.
+- Project-owned one-shot private-key source contract.
+- Atomic available-to-consumed and available-to-invalidated source transitions.
+- Bounded private-key material reading with the accepted `256 KiB` limit.
+- Stable source lifecycle and content-read failure categories.
+- Callback-scoped key-material access with redacted string representations and best-effort buffer clearing.
 
 ### SSHJ Integration
 
@@ -207,6 +212,7 @@ These boundaries are accepted for the next focused implementation slices. They d
 - SSH duplicate host-key confirmation regression test.
 - Manual SSH route verification.
 - Automated SSH route verification through unit tests and debug build.
+- One-shot private-key source lifecycle, concurrency, size-limit, failure-mapping, resource-closing, redaction, cancellation, and buffer-clearing unit tests.
 - Manual runtime test against macOS Remote Login through the Android emulator host address.
 - Verified successful SSH connection and non-interactive `whoami` command execution.
 
@@ -246,10 +252,11 @@ The following items are intentionally not implemented yet:
 
 The next safe development steps are:
 
-1. Implement the project-owned one-shot private-key source and bounded Android content-access boundary.
-2. Add lifecycle, invalidation, cancellation, cleanup, provider-failure, and size-limit tests.
-3. Add SSHJ private-key parsing and authentication behind project-owned error mapping, then verify the supported format matrix on Android.
-4. Keep terminal UI, saved command workflows, background monitoring, persistent credentials, and Xray or x-ui management out of scope.
+1. Add the Android private-key content factory using `GetContent`, cancellable descriptor opening, and joint descriptor-stream ownership.
+2. Add Android boundary tests for unavailable, cancelled, oversized, failing, and successfully closed content.
+3. Wire one pending source into the SSH ViewModel without placing the source, URI, bytes, or passphrase in observable or saved state.
+4. Add SSHJ private-key parsing and authentication behind project-owned error mapping, then verify the supported format matrix on Android.
+5. Keep terminal UI, saved command workflows, background monitoring, persistent credentials, and Xray or x-ui management out of scope.
 
 ---
 

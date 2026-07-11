@@ -14,6 +14,7 @@ The project follows Conventional Commits and Semantic Versioning principles.
 - Added AI change-impact workflow rules for scoped implementation, affected-file review, validation, and documentation synchronization gates.
 - Added ADR-012 for Android backup and data extraction policy.
 - Added ADR-013 for the accepted ephemeral SSH private-key authentication boundary.
+- Added the project-owned one-shot SSH private-key source with atomic lifecycle transitions, bounded reading, stable failures, scoped cleanup, and focused unit coverage.
 - Added Hilt-enabled application setup.
 - Added Dashboard ViewModel.
 - Added Dashboard UI state.
