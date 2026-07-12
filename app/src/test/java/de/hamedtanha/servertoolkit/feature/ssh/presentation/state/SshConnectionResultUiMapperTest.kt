@@ -87,6 +87,54 @@ class SshConnectionResultUiMapperTest {
                 detail = "No SSH session was opened because authentication did not complete successfully.",
             ),
             ExpectedConnectionFailure(
+                error = SshConnectionError.PrivateKeyUnavailable,
+                statusLabel = "Private key unavailable",
+                message = "The selected private key could not be read.",
+                detail = "Select the private-key document again, then retry the connection.",
+            ),
+            ExpectedConnectionFailure(
+                error = SshConnectionError.PrivateKeyEmpty,
+                statusLabel = "Private key is empty",
+                message = "The selected private-key document is empty.",
+                detail = "Select a valid OpenSSH v1 RSA or Ed25519 private-key document.",
+            ),
+            ExpectedConnectionFailure(
+                error = SshConnectionError.PrivateKeyTooLarge,
+                statusLabel = "Private key is too large",
+                message = "The selected private-key document exceeds the allowed size.",
+                detail = "Select a private-key document no larger than 256 KiB.",
+            ),
+            ExpectedConnectionFailure(
+                error = SshConnectionError.PrivateKeyUnsupportedFormat,
+                statusLabel = "Private key format unsupported",
+                message = "The selected private-key format is not supported.",
+                detail = "Use an OpenSSH v1 RSA or Ed25519 private key.",
+            ),
+            ExpectedConnectionFailure(
+                error = SshConnectionError.PrivateKeyInvalid,
+                statusLabel = "Private key is invalid",
+                message = "The selected private key could not be parsed.",
+                detail = "Use a valid OpenSSH v1 RSA or Ed25519 private key.",
+            ),
+            ExpectedConnectionFailure(
+                error = SshConnectionError.PrivateKeyPassphraseRequired,
+                statusLabel = "Private key passphrase required",
+                message = "This private key requires a passphrase.",
+                detail = "Enter the private-key passphrase and try again.",
+            ),
+            ExpectedConnectionFailure(
+                error = SshConnectionError.PrivateKeyPassphraseRejected,
+                statusLabel = "Private key passphrase rejected",
+                message = "The private-key passphrase was not accepted.",
+                detail = "Check the passphrase and try again.",
+            ),
+            ExpectedConnectionFailure(
+                error = SshConnectionError.AuthenticationRejected,
+                statusLabel = "Authentication rejected",
+                message = "The SSH server rejected the supplied credentials.",
+                detail = "Verify the username and authentication credentials, then try again.",
+            ),
+            ExpectedConnectionFailure(
                 error = SshConnectionError.HostTrustRequired,
                 statusLabel = "Server identity review required",
                 message = "Review and trust the server identity before connecting.",
@@ -96,7 +144,7 @@ class SshConnectionResultUiMapperTest {
                 error = SshConnectionError.UnsupportedConfiguration,
                 statusLabel = "Unsupported SSH configuration",
                 message = "This SSH configuration is not supported yet.",
-                detail = "Use a supported password-based SSH configuration for this connection attempt.",
+                detail = "Use a supported SSH configuration for this connection attempt.",
             ),
             ExpectedConnectionFailure(
                 error = SshConnectionError.Unknown,
@@ -104,6 +152,15 @@ class SshConnectionResultUiMapperTest {
                 message = "The connection attempt failed.",
                 detail = "No SSH session was opened.",
             ),
+        )
+
+        assertEquals(
+            SshConnectionError.entries.toSet(),
+            cases.map { expected -> expected.error }.toSet(),
+        )
+        assertEquals(
+            cases.size,
+            cases.map { expected -> expected.error }.toSet().size,
         )
 
         cases.forEach { expected ->

@@ -9,6 +9,7 @@ import de.hamedtanha.servertoolkit.feature.ssh.domain.model.SshTrustedHostKey
 import java.net.SocketTimeoutException
 import java.net.UnknownHostException
 import kotlinx.coroutines.CancellationException
+import kotlinx.coroutines.test.runTest
 import net.schmizz.sshj.transport.verification.HostKeyVerifier
 import org.junit.Assert.assertEquals
 import org.junit.Assert.assertFalse
@@ -21,7 +22,7 @@ class SshjTrustedConnectionExecutorTest {
     private val authenticationExecutor = SshjAuthenticationExecutor()
 
     @Test
-    fun `authenticated result remains represented as authenticated boundary result`() {
+    fun `authenticated result remains represented as authenticated boundary result`() = runTest {
         val client = FakeAuthenticatedClient()
         val result = authenticationExecutor.authenticate(
             client = client,
@@ -39,7 +40,7 @@ class SshjTrustedConnectionExecutorTest {
     }
 
     @Test
-    fun `authentication failure is mapped to authentication required`() {
+    fun `authentication failure is mapped to authentication required`() = runTest {
         val client = FakeAuthenticatedClient(
             authPasswordError = SshjAuthenticationFailedException(),
         )
@@ -58,7 +59,7 @@ class SshjTrustedConnectionExecutorTest {
     }
 
     @Test
-    fun `missing password is mapped to authentication required`() {
+    fun `missing password is mapped to authentication required`() = runTest {
         val client = FakeAuthenticatedClient()
 
         val result = authenticationExecutor.authenticate(
@@ -72,7 +73,7 @@ class SshjTrustedConnectionExecutorTest {
     }
 
     @Test
-    fun `trusted connection failure closes client and maps unknown host`() {
+    fun `trusted connection failure closes client and maps unknown host`() = runTest {
         val client = FakeTrustedConnectionClient(
             connectError = UnknownHostException("host not found"),
         )
@@ -98,7 +99,7 @@ class SshjTrustedConnectionExecutorTest {
     }
 
     @Test
-    fun `trusted connection timeout closes client and maps connection timeout`() {
+    fun `trusted connection timeout closes client and maps connection timeout`() = runTest {
         val client = FakeTrustedConnectionClient(
             connectError = SocketTimeoutException("connect timed out"),
         )
@@ -123,7 +124,7 @@ class SshjTrustedConnectionExecutorTest {
     }
 
     @Test
-    fun `authentication failure closes client before returning failure`() {
+    fun `authentication failure closes client before returning failure`() = runTest {
         val client = FakeTrustedConnectionClient(
             authPasswordError = SshjAuthenticationFailedException(),
         )
@@ -150,7 +151,7 @@ class SshjTrustedConnectionExecutorTest {
     }
 
     @Test
-    fun `authenticated connection transfers client ownership without closing immediately`() {
+    fun `authenticated connection transfers client ownership without closing immediately`() = runTest {
         val client = FakeTrustedConnectionClient()
         val executor = trustedConnectionExecutor(client)
 
@@ -178,7 +179,7 @@ class SshjTrustedConnectionExecutorTest {
     }
 
     @Test
-    fun `trusted connection cleanup failure is contained`() {
+    fun `trusted connection cleanup failure is contained`() = runTest {
         val client = FakeTrustedConnectionClient(
             connectError = UnknownHostException("host not found"),
             closeError = IllegalStateException("close failed"),
@@ -203,7 +204,7 @@ class SshjTrustedConnectionExecutorTest {
     }
 
     @Test
-    fun `preserves cancellation when trusted connection cleanup fails`() {
+    fun `preserves cancellation when trusted connection cleanup fails`() = runTest {
         val client = FakeTrustedConnectionClient(
             connectError = CancellationException("cancelled connection"),
             closeError = IllegalStateException("close failed"),
@@ -277,6 +278,15 @@ class SshjTrustedConnectionExecutorTest {
         var lastPassword: String? = null
             private set
 
+        override fun authPrivateKey(
+            username: String,
+            privateKeyBytes: ByteArray,
+            privateKeySize: Int,
+            passphrase: String,
+        ) {
+            error("Private-key authentication is outside this test scope.")
+        }
+
         override fun authPassword(
             username: String,
             password: String,
@@ -327,6 +337,15 @@ class SshjTrustedConnectionExecutorTest {
         ) {
             connectCallCount += 1
             connectError?.let { throw it }
+        }
+
+        override fun authPrivateKey(
+            username: String,
+            privateKeyBytes: ByteArray,
+            privateKeySize: Int,
+            passphrase: String,
+        ) {
+            error("Private-key authentication is outside this test scope.")
         }
 
         override fun authPassword(

@@ -1,6 +1,8 @@
 package de.hamedtanha.servertoolkit.feature.ssh.data.service
 
 import de.hamedtanha.servertoolkit.feature.ssh.domain.model.SshConnectionError
+import de.hamedtanha.servertoolkit.feature.ssh.domain.model.SshPrivateKeySourceError
+import de.hamedtanha.servertoolkit.feature.ssh.domain.model.SshPrivateKeySourceResult
 import javax.inject.Inject
 import kotlinx.coroutines.CancellationException
 
@@ -13,7 +15,7 @@ import kotlinx.coroutines.CancellationException
  */
 class SshjAuthenticationExecutor @Inject constructor() {
 
-    internal fun authenticate(
+    internal suspend fun authenticate(
         client: SshjAuthenticatedClient,
         mapping: SshjAuthenticationMapping,
     ): SshjAuthenticationExecutionResult {
@@ -43,9 +45,80 @@ class SshjAuthenticationExecutor @Inject constructor() {
             }
 
             is SshjAuthenticationMapping.PrivateKey -> {
-                SshjAuthenticationExecutionResult.Failed(SshConnectionError.UnsupportedConfiguration)
+                authenticatePrivateKey(
+                    client = client,
+                    mapping = mapping,
+                )
             }
         }
+    }
+
+    private suspend fun authenticatePrivateKey(
+        client: SshjAuthenticatedClient,
+        mapping: SshjAuthenticationMapping.PrivateKey,
+    ): SshjAuthenticationExecutionResult {
+        val source = mapping.takePrivateKeySource()
+            ?: return SshjAuthenticationExecutionResult.Failed(
+                SshConnectionError.PrivateKeyUnavailable,
+            )
+
+        return try {
+            when (
+                val sourceResult = source.consume {
+                    useBytes { privateKeyBytes, privateKeySize ->
+                        client.authPrivateKey(
+                            username = mapping.username,
+                            privateKeyBytes = privateKeyBytes,
+                            privateKeySize = privateKeySize,
+                            passphrase = mapping.passphrase,
+                        )
+                    }
+                }
+            ) {
+                is SshPrivateKeySourceResult.Success -> {
+                    SshjAuthenticationExecutionResult.Authenticated
+                }
+
+                is SshPrivateKeySourceResult.Failure -> {
+                    SshjAuthenticationExecutionResult.Failed(
+                        sourceResult.error.toConnectionError(),
+                    )
+                }
+            }
+        } catch (_: SshjPrivateKeyAuthenticationException.UnsupportedFormat) {
+            SshjAuthenticationExecutionResult.Failed(
+                SshConnectionError.PrivateKeyUnsupportedFormat,
+            )
+        } catch (_: SshjPrivateKeyAuthenticationException.InvalidKey) {
+            SshjAuthenticationExecutionResult.Failed(SshConnectionError.PrivateKeyInvalid)
+        } catch (_: SshjPrivateKeyAuthenticationException.PassphraseRequired) {
+            SshjAuthenticationExecutionResult.Failed(
+                SshConnectionError.PrivateKeyPassphraseRequired,
+            )
+        } catch (_: SshjPrivateKeyAuthenticationException.PassphraseRejected) {
+            SshjAuthenticationExecutionResult.Failed(
+                SshConnectionError.PrivateKeyPassphraseRejected,
+            )
+        } catch (_: SshjPrivateKeyAuthenticationException.AuthenticationRejected) {
+            SshjAuthenticationExecutionResult.Failed(SshConnectionError.AuthenticationRejected)
+        } catch (error: CancellationException) {
+            throw error
+        } catch (_: Exception) {
+            SshjAuthenticationExecutionResult.Failed(SshConnectionError.Unknown)
+        }
+    }
+}
+
+private fun SshPrivateKeySourceError.toConnectionError(): SshConnectionError {
+    return when (this) {
+        SshPrivateKeySourceError.AlreadyConsumed,
+        SshPrivateKeySourceError.Invalidated,
+        SshPrivateKeySourceError.DocumentUnavailable,
+        SshPrivateKeySourceError.ReadFailed,
+        -> SshConnectionError.PrivateKeyUnavailable
+
+        SshPrivateKeySourceError.EmptyDocument -> SshConnectionError.PrivateKeyEmpty
+        SshPrivateKeySourceError.DocumentTooLarge -> SshConnectionError.PrivateKeyTooLarge
     }
 }
 
@@ -76,6 +149,13 @@ internal interface SshjAuthenticatedClient {
         username: String,
         password: String,
     )
+
+    fun authPrivateKey(
+        username: String,
+        privateKeyBytes: ByteArray,
+        privateKeySize: Int,
+        passphrase: String,
+    )
 }
 
 /**
@@ -84,3 +164,33 @@ internal interface SshjAuthenticatedClient {
 internal class SshjAuthenticationFailedException(
     cause: Throwable? = null,
 ) : RuntimeException(cause)
+
+/**
+ * Stable data-layer private-key authentication failures.
+ *
+ * SSHJ exception types must not escape through the project-owned authentication boundary.
+ */
+internal sealed class SshjPrivateKeyAuthenticationException(
+    cause: Throwable? = null,
+) : RuntimeException(cause) {
+
+    class UnsupportedFormat(
+        cause: Throwable? = null,
+    ) : SshjPrivateKeyAuthenticationException(cause)
+
+    class InvalidKey(
+        cause: Throwable? = null,
+    ) : SshjPrivateKeyAuthenticationException(cause)
+
+    class PassphraseRequired(
+        cause: Throwable? = null,
+    ) : SshjPrivateKeyAuthenticationException(cause)
+
+    class PassphraseRejected(
+        cause: Throwable? = null,
+    ) : SshjPrivateKeyAuthenticationException(cause)
+
+    class AuthenticationRejected(
+        cause: Throwable? = null,
+    ) : SshjPrivateKeyAuthenticationException(cause)
+}

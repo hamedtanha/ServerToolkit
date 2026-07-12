@@ -359,6 +359,74 @@ Before private-key authentication implementation may merge, validation must incl
 
 ---
 
+# Implementation Outcome
+
+**Verified:** 2026-07-12
+
+The initial ADR-013 implementation slice is complete.
+
+The implementation preserves the accepted one-attempt and non-persistent credential boundary:
+
+- the Android system picker supplies the selected private-key document;
+- the Android document reference is converted immediately into a project-owned one-shot source;
+- key-document content is read within the accepted `256 KiB` boundary;
+- private-key parsing and SSHJ key-provider creation remain inside the SSH data layer;
+- parsing and authentication operate in memory without application-created temporary private-key files;
+- application-owned key buffers and mutable passphrase arrays are cleared on a best-effort basis;
+- cancellation remains preserved;
+- private-key documents, key material, and passphrases are not persisted.
+
+## Verified OpenSSH KDF Work Boundary
+
+Encrypted OpenSSH v1 private keys contain a file-controlled bcrypt KDF work factor. SSHJ uses that value during key decryption, so the accepted document-size boundary alone does not bound CPU consumption.
+
+The implementation therefore performs project-owned OpenSSH v1 envelope preflight validation before SSHJ parsing:
+
+- the maximum accepted bcrypt KDF work factor is `64` rounds;
+- zero rounds and values greater than `64` map to the stable unsupported-format outcome;
+- malformed KDF metadata maps to the stable invalid-key outcome;
+- the decoded application-owned metadata buffer is cleared on a best-effort basis after validation;
+- SSHJ parsing and decryption begin only after the metadata passes this boundary.
+
+The `64`-round boundary was measured on a Pixel 9 Android Virtual Device using actual encrypted OpenSSH v1 Ed25519 keys and complete SSHJ provider parsing. The median of three measured parses was approximately `204.11 ms` at `16` rounds and `724.18 ms` at `64` rounds, a `3.55` ratio.
+
+These measurements are implementation evidence rather than a universal performance guarantee. Physical devices, especially lower-performance devices, may require more time. The boundary is intended to preserve compatibility with reasonably hardened keys while preventing an attacker-controlled unbounded bcrypt loop.
+
+## Verified Key-Format Matrix
+
+| Container | Algorithm | Passphrase | Outcome |
+|---|---|---|---|
+| OpenSSH v1 | Ed25519 | None | Supported |
+| OpenSSH v1 | Ed25519 | Required | Supported |
+| OpenSSH v1 | RSA | None | Supported |
+| OpenSSH v1 | RSA | Required | Supported |
+| PKCS#8 | RSA | None | Unsupported format |
+| PKCS#8 | RSA | Required | Unsupported format |
+
+Algorithms and containers outside this verified matrix remain unsupported.
+
+## Validation Evidence
+
+The implementation gates were completed with:
+
+- focused unit coverage for private-key parsing, passphrase handling, unsupported and malformed formats, unauthorized keys, one-shot source ownership, cancellation preservation, failure mapping, and best-effort cleanup;
+- focused boundary coverage for accepted, zero, and excessive OpenSSH bcrypt KDF rounds;
+- Android benchmark evidence for complete SSHJ parsing at `16` and `64` bcrypt rounds;
+- successful complete unit-test execution;
+- successful Android lint validation;
+- successful debug APK assembly;
+- manual Android system-picker runtime verification through an emulator;
+- successful authentication with all four supported OpenSSH combinations;
+- successful non-interactive `whoami` execution after private-key authentication;
+- verified incorrect-passphrase rejection;
+- verified server rejection for a valid but unauthorized key;
+- verified stable unsupported-format outcomes for both tested PKCS#8 variants;
+- cleanup of all runtime-only private keys, passphrases, authorized-key entries, and emulator test documents.
+
+Persistent credential profiles, key import, durable URI access, key synchronization, hardware-backed client keys, and persistent secret storage remain outside the scope authorized by this ADR.
+
+---
+
 # References
 
 - ADR-007: Secure Storage Strategy
@@ -377,6 +445,8 @@ Before private-key authentication implementation may merge, validation must incl
 
 # Notes
 
-This ADR accepts the design boundary for a future ephemeral private-key authentication implementation.
+This ADR remains the accepted architecture and security decision for ephemeral SSH private-key authentication.
 
-It does not describe private-key authentication as implemented and does not authorize persistent credential storage.
+The original Context and Decision sections record the state and reasoning at decision time. The Implementation Outcome section records completion and verification of the initial implementation on 2026-07-12.
+
+This ADR does not authorize persistent credential storage.

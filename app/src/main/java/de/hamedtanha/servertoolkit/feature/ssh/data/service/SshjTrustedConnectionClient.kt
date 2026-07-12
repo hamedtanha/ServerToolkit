@@ -50,6 +50,8 @@ internal interface SshjTrustedConnectionClient : SshjAuthenticatedClient {
 
 private class SshjTrustedConnectionClientAdapter(
     private val client: SSHClient,
+    private val privateKeyProviderFactory: SshjPrivateKeyProviderFactory =
+        SshjPrivateKeyProviderFactory(),
 ) : SshjTrustedConnectionClient {
 
     override var connectTimeout: Int
@@ -83,6 +85,26 @@ private class SshjTrustedConnectionClientAdapter(
             client.authPassword(username, password)
         } catch (error: UserAuthException) {
             throw SshjAuthenticationFailedException(error)
+        }
+    }
+
+    override fun authPrivateKey(
+        username: String,
+        privateKeyBytes: ByteArray,
+        privateKeySize: Int,
+        passphrase: String,
+    ) {
+        val keyProvider = privateKeyProviderFactory.create(
+            client = client,
+            privateKeyBytes = privateKeyBytes,
+            privateKeySize = privateKeySize,
+            passphrase = passphrase,
+        )
+
+        try {
+            client.authPublickey(username, keyProvider)
+        } catch (error: UserAuthException) {
+            throw SshjPrivateKeyAuthenticationException.AuthenticationRejected(error)
         }
     }
 
