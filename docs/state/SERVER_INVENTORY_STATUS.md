@@ -4,7 +4,7 @@
 **Feature Area:** Server Inventory
 **Status:** Accepted Baseline
 **Related Milestone:** Version 0.3.0 — Server Inventory Foundation
-**Last Updated:** 2026-07-09
+**Last Updated:** 2026-07-12
 
 ---
 
@@ -33,6 +33,7 @@ The feature provides local server inventory management backed by Room persistenc
 - Server Inventory UI state.
 - Server Inventory empty screen.
 - Server Inventory empty-state action.
+- Stable inventory-empty rendering after deleting the final server while a filter remains active.
 - Basic Server Inventory list rendering.
 - Dashboard navigation action to Server Inventory.
 
@@ -94,6 +95,7 @@ The feature provides local server inventory management backed by Room persistenc
 - Automated Edit Server verification through unit tests, instrumented tests, and debug build.
 - Automated shared Server Form naming verification through unit tests, instrumented tests, and debug build.
 - Server Inventory filter matcher unit tests.
+- Server Inventory UI-state regression tests for inventory-empty and filter-result-empty semantics.
 - DAO instrumentation tests for insert, replace, and delete behavior.
 - Room-backed repository instrumentation tests for save, replace, and delete behavior.
 - Server entity/domain mapper unit tests.
