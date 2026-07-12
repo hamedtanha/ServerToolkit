@@ -18,7 +18,7 @@ import java.util.UUID
  */
 internal interface SshjTrustedConnectionExecutor {
 
-    fun connectAndAuthenticate(
+    suspend fun connectAndAuthenticate(
         request: SshConnectionRequest,
         trustedHostKey: SshTrustedHostKey,
         authenticationMapping: SshjAuthenticationMapping,
@@ -44,7 +44,7 @@ internal class SshjNetworkTrustedConnectionExecutor(
         SshjDefaultTrustedConnectionClientFactory(),
 ) : SshjTrustedConnectionExecutor {
 
-    override fun connectAndAuthenticate(
+    override suspend fun connectAndAuthenticate(
         request: SshConnectionRequest,
         trustedHostKey: SshTrustedHostKey,
         authenticationMapping: SshjAuthenticationMapping,

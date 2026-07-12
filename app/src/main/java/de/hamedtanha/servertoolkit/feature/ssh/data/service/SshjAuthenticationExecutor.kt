@@ -13,7 +13,7 @@ import kotlinx.coroutines.CancellationException
  */
 class SshjAuthenticationExecutor @Inject constructor() {
 
-    internal fun authenticate(
+    internal suspend fun authenticate(
         client: SshjAuthenticatedClient,
         mapping: SshjAuthenticationMapping,
     ): SshjAuthenticationExecutionResult {

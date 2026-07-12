@@ -5,6 +5,7 @@ import de.hamedtanha.servertoolkit.feature.ssh.domain.model.SshConnectionError
 import de.hamedtanha.servertoolkit.feature.ssh.domain.model.SshConnectionRequest
 import de.hamedtanha.servertoolkit.feature.ssh.test.TrackingSshPrivateKeySource
 import kotlinx.coroutines.CancellationException
+import kotlinx.coroutines.test.runTest
 import org.junit.Assert.assertEquals
 import org.junit.Assert.assertTrue
 import org.junit.Assert.fail
@@ -16,7 +17,7 @@ class SshjAuthenticationExecutorTest {
     private val executor = SshjAuthenticationExecutor()
 
     @Test
-    fun `returns authentication required for missing authentication input`() {
+    fun `returns authentication required for missing authentication input`() = runTest {
         val client = FakeAuthenticatedClient()
         val mapping = adapter.map(connectionRequest())
 
@@ -27,7 +28,7 @@ class SshjAuthenticationExecutorTest {
     }
 
     @Test
-    fun `returns authentication required for blank password input`() {
+    fun `returns authentication required for blank password input`() = runTest {
         val client = FakeAuthenticatedClient()
         val mapping = adapter.map(
             connectionRequest(
@@ -42,7 +43,7 @@ class SshjAuthenticationExecutorTest {
     }
 
     @Test
-    fun `executes password authentication against provided client`() {
+    fun `executes password authentication against provided client`() = runTest {
         val client = FakeAuthenticatedClient()
         val mapping = adapter.map(
             connectionRequest(
@@ -59,7 +60,7 @@ class SshjAuthenticationExecutorTest {
     }
 
     @Test
-    fun `maps password authentication failure to authentication required`() {
+    fun `maps password authentication failure to authentication required`() = runTest {
         val client = FakeAuthenticatedClient(
             authPasswordError = SshjAuthenticationFailedException(),
         )
@@ -75,7 +76,7 @@ class SshjAuthenticationExecutorTest {
     }
 
     @Test
-    fun `maps unexpected password authentication failure to unknown`() {
+    fun `maps unexpected password authentication failure to unknown`() = runTest {
         val client = FakeAuthenticatedClient(
             authPasswordError = IllegalStateException("Unexpected authentication failure"),
         )
@@ -91,7 +92,7 @@ class SshjAuthenticationExecutorTest {
     }
 
     @Test
-    fun `preserves password authentication cancellation`() {
+    fun `preserves password authentication cancellation`() = runTest {
         val client = FakeAuthenticatedClient(
             authPasswordError = CancellationException("cancelled"),
         )
@@ -112,7 +113,7 @@ class SshjAuthenticationExecutorTest {
     }
 
     @Test
-    fun `returns unsupported configuration for private key input until parsing is implemented`() {
+    fun `returns unsupported configuration for private key input until parsing is implemented`() = runTest {
         val client = FakeAuthenticatedClient()
         val source = TrackingSshPrivateKeySource()
         val mapping = adapter.map(

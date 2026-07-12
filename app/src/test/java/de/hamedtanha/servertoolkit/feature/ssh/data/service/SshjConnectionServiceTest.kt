@@ -265,7 +265,7 @@ class SshjConnectionServiceTest {
         var lastAuthenticationMapping: SshjAuthenticationMapping? = null
             private set
 
-        override fun connectAndAuthenticate(
+        override suspend fun connectAndAuthenticate(
             request: SshConnectionRequest,
             trustedHostKey: SshTrustedHostKey,
             authenticationMapping: SshjAuthenticationMapping,
