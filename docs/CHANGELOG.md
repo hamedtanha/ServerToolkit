@@ -97,6 +97,7 @@ The project follows Conventional Commits and Semantic Versioning principles.
 - Added Server DAO instrumentation tests.
 - Added Room-backed Server repository instrumentation tests.
 - Added Server entity/domain mapper unit tests.
+- Added Server Inventory UI-state regression coverage for deleting the final server while a filter remains active.
 - Added core connection target-resolution contract.
 - Added Server Inventory-backed connection target resolver.
 - Added SSH ViewModel target-resolution tests.
@@ -207,6 +208,7 @@ The project follows Conventional Commits and Semantic Versioning principles.
 - Updated Dashboard empty-state copy to point users toward Server Inventory.
 - Improved Server Inventory screen structure by extracting shared centered content and message content.
 - Clarified Server Inventory UI state semantics for inventory-empty and filter-empty states.
+- Fixed inventory-empty rendering after deleting the final server while a filter remains active.
 - Connected Server Inventory empty-state action to the Add Server placeholder route.
 - Connected Server Inventory ViewModel to the Server repository.
 - Connected Add Server save behavior to the Server repository.
