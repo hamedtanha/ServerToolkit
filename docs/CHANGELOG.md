@@ -187,6 +187,7 @@ The project follows Conventional Commits and Semantic Versioning principles.
 - Stabilized SSH command execution UI state when an active SSH session becomes unavailable.
 - Updated the SSH screen from placeholder-only connection UI to include non-interactive command execution controls.
 - Disabled Android backup and data extraction for the alpha release to protect infrastructure inventory metadata.
+- Completed explicit backup and transfer exclusions across all supported app storage domains.
 - Replaced SSH placeholder connection metadata with resolved inventory-backed connection targets.
 - Moved SSH connection attempt orchestration from the ViewModel into a dedicated domain use case.
 - Updated the Server Toolkit database schema to version 2 for SSH trusted host keys.
