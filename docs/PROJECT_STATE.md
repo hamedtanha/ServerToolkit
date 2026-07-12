@@ -3,7 +3,7 @@
 **Project:** Server Toolkit
 **Version:** 0.4.0-alpha
 **Status:** Active Implementation
-**Last Updated:** 2026-07-11
+**Last Updated:** 2026-07-12
 
 ---
 
@@ -25,9 +25,11 @@ The Server Inventory 0.3.0 baseline is accepted.
 
 Version 0.4.0-alpha is focused on SSH.
 
-The current SSH implementation supports real ephemeral password-based SSH connections and user-facing non-interactive command execution behind project-owned SSH session handles.
+The current SSH implementation supports real ephemeral password-based and private-key SSH connections, together with user-facing non-interactive command execution behind project-owned SSH session handles.
 
-The ephemeral private-key authentication boundary is accepted through ADR-013. The one-shot source, bounded reading primitive, Android content factory, system-picker integration, and private ViewModel pending-source ownership are implemented. Source lifecycle and ViewModel ownership have automated coverage, and manual system-picker runtime verification is complete. Key parsing and private-key authentication remain incomplete.
+The ADR-013 ephemeral private-key workflow is implemented end to end. Private-key documents are selected through the Android system picker, converted immediately into project-owned one-shot sources, read within the accepted size boundary, parsed in memory inside the SSH data layer, and consumed for one authentication attempt without temporary private-key files or persistent credential storage. Encrypted OpenSSH v1 metadata is preflight-validated before SSHJ parsing, with bcrypt KDF work limited to `64` rounds.
+
+Automated JVM coverage, Android runtime verification, and Android benchmark evidence confirm support for encrypted and unencrypted OpenSSH v1 Ed25519 and RSA keys. Tested PKCS#8 RSA keys map to a stable unsupported-format outcome. Parser, passphrase, source-lifecycle, cleanup, and server-rejection failures map to project-owned errors, while coroutine cancellation is preserved.
 
 Persistent credentials, terminal UI, saved command workflows, background monitoring, and Xray or x-ui management remain intentionally out of scope.
 
@@ -54,6 +56,7 @@ The current SSH implementation must continue from the accepted architecture on `
 - SSH authentication input state must not own a separate username value.
 - SSH authentication input state may expose only the selected authentication method and secret presence flags.
 - Persistent credential metadata and persistent secret storage are not implemented.
+- Private-key documents, loaded key material, and passphrases remain one-attempt and non-persistent.
 - Credential persistence requires a separate reviewed implementation slice with a secure storage boundary.
 - SSH command execution remains non-interactive and must continue to use project-owned session handles.
 - Terminal UI, saved commands, background monitoring, and persistent credentials remain out of scope.
@@ -67,7 +70,6 @@ The following items are intentionally not implemented yet:
 - Interactive terminal workflow for owned sessions.
 - Additional SSH host key verification hardening, if future runtime testing identifies gaps.
 - Persistent credential storage implementation.
-- Ephemeral private-key authentication implementation.
 - Monitoring workflow.
 - Saved command workflow.
 - Xray or x-ui management workflow.
@@ -80,7 +82,7 @@ The following items are intentionally not implemented yet:
 
 The current implementation area is:
 
-- SSH 0.4.0-alpha system-picker integration and pending-source ownership are implemented and runtime-verified against accepted ADR-013.
+- SSH 0.4.0-alpha ephemeral private-key authentication is implemented and runtime-verified against ADR-013, including the supported OpenSSH format matrix and stable unsupported PKCS#8 outcomes.
 - Connection history domain, Room persistence, automatic recording, and per-server presentation are complete and runtime-verified.
 
 ---
@@ -89,10 +91,9 @@ The current implementation area is:
 
 The next safe development steps are:
 
-1. Add SSHJ private-key parsing behind the transferred one-shot source boundary.
-2. Map parser, passphrase, and authentication failures into stable project-owned outcomes.
-3. Verify and document the supported private-key format matrix on Android.
-4. Keep terminal UI, saved command workflows, background monitoring, and persistent credentials out of scope.
+1. Reassess the remaining version 0.4.0 SSH milestone against its documented deliverable.
+2. Record the next focused SSH implementation slice through reviewed planning before implementation begins.
+3. Keep terminal UI, saved command workflows, background monitoring, persistent credentials, and Xray or x-ui management out of scope.
 
 ---
 

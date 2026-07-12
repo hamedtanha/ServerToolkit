@@ -13,7 +13,8 @@ The application is designed for system administrators, DevOps engineers, and inf
 - Local Room-backed server persistence.
 - Server search and filtering.
 - SSH host-key trust review and Room-backed trusted-host persistence.
-- Ephemeral password-based SSH connections.
+- Ephemeral password-based and private-key SSH connections.
+- Verified OpenSSH v1 Ed25519 and RSA private-key authentication with optional passphrases.
 - Project-owned SSH session management.
 - User-facing non-interactive SSH command execution workflow.
 - SSH command output display for stdout, stderr, and exit status.

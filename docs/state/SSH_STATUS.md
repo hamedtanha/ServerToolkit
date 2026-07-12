@@ -4,7 +4,7 @@
 **Feature Area:** SSH
 **Status:** Active Implementation
 **Related Milestone:** Version 0.4.0 — SSH
-**Last Updated:** 2026-07-11
+**Last Updated:** 2026-07-12
 
 ---
 
@@ -20,9 +20,11 @@ The high-level project state remains documented in [Project State](../PROJECT_ST
 
 SSH is in active implementation for version 0.4.0-alpha.
 
-The current implementation supports real ephemeral password-based SSH connections and user-facing non-interactive command execution behind project-owned SSH session handles.
+The current implementation supports real ephemeral password-based and private-key SSH authentication, together with user-facing non-interactive command execution behind project-owned SSH session handles.
 
-The ephemeral private-key authentication boundary is accepted through ADR-013. The one-shot source, bounded reading primitive, Android content factory, system-picker integration, and private ViewModel pending-source ownership are implemented. Source lifecycle and ViewModel ownership have automated coverage, and manual system-picker runtime verification is complete. Key parsing and private-key authentication remain incomplete.
+The ADR-013 ephemeral private-key workflow is implemented end to end. The implementation includes the one-shot source, bounded key-document reading, Android system-picker integration, private ViewModel pending-source ownership, in-memory SSHJ key-provider creation, stable project-owned failure mapping, and authentication without temporary private-key files.
+
+Automated JVM coverage, Android runtime verification, full unit tests, lint, and debug-build validation are complete. Verified private-key support is intentionally restricted to the documented format matrix below.
 
 The current timeout, cleanup, cancellation, and failure-mapping hardening coverage pass is complete. Future SSH hardening must be driven by concrete runtime evidence, current repository inspection, or a newly recorded focused review finding.
 
@@ -38,12 +40,39 @@ ADR-013 defines the following private-key authentication boundaries:
 - Immediate conversion of the selected Android document reference into a project-owned one-shot source.
 - No persistent URI permission, key import, key copy, credential profile, or secret persistence.
 - Bounded key-document reading with an initial `256 KiB` limit.
+- Preflight validation of encrypted OpenSSH v1 KDF metadata before SSHJ parsing, with a maximum accepted bcrypt work factor of `64` rounds.
 - Private-key parsing and SSHJ authentication inside the SSH data layer.
 - Optional passphrase handling outside observable UI state and saved state.
 - Secret invalidation when an attempt enters host-key review.
 - Stable project-owned failure mapping, cancellation preservation, and best-effort cleanup.
 
-These boundaries are accepted for the next focused implementation slices. They do not describe private-key authentication as implemented.
+These boundaries are implemented for the current ephemeral private-key authentication workflow. Persistent key import, persistent URI access, credential profiles, and secret storage remain outside the accepted scope.
+
+---
+
+## Verified Private-Key Format Matrix
+
+The initial private-key format matrix is based on automated SSHJ adapter tests and manual Android runtime verification through the system document picker.
+
+| Container | Algorithm | Passphrase | Result |
+|---|---|---|---|
+| OpenSSH v1 | Ed25519 | None | Supported |
+| OpenSSH v1 | Ed25519 | Required | Supported |
+| OpenSSH v1 | RSA | None | Supported |
+| OpenSSH v1 | RSA | Required | Supported |
+| PKCS#8 | RSA | None | Unsupported format |
+| PKCS#8 | RSA | Required | Unsupported format |
+
+Algorithms and containers outside this verified matrix are unsupported.
+
+The Android runtime verification also confirmed:
+
+- successful authentication with all four supported OpenSSH combinations;
+- successful non-interactive `whoami` execution after authentication;
+- stable rejection for an incorrect private-key passphrase;
+- stable rejection for a valid but unauthorized key;
+- stable unsupported-format outcomes for both tested PKCS#8 variants;
+- key reselection after host-key review, consistent with the one-attempt source contract.
 
 ---
 
@@ -148,6 +177,8 @@ These boundaries are accepted for the next focused implementation slices. They d
 - Private ViewModel ownership of at most one pending source outside observable and saved state.
 - Pending-source invalidation on replacement, picker cancellation, method change, workflow exit, and host-key review.
 - One-attempt source transfer into connection-attempt orchestration.
+- Authentication-time source consumption exactly once inside the key-material lifetime boundary.
+- Best-effort clearing of application-owned key-material buffers after success, failure, or cancellation.
 
 ### SSHJ Integration
 
@@ -162,8 +193,14 @@ These boundaries are accepted for the next focused implementation slices. They d
 - SSHJ trusted host-key verifier boundary.
 - SSHJ trusted connection execution boundary.
 - SSHJ password authentication execution boundary.
+- SSHJ private-key provider factory and authentication execution boundary.
+- In-memory OpenSSH v1 private-key parsing without temporary private-key files.
+- Project-owned rejection of zero or excessive OpenSSH bcrypt KDF rounds before SSHJ parsing and decryption begin.
+- Explicit Ed25519 and RSA key-type restriction for the verified OpenSSH matrix.
+- Stable mapping for unavailable, empty, oversized, unsupported, malformed, passphrase, server-rejection, cancellation, and unexpected outcomes.
+- Best-effort clearing of application-owned passphrase character arrays.
 - SSHJ session ownership execution boundary.
-- Real ephemeral password-based SSH connection workflow.
+- Real ephemeral password-based and private-key SSH connection workflows.
 
 ### Session Lifecycle
 
@@ -225,9 +262,15 @@ These boundaries are accepted for the next focused implementation slices. They d
 - One-shot private-key source lifecycle, concurrency, size-limit, failure-mapping, resource-closing, redaction, cancellation, and buffer-clearing unit tests.
 - Android private-key content factory instrumentation tests for successful reads, unavailable content, descriptor cleanup, and cancellation bridging.
 - Private-key picker ownership tests for presence-only state, replacement, cancellation, workflow exit, host review, one-attempt transfer, and connection cancellation.
-- Manual Android verification of private-key picker cancellation, selection, replacement, configuration-change behavior, navigation cleanup, process-death reset, host-key review cleanup, and the controlled unsupported-authentication outcome.
+- Manual Android verification of private-key picker cancellation, selection, replacement, configuration-change behavior, navigation cleanup, process-death reset, and host-key review cleanup.
+- Android benchmark verification of complete SSHJ parsing at `16` and `64` OpenSSH bcrypt KDF rounds, measuring approximately `204.11 ms` and `724.18 ms` respectively on a Pixel 9 Android Virtual Device.
 - Manual runtime test against macOS Remote Login through the Android emulator host address.
 - Verified successful SSH connection and non-interactive `whoami` command execution.
+- Dedicated test-only OpenSSH Ed25519 and RSA fixtures for encrypted and unencrypted authentication.
+- Dedicated test-only PKCS#8 RSA fixtures for stable unsupported-format verification.
+- Malformed-key, missing-passphrase, incorrect-passphrase, unauthorized-key, source-failure, cancellation, and buffer-clearing coverage.
+- Android runtime verification of the complete supported and unsupported private-key format matrix.
+- Full unit-test, lint, and debug-assembly quality gate after private-key authentication implementation.
 
 ---
 
@@ -237,6 +280,7 @@ These boundaries are accepted for the next focused implementation slices. They d
 - SSH authentication input state must not own a separate username value.
 - SSH authentication input state may expose only the selected authentication method and secret presence flags.
 - Persistent credential metadata and persistent secret storage are not implemented.
+- Private-key documents, loaded key material, and passphrases remain one-attempt and non-persistent.
 - Credential persistence requires a separate reviewed implementation slice with a secure storage boundary.
 - SSH command execution remains non-interactive and must continue to use project-owned session handles.
 - SSH connection history must contain non-sensitive resolved target metadata and result classification only.
@@ -252,7 +296,6 @@ The following items are intentionally not implemented yet:
 
 - Interactive terminal workflow for owned sessions.
 - Persistent credential storage implementation.
-- Ephemeral private-key authentication implementation.
 - Monitoring workflow.
 - Saved command workflow.
 - Xray or x-ui management workflow.
@@ -265,10 +308,9 @@ The following items are intentionally not implemented yet:
 
 The next safe development steps are:
 
-1. Add SSHJ private-key parsing and authentication behind the transferred one-shot source boundary.
-2. Map parser, passphrase, and authentication failures into stable project-owned outcomes.
-3. Verify and document the supported private-key format matrix on Android.
-4. Keep terminal UI, saved command workflows, background monitoring, persistent credentials, and Xray or x-ui management out of scope.
+1. Reassess the remaining version 0.4.0 SSH milestone against its documented deliverable.
+2. Record the next focused SSH implementation slice through reviewed planning before implementation begins.
+3. Keep terminal UI, saved command workflows, background monitoring, persistent credentials, and Xray or x-ui management out of scope.
 
 ---
 

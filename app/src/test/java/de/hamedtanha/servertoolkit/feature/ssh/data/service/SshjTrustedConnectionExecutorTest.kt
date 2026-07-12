@@ -278,6 +278,15 @@ class SshjTrustedConnectionExecutorTest {
         var lastPassword: String? = null
             private set
 
+        override fun authPrivateKey(
+            username: String,
+            privateKeyBytes: ByteArray,
+            privateKeySize: Int,
+            passphrase: String,
+        ) {
+            error("Private-key authentication is outside this test scope.")
+        }
+
         override fun authPassword(
             username: String,
             password: String,
@@ -328,6 +337,15 @@ class SshjTrustedConnectionExecutorTest {
         ) {
             connectCallCount += 1
             connectError?.let { throw it }
+        }
+
+        override fun authPrivateKey(
+            username: String,
+            privateKeyBytes: ByteArray,
+            privateKeySize: Int,
+            passphrase: String,
+        ) {
+            error("Private-key authentication is outside this test scope.")
         }
 
         override fun authPassword(

@@ -3,7 +3,7 @@
 **Project:** Server Toolkit
 **Version:** 0.4.0-alpha
 **Status:** Active Implementation
-**Last Updated:** 2026-07-10
+**Last Updated:** 2026-07-12
 
 ---
 
@@ -174,6 +174,12 @@ Implemented in the current milestone:
 - Project-owned session management boundary.
 - Non-interactive command execution workflow.
 - Evidence-driven timeout, cleanup, cancellation, and failure-mapping hardening.
+- Ephemeral private-key selection through the Android system document picker.
+- Project-owned one-shot private-key source lifecycle with bounded reading and cleanup.
+- In-memory OpenSSH v1 Ed25519 and RSA private-key authentication without temporary key files.
+- Encrypted and unencrypted OpenSSH private-key support with stable passphrase failure mapping.
+- Stable unsupported-format handling for the verified PKCS#8 RSA cases.
+- Android runtime verification of the supported and unsupported private-key format matrix.
 - SSH connection history domain model and repository contract.
 - Room-backed SSH connection history persistence with database migration to version 4.
 - Automatic recording of resolved SSH connection attempt outcomes.
@@ -182,8 +188,8 @@ Implemented in the current milestone:
 
 Next:
 
-- Reviewed design for ephemeral private-key authentication without persistent key material or passphrases.
-- Implementation and runtime verification of the accepted private-key authentication slice.
+- Reassess the remaining version 0.4.0 SSH scope against the reliable SSH connection deliverable.
+- Select the next focused SSH implementation slice through reviewed planning before implementation begins.
 
 Planned:
 

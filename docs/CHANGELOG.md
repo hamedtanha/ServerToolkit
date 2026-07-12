@@ -18,6 +18,10 @@ The project follows Conventional Commits and Semantic Versioning principles.
 - Added the project-owned one-shot SSH private-key source with atomic lifecycle transitions, bounded reading, stable failures, scoped cleanup, and focused unit coverage.
 - Added the Android SSH private-key content factory with cancellable descriptor opening, joint descriptor-stream ownership, and instrumentation coverage.
 - Added ephemeral SSH private-key document selection with immediate source conversion, private ViewModel ownership, lifecycle invalidation, configuration-safe secret clearing, one-attempt transfer coverage, and manual Android workflow verification.
+- Added end-to-end ephemeral SSH private-key authentication with in-memory SSHJ parsing for encrypted and unencrypted OpenSSH v1 Ed25519 and RSA keys, without temporary private-key files or persistent secret storage.
+- Added preflight validation of encrypted OpenSSH v1 bcrypt KDF metadata with a maximum accepted work factor of `64` rounds before SSHJ parsing, backed by boundary tests and Android benchmark evidence.
+- Added stable private-key source, format, passphrase, authentication-rejection, cancellation, cleanup, and unexpected-failure mapping with focused automated coverage.
+- Added Android runtime verification of the supported OpenSSH matrix and stable unsupported-format handling for tested PKCS#8 RSA keys.
 - Added Hilt-enabled application setup.
 - Added Dashboard ViewModel.
 - Added Dashboard UI state.
@@ -168,7 +172,8 @@ The project follows Conventional Commits and Semantic Versioning principles.
 ### Changed
 
 - Strengthened AI project-context reconstruction rules and synchronized AI Memory with the current documentation source-of-truth hierarchy.
-- Synchronized current-state SSH planning with accepted ADR-013 while keeping private-key authentication explicitly unimplemented.
+- Synchronized current-state SSH planning with accepted ADR-013 before private-key implementation began.
+- Synchronized current-state, roadmap, README, changelog, and ADR implementation-outcome documentation with verified ephemeral private-key authentication.
 - Synchronized current-state documentation with the complete SSH connection history domain, persistence, recording, and presentation workflow.
 - Synchronized SSH current-state and review documentation after completing the current timeout, cleanup, cancellation, and failure-mapping hardening coverage pass.
 - Synchronized SSH current-state documentation with trusted-host cascade deletion, duplicate host-key confirmation protection, trusted-host accepted copy, and current non-interactive command execution behavior.
@@ -272,7 +277,6 @@ The following items are intentionally not implemented yet:
 - Interactive terminal workflow.
 - Saved command history.
 - Persistent sensitive credential storage.
-- Private-key authentication.
 - Monitoring workflow.
 - Xray or x-ui management workflow.
 - Room migrations beyond database version 4.
