@@ -142,6 +142,9 @@ The project follows Conventional Commits and Semantic Versioning principles.
 - Added SSH session close result model.
 - Added SSH session lifecycle service contract.
 - Added SSHJ session lifecycle shell.
+- Added deterministic active-session cleanup before permanent SSH workflow exit.
+- Added cleanup-before-navigation orchestration for back, system-back, and connection-history navigation.
+- Added focused SSH workflow-exit lifecycle and presentation regression coverage.
 - Added SSHJ session owner registry boundary.
 - Added SSHJ authentication adapter mapping.
 - Added SSHJ authentication executor boundary.
@@ -178,6 +181,9 @@ The project follows Conventional Commits and Semantic Versioning principles.
 - Synchronized current-state documentation with the complete SSH connection history domain, persistence, recording, and presentation workflow.
 - Synchronized SSH current-state and review documentation after completing the current timeout, cleanup, cancellation, and failure-mapping hardening coverage pass.
 - Synchronized SSH current-state documentation with trusted-host cascade deletion, duplicate host-key confirmation protection, trusted-host accepted copy, and current non-interactive command execution behavior.
+- Changed SSH workflow-exit navigation to wait for active-session cleanup and remain on the route when cleanup cannot complete.
+- Added deterministic disconnecting, close-failure retry, duplicate-exit suppression, and stale command-output cleanup behavior.
+- Synchronized project state, SSH status, roadmap, changelog, and engineering review documentation with runtime-verified workflow-exit cleanup.
 
 - Synchronized README and Documentation Governance indexes with the focused `docs/state/` documents.
 - Split detailed project state into focused current-state documents for Server Inventory and SSH while keeping `PROJECT_STATE.md` as the source-of-truth entry point.

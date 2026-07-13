@@ -344,39 +344,36 @@ Future SSH hardening must come from concrete runtime evidence, current repositor
 
 ### P8 — Active SSH sessions are not released when the SSH workflow exits
 
-Status: Open.
+Status: Partially resolved.
 
 Recorded: 2026-07-13.
 
-Finding:
+Updated: 2026-07-13.
 
-The SSH presentation workflow retains the active project-owned session handle after a successful connection, but route-exit and ViewModel-cleanup paths do not close that session through the existing session lifecycle boundary.
+Implemented resolution:
 
-Current evidence:
+- `SshViewModel.onWorkflowExit()` closes the active project-owned session through `SshSessionLifecycleService`.
+- Back navigation, system back, and connection-history navigation wait for cleanup before leaving the SSH route.
+- `Closed` and `NotFound` clear the active session state and permit navigation.
+- `Failed` restores the active session state and keeps the route open so cleanup can be retried.
+- Duplicate workflow-exit requests do not start duplicate close operations.
+- Workflow exit is blocked while connection or command execution remains in progress.
+- Successful cleanup clears stale command output and resets presentation state to not connected.
+- SSHJ cleanup runs on the IO dispatcher inside a non-cancellable cleanup context.
+- Route navigation checks coroutine cancellation after cleanup and before invoking navigation.
+- Focused lifecycle and ViewModel regression coverage has been added.
+- Manual Android runtime verification completed without an observed application crash or SSH lifecycle error.
 
-- `SshViewModel` stores the active `SshSessionHandle` after a successful connection.
-- `onWorkflowExit()` clears authentication input but does not close the active session.
-- `onCleared()` clears authentication input but does not close the active session.
-- Back navigation and connection-history navigation invoke workflow exit before leaving the SSH route.
-- `SshjSessionOwnerRegistry` is application-scoped and retains registered session owners until an explicit close operation removes them.
-- `SshSessionLifecycleService` already defines the project-owned close boundary, but the SSH presentation workflow does not currently use it.
+Remaining resolution:
 
-Risk:
-
-- An authenticated SSH connection may remain open after the user leaves the SSH screen.
-- SSHJ clients, sockets, and session-owner entries may outlive their intended presentation workflow.
-- Repeated navigation and connection attempts may accumulate orphaned live sessions inside the application-scoped registry.
-- The implemented session lifecycle does not yet match the version `0.4.0` reliable-connection deliverable.
-
-Required resolution:
-
-- Close the active project-owned SSH session when the SSH workflow permanently exits.
 - Add an explicit user-facing disconnect action for connected sessions.
-- Keep close orchestration behind the existing domain lifecycle contract.
-- Prevent duplicate close operations and stale command results.
-- Define deterministic behavior for `Closed`, `NotFound`, `Failed`, and cancellation outcomes.
-- Add focused lifecycle and presentation regression coverage.
-- Synchronize SSH current-state and changelog documentation with the implemented behavior.
+- Runtime-verify explicit disconnect behavior.
+- Reassess the remaining version `0.4.0` milestone afterward.
+
+Residual limitation:
+
+- A connected user cannot disconnect while remaining on the SSH screen.
+- Permanent workflow exit is currently the supported user-triggered session cleanup path.
 
 Scope boundary:
 
@@ -391,7 +388,9 @@ This finding does not authorize:
 
 Decision:
 
-Version `0.4.0` should not be closed until active SSH session release is implemented and runtime-verified.
+Automatic active-session release on permanent SSH workflow exit is implemented and runtime-verified.
+
+P8 remains partially open only for the explicit user-facing disconnect action. Version `0.4.0` should not be closed until that behavior is implemented and runtime-verified.
 
 Future SSH hardening must continue to be driven by concrete runtime evidence, current repository inspection, or a newly recorded focused review finding.
 

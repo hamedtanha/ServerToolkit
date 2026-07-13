@@ -4,6 +4,9 @@ import de.hamedtanha.servertoolkit.feature.ssh.domain.model.SshSessionCloseResul
 import de.hamedtanha.servertoolkit.feature.ssh.domain.model.SshSessionHandle
 import de.hamedtanha.servertoolkit.feature.ssh.domain.service.SshSessionLifecycleService
 import javax.inject.Inject
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.NonCancellable
+import kotlinx.coroutines.withContext
 
 /**
  * SSHJ-backed session lifecycle service.
@@ -16,6 +19,10 @@ class SshjSessionLifecycleService @Inject constructor(
 ) : SshSessionLifecycleService {
 
     override suspend fun close(sessionHandle: SshSessionHandle): SshSessionCloseResult {
-        return sessionOwnerRegistry.close(sessionHandle)
+        return withContext(NonCancellable) {
+            withContext(Dispatchers.IO) {
+                sessionOwnerRegistry.close(sessionHandle)
+            }
+        }
     }
 }

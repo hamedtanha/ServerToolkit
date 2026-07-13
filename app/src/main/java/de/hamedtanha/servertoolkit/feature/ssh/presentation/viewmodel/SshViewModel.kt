@@ -12,8 +12,10 @@ import de.hamedtanha.servertoolkit.feature.ssh.domain.model.SshConnectionAttempt
 import de.hamedtanha.servertoolkit.feature.ssh.domain.model.SshConnectionResult
 import de.hamedtanha.servertoolkit.feature.ssh.domain.model.SshHostTrustDecision
 import de.hamedtanha.servertoolkit.feature.ssh.domain.model.SshObservedHostKey
+import de.hamedtanha.servertoolkit.feature.ssh.domain.model.SshSessionCloseResult
 import de.hamedtanha.servertoolkit.feature.ssh.domain.model.SshSessionHandle
 import de.hamedtanha.servertoolkit.feature.ssh.domain.service.SshPrivateKeySource
+import de.hamedtanha.servertoolkit.feature.ssh.domain.service.SshSessionLifecycleService
 import de.hamedtanha.servertoolkit.feature.ssh.domain.usecase.ConfirmSshHostTrustUseCase
 import de.hamedtanha.servertoolkit.feature.ssh.domain.usecase.SshCommandExecutionUseCase
 import de.hamedtanha.servertoolkit.feature.ssh.domain.usecase.SshConnectionAttemptUseCase
@@ -40,6 +42,7 @@ class SshViewModel @Inject constructor(
     private val connectionAttemptUseCase: SshConnectionAttemptUseCase,
     private val confirmHostTrustUseCase: ConfirmSshHostTrustUseCase,
     private val commandExecutionUseCase: SshCommandExecutionUseCase,
+    private val sessionLifecycleService: SshSessionLifecycleService,
 ) : ViewModel() {
 
     private val serverId: String = checkNotNull(savedStateHandle[SshDestination.SERVER_ID_ARGUMENT])
@@ -49,6 +52,8 @@ class SshViewModel @Inject constructor(
     private var isCommandExecutionInProgress: Boolean = false
 
     private var isHostKeyConfirmationInProgress: Boolean = false
+
+    private var isWorkflowExitInProgress: Boolean = false
 
     private var activeSessionHandle: SshSessionHandle? = null
 
@@ -108,7 +113,11 @@ class SshViewModel @Inject constructor(
     }
 
     fun onPrivateKeySourceSelected(source: SshPrivateKeySource) {
-        if (isConnectionAttemptInProgress || activeSessionHandle != null) {
+        if (
+            isConnectionAttemptInProgress ||
+            isWorkflowExitInProgress ||
+            activeSessionHandle != null
+        ) {
             source.invalidate()
             return
         }
@@ -166,8 +175,92 @@ class SshViewModel @Inject constructor(
         )
     }
 
-    fun onWorkflowExit() {
+    suspend fun onWorkflowExit(): Boolean {
+        if (isWorkflowExitInProgress) {
+            return false
+        }
+
         clearAuthenticationInputState()
+
+        if (isConnectionAttemptInProgress) {
+            _uiState.value = _uiState.value.copy(
+                message = "Connection attempt is still running.",
+                detail = "Wait for the current connection attempt to finish before leaving.",
+            )
+            return false
+        }
+
+        if (isCommandExecutionInProgress) {
+            _uiState.value = _uiState.value.copy(
+                message = "Command execution is still running.",
+                detail = "Wait for the current command to finish before leaving.",
+            )
+            return false
+        }
+
+        val sessionHandle = activeSessionHandle ?: return true
+        val commandExecutionBeforeExit = _uiState.value.commandExecution
+
+        isWorkflowExitInProgress = true
+        activeSessionHandle = null
+
+        _uiState.value = _uiState.value.copy(
+            status = SshConnectionStatus.Disconnecting,
+            statusLabel = "Disconnecting",
+            message = "Closing the active SSH session.",
+            detail = "Navigation will continue after session cleanup completes.",
+            commandExecution = _uiState.value.commandExecution.asSessionUnavailable(),
+        )
+
+        return try {
+            when (sessionLifecycleService.close(sessionHandle)) {
+                SshSessionCloseResult.Closed -> {
+                    _uiState.value = _uiState.value.copy(
+                        status = SshConnectionStatus.NotStarted,
+                        statusLabel = "Not connected",
+                        message = "SSH session closed.",
+                        detail = "The active SSH session was released before leaving the workflow.",
+                        commandExecution = _uiState.value.commandExecution.asSessionUnavailable(),
+                    )
+                    true
+                }
+
+                SshSessionCloseResult.NotFound -> {
+                    _uiState.value = _uiState.value.copy(
+                        status = SshConnectionStatus.NotStarted,
+                        statusLabel = "Not connected",
+                        message = "SSH session was already closed.",
+                        detail = "No active session resource remains for this workflow.",
+                        commandExecution = _uiState.value.commandExecution.asSessionUnavailable(),
+                    )
+                    true
+                }
+
+                SshSessionCloseResult.Failed -> {
+                    activeSessionHandle = sessionHandle
+                    _uiState.value = _uiState.value.copy(
+                        status = SshConnectionStatus.Connected,
+                        statusLabel = "Connected",
+                        message = "SSH session could not be closed.",
+                        detail = "Leaving the workflow was cancelled. Try again to retry cleanup.",
+                        commandExecution = commandExecutionBeforeExit,
+                    )
+                    false
+                }
+            }
+        } catch (error: CancellationException) {
+            activeSessionHandle = sessionHandle
+            _uiState.value = _uiState.value.copy(
+                status = SshConnectionStatus.Connected,
+                statusLabel = "Connected",
+                message = "SSH session cleanup was cancelled.",
+                detail = "The workflow remains active so session cleanup can be retried.",
+                commandExecution = commandExecutionBeforeExit,
+            )
+            throw error
+        } finally {
+            isWorkflowExitInProgress = false
+        }
     }
 
     fun onCommandChanged(command: String) {
@@ -187,7 +280,11 @@ class SshViewModel @Inject constructor(
     }
 
     internal suspend fun connect() {
-        if (isConnectionAttemptInProgress || activeSessionHandle != null) {
+        if (
+            isConnectionAttemptInProgress ||
+            isWorkflowExitInProgress ||
+            activeSessionHandle != null
+        ) {
             return
         }
 

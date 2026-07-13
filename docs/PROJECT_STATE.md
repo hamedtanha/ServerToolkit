@@ -84,6 +84,9 @@ The current implementation area is:
 
 - SSH 0.4.0-alpha ephemeral private-key authentication is implemented and runtime-verified against ADR-013, including the supported OpenSSH format matrix and stable unsupported PKCS#8 outcomes.
 - Connection history domain, Room persistence, automatic recording, and per-server presentation are complete and runtime-verified.
+- Active SSH sessions are closed deterministically before permanent workflow exit, with navigation deferred until cleanup completes.
+- Workflow-exit cleanup is covered by focused lifecycle and presentation tests and has been manually runtime-verified.
+- Engineering review finding P8 is partially resolved; only the explicit user-facing disconnect action remains open.
 
 ---
 
@@ -91,8 +94,8 @@ The current implementation area is:
 
 The next safe development steps are:
 
-1. Reassess the remaining version 0.4.0 SSH milestone against its documented deliverable.
-2. Record the next focused SSH implementation slice through reviewed planning before implementation begins.
+1. Implement an explicit user-facing disconnect action for connected SSH sessions.
+2. Runtime-verify explicit disconnect and reassess the remaining version 0.4.0 SSH milestone.
 3. Keep terminal UI, saved command workflows, background monitoring, persistent credentials, and Xray or x-ui management out of scope.
 
 ---

@@ -25,6 +25,7 @@ import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -44,6 +45,9 @@ import de.hamedtanha.servertoolkit.feature.ssh.presentation.state.SshConnectionS
 import de.hamedtanha.servertoolkit.feature.ssh.presentation.state.SshHostKeyReviewUiState
 import de.hamedtanha.servertoolkit.feature.ssh.presentation.state.SshUiState
 import de.hamedtanha.servertoolkit.feature.ssh.presentation.viewmodel.SshViewModel
+import kotlinx.coroutines.currentCoroutineContext
+import kotlinx.coroutines.ensureActive
+import kotlinx.coroutines.launch
 
 @Composable
 fun SshRoute(
@@ -70,6 +74,16 @@ fun SshRoute(
             )
         }
     }
+    val coroutineScope = rememberCoroutineScope()
+
+    fun requestWorkflowExit(onExitConfirmed: () -> Unit) {
+        coroutineScope.launch {
+            if (viewModel.onWorkflowExit()) {
+                currentCoroutineContext().ensureActive()
+                onExitConfirmed()
+            }
+        }
+    }
 
     DisposableEffect(viewModel) {
         onDispose {
@@ -78,8 +92,7 @@ fun SshRoute(
     }
 
     BackHandler {
-        viewModel.onWorkflowExit()
-        onNavigateBack()
+        requestWorkflowExit(onNavigateBack)
     }
 
     SshScreen(
@@ -96,12 +109,10 @@ fun SshRoute(
         onCommandChange = viewModel::onCommandChanged,
         onExecuteCommandClick = viewModel::onExecuteCommandClicked,
         onOpenConnectionHistory = {
-            viewModel.onWorkflowExit()
-            onOpenConnectionHistory()
+            requestWorkflowExit(onOpenConnectionHistory)
         },
         onNavigateBack = {
-            viewModel.onWorkflowExit()
-            onNavigateBack()
+            requestWorkflowExit(onNavigateBack)
         },
         modifier = modifier,
     )
