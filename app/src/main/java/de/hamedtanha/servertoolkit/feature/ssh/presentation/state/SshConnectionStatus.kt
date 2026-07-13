@@ -7,5 +7,6 @@ enum class SshConnectionStatus {
     NotStarted,
     Connecting,
     Connected,
+    Disconnecting,
     Failed,
 }

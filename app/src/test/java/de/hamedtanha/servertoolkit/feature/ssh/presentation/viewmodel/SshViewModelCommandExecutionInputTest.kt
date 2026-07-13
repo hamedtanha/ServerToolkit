@@ -20,6 +20,7 @@ import de.hamedtanha.servertoolkit.feature.ssh.domain.usecase.SshHostTrustEvalua
 import de.hamedtanha.servertoolkit.feature.ssh.presentation.state.SshCommandExecutionStatus
 import de.hamedtanha.servertoolkit.feature.ssh.test.FakeConnectionTargetResolver
 import de.hamedtanha.servertoolkit.feature.ssh.test.FakeSshConnectionHistoryRepository
+import de.hamedtanha.servertoolkit.feature.ssh.test.FakeSshSessionLifecycleService
 import de.hamedtanha.servertoolkit.feature.ssh.test.FakeSshConnectionService
 import de.hamedtanha.servertoolkit.feature.ssh.test.FakeSshHostKeyObservationService
 import de.hamedtanha.servertoolkit.feature.ssh.test.FakeSshHostTrustRepository
@@ -156,6 +157,7 @@ class SshViewModelCommandExecutionInputTest {
                 hostTrustRepository = hostTrustRepository,
             ),
             commandExecutionUseCase = SshCommandExecutionUseCase(commandExecutionService),
+            sessionLifecycleService = FakeSshSessionLifecycleService(),
         )
     }
 

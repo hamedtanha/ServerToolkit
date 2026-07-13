@@ -19,7 +19,8 @@ data class SshUiState(
 
     val canEditAuthenticationInput: Boolean
         get() = status != SshConnectionStatus.Connecting &&
-            status != SshConnectionStatus.Connected
+            status != SshConnectionStatus.Connected &&
+            status != SshConnectionStatus.Disconnecting
 
     val canStartConnection: Boolean
         get() = canEditAuthenticationInput &&

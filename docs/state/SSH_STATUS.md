@@ -211,6 +211,15 @@ The Android runtime verification also confirmed:
 - SSHJ session owner registry boundary.
 - SSH session owner serialization between command execution and close cleanup.
 - SSH session close cancellation preservation.
+- Deterministic active-session cleanup before permanent SSH workflow exit.
+- Back, system-back, and connection-history navigation deferred until cleanup completes.
+- Dedicated disconnecting presentation state during session cleanup.
+- Duplicate workflow-exit suppression.
+- Workflow-exit blocking during connection and command execution.
+- Deterministic `Closed`, `NotFound`, `Failed`, and cancellation handling.
+- Active-session restoration and cleanup retry after close failure.
+- Stale command output clearing after successful cleanup.
+- IO-dispatched SSHJ cleanup inside a non-cancellable cleanup context.
 
 ### Command Execution
 
@@ -271,6 +280,10 @@ The Android runtime verification also confirmed:
 - Malformed-key, missing-passphrase, incorrect-passphrase, unauthorized-key, source-failure, cancellation, and buffer-clearing coverage.
 - Android runtime verification of the complete supported and unsupported private-key format matrix.
 - Full unit-test, lint, and debug-assembly quality gate after private-key authentication implementation.
+- Focused SSH workflow-exit coverage for no-session, successful close, missing owner, close failure, retry, duplicate exit, active connection, active command execution, stale output cleanup, and cancellation.
+- SSHJ lifecycle regression coverage for caller cancellation during started cleanup.
+- Manual Android runtime verification of workflow-exit cleanup and crash-free execution.
+- Full unit-test, lint, and debug-assembly quality gate after workflow-exit cleanup implementation.
 
 ---
 
@@ -294,6 +307,7 @@ The Android runtime verification also confirmed:
 
 The following items are intentionally not implemented yet:
 
+- Explicit user-facing disconnect action for connected SSH sessions.
 - Interactive terminal workflow for owned sessions.
 - Persistent credential storage implementation.
 - Monitoring workflow.
@@ -308,8 +322,8 @@ The following items are intentionally not implemented yet:
 
 The next safe development steps are:
 
-1. Reassess the remaining version 0.4.0 SSH milestone against its documented deliverable.
-2. Record the next focused SSH implementation slice through reviewed planning before implementation begins.
+1. Implement an explicit user-facing disconnect action through the existing lifecycle boundary.
+2. Runtime-verify explicit disconnect and reassess the remaining version 0.4.0 SSH milestone.
 3. Keep terminal UI, saved command workflows, background monitoring, persistent credentials, and Xray or x-ui management out of scope.
 
 ---

@@ -172,6 +172,8 @@ Implemented in the current milestone:
 - Ephemeral password input for single-attempt SSH authentication.
 - Host key verification and trusted-host persistence.
 - Project-owned session management boundary.
+- Deterministic active-session cleanup before permanent SSH workflow exit.
+- Navigation deferred until active-session cleanup completes.
 - Non-interactive command execution workflow.
 - Evidence-driven timeout, cleanup, cancellation, and failure-mapping hardening.
 - Ephemeral private-key selection through the Android system document picker.
@@ -188,8 +190,9 @@ Implemented in the current milestone:
 
 Next:
 
+- Add an explicit user-facing disconnect action for connected SSH sessions.
+- Runtime-verify explicit disconnect behavior.
 - Reassess the remaining version 0.4.0 SSH scope against the reliable SSH connection deliverable.
-- Select the next focused SSH implementation slice through reviewed planning before implementation begins.
 
 Planned:
 

@@ -21,6 +21,7 @@ import de.hamedtanha.servertoolkit.feature.ssh.domain.model.SshHostTrustDecision
 import de.hamedtanha.servertoolkit.feature.ssh.domain.model.SshObservedHostKey
 import de.hamedtanha.servertoolkit.feature.ssh.domain.model.SshTrustedHostKey
 import de.hamedtanha.servertoolkit.feature.ssh.domain.service.SshCommandExecutionService
+import de.hamedtanha.servertoolkit.feature.ssh.domain.service.SshSessionLifecycleService
 import de.hamedtanha.servertoolkit.feature.ssh.domain.usecase.ConfirmSshHostTrustUseCase
 import de.hamedtanha.servertoolkit.feature.ssh.domain.usecase.SshCommandExecutionUseCase
 import de.hamedtanha.servertoolkit.feature.ssh.domain.usecase.SshConnectionAttemptUseCase
@@ -30,6 +31,7 @@ import de.hamedtanha.servertoolkit.feature.ssh.presentation.state.SshCommandExec
 import de.hamedtanha.servertoolkit.feature.ssh.presentation.state.SshConnectionStatus
 import de.hamedtanha.servertoolkit.feature.ssh.test.FakeConnectionTargetResolver
 import de.hamedtanha.servertoolkit.feature.ssh.test.FakeSshConnectionHistoryRepository
+import de.hamedtanha.servertoolkit.feature.ssh.test.FakeSshSessionLifecycleService
 import de.hamedtanha.servertoolkit.feature.ssh.test.FakeSshConnectionService
 import de.hamedtanha.servertoolkit.feature.ssh.test.FakeSshHostKeyObservationService
 import de.hamedtanha.servertoolkit.feature.ssh.test.FakeSshHostTrustRepository
@@ -793,7 +795,7 @@ class SshViewModelTest {
     }
 
     @Test
-    fun `workflow exit invalidates pending private key source`() {
+    fun `workflow exit invalidates pending private key source`() = runBlocking {
         val source = TrackingSshPrivateKeySource()
         val viewModel = createViewModel(serverId = "server-1")
 
@@ -944,6 +946,8 @@ class SshViewModelTest {
             initialTrustedHostKey = trustedHostKey(),
         ),
         commandExecutionService: FakeSshCommandExecutionService = FakeSshCommandExecutionService(),
+        sessionLifecycleService: SshSessionLifecycleService =
+            FakeSshSessionLifecycleService(),
     ): SshViewModel {
         val hostTrustDecisionUseCase = SshHostTrustDecisionUseCase(
             hostTrustEvaluator = SshHostTrustEvaluator(hostTrustRepository),
@@ -966,6 +970,7 @@ class SshViewModelTest {
                 hostTrustRepository = hostTrustRepository,
             ),
             commandExecutionUseCase = SshCommandExecutionUseCase(commandExecutionService),
+            sessionLifecycleService = sessionLifecycleService,
         )
     }
 
