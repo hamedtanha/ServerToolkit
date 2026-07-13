@@ -342,9 +342,58 @@ Future SSH hardening must come from concrete runtime evidence, current repositor
 
 ## Open Review Backlog
 
-No open review findings are currently tracked.
+### P8 — Active SSH sessions are not released when the SSH workflow exits
 
-Future runtime testing may still identify new SSH hardening work, but it should be recorded as a new finding rather than continuing the closed P1-P6 checkpoint scope.
+Status: Open.
+
+Recorded: 2026-07-13.
+
+Finding:
+
+The SSH presentation workflow retains the active project-owned session handle after a successful connection, but route-exit and ViewModel-cleanup paths do not close that session through the existing session lifecycle boundary.
+
+Current evidence:
+
+- `SshViewModel` stores the active `SshSessionHandle` after a successful connection.
+- `onWorkflowExit()` clears authentication input but does not close the active session.
+- `onCleared()` clears authentication input but does not close the active session.
+- Back navigation and connection-history navigation invoke workflow exit before leaving the SSH route.
+- `SshjSessionOwnerRegistry` is application-scoped and retains registered session owners until an explicit close operation removes them.
+- `SshSessionLifecycleService` already defines the project-owned close boundary, but the SSH presentation workflow does not currently use it.
+
+Risk:
+
+- An authenticated SSH connection may remain open after the user leaves the SSH screen.
+- SSHJ clients, sockets, and session-owner entries may outlive their intended presentation workflow.
+- Repeated navigation and connection attempts may accumulate orphaned live sessions inside the application-scoped registry.
+- The implemented session lifecycle does not yet match the version `0.4.0` reliable-connection deliverable.
+
+Required resolution:
+
+- Close the active project-owned SSH session when the SSH workflow permanently exits.
+- Add an explicit user-facing disconnect action for connected sessions.
+- Keep close orchestration behind the existing domain lifecycle contract.
+- Prevent duplicate close operations and stale command results.
+- Define deterministic behavior for `Closed`, `NotFound`, `Failed`, and cancellation outcomes.
+- Add focused lifecycle and presentation regression coverage.
+- Synchronize SSH current-state and changelog documentation with the implemented behavior.
+
+Scope boundary:
+
+This finding does not authorize:
+
+- interactive terminal implementation;
+- saved command workflows;
+- background session retention;
+- persistent credentials;
+- new SSHJ types outside the data layer;
+- unrelated SSH hardening.
+
+Decision:
+
+Version `0.4.0` should not be closed until active SSH session release is implemented and runtime-verified.
+
+Future SSH hardening must continue to be driven by concrete runtime evidence, current repository inspection, or a newly recorded focused review finding.
 
 ---
 
