@@ -51,7 +51,7 @@ The application is designed for system administrators, DevOps engineers, and inf
 Current Version:
 
 ```
-v0.4.0 (Release Ready)
+v0.4.0 (Released)
 ```
 
 ---

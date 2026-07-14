@@ -226,7 +226,39 @@ Android Validation conclusion: success
 
 The candidate proved the signing and verification workflow but is not a distribution artifact. During finalization, the native-stripping warning was traced to a missing local NDK installation. Android NDK `28.2.13676358` is now repository-pinned, the matching `llvm-strip` has been validated for all packaged ABIs, and the signing workflow fails closed when the required NDK toolchain is unavailable.
 
-The official APK must be freshly rebuilt, signed, and verified from the exact final `main` commit that receives tag `v0.4.0`. Its checksum is expected to differ from the candidate checksum.
+The candidate checksum differs from the official checksum because the official APK was rebuilt from the final tagged release commit.
+
+---
+
+## Version 0.4.0 Official Release Evidence
+
+Version 0.4.0 was built, signed, independently verified, tagged, published, downloaded again, and compared byte-for-byte with the verified local outputs.
+
+```text
+Release tag: v0.4.0
+Published date: 2026-07-14
+Source commit: 7be930f27cc19ea849d6ce720fb05fce074f3320
+Application ID: de.hamedtanha.servertoolkit
+Version code: 2
+Version name: 0.4.0
+Android Build Tools: 36.1.0
+Android NDK: 28.2.13676358
+Certificate SHA-256: 8EECDB2A84052ABCA92848B8E717A136C33F4A3D1CB85EE2AA77C4F3ED9424FC
+Official APK SHA-256: 5BA5187999AA93677802DCCC2D318A9AE098D67C551399FBBA9CD9F563151273
+Android Validation run: 29358724293
+Android Validation conclusion: success
+Published asset verification: byte-for-byte match
+```
+
+Published project assets:
+
+```text
+ServerToolkit-v0.4.0.apk
+ServerToolkit-v0.4.0.apk.sha256
+ServerToolkit-v0.4.0-release-evidence.txt
+```
+
+The release tag and published assets identify the same exact source commit. Future repository changes do not alter the immutable version 0.4.0 release baseline.
 
 ---
 
@@ -369,16 +401,16 @@ Recommended assets:
 
 ## Current Release State
 
-Current stable checkpoint:
+Current stable release:
 
 ```text
-v0.1.0 — Foundation
+v0.4.0 — SSH
 ```
 
 Current release candidate:
 
 ```text
-v0.4.0 — SSH
+None
 ```
 
 Next development milestone:
@@ -390,17 +422,19 @@ v0.5.0-alpha — Operations
 Project status:
 
 ```text
-Release Ready
+Released
 ```
 
-Signing implementation status:
+Signing and publication status:
 
 ```text
-Implemented and candidate-verified.
-Candidate source commit: 250d46649834ef0f88dd6c3c330aacf137d44ab5
-Candidate APK SHA-256: 906A87D7645F7E4035F6A96AD2DB395A4A7600D8B487BC39CF80D30C92C7EB04
-Android NDK 28.2.13676358 and llvm-strip preflight are validated.
-Official APK rebuild, final verification, tag creation, and GitHub Release publication remain pending.
+Implemented, independently verified, and published.
+Release tag: v0.4.0
+Official source commit: 7be930f27cc19ea849d6ce720fb05fce074f3320
+Official APK SHA-256: 5BA5187999AA93677802DCCC2D318A9AE098D67C551399FBBA9CD9F563151273
+Certificate SHA-256: 8EECDB2A84052ABCA92848B8E717A136C33F4A3D1CB85EE2AA77C4F3ED9424FC
+Android Validation run: 29358724293
+Published assets: byte-for-byte verified
 ```
 
 ---

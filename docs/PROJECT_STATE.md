@@ -2,7 +2,7 @@
 
 **Project:** Server Toolkit
 **Version:** 0.4.0
-**Status:** Release Ready
+**Status:** Released
 **Last Updated:** 2026-07-14
 
 ---
@@ -23,7 +23,7 @@ Engineering task selection and delivery rules are defined in [Engineering Strate
 
 The Server Inventory 0.3.0 baseline is accepted.
 
-Version 0.4.0 is release-ready and establishes the accepted reliable SSH connection baseline.
+Version 0.4.0 is released and establishes the accepted reliable SSH connection baseline.
 
 The current SSH implementation supports real ephemeral password-based and private-key SSH connections, user-facing non-interactive command execution behind project-owned SSH session handles, deterministic workflow-exit cleanup, and explicit user-requested disconnection with reconnection support.
 
@@ -31,7 +31,7 @@ The ADR-013 ephemeral private-key workflow is implemented end to end. Private-ke
 
 Automated JVM coverage, Android runtime verification, and Android benchmark evidence confirm support for encrypted and unencrypted OpenSSH v1 Ed25519 and RSA keys. Tested PKCS#8 RSA keys map to a stable unsupported-format outcome. Parser, passphrase, source-lifecycle, cleanup, and server-rejection failures map to project-owned errors, while coroutine cancellation is preserved.
 
-The repository includes a fail-closed local post-build Android APK signing workflow. Candidate signing and independent verification succeeded from exact `main` commit `250d46649834ef0f88dd6c3c330aacf137d44ab5` with APK SHA-256 `906A87D7645F7E4035F6A96AD2DB395A4A7600D8B487BC39CF80D30C92C7EB04` and the accepted release certificate. Android NDK `28.2.13676358` is now pinned, native-library stripping succeeds with the matching `llvm-strip`, and signing validation fails closed when the NDK toolchain is missing or inconsistent. The primary release keystore and an independently protected recovery copy have also been verified. The candidate remains non-distributable; the official APK must be rebuilt from the exact final merged `main` commit before tagging and publication.
+The repository includes a fail-closed local post-build Android APK signing workflow. Version 0.4.0 was officially built, signed, and independently verified from exact tagged commit `7be930f27cc19ea849d6ce720fb05fce074f3320`. The published APK SHA-256 is `5BA5187999AA93677802DCCC2D318A9AE098D67C551399FBBA9CD9F563151273`, and the accepted release certificate SHA-256 is `8EECDB2A84052ABCA92848B8E717A136C33F4A3D1CB85EE2AA77C4F3ED9424FC`. Android Validation run `29358724293` completed successfully for the same commit. Tag `v0.4.0`, the GitHub Release, and all three published assets were verified byte-for-byte against the local official outputs. Android NDK `28.2.13676358` remains pinned, native-library stripping succeeds with the matching `llvm-strip`, and signing validation fails closed when the NDK toolchain is missing or inconsistent.
 
 Persistent credentials, terminal UI, saved command workflows, background monitoring, and Xray or x-ui management remain intentionally out of scope.
 
@@ -47,7 +47,7 @@ Persistent credentials, terminal UI, saved command workflows, background monitor
 | Documentation Governance | Active | Source-of-truth ordering, version metadata rules, changelog usage, and ADR documentation boundaries are documented. |
 | Android Version Metadata | Current | Android `versionName` is synchronized with the current project milestone. |
 | Continuous Integration | Implemented | GitHub Actions validates Kotlin compilation, Android test compilation, unit tests, lint, and debug builds for pull requests and `main`. |
-| Android Release Signing | Implemented, final publication pending | Local post-build APK signing, certificate verification, metadata verification, pinned-NDK validation, checksum generation, and recovery readiness validation are implemented. |
+| Android Release Signing | Implemented and published | The version 0.4.0 APK, checksum, and release evidence were signed, independently verified, published, and confirmed byte-for-byte against the official local outputs. |
 
 ---
 
@@ -93,6 +93,8 @@ The completed version 0.4.0 SSH milestone includes:
 - Engineering review finding P8 is resolved.
 - Version 0.4.0 candidate verification completed from exact `main` commit `250d46649834ef0f88dd6c3c330aacf137d44ab5` with APK SHA-256 `906A87D7645F7E4035F6A96AD2DB395A4A7600D8B487BC39CF80D30C92C7EB04`.
 - Release-toolchain hardening now pins Android NDK `28.2.13676358`, verifies `llvm-strip`, and removes the deprecated Android test-assets source-set API.
+- Version 0.4.0 was published from tagged commit `7be930f27cc19ea849d6ce720fb05fce074f3320` with APK SHA-256 `5BA5187999AA93677802DCCC2D318A9AE098D67C551399FBBA9CD9F563151273`.
+- The published APK, checksum, and release-evidence assets were downloaded and verified byte-for-byte against the official local outputs.
 
 ---
 
@@ -100,12 +102,10 @@ The completed version 0.4.0 SSH milestone includes:
 
 The next safe development steps are:
 
-1. Merge the approved version 0.4.0 final release state to `main`.
-2. Rebuild, sign, and independently verify the official APK from the exact final merged `main` commit.
-3. Tag that exact commit as `v0.4.0` and publish the verified APK, checksum, and release notes through GitHub Releases.
-4. Preserve version 0.4.0 SSH as the accepted reliable connection baseline.
-5. Begin version 0.5.0 Operations only after the official version 0.4.0 release is published.
-6. Keep terminal UI, background monitoring, persistent credentials, and Xray or x-ui management outside the completed version 0.4.0 scope.
+1. Preserve tag `v0.4.0` and its published assets as the immutable released SSH baseline.
+2. Begin version 0.5.0-alpha Operations through a new reviewed planning and implementation slice.
+3. Define the first Operations increment before changing Android version metadata.
+4. Keep terminal UI, background monitoring, persistent credentials, and Xray or x-ui management outside the completed version 0.4.0 scope unless a future milestone explicitly accepts them.
 
 ---
 
