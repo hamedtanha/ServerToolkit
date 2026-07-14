@@ -1,8 +1,8 @@
 # Project State
 
 **Project:** Server Toolkit
-**Version:** 0.4.0-alpha
-**Status:** Active Implementation
+**Version:** 0.4.0
+**Status:** Release Preparation
 **Last Updated:** 2026-07-14
 
 ---
@@ -23,7 +23,7 @@ Engineering task selection and delivery rules are defined in [Engineering Strate
 
 The Server Inventory 0.3.0 baseline is accepted.
 
-Version 0.4.0-alpha is focused on SSH.
+Version 0.4.0 completes the SSH milestone and establishes the accepted reliable SSH connection baseline.
 
 The current SSH implementation supports real ephemeral password-based and private-key SSH connections, user-facing non-interactive command execution behind project-owned SSH session handles, deterministic workflow-exit cleanup, and explicit user-requested disconnection with reconnection support.
 
@@ -41,7 +41,7 @@ Persistent credentials, terminal UI, saved command workflows, background monitor
 |---|---|---|
 | Foundation | Implemented | Single Activity, Hilt setup, Navigation Compose, Dashboard, Room setup, and baseline Android architecture are in place. |
 | Server Inventory | Accepted baseline | See [Server Inventory Status](state/SERVER_INVENTORY_STATUS.md). |
-| SSH | Active implementation | See [SSH Status](state/SSH_STATUS.md). |
+| SSH | Completed milestone | See [SSH Status](state/SSH_STATUS.md). |
 | Documentation Governance | Active | Source-of-truth ordering, version metadata rules, changelog usage, and ADR documentation boundaries are documented. |
 | Android Version Metadata | Current | Android `versionName` is synchronized with the current project milestone. |
 | Continuous Integration | Implemented | GitHub Actions validates Kotlin compilation, Android test compilation, unit tests, lint, and debug builds for pull requests and `main`. |
@@ -78,11 +78,11 @@ The following items are intentionally not implemented yet:
 
 ---
 
-## In Progress
+## Completed Milestone
 
-The current implementation area is:
+The completed version 0.4.0 SSH milestone includes:
 
-- SSH 0.4.0-alpha ephemeral private-key authentication is implemented and runtime-verified against ADR-013, including the supported OpenSSH format matrix and stable unsupported PKCS#8 outcomes.
+- SSH 0.4.0 ephemeral private-key authentication is implemented and runtime-verified against ADR-013, including the supported OpenSSH format matrix and stable unsupported PKCS#8 outcomes.
 - Connection history domain, Room persistence, automatic recording, and per-server presentation are complete and runtime-verified.
 - Active SSH sessions are closed deterministically before permanent workflow exit, with navigation deferred until cleanup completes.
 - Connected users can explicitly disconnect while remaining on the SSH screen and reconnect after successful cleanup.
@@ -95,8 +95,10 @@ The current implementation area is:
 
 The next safe development steps are:
 
-1. Reassess the remaining version 0.4.0 SSH milestone against the reliable SSH connection deliverable.
-2. Keep terminal UI, saved command workflows, background monitoring, persistent credentials, and Xray or x-ui management out of scope.
+1. Complete version 0.4.0 release preparation, including the signing workflow, signed APK verification, checksum evidence, and recovery verification.
+2. Preserve version 0.4.0 SSH as the accepted reliable connection baseline.
+3. Begin version 0.5.0 Operations only after the official version 0.4.0 release is published.
+4. Keep terminal UI, background monitoring, persistent credentials, and Xray or x-ui management outside the completed version 0.4.0 scope.
 
 ---
 

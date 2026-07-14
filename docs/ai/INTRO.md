@@ -1,9 +1,9 @@
 # Project Bootstrap
 
 **Project:** Server Toolkit
-**Current Project Version:** 0.4.0-alpha
+**Current Project Version:** 0.4.0
 **Status:** Active
-**Last Updated:** 2026-07-07
+**Last Updated:** 2026-07-14
 
 ---
 
@@ -42,5 +42,5 @@ SSH is one feature of the product, not the entire product.
 Current version:
 
 ```text
-v0.4.0-alpha
+v0.4.0
 ```

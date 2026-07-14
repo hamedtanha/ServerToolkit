@@ -3,7 +3,7 @@
 **Project:** Server Toolkit
 **Document Baseline:** 0.2.0-alpha
 **Status:** Foundational
-**Last Updated:** 2026-07-07
+**Last Updated:** 2026-07-14
 
 ---
 
@@ -127,16 +127,18 @@ Rules:
 - `versionCode` must not be derived mechanically from the project milestone number.
 - `versionCode` should be incremented only when preparing a distributed Android artifact that must upgrade over a previous installed artifact.
 
-Current alpha metadata:
+Release candidate metadata:
 
-- `versionName`: `0.4.0-alpha`
-- `versionCode`: `1`
+- `versionName`: `0.4.0`
+- `versionCode`: `2`
 
 ---
 
 ## Release Workflow
 
-Every release follows this process:
+Every release follows a two-stage validation and publication process.
+
+### Release Candidate Validation
 
 ```text
 Feature Complete
@@ -145,36 +147,67 @@ Testing
 ↓
 Documentation Review
 ↓
-Update CHANGELOG
+Update CHANGELOG and PROJECT_STATE for Release Preparation
 ↓
-Update PROJECT_STATE
+Update Version Metadata
 ↓
-Version Update
+Merge Approved Release Candidate State to main
 ↓
-Git Tag
+Build Candidate APK from the Exact main Commit
 ↓
-GitHub Release
+Sign and Verify the Candidate APK
 ↓
-APK Build
+Verify Signing Recovery Readiness and Record Candidate Evidence
+```
+
+A successfully verified candidate proves that the release workflow is operational, but it is not the official published artifact. `CHANGELOG.md` remains unreleased and the project status remains `Release Preparation` until finalization.
+
+### Final Release Publication
+
+```text
+Finalize CHANGELOG Date and Release State
+↓
+Merge Approved Final Release State to main
+↓
+Build Official APK from the Exact Final main Commit
+↓
+Sign APK
+↓
+Verify Signing Certificate and Application Metadata
+↓
+Generate SHA-256 Checksum and Final Release Evidence
+↓
+Create Git Tag for the Exact Final Commit
+↓
+Create GitHub Release
 ↓
 Distribution
 ```
+
+The final tag, source archive, release notes, checksum evidence, and APK must identify the same final `main` commit. Any repository change after final artifact verification invalidates the existing release evidence and requires the APK to be rebuilt, signed, and verified again.
 
 ---
 
 ## Release Checklist
 
-Before creating a release verify:
+Before creating the Git tag and GitHub Release, verify:
 
 - All milestone tasks are complete.
+- Release candidate signing and verification completed successfully.
+- The official APK was rebuilt from the exact final `main` commit that will be tagged.
 - Project builds successfully.
 - No critical compiler warnings remain.
 - Relevant tests are completed.
 - Documentation is updated.
 - `CHANGELOG.md` is updated.
 - `PROJECT_STATE.md` is updated.
-- Version is updated where applicable.
-- Sensitive data is removed.
+- Version metadata is updated where applicable.
+- The official signing workflow is available and fails closed when required signing material is unavailable or invalid.
+- The primary signing keystore and at least one recovery copy have been verified before first distribution.
+- The APK is signed with the accepted release identity and not with the Android debug certificate.
+- The signing certificate, application identifier, and version metadata are verified.
+- The signed APK SHA-256 checksum and required release evidence are recorded.
+- Sensitive data is absent from Git history, build output, logs, documentation, and release assets.
 - Release notes are prepared.
 - The `main` branch is releasable.
 
@@ -231,7 +264,8 @@ Each stable release should create a GitHub Release.
 
 Recommended assets:
 
-- APK.
+- Signed and verified APK.
+- APK SHA-256 checksum.
 - Release notes.
 - Source code archive.
 
@@ -245,16 +279,22 @@ Current stable checkpoint:
 v0.1.0 — Foundation
 ```
 
-Current development milestone:
+Current release candidate:
 
 ```text
-v0.4.0-alpha — SSH
+v0.4.0 — SSH
+```
+
+Next development milestone:
+
+```text
+v0.5.0-alpha — Operations
 ```
 
 Project status:
 
 ```text
-Active Development
+Release Preparation
 ```
 
 ---

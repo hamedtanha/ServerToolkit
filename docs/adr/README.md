@@ -2,7 +2,7 @@
 
 **Project:** Server Toolkit
 
-**Version:** 0.4.0-alpha
+**Version:** 0.4.0
 
 **Status:** Active
 

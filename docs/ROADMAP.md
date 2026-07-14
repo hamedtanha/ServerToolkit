@@ -1,8 +1,8 @@
 # Roadmap
 
 **Project:** Server Toolkit
-**Version:** 0.4.0-alpha
-**Status:** Active Implementation
+**Version:** 0.4.0
+**Status:** Active
 **Last Updated:** 2026-07-14
 
 ---
@@ -154,7 +154,7 @@ Accepted baseline.
 
 ---
 
-## Version 0.4.0 — SSH
+## Version 0.4.0 — SSH ✅
 
 Objective:
 
@@ -164,7 +164,7 @@ Entry condition:
 
 The Server Inventory 0.3.0 baseline has been accepted. Credential storage still requires a separate reviewed implementation before persistent credential storage is added.
 
-Implemented in the current milestone:
+Completed:
 
 - SSH architecture and security ADRs.
 - SSHJ integration through data-layer boundaries.
@@ -190,14 +190,10 @@ Implemented in the current milestone:
 - Per-server connection history presentation using repository observation contracts.
 - Runtime verification of recorded history navigation, ordering, and entry details.
 
-Next:
+Deferred follow-up:
 
-- Reassess the remaining version 0.4.0 SSH scope against the reliable SSH connection deliverable.
-
-Planned:
-
-- Additional SSH host key verification hardening, if future runtime testing identifies gaps.
-- Persistent credential storage only after reviewed secure storage implementation.
+- Additional SSH host key verification hardening only if future runtime testing identifies a concrete gap.
+- Persistent credential storage only through a separately reviewed future milestone with an accepted secure storage implementation.
 
 Deliverable:
 
@@ -205,7 +201,7 @@ Reliable SSH connections to managed servers.
 
 Status:
 
-Active implementation.
+Completed.
 
 ---
 

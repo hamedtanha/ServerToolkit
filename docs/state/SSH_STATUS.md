@@ -2,7 +2,7 @@
 
 **Project:** Server Toolkit
 **Feature Area:** SSH
-**Status:** Active Implementation
+**Status:** Milestone Complete
 **Related Milestone:** Version 0.4.0 — SSH
 **Last Updated:** 2026-07-14
 
@@ -18,7 +18,7 @@ The high-level project state remains documented in [Project State](../PROJECT_ST
 
 ## Current Status
 
-SSH is in active implementation for version 0.4.0-alpha.
+The SSH milestone implementation for version 0.4.0 is complete. Official release preparation remains in progress until the signed and verified APK and required release evidence are complete.
 
 The current implementation supports real ephemeral password-based and private-key SSH authentication, user-facing non-interactive command execution behind project-owned SSH session handles, deterministic workflow-exit cleanup, and explicit disconnection while remaining on the SSH screen.
 
@@ -323,8 +323,9 @@ The following items are intentionally not implemented yet:
 
 The next safe development steps are:
 
-1. Reassess the remaining version 0.4.0 SSH milestone against the reliable SSH connection deliverable.
-2. Keep terminal UI, saved command workflows, background monitoring, persistent credentials, and Xray or x-ui management out of scope.
+1. Preserve version 0.4.0 SSH as the accepted baseline for the version 0.5.0 Operations milestone.
+2. Reopen SSH hardening only from concrete runtime evidence, current repository inspection, or a newly recorded focused review finding.
+3. Keep terminal UI, background monitoring, persistent credentials, and Xray or x-ui management outside the completed version 0.4.0 scope.
 
 ---
 
