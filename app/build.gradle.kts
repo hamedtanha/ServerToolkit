@@ -12,6 +12,7 @@ android {
             minorApiLevel = 1
         }
     }
+    ndkVersion = "28.2.13676358"
 
     defaultConfig {
         applicationId = "de.hamedtanha.servertoolkit"
@@ -40,7 +41,7 @@ android {
 
     sourceSets {
         getByName("androidTest") {
-            assets.srcDir("$projectDir/schemas")
+            assets.directories.add("$projectDir/schemas")
         }
     }
 }
