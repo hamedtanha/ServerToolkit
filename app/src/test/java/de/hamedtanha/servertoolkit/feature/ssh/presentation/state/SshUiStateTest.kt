@@ -27,6 +27,25 @@ class SshUiStateTest {
         assertTrue(SshUiState(status = SshConnectionStatus.NotStarted).canStartConnection)
         assertFalse(SshUiState(status = SshConnectionStatus.Connecting).canStartConnection)
         assertFalse(SshUiState(status = SshConnectionStatus.Connected).canStartConnection)
+        assertFalse(SshUiState(status = SshConnectionStatus.Disconnecting).canStartConnection)
         assertTrue(SshUiState(status = SshConnectionStatus.Failed).canStartConnection)
+    }
+
+    @Test
+    fun `allows disconnect only for connected session without running command`() {
+        assertFalse(SshUiState(status = SshConnectionStatus.NotStarted).canDisconnect)
+        assertFalse(SshUiState(status = SshConnectionStatus.Connecting).canDisconnect)
+        assertTrue(SshUiState(status = SshConnectionStatus.Connected).canDisconnect)
+        assertFalse(SshUiState(status = SshConnectionStatus.Disconnecting).canDisconnect)
+        assertFalse(SshUiState(status = SshConnectionStatus.Failed).canDisconnect)
+
+        assertFalse(
+            SshUiState(
+                status = SshConnectionStatus.Connected,
+                commandExecution = SshCommandExecutionUiState(
+                    status = SshCommandExecutionStatus.Running,
+                ),
+            ).canDisconnect,
+        )
     }
 }
