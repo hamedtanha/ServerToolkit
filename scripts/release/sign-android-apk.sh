@@ -14,6 +14,7 @@ readonly REPOSITORY_ROOT="$(
 )"
 
 readonly RELEASE_CONFIG="$REPOSITORY_ROOT/config/release/android-release.properties"
+readonly APP_BUILD_FILE="$REPOSITORY_ROOT/app/build.gradle.kts"
 readonly CERTIFICATE_FINGERPRINT_FILE="$REPOSITORY_ROOT/config/release/android-signing-certificate.sha256"
 readonly DEFAULT_KEYSTORE="$HOME/.servertoolkit/release-signing/servertoolkit-release.p12"
 readonly DEFAULT_KEY_ALIAS="servertoolkit-release"
@@ -147,7 +148,7 @@ extract_badging_value() {
     printf '%s' "$value"
 }
 
-for command_name in git grep sed tr awk shasum mktemp date tee; do
+for command_name in git grep sed tr awk shasum mktemp date tee find; do
     require_command "$command_name"
 done
 
@@ -156,6 +157,9 @@ done
 
 [[ -f "$RELEASE_CONFIG" ]] ||
     fail "Release configuration is missing: $RELEASE_CONFIG"
+
+[[ -f "$APP_BUILD_FILE" ]] ||
+    fail "Android application build file is missing: $APP_BUILD_FILE"
 
 [[ -f "$CERTIFICATE_FINGERPRINT_FILE" ]] ||
     fail "Certificate fingerprint file is missing: $CERTIFICATE_FINGERPRINT_FILE"
@@ -202,6 +206,9 @@ readonly EXPECTED_VERSION_NAME="$(
 readonly BUILD_TOOLS_VERSION="$(
     read_property buildToolsVersion "$RELEASE_CONFIG"
 )"
+readonly NDK_VERSION="$(
+    read_property ndkVersion "$RELEASE_CONFIG"
+)"
 readonly EXPECTED_CERTIFICATE_SHA256="$(
     normalize_sha256 "$(cat "$CERTIFICATE_FINGERPRINT_FILE")"
 )"
@@ -209,11 +216,25 @@ readonly EXPECTED_CERTIFICATE_SHA256="$(
 [[ "$EXPECTED_VERSION_CODE" =~ ^[0-9]+$ ]] ||
     fail "Configured versionCode is invalid."
 
+readonly EXPECTED_GRADLE_NDK_ASSIGNMENT="    ndkVersion = \"$NDK_VERSION\""
+readonly GRADLE_NDK_ASSIGNMENT_COUNT="$(
+    grep -Fxc \
+        "$EXPECTED_GRADLE_NDK_ASSIGNMENT" \
+        "$APP_BUILD_FILE" ||
+        true
+)"
+
+[[ "$GRADLE_NDK_ASSIGNMENT_COUNT" == "1" ]] ||
+    fail \
+        "Release NDK version does not match the Gradle Android module."
+
 [[ "$EXPECTED_CERTIFICATE_SHA256" =~ ^[0-9A-F]{64}$ ]] ||
     fail "Configured certificate SHA-256 fingerprint is invalid."
 
 readonly SDK_ROOT="$(resolve_android_sdk_root)"
 readonly BUILD_TOOLS="$SDK_ROOT/build-tools/$BUILD_TOOLS_VERSION"
+readonly NDK_ROOT="$SDK_ROOT/ndk/$NDK_VERSION"
+readonly NDK_LLVM_PREBUILT="$NDK_ROOT/toolchains/llvm/prebuilt"
 readonly APKSIGNER="$BUILD_TOOLS/apksigner"
 readonly ZIPALIGN="$BUILD_TOOLS/zipalign"
 readonly AAPT2="$BUILD_TOOLS/aapt2"
@@ -222,6 +243,23 @@ for tool in "$APKSIGNER" "$ZIPALIGN" "$AAPT2"; do
     [[ -x "$tool" ]] ||
         fail "Required Android build tool is missing: $tool"
 done
+
+[[ -d "$NDK_ROOT" ]] ||
+    fail "Required Android NDK is missing: $NDK_ROOT"
+
+[[ -d "$NDK_LLVM_PREBUILT" ]] ||
+    fail "Required Android NDK LLVM toolchain is missing: $NDK_LLVM_PREBUILT"
+
+readonly LLVM_STRIP="$(
+    find "$NDK_LLVM_PREBUILT" \
+        \( -type f -o -type l \) \
+        -path '*/bin/llvm-strip' \
+        -print |
+        sed -n '1p'
+)"
+
+[[ -x "$LLVM_STRIP" ]] ||
+    fail "Required Android NDK llvm-strip executable is missing."
 
 readonly KEYSTORE="${SERVERTOOLKIT_RELEASE_KEYSTORE:-$DEFAULT_KEYSTORE}"
 readonly KEY_ALIAS="${SERVERTOOLKIT_RELEASE_KEY_ALIAS:-$DEFAULT_KEY_ALIAS}"
@@ -457,6 +495,7 @@ Source commit:       $SOURCE_COMMIT
 Application ID:      $ACTUAL_APPLICATION_ID
 Version code:        $ACTUAL_VERSION_CODE
 Version name:        $ACTUAL_VERSION_NAME
+NDK version:         $NDK_VERSION
 Certificate SHA-256: $ACTUAL_CERTIFICATE_SHA256
 APK SHA-256:         $APK_SHA256
 EOF
@@ -486,6 +525,7 @@ applicationId=$ACTUAL_APPLICATION_ID
 versionCode=$ACTUAL_VERSION_CODE
 versionName=$ACTUAL_VERSION_NAME
 buildToolsVersion=$BUILD_TOOLS_VERSION
+ndkVersion=$NDK_VERSION
 certificateSha256=$ACTUAL_CERTIFICATE_SHA256
 apkSha256=$APK_SHA256
 artifactFile=$(basename -- "$OUTPUT_APK")
