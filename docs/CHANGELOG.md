@@ -8,6 +8,12 @@ The project follows Conventional Commits and Semantic Versioning principles.
 
 ## [Unreleased]
 
+No changes beyond the version 0.4.0 release candidate.
+
+---
+
+## [0.4.0] - Unreleased
+
 ### Added
 
 - Added documentation governance rules for version metadata, source-of-truth ordering, changelog usage, and ADR documentation boundaries.

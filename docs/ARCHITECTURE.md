@@ -1,9 +1,9 @@
 # Architecture
 
 **Project:** Server Toolkit  
-**Version:** 0.4.0-alpha
+**Version:** 0.4.0
 **Status:** Active  
-**Last Updated:** 2026-07-11
+**Last Updated:** 2026-07-14
 
 ---
 

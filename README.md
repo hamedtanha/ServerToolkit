@@ -16,6 +16,7 @@ The application is designed for system administrators, DevOps engineers, and inf
 - Ephemeral password-based and private-key SSH connections.
 - Verified OpenSSH v1 Ed25519 and RSA private-key authentication with optional passphrases.
 - Project-owned SSH session management.
+- Explicit SSH disconnect and reconnection workflow.
 - User-facing non-interactive SSH command execution workflow.
 - SSH command output display for stdout, stderr, and exit status.
 - Per-server SSH connection history presentation backed by automatic Room recording.
@@ -50,7 +51,7 @@ The application is designed for system administrators, DevOps engineers, and inf
 Current Version:
 
 ```
-v0.4.0-alpha (Development)
+v0.4.0 (Release Preparation)
 ```
 
 ---

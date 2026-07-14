@@ -340,7 +340,9 @@ Future SSH hardening must come from concrete runtime evidence, current repositor
 
 ---
 
-## Open Review Backlog
+## Version 0.4.0 Milestone Closure
+
+No open review findings remain after the version `0.4.0` milestone reassessment.
 
 ### P8 — Active SSH sessions are not released when the SSH workflow exits
 
@@ -382,7 +384,7 @@ Decision:
 
 Active SSH sessions now have deterministic project-owned cleanup for both permanent workflow exit and explicit user-requested disconnect.
 
-P8 is resolved. The remaining version `0.4.0` scope should be reassessed separately against the reliable SSH connection deliverable.
+P8 is resolved. The version `0.4.0` milestone reassessment found no remaining blocker to the reliable SSH connection deliverable.
 
 Future SSH hardening must continue to be driven by concrete runtime evidence, current repository inspection, or a newly recorded focused review finding.
 
