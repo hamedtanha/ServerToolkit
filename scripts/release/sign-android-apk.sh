@@ -358,6 +358,28 @@ if grep -Fqi 'CN=Android Debug' "$VERIFY_LOG"; then
     fail "Signed APK uses an Android debug certificate."
 fi
 
+readonly SIGNER_COUNT_LINE_COUNT="$(
+    grep -c \
+        '^Number of signers:' \
+        "$VERIFY_LOG" ||
+        true
+)"
+
+[[ "$SIGNER_COUNT_LINE_COUNT" == "1" ]] ||
+    fail "Expected exactly one APK signer-count result."
+
+readonly ACTUAL_SIGNER_COUNT="$(
+    sed -n \
+        's/^Number of signers:[[:space:]]*//p' \
+        "$VERIFY_LOG"
+)"
+
+[[ "$ACTUAL_SIGNER_COUNT" =~ ^[0-9]+$ ]] ||
+    fail "APK signer count is invalid."
+
+[[ "$ACTUAL_SIGNER_COUNT" == "1" ]] ||
+    fail "Expected exactly one APK signer, found $ACTUAL_SIGNER_COUNT."
+
 readonly CERTIFICATE_LINE_COUNT="$(
     grep -c \
         '^Signer #1 certificate SHA-256 digest:' \
