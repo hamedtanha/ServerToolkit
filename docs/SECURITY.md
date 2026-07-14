@@ -59,6 +59,26 @@ Examples include:
 
 ---
 
+# Android Release Signing
+
+The Android application signing identity is a long-lived release and supply-chain security boundary governed by ADR-014.
+
+Current implementation:
+
+- Gradle `assembleRelease` produces unsigned technical output and does not require access to release signing secrets.
+- Official distributable APKs are produced through the local post-build signing workflow in `scripts/release/sign-android-apk.sh`.
+- The release keystore, private signing key, passwords, and recovery locations remain outside the Git repository.
+- The accepted public signing-certificate SHA-256 fingerprint is stored in `config/release/android-signing-certificate.sha256`.
+- Validation mode exercises the complete signing and verification workflow but deletes the signed validation artifact afterward.
+- Official mode requires a clean `main` branch matching `origin/main`, the accepted signing identity, and explicit maintainer confirmation that recovery readiness has been verified.
+- The primary release keystore and at least one independently protected recovery copy were verified before first distribution.
+- Signed APK verification includes certificate identity, signer count, debug-certificate rejection, application metadata, alignment, and final SHA-256 checksum generation.
+- Automated signing in GitHub Actions, GitHub-hosted signing secrets, Google Play distribution, and Play App Signing remain outside the current implementation scope.
+
+Signing passwords, keystore files, private keys, private recovery locations, and operational recovery details must never appear in Git history, documentation, issues, pull requests, logs, or release notes.
+
+---
+
 # Credential Storage
 
 Credentials must never be stored as plain text.
@@ -241,3 +261,5 @@ Changes are allowed only when:
 - CHANGELOG.md
 - PROJECT_STATE.md
 - adr/ADR-012-android-backup-and-data-extraction-policy.md
+- adr/ADR-014-android-release-signing-strategy.md
+- release/ANDROID_RELEASE_SIGNING.md
