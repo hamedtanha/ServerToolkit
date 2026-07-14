@@ -176,6 +176,7 @@ The project follows Conventional Commits and Semantic Versioning principles.
 
 ### Changed
 
+- Clarified ADR ownership and relationships with a decision-boundary map and aligned ADR-006 references with its canonical title without changing accepted decisions.
 - Strengthened AI project-context reconstruction rules and synchronized AI Memory with the current documentation source-of-truth hierarchy.
 - Synchronized current-state SSH planning with accepted ADR-013 before private-key implementation began.
 - Synchronized current-state, roadmap, README, changelog, and ADR implementation-outcome documentation with verified ephemeral private-key authentication.
