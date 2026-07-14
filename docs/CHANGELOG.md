@@ -8,7 +8,7 @@ The project follows Conventional Commits and Semantic Versioning principles.
 
 ## [Unreleased]
 
-No changes beyond the version 0.4.0 release candidate.
+Version 0.4.0 release signing and publication preparation is in progress.
 
 ---
 
@@ -22,6 +22,11 @@ No changes beyond the version 0.4.0 release candidate.
 - Added ADR-012 for Android backup and data extraction policy.
 - Added ADR-013 for the accepted ephemeral SSH private-key authentication boundary.
 - Added ADR-014 for Android release signing identity, repository-external secret handling, artifact verification, and signing-key recovery requirements.
+- Added a fail-closed local post-build Android APK signing workflow using `zipalign`, `apksigner`, `aapt2`, and Android Build Tools `36.1.0`.
+- Added repository-controlled non-secret release metadata and the accepted public signing-certificate SHA-256 fingerprint.
+- Added a validation mode that performs complete signing and verification while deleting the signed validation artifact afterward.
+- Added official-mode guards for clean `main`, source-commit alignment, external signing material, recovery-readiness attestation, artifact overwrite protection, certificate identity, application metadata, alignment, checksum generation, and release evidence.
+- Verified the project release signing identity and an independently protected recovery copy without recording private recovery locations or signing credentials in the repository.
 - Added the project-owned one-shot SSH private-key source with atomic lifecycle transitions, bounded reading, stable failures, scoped cleanup, and focused unit coverage.
 - Added the Android SSH private-key content factory with cancellable descriptor opening, joint descriptor-stream ownership, and instrumentation coverage.
 - Added ephemeral SSH private-key document selection with immediate source conversion, private ViewModel ownership, lifecycle invalidation, configuration-safe secret clearing, one-attempt transfer coverage, and manual Android workflow verification.
@@ -183,6 +188,7 @@ No changes beyond the version 0.4.0 release candidate.
 
 ### Changed
 
+- Synchronized security, release-process, project-state, changelog, and operator documentation with the implemented Android release signing workflow.
 - Clarified ADR ownership and relationships with a decision-boundary map and aligned ADR-006 references with its canonical title without changing accepted decisions.
 - Strengthened AI project-context reconstruction rules and synchronized AI Memory with the current documentation source-of-truth hierarchy.
 - Synchronized current-state SSH planning with accepted ADR-013 before private-key implementation began.

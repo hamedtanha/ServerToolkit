@@ -31,6 +31,8 @@ The ADR-013 ephemeral private-key workflow is implemented end to end. Private-ke
 
 Automated JVM coverage, Android runtime verification, and Android benchmark evidence confirm support for encrypted and unencrypted OpenSSH v1 Ed25519 and RSA keys. Tested PKCS#8 RSA keys map to a stable unsupported-format outcome. Parser, passphrase, source-lifecycle, cleanup, and server-rejection failures map to project-owned errors, while coroutine cancellation is preserved.
 
+The repository now includes a fail-closed local post-build Android APK signing workflow. Complete validation has succeeded with the accepted release certificate, verified application metadata, valid alignment, and post-signing SHA-256 calculation. The primary release keystore and an independently protected recovery copy have also been verified. Candidate signing from the exact merged `main` commit and final release publication remain pending.
+
 Persistent credentials, terminal UI, saved command workflows, background monitoring, and Xray or x-ui management remain intentionally out of scope.
 
 ---
@@ -45,6 +47,7 @@ Persistent credentials, terminal UI, saved command workflows, background monitor
 | Documentation Governance | Active | Source-of-truth ordering, version metadata rules, changelog usage, and ADR documentation boundaries are documented. |
 | Android Version Metadata | Current | Android `versionName` is synchronized with the current project milestone. |
 | Continuous Integration | Implemented | GitHub Actions validates Kotlin compilation, Android test compilation, unit tests, lint, and debug builds for pull requests and `main`. |
+| Android Release Signing | Implemented, publication pending | Local post-build APK signing, certificate verification, metadata verification, checksum generation, and recovery readiness validation are implemented. |
 
 ---
 
@@ -95,10 +98,12 @@ The completed version 0.4.0 SSH milestone includes:
 
 The next safe development steps are:
 
-1. Complete version 0.4.0 release preparation, including the signing workflow, signed APK verification, checksum evidence, and recovery verification.
-2. Preserve version 0.4.0 SSH as the accepted reliable connection baseline.
-3. Begin version 0.5.0 Operations only after the official version 0.4.0 release is published.
-4. Keep terminal UI, background monitoring, persistent credentials, and Xray or x-ui management outside the completed version 0.4.0 scope.
+1. Merge the Android release signing workflow and run candidate signing from the exact merged `main` commit.
+2. Record candidate evidence, finalize the version 0.4.0 release state, and rebuild the official APK from the exact final `main` commit.
+3. Create the version 0.4.0 Git tag and GitHub Release only after final artifact verification.
+4. Preserve version 0.4.0 SSH as the accepted reliable connection baseline.
+5. Begin version 0.5.0 Operations only after the official version 0.4.0 release is published.
+6. Keep terminal UI, background monitoring, persistent credentials, and Xray or x-ui management outside the completed version 0.4.0 scope.
 
 ---
 

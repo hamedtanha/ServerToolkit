@@ -134,6 +134,75 @@ Release candidate metadata:
 
 ---
 
+## Implemented Android APK Signing Workflow
+
+Server Toolkit uses a local post-build APK signing workflow for project-distributed Android releases.
+
+Implemented sequence:
+
+```text
+Gradle assembleRelease
+↓
+Unsigned technical APK
+↓
+zipalign
+↓
+apksigner sign
+↓
+apksigner verify
+↓
+Signing-certificate fingerprint verification
+↓
+Application metadata verification
+↓
+SHA-256 checksum and release evidence
+```
+
+Repository-controlled, non-secret configuration:
+
+```text
+config/release/android-release.properties
+config/release/android-signing-certificate.sha256
+```
+
+Executable workflow:
+
+```text
+scripts/release/sign-android-apk.sh
+```
+
+Validation mode:
+
+```bash
+scripts/release/sign-android-apk.sh --validation
+```
+
+Validation mode performs the complete signing and verification sequence from a clean feature branch. The signed validation artifact is temporary and is deleted after verification.
+
+Official mode:
+
+```bash
+SERVERTOOLKIT_RELEASE_RECOVERY_VERIFIED=YES \
+  scripts/release/sign-android-apk.sh
+```
+
+Official mode:
+
+- runs only from a clean `main` branch;
+- requires the local `main` commit to match `origin/main` when that remote reference is available;
+- requires explicit maintainer confirmation that signing-key recovery readiness has been verified;
+- refuses missing, unreadable, repository-contained, or invalid signing material;
+- verifies the accepted release certificate and rejects the Android debug certificate;
+- verifies the application identifier, version code, and version name;
+- generates the final APK SHA-256 checksum and release evidence;
+- refuses to overwrite an existing official release artifact.
+
+The release keystore, signing passwords, and recovery locations remain outside the repository. Automated signing in GitHub Actions is not part of the current distribution model.
+
+Detailed operator guidance is maintained in `release/ANDROID_RELEASE_SIGNING.md`.
+
+---
+
 ## Release Workflow
 
 Every release follows a two-stage validation and publication process.
@@ -295,6 +364,14 @@ Project status:
 
 ```text
 Release Preparation
+```
+
+Signing implementation status:
+
+```text
+Implemented and locally validation-tested.
+Candidate signing from the exact merged main commit remains pending.
+Official publication remains pending.
 ```
 
 ---
