@@ -33,6 +33,7 @@ This directory contains all Architecture Decision Records for the Server Toolkit
 | ADR-011 | SSH Credential Ownership and Secure Storage Strategy | Accepted |
 | ADR-012 | Android Backup and Data Extraction Policy | Accepted |
 | ADR-013 | Ephemeral SSH Private-Key Authentication Boundary | Accepted |
+| ADR-014 | Android Release Signing Strategy | Accepted |
 
 ---
 
@@ -64,6 +65,7 @@ The decision role describes what an ADR contributes. The dependency column ident
 | ADR-011 | SSH credential ownership and future persistent credential model | Refinement | ADR-007, ADR-009 |
 | ADR-012 | Android backup, data extraction, and device-transfer policy | Cross-cutting | ADR-003, ADR-007, ADR-009, ADR-011 |
 | ADR-013 | Ephemeral SSH private-key authentication and one-shot key-source lifecycle | Refinement | ADR-006, ADR-008, ADR-009, ADR-011, ADR-012 |
+| ADR-014 | Android application signing identity and release artifact trust | Cross-cutting | ADR-001 |
 
 No current ADR supersedes another ADR. A future decision that replaces an accepted decision must declare the superseded ADR explicitly; document date or ADR number alone does not establish precedence.
 
