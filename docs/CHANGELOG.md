@@ -144,7 +144,8 @@ The project follows Conventional Commits and Semantic Versioning principles.
 - Added SSHJ session lifecycle shell.
 - Added deterministic active-session cleanup before permanent SSH workflow exit.
 - Added cleanup-before-navigation orchestration for back, system-back, and connection-history navigation.
-- Added focused SSH workflow-exit lifecycle and presentation regression coverage.
+- Added explicit user-facing SSH disconnect through the existing lifecycle boundary, with shared close orchestration, duplicate-close suppression, command-execution blocking, reconnect support, focused regression coverage, and Android runtime verification.
+- Added focused SSH session-close lifecycle and presentation regression coverage.
 - Added SSHJ session owner registry boundary.
 - Added SSHJ authentication adapter mapping.
 - Added SSHJ authentication executor boundary.

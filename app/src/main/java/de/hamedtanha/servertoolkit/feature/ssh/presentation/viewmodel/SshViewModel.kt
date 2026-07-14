@@ -53,7 +53,7 @@ class SshViewModel @Inject constructor(
 
     private var isHostKeyConfirmationInProgress: Boolean = false
 
-    private var isWorkflowExitInProgress: Boolean = false
+    private var isSessionCloseInProgress: Boolean = false
 
     private var activeSessionHandle: SshSessionHandle? = null
 
@@ -71,6 +71,12 @@ class SshViewModel @Inject constructor(
     fun onConnectClicked() {
         viewModelScope.launch {
             connect()
+        }
+    }
+
+    fun onDisconnectClicked() {
+        viewModelScope.launch {
+            disconnect()
         }
     }
 
@@ -115,7 +121,7 @@ class SshViewModel @Inject constructor(
     fun onPrivateKeySourceSelected(source: SshPrivateKeySource) {
         if (
             isConnectionAttemptInProgress ||
-            isWorkflowExitInProgress ||
+            isSessionCloseInProgress ||
             activeSessionHandle != null
         ) {
             source.invalidate()
@@ -176,7 +182,7 @@ class SshViewModel @Inject constructor(
     }
 
     suspend fun onWorkflowExit(): Boolean {
-        if (isWorkflowExitInProgress) {
+        if (isSessionCloseInProgress) {
             return false
         }
 
@@ -198,17 +204,65 @@ class SshViewModel @Inject constructor(
             return false
         }
 
-        val sessionHandle = activeSessionHandle ?: return true
-        val commandExecutionBeforeExit = _uiState.value.commandExecution
+        return closeActiveSession(SshSessionCloseIntent.WorkflowExit)
+    }
 
-        isWorkflowExitInProgress = true
+    internal suspend fun disconnect() {
+        if (isSessionCloseInProgress) {
+            return
+        }
+
+        clearAuthenticationInputState()
+
+        if (isConnectionAttemptInProgress) {
+            _uiState.value = _uiState.value.copy(
+                message = "Connection attempt is still running.",
+                detail = "Wait for the current connection attempt to finish before disconnecting.",
+            )
+            return
+        }
+
+        if (isCommandExecutionInProgress) {
+            _uiState.value = _uiState.value.copy(
+                message = "Command execution is still running.",
+                detail = "Wait for the current command to finish before disconnecting.",
+            )
+            return
+        }
+
+        closeActiveSession(SshSessionCloseIntent.UserRequest)
+    }
+
+    private suspend fun closeActiveSession(
+        intent: SshSessionCloseIntent,
+    ): Boolean {
+        if (isSessionCloseInProgress) {
+            return false
+        }
+
+        val sessionHandle = activeSessionHandle ?: return true
+        val commandExecutionBeforeClose = _uiState.value.commandExecution
+
+        isSessionCloseInProgress = true
         activeSessionHandle = null
 
         _uiState.value = _uiState.value.copy(
             status = SshConnectionStatus.Disconnecting,
             statusLabel = "Disconnecting",
-            message = "Closing the active SSH session.",
-            detail = "Navigation will continue after session cleanup completes.",
+            message = when (intent) {
+                SshSessionCloseIntent.WorkflowExit ->
+                    "Closing the active SSH session."
+
+                SshSessionCloseIntent.UserRequest ->
+                    "Disconnecting from the SSH server."
+            },
+            detail = when (intent) {
+                SshSessionCloseIntent.WorkflowExit ->
+                    "Navigation will continue after session cleanup completes."
+
+                SshSessionCloseIntent.UserRequest ->
+                    "The SSH session will remain unavailable while cleanup completes."
+            },
             commandExecution = _uiState.value.commandExecution.asSessionUnavailable(),
         )
 
@@ -218,9 +272,22 @@ class SshViewModel @Inject constructor(
                     _uiState.value = _uiState.value.copy(
                         status = SshConnectionStatus.NotStarted,
                         statusLabel = "Not connected",
-                        message = "SSH session closed.",
-                        detail = "The active SSH session was released before leaving the workflow.",
-                        commandExecution = _uiState.value.commandExecution.asSessionUnavailable(),
+                        message = when (intent) {
+                            SshSessionCloseIntent.WorkflowExit ->
+                                "SSH session closed."
+
+                            SshSessionCloseIntent.UserRequest ->
+                                "SSH session disconnected."
+                        },
+                        detail = when (intent) {
+                            SshSessionCloseIntent.WorkflowExit ->
+                                "The active SSH session was released before leaving the workflow."
+
+                            SshSessionCloseIntent.UserRequest ->
+                                "You can start a new SSH connection when ready."
+                        },
+                        commandExecution =
+                            _uiState.value.commandExecution.asSessionUnavailable(),
                     )
                     true
                 }
@@ -229,37 +296,77 @@ class SshViewModel @Inject constructor(
                     _uiState.value = _uiState.value.copy(
                         status = SshConnectionStatus.NotStarted,
                         statusLabel = "Not connected",
-                        message = "SSH session was already closed.",
-                        detail = "No active session resource remains for this workflow.",
-                        commandExecution = _uiState.value.commandExecution.asSessionUnavailable(),
+                        message = when (intent) {
+                            SshSessionCloseIntent.WorkflowExit ->
+                                "SSH session was already closed."
+
+                            SshSessionCloseIntent.UserRequest ->
+                                "SSH session was already disconnected."
+                        },
+                        detail = when (intent) {
+                            SshSessionCloseIntent.WorkflowExit ->
+                                "No active session resource remains for this workflow."
+
+                            SshSessionCloseIntent.UserRequest ->
+                                "No active SSH session resource remains."
+                        },
+                        commandExecution =
+                            _uiState.value.commandExecution.asSessionUnavailable(),
                     )
                     true
                 }
 
                 SshSessionCloseResult.Failed -> {
                     activeSessionHandle = sessionHandle
+
                     _uiState.value = _uiState.value.copy(
                         status = SshConnectionStatus.Connected,
                         statusLabel = "Connected",
-                        message = "SSH session could not be closed.",
-                        detail = "Leaving the workflow was cancelled. Try again to retry cleanup.",
-                        commandExecution = commandExecutionBeforeExit,
+                        message = when (intent) {
+                            SshSessionCloseIntent.WorkflowExit ->
+                                "SSH session could not be closed."
+
+                            SshSessionCloseIntent.UserRequest ->
+                                "SSH session could not be disconnected."
+                        },
+                        detail = when (intent) {
+                            SshSessionCloseIntent.WorkflowExit ->
+                                "Leaving the workflow was cancelled. Try again to retry cleanup."
+
+                            SshSessionCloseIntent.UserRequest ->
+                                "The active session was preserved. Try disconnecting again."
+                        },
+                        commandExecution = commandExecutionBeforeClose,
                     )
                     false
                 }
             }
         } catch (error: CancellationException) {
             activeSessionHandle = sessionHandle
+
             _uiState.value = _uiState.value.copy(
                 status = SshConnectionStatus.Connected,
                 statusLabel = "Connected",
-                message = "SSH session cleanup was cancelled.",
-                detail = "The workflow remains active so session cleanup can be retried.",
-                commandExecution = commandExecutionBeforeExit,
+                message = when (intent) {
+                    SshSessionCloseIntent.WorkflowExit ->
+                        "SSH session cleanup was cancelled."
+
+                    SshSessionCloseIntent.UserRequest ->
+                        "SSH disconnect was cancelled."
+                },
+                detail = when (intent) {
+                    SshSessionCloseIntent.WorkflowExit ->
+                        "The workflow remains active so session cleanup can be retried."
+
+                    SshSessionCloseIntent.UserRequest ->
+                        "The active session was preserved so disconnect can be retried."
+                },
+                commandExecution = commandExecutionBeforeClose,
             )
+
             throw error
         } finally {
-            isWorkflowExitInProgress = false
+            isSessionCloseInProgress = false
         }
     }
 
@@ -282,7 +389,7 @@ class SshViewModel @Inject constructor(
     internal suspend fun connect() {
         if (
             isConnectionAttemptInProgress ||
-            isWorkflowExitInProgress ||
+            isSessionCloseInProgress ||
             activeSessionHandle != null
         ) {
             return
@@ -498,6 +605,11 @@ class SshViewModel @Inject constructor(
             authenticationInput = SshAuthenticationInputUiState(),
         )
     }
+}
+
+private enum class SshSessionCloseIntent {
+    WorkflowExit,
+    UserRequest,
 }
 
 private class PendingAuthenticationSecrets {

@@ -102,6 +102,7 @@ fun SshRoute(
             privateKeyPickerLauncher.launch(PRIVATE_KEY_MIME_TYPE)
         },
         onConnectClick = viewModel::onConnectClicked,
+        onDisconnectClick = viewModel::onDisconnectClicked,
         onConfirmHostKeyClick = viewModel::onConfirmHostKeyClicked,
         onCancelHostKeyReviewClick = viewModel::onCancelHostKeyReviewClicked,
         onPasswordChange = viewModel::onPasswordChanged,
@@ -124,6 +125,7 @@ fun SshScreen(
     onAuthenticationMethodSelect: (SshAuthenticationMethod) -> Unit,
     onPrivateKeySelectClick: () -> Unit,
     onConnectClick: () -> Unit,
+    onDisconnectClick: () -> Unit,
     onConfirmHostKeyClick: () -> Unit,
     onCancelHostKeyReviewClick: () -> Unit,
     onPasswordChange: (String) -> Unit,
@@ -241,16 +243,37 @@ fun SshScreen(
 
             Spacer(modifier = Modifier.height(8.dp))
 
-            Button(
-                onClick = {
-                    onConnectClick()
-                    password = ""
-                    privateKeyPassphrase = ""
-                },
-                enabled = uiState.canStartConnection,
-                modifier = Modifier.fillMaxWidth(),
+            if (
+                uiState.status == SshConnectionStatus.Connected ||
+                uiState.status == SshConnectionStatus.Disconnecting
             ) {
-                Text(text = "Connect")
+                Button(
+                    onClick = onDisconnectClick,
+                    enabled = uiState.canDisconnect,
+                    modifier = Modifier.fillMaxWidth(),
+                ) {
+                    Text(
+                        text = if (
+                            uiState.status == SshConnectionStatus.Disconnecting
+                        ) {
+                            "Disconnecting"
+                        } else {
+                            "Disconnect"
+                        },
+                    )
+                }
+            } else {
+                Button(
+                    onClick = {
+                        onConnectClick()
+                        password = ""
+                        privateKeyPassphrase = ""
+                    },
+                    enabled = uiState.canStartConnection,
+                    modifier = Modifier.fillMaxWidth(),
+                ) {
+                    Text(text = "Connect")
+                }
             }
         }
 

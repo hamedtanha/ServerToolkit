@@ -4,7 +4,7 @@
 **Feature Area:** SSH
 **Status:** Active Implementation
 **Related Milestone:** Version 0.4.0 — SSH
-**Last Updated:** 2026-07-12
+**Last Updated:** 2026-07-14
 
 ---
 
@@ -20,7 +20,7 @@ The high-level project state remains documented in [Project State](../PROJECT_ST
 
 SSH is in active implementation for version 0.4.0-alpha.
 
-The current implementation supports real ephemeral password-based and private-key SSH authentication, together with user-facing non-interactive command execution behind project-owned SSH session handles.
+The current implementation supports real ephemeral password-based and private-key SSH authentication, user-facing non-interactive command execution behind project-owned SSH session handles, deterministic workflow-exit cleanup, and explicit disconnection while remaining on the SSH screen.
 
 The ADR-013 ephemeral private-key workflow is implemented end to end. The implementation includes the one-shot source, bounded key-document reading, Android system-picker integration, private ViewModel pending-source ownership, in-memory SSHJ key-provider creation, stable project-owned failure mapping, and authentication without temporary private-key files.
 
@@ -91,7 +91,7 @@ The Android runtime verification also confirmed:
 ### Navigation and Presentation
 
 - SSH navigation destination.
-- SSH screen with ephemeral password input, host-key review actions, connection status, non-interactive command controls, and connection history navigation.
+- SSH screen with ephemeral password input, host-key review actions, connection status, explicit disconnect control, non-interactive command controls, and connection history navigation.
 - SSH ViewModel and UI state for connection attempts, host-key review, authentication input, and command execution.
 - Per-server SSH connection history destination and read-only screen.
 - Connection history ViewModel and UI state backed by repository observation.
@@ -214,8 +214,10 @@ The Android runtime verification also confirmed:
 - Deterministic active-session cleanup before permanent SSH workflow exit.
 - Back, system-back, and connection-history navigation deferred until cleanup completes.
 - Dedicated disconnecting presentation state during session cleanup.
-- Duplicate workflow-exit suppression.
-- Workflow-exit blocking during connection and command execution.
+- Shared active-session close orchestration for workflow exit and explicit user-requested disconnect.
+- Duplicate session-close suppression across workflow-exit and explicit disconnect requests.
+- Workflow exit and explicit disconnect blocking during connection and command execution.
+- Explicit disconnect presentation with reconnect support after successful cleanup.
 - Deterministic `Closed`, `NotFound`, `Failed`, and cancellation handling.
 - Active-session restoration and cleanup retry after close failure.
 - Stale command output clearing after successful cleanup.
@@ -280,10 +282,10 @@ The Android runtime verification also confirmed:
 - Malformed-key, missing-passphrase, incorrect-passphrase, unauthorized-key, source-failure, cancellation, and buffer-clearing coverage.
 - Android runtime verification of the complete supported and unsupported private-key format matrix.
 - Full unit-test, lint, and debug-assembly quality gate after private-key authentication implementation.
-- Focused SSH workflow-exit coverage for no-session, successful close, missing owner, close failure, retry, duplicate exit, active connection, active command execution, stale output cleanup, and cancellation.
+- Focused SSH session-close coverage for workflow exit and explicit disconnect, including no-session, successful close, missing owner, close failure, retry, duplicate requests, active connection, active command execution, stale output cleanup, cancellation, and reconnect eligibility.
 - SSHJ lifecycle regression coverage for caller cancellation during started cleanup.
-- Manual Android runtime verification of workflow-exit cleanup and crash-free execution.
-- Full unit-test, lint, and debug-assembly quality gate after workflow-exit cleanup implementation.
+- Manual Android runtime verification of workflow-exit cleanup, explicit disconnect, reconnection, and crash-free execution.
+- Full compilation, Android-test compilation, unit-test, lint, and debug-assembly quality gate after explicit disconnect implementation.
 
 ---
 
@@ -307,7 +309,6 @@ The Android runtime verification also confirmed:
 
 The following items are intentionally not implemented yet:
 
-- Explicit user-facing disconnect action for connected SSH sessions.
 - Interactive terminal workflow for owned sessions.
 - Persistent credential storage implementation.
 - Monitoring workflow.
@@ -322,9 +323,8 @@ The following items are intentionally not implemented yet:
 
 The next safe development steps are:
 
-1. Implement an explicit user-facing disconnect action through the existing lifecycle boundary.
-2. Runtime-verify explicit disconnect and reassess the remaining version 0.4.0 SSH milestone.
-3. Keep terminal UI, saved command workflows, background monitoring, persistent credentials, and Xray or x-ui management out of scope.
+1. Reassess the remaining version 0.4.0 SSH milestone against the reliable SSH connection deliverable.
+2. Keep terminal UI, saved command workflows, background monitoring, persistent credentials, and Xray or x-ui management out of scope.
 
 ---
 

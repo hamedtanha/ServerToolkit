@@ -3,7 +3,7 @@
 **Project:** Server Toolkit
 **Version:** 0.4.0-alpha
 **Status:** Active Implementation
-**Last Updated:** 2026-07-12
+**Last Updated:** 2026-07-14
 
 ---
 
@@ -174,6 +174,8 @@ Implemented in the current milestone:
 - Project-owned session management boundary.
 - Deterministic active-session cleanup before permanent SSH workflow exit.
 - Navigation deferred until active-session cleanup completes.
+- Explicit user-facing disconnect action through the existing session lifecycle boundary.
+- Reconnection support after successful explicit disconnect.
 - Non-interactive command execution workflow.
 - Evidence-driven timeout, cleanup, cancellation, and failure-mapping hardening.
 - Ephemeral private-key selection through the Android system document picker.
@@ -190,8 +192,6 @@ Implemented in the current milestone:
 
 Next:
 
-- Add an explicit user-facing disconnect action for connected SSH sessions.
-- Runtime-verify explicit disconnect behavior.
 - Reassess the remaining version 0.4.0 SSH scope against the reliable SSH connection deliverable.
 
 Planned:

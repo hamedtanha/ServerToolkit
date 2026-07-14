@@ -29,6 +29,10 @@ data class SshUiState(
                     authenticationInput.hasPrivateKeySource
                 )
 
+    val canDisconnect: Boolean
+        get() = status == SshConnectionStatus.Connected &&
+            commandExecution.status != SshCommandExecutionStatus.Running
+
     val canExecuteCommand: Boolean
         get() = status == SshConnectionStatus.Connected && commandExecution.canExecute
 }

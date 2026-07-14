@@ -39,7 +39,7 @@ import org.junit.Assert.assertTrue
 import org.junit.Assert.fail
 import org.junit.Test
 
-class SshViewModelWorkflowExitTest {
+class SshViewModelSessionCloseTest {
 
     @Test
     fun `workflow exit without active session succeeds without requesting close`() = runBlocking {
@@ -314,6 +314,96 @@ class SshViewModelWorkflowExitTest {
             "SSH session cleanup was cancelled.",
             viewModel.uiState.value.message,
         )
+    }
+
+    @Test
+    fun `explicit disconnect closes active session and allows reconnection`() = runBlocking {
+        val lifecycleService = FakeSshSessionLifecycleService(
+            result = SshSessionCloseResult.Closed,
+        )
+        val viewModel = createViewModel(
+            sessionLifecycleService = lifecycleService,
+        )
+
+        viewModel.onConnectionResultReceived(sshConnectedResult())
+
+        viewModel.disconnect()
+
+        assertEquals(1, lifecycleService.closeCallCount)
+        assertEquals(SshConnectionStatus.NotStarted, viewModel.uiState.value.status)
+        assertEquals("Not connected", viewModel.uiState.value.statusLabel)
+        assertEquals("SSH session disconnected.", viewModel.uiState.value.message)
+        assertTrue(viewModel.uiState.value.canStartConnection)
+        assertFalse(viewModel.uiState.value.canDisconnect)
+    }
+
+    @Test
+    fun `failed explicit disconnect preserves active session and supports retry`() = runBlocking {
+        val lifecycleService = FakeSshSessionLifecycleService(
+            result = SshSessionCloseResult.Failed,
+        )
+        val viewModel = createViewModel(
+            sessionLifecycleService = lifecycleService,
+        )
+
+        viewModel.onConnectionResultReceived(sshConnectedResult())
+        viewModel.onCommandChanged("uptime")
+
+        viewModel.disconnect()
+
+        assertEquals(1, lifecycleService.closeCallCount)
+        assertEquals(SshConnectionStatus.Connected, viewModel.uiState.value.status)
+        assertEquals("Connected", viewModel.uiState.value.statusLabel)
+        assertEquals(
+            "SSH session could not be disconnected.",
+            viewModel.uiState.value.message,
+        )
+        assertEquals("uptime", viewModel.uiState.value.commandExecution.command)
+        assertTrue(viewModel.uiState.value.canDisconnect)
+
+        lifecycleService.result = SshSessionCloseResult.Closed
+
+        viewModel.disconnect()
+
+        assertEquals(2, lifecycleService.closeCallCount)
+        assertEquals(SshConnectionStatus.NotStarted, viewModel.uiState.value.status)
+        assertFalse(viewModel.uiState.value.canDisconnect)
+    }
+
+    @Test
+    fun `duplicate explicit disconnect does not start a second close operation`() = runBlocking {
+        val closeStarted = CompletableDeferred<Unit>()
+        val releaseClose = CompletableDeferred<Unit>()
+        val lifecycleService = FakeSshSessionLifecycleService(
+            onClose = {
+                closeStarted.complete(Unit)
+                releaseClose.await()
+            },
+        )
+        val viewModel = createViewModel(
+            sessionLifecycleService = lifecycleService,
+        )
+
+        viewModel.onConnectionResultReceived(sshConnectedResult())
+
+        val firstDisconnect = async {
+            viewModel.disconnect()
+        }
+
+        closeStarted.await()
+
+        assertEquals(SshConnectionStatus.Disconnecting, viewModel.uiState.value.status)
+        assertFalse(viewModel.uiState.value.canDisconnect)
+
+        viewModel.disconnect()
+
+        assertEquals(1, lifecycleService.closeCallCount)
+
+        releaseClose.complete(Unit)
+        firstDisconnect.await()
+
+        assertEquals(1, lifecycleService.closeCallCount)
+        assertEquals(SshConnectionStatus.NotStarted, viewModel.uiState.value.status)
     }
 
     private fun createViewModel(
