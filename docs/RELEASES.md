@@ -141,6 +141,10 @@ Server Toolkit uses a local post-build APK signing workflow for project-distribu
 Implemented sequence:
 
 ```text
+Resolve Android Build Tools 36.1.0
+↓
+Resolve Android NDK 28.2.13676358 and llvm-strip
+↓
 Gradle assembleRelease
 ↓
 Unsigned technical APK
@@ -194,12 +198,35 @@ Official mode:
 - refuses missing, unreadable, repository-contained, or invalid signing material;
 - verifies the accepted release certificate and rejects the Android debug certificate;
 - verifies the application identifier, version code, and version name;
-- generates the final APK SHA-256 checksum and release evidence;
+- verifies the repository-pinned Android NDK and required `llvm-strip` executable;
+- generates the final APK SHA-256 checksum and release evidence, including the NDK version;
 - refuses to overwrite an existing official release artifact.
 
 The release keystore, signing passwords, and recovery locations remain outside the repository. Automated signing in GitHub Actions is not part of the current distribution model.
 
 Detailed operator guidance is maintained in `release/ANDROID_RELEASE_SIGNING.md`.
+
+---
+
+## Version 0.4.0 Candidate Evidence
+
+The non-distributable version 0.4.0 candidate was built, signed, and independently verified from the exact merged `main` state.
+
+```text
+Source commit: 250d46649834ef0f88dd6c3c330aacf137d44ab5
+Application ID: de.hamedtanha.servertoolkit
+Version code: 2
+Version name: 0.4.0
+Android Build Tools: 36.1.0
+Certificate SHA-256: 8EECDB2A84052ABCA92848B8E717A136C33F4A3D1CB85EE2AA77C4F3ED9424FC
+Candidate APK SHA-256: 906A87D7645F7E4035F6A96AD2DB395A4A7600D8B487BC39CF80D30C92C7EB04
+Android Validation run: 29351658269
+Android Validation conclusion: success
+```
+
+The candidate proved the signing and verification workflow but is not a distribution artifact. During finalization, the native-stripping warning was traced to a missing local NDK installation. Android NDK `28.2.13676358` is now repository-pinned, the matching `llvm-strip` has been validated for all packaged ABIs, and the signing workflow fails closed when the required NDK toolchain is unavailable.
+
+The official APK must be freshly rebuilt, signed, and verified from the exact final `main` commit that receives tag `v0.4.0`. Its checksum is expected to differ from the candidate checksum.
 
 ---
 
@@ -363,15 +390,17 @@ v0.5.0-alpha — Operations
 Project status:
 
 ```text
-Release Preparation
+Release Ready
 ```
 
 Signing implementation status:
 
 ```text
-Implemented and locally validation-tested.
-Candidate signing from the exact merged main commit remains pending.
-Official publication remains pending.
+Implemented and candidate-verified.
+Candidate source commit: 250d46649834ef0f88dd6c3c330aacf137d44ab5
+Candidate APK SHA-256: 906A87D7645F7E4035F6A96AD2DB395A4A7600D8B487BC39CF80D30C92C7EB04
+Android NDK 28.2.13676358 and llvm-strip preflight are validated.
+Official APK rebuild, final verification, tag creation, and GitHub Release publication remain pending.
 ```
 
 ---

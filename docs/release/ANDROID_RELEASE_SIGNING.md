@@ -2,7 +2,7 @@
 
 **Project:** Server Toolkit
 **Version:** 0.4.0
-**Status:** Implemented — Publication Pending
+**Status:** Implemented — Release Ready
 **Last Updated:** 2026-07-14
 
 ---
@@ -59,17 +59,29 @@ The workflow requires:
 - The committed Gradle Wrapper.
 - Android SDK.
 - Android Build Tools `36.1.0`.
+- Android NDK `28.2.13676358`.
+- NDK `llvm-strip`.
 - `zipalign`.
 - `apksigner`.
 - `aapt2`.
 - `shasum`.
 - Git.
 
-The required Build Tools version is repository-controlled in:
+The required Build Tools and NDK versions are repository-controlled in:
 
 ```text
 config/release/android-release.properties
 ```
+
+The Android module declares the same NDK version in `app/build.gradle.kts`. The signing workflow fails closed when the two declarations differ or the required `llvm-strip` executable is unavailable.
+
+The current AGP built-in Kotlin and KSP integration requires:
+
+```properties
+android.disallowKotlinSourceSets=false
+```
+
+Removing this compatibility setting causes project configuration to fail because current KSP-generated Kotlin and Java source directories are still registered through the Kotlin source-set integration. The setting emits an experimental-option warning, but the warning is understood, non-critical, and must remain until a separately validated KSP and built-in Kotlin migration removes the requirement.
 
 ---
 
@@ -107,19 +119,21 @@ Validation mode performs the complete workflow:
 
 1. Verify repository cleanliness.
 2. Resolve repository-controlled release metadata.
-3. Resolve Android SDK Build Tools.
-4. Verify that the keystore remains outside the repository.
-5. Build the unsigned release APK with Gradle.
-6. Reject an unexpectedly signed Gradle output.
-7. Align the APK with `zipalign`.
-8. Sign the aligned APK with `apksigner`.
-9. Verify the APK signature with warnings treated as errors.
-10. Confirm that exactly one signer exists.
-11. Reject the Android debug certificate.
-12. Match the signing certificate against the accepted public SHA-256 fingerprint.
-13. Verify application identifier, version code, and version name.
-14. Calculate the signed APK SHA-256 checksum.
-15. Delete the temporary signed validation artifact.
+3. Resolve Android SDK Build Tools and the repository-pinned Android NDK.
+4. Verify that the Gradle and release-metadata NDK declarations match.
+5. Verify that the required NDK `llvm-strip` executable is available.
+6. Verify that the keystore remains outside the repository.
+7. Build the unsigned release APK with Gradle.
+8. Reject an unexpectedly signed Gradle output.
+9. Align the APK with `zipalign`.
+10. Sign the aligned APK with `apksigner`.
+11. Verify the APK signature with warnings treated as errors.
+12. Confirm that exactly one signer exists.
+13. Reject the Android debug certificate.
+14. Match the signing certificate against the accepted public SHA-256 fingerprint.
+15. Verify application identifier, version code, and version name.
+16. Calculate the signed APK SHA-256 checksum.
+17. Delete the temporary signed validation artifact.
 
 A validation artifact is not an official release artifact and must not be distributed.
 
@@ -150,6 +164,28 @@ The script refuses to overwrite existing official outputs.
 
 ---
 
+## Version 0.4.0 Candidate Evidence
+
+The non-distributable version 0.4.0 candidate was built, signed, and independently verified from the exact merged `main` state.
+
+```text
+Source commit: 250d46649834ef0f88dd6c3c330aacf137d44ab5
+Application ID: de.hamedtanha.servertoolkit
+Version code: 2
+Version name: 0.4.0
+Android Build Tools: 36.1.0
+Certificate SHA-256: 8EECDB2A84052ABCA92848B8E717A136C33F4A3D1CB85EE2AA77C4F3ED9424FC
+Candidate APK SHA-256: 906A87D7645F7E4035F6A96AD2DB395A4A7600D8B487BC39CF80D30C92C7EB04
+Android Validation run: 29351658269
+Android Validation conclusion: success
+```
+
+The candidate proved the signing and verification workflow but is not a distribution artifact. During finalization, the native-stripping warning was traced to a missing local NDK installation. Android NDK `28.2.13676358` is now repository-pinned, the matching `llvm-strip` has been validated for all packaged ABIs, and the signing workflow fails closed when the required NDK toolchain is unavailable.
+
+The official APK must be freshly rebuilt, signed, and verified from the exact final `main` commit that receives tag `v0.4.0`. Its checksum is expected to differ from the candidate checksum.
+
+---
+
 ## Verification Evidence
 
 Official release evidence records:
@@ -161,6 +197,7 @@ Official release evidence records:
 - Version code.
 - Version name.
 - Android Build Tools version.
+- Android NDK version.
 - Release certificate SHA-256 fingerprint.
 - Signed APK SHA-256 checksum.
 - Artifact filename.
@@ -195,7 +232,10 @@ The workflow fails closed when:
 - Official mode is run outside `main`.
 - Local `main` does not match `origin/main`.
 - Recovery readiness is not explicitly attested in official mode.
-- Required Android tools are unavailable.
+- Required Android Build Tools are unavailable.
+- The repository-pinned Android NDK is unavailable.
+- The Gradle and release-metadata NDK declarations differ.
+- The required NDK `llvm-strip` executable is unavailable.
 - Signing configuration is absent or invalid.
 - The keystore is missing, unreadable, or inside the repository.
 - Signing credentials are absent or rejected.

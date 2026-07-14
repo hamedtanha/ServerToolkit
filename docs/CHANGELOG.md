@@ -8,11 +8,11 @@ The project follows Conventional Commits and Semantic Versioning principles.
 
 ## [Unreleased]
 
-Version 0.4.0 release signing and publication preparation is in progress.
+No changes beyond version 0.4.0.
 
 ---
 
-## [0.4.0] - Unreleased
+## [0.4.0] - 2026-07-14
 
 ### Added
 
@@ -188,6 +188,8 @@ Version 0.4.0 release signing and publication preparation is in progress.
 
 ### Changed
 
+- Pinned Android NDK `28.2.13676358` and made release signing fail closed when the required NDK, `llvm-strip`, or Gradle NDK declaration is unavailable or inconsistent.
+- Replaced the deprecated Android test-assets source-set API while retaining the required built-in Kotlin and KSP compatibility setting.
 - Synchronized security, release-process, project-state, changelog, and operator documentation with the implemented Android release signing workflow.
 - Clarified ADR ownership and relationships with a decision-boundary map and aligned ADR-006 references with its canonical title without changing accepted decisions.
 - Strengthened AI project-context reconstruction rules and synchronized AI Memory with the current documentation source-of-truth hierarchy.
