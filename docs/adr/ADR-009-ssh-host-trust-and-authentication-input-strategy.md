@@ -230,7 +230,7 @@ Before real SSH connection behavior is implemented, the project must:
 
 # References
 
-- ADR-006: Remote Connection Workflow Boundaries
+- ADR-006: SSH Workflow and Security Boundaries
 - ADR-007: Secure Storage Strategy
 - ADR-008: SSH Client Library Selection
 - ARCHITECTURE.md

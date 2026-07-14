@@ -252,7 +252,7 @@ Real SSH command execution is enabled only while the implementation continues to
 # References
 
 - ADR-001: Project Vision
-- ADR-006: Remote Connection Workflow Boundaries
+- ADR-006: SSH Workflow and Security Boundaries
 - ADR-007: Secure Storage Strategy
 - ADR-008: SSH Client Library Selection
 - ADR-009: SSH Host Trust and Authentication Input Strategy
