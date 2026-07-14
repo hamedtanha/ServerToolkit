@@ -16,3 +16,12 @@
 local.properties
 .idea/deploymentTargetSelector.xml
 .idea/deploymentTargetSelector.xml
+
+# Android release signing secrets
+*.jks
+*.keystore
+*.p12
+*.pfx
+keystore.properties
+signing.properties
+*.signing.properties
