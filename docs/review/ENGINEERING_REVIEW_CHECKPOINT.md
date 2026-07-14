@@ -344,36 +344,28 @@ Future SSH hardening must come from concrete runtime evidence, current repositor
 
 ### P8 — Active SSH sessions are not released when the SSH workflow exits
 
-Status: Partially resolved.
+Status: Resolved.
 
 Recorded: 2026-07-13.
 
-Updated: 2026-07-13.
+Resolved: 2026-07-14.
 
 Implemented resolution:
 
 - `SshViewModel.onWorkflowExit()` closes the active project-owned session through `SshSessionLifecycleService`.
 - Back navigation, system back, and connection-history navigation wait for cleanup before leaving the SSH route.
-- `Closed` and `NotFound` clear the active session state and permit navigation.
-- `Failed` restores the active session state and keeps the route open so cleanup can be retried.
-- Duplicate workflow-exit requests do not start duplicate close operations.
-- Workflow exit is blocked while connection or command execution remains in progress.
-- Successful cleanup clears stale command output and resets presentation state to not connected.
+- Connected users can explicitly disconnect while remaining on the SSH screen.
+- Workflow exit and explicit disconnect share the same project-owned session-close orchestration.
+- `Closed` and `NotFound` clear the active session state.
+- `Failed` and cancellation restore the active session state so cleanup can be retried.
+- Duplicate close requests do not start duplicate cleanup operations.
+- Session close is blocked while connection or command execution remains in progress.
+- Successful cleanup clears stale command output and enables a new connection attempt.
 - SSHJ cleanup runs on the IO dispatcher inside a non-cancellable cleanup context.
 - Route navigation checks coroutine cancellation after cleanup and before invoking navigation.
-- Focused lifecycle and ViewModel regression coverage has been added.
-- Manual Android runtime verification completed without an observed application crash or SSH lifecycle error.
-
-Remaining resolution:
-
-- Add an explicit user-facing disconnect action for connected sessions.
-- Runtime-verify explicit disconnect behavior.
-- Reassess the remaining version `0.4.0` milestone afterward.
-
-Residual limitation:
-
-- A connected user cannot disconnect while remaining on the SSH screen.
-- Permanent workflow exit is currently the supported user-triggered session cleanup path.
+- Focused lifecycle, presentation-state, workflow-exit, and explicit-disconnect regression coverage has been added.
+- Manual Android runtime verification completed for explicit disconnect, reconnection, workflow-exit cleanup, and crash-free execution.
+- Full Kotlin compilation, Android test compilation, unit tests, lint, and debug assembly pass.
 
 Scope boundary:
 
@@ -388,9 +380,9 @@ This finding does not authorize:
 
 Decision:
 
-Automatic active-session release on permanent SSH workflow exit is implemented and runtime-verified.
+Active SSH sessions now have deterministic project-owned cleanup for both permanent workflow exit and explicit user-requested disconnect.
 
-P8 remains partially open only for the explicit user-facing disconnect action. Version `0.4.0` should not be closed until that behavior is implemented and runtime-verified.
+P8 is resolved. The remaining version `0.4.0` scope should be reassessed separately against the reliable SSH connection deliverable.
 
 Future SSH hardening must continue to be driven by concrete runtime evidence, current repository inspection, or a newly recorded focused review finding.
 

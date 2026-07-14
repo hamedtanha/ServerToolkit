@@ -3,7 +3,7 @@
 **Project:** Server Toolkit
 **Version:** 0.4.0-alpha
 **Status:** Active Implementation
-**Last Updated:** 2026-07-12
+**Last Updated:** 2026-07-14
 
 ---
 
@@ -25,7 +25,7 @@ The Server Inventory 0.3.0 baseline is accepted.
 
 Version 0.4.0-alpha is focused on SSH.
 
-The current SSH implementation supports real ephemeral password-based and private-key SSH connections, together with user-facing non-interactive command execution behind project-owned SSH session handles.
+The current SSH implementation supports real ephemeral password-based and private-key SSH connections, user-facing non-interactive command execution behind project-owned SSH session handles, deterministic workflow-exit cleanup, and explicit user-requested disconnection with reconnection support.
 
 The ADR-013 ephemeral private-key workflow is implemented end to end. Private-key documents are selected through the Android system picker, converted immediately into project-owned one-shot sources, read within the accepted size boundary, parsed in memory inside the SSH data layer, and consumed for one authentication attempt without temporary private-key files or persistent credential storage. Encrypted OpenSSH v1 metadata is preflight-validated before SSHJ parsing, with bcrypt KDF work limited to `64` rounds.
 
@@ -85,8 +85,9 @@ The current implementation area is:
 - SSH 0.4.0-alpha ephemeral private-key authentication is implemented and runtime-verified against ADR-013, including the supported OpenSSH format matrix and stable unsupported PKCS#8 outcomes.
 - Connection history domain, Room persistence, automatic recording, and per-server presentation are complete and runtime-verified.
 - Active SSH sessions are closed deterministically before permanent workflow exit, with navigation deferred until cleanup completes.
-- Workflow-exit cleanup is covered by focused lifecycle and presentation tests and has been manually runtime-verified.
-- Engineering review finding P8 is partially resolved; only the explicit user-facing disconnect action remains open.
+- Connected users can explicitly disconnect while remaining on the SSH screen and reconnect after successful cleanup.
+- Shared session-close behavior is covered by focused lifecycle and presentation tests and has been manually runtime-verified.
+- Engineering review finding P8 is resolved.
 
 ---
 
@@ -94,9 +95,8 @@ The current implementation area is:
 
 The next safe development steps are:
 
-1. Implement an explicit user-facing disconnect action for connected SSH sessions.
-2. Runtime-verify explicit disconnect and reassess the remaining version 0.4.0 SSH milestone.
-3. Keep terminal UI, saved command workflows, background monitoring, persistent credentials, and Xray or x-ui management out of scope.
+1. Reassess the remaining version 0.4.0 SSH milestone against the reliable SSH connection deliverable.
+2. Keep terminal UI, saved command workflows, background monitoring, persistent credentials, and Xray or x-ui management out of scope.
 
 ---
 
