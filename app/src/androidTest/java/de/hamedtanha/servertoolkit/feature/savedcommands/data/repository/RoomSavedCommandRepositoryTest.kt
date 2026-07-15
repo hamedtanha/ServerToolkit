@@ -38,10 +38,10 @@ class RoomSavedCommandRepositoryTest {
     }
 
     @Test
-    fun saveSavedCommand_whenCommandDoesNotExist_persistsExactDomainModel() = runBlocking {
+    fun createSavedCommand_whenCommandDoesNotExist_persistsExactDomainModel() = runBlocking {
         val command = savedCommand(command = "  df -h\n")
 
-        repository.saveSavedCommand(command)
+        repository.createSavedCommand(command)
 
         assertEquals(
             command,
@@ -62,8 +62,8 @@ class RoomSavedCommandRepositoryTest {
             createdAtEpochMillis = 2_000,
         )
 
-        repository.saveSavedCommand(olderCommand)
-        repository.saveSavedCommand(newerCommand)
+        repository.createSavedCommand(olderCommand)
+        repository.createSavedCommand(newerCommand)
 
         assertEquals(
             listOf(newerCommand, olderCommand),
@@ -72,14 +72,14 @@ class RoomSavedCommandRepositoryTest {
     }
 
     @Test
-    fun saveSavedCommand_whenIdentifierAlreadyExists_doesNotReplaceSilently() = runBlocking {
+    fun createSavedCommand_whenIdentifierAlreadyExists_doesNotReplaceSilently() = runBlocking {
         val originalCommand = savedCommand(command = "df -h")
         val changedCommand = savedCommand(command = "df -i")
 
-        repository.saveSavedCommand(originalCommand)
+        repository.createSavedCommand(originalCommand)
 
         try {
-            repository.saveSavedCommand(changedCommand)
+            repository.createSavedCommand(changedCommand)
             fail("Expected SQLiteConstraintException")
         } catch (_: SQLiteConstraintException) {
             assertEquals(
@@ -91,7 +91,7 @@ class RoomSavedCommandRepositoryTest {
 
     @Test
     fun deleteSavedCommand_whenCommandExists_removesDomainModel() = runBlocking {
-        repository.saveSavedCommand(savedCommand())
+        repository.createSavedCommand(savedCommand())
 
         repository.deleteSavedCommand("command-1")
 
