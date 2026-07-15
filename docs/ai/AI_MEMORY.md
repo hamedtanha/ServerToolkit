@@ -50,9 +50,9 @@ The project follows Living Documentation.
 
 `docs/PROJECT_STATE.md` is the primary source-of-truth entry point for current implementation state.
 
-Detailed feature state belongs in focused documents under `docs/state/`.
+Detailed feature and engineering baseline state belongs in focused documents under `docs/state/`.
 
-When current-state documentation conflicts, use this order:
+When documentation conflicts, use this order:
 
 PROJECT_STATE
 
@@ -63,6 +63,10 @@ Focused documents under docs/state
 ↓
 
 Accepted ADRs
+
+↓
+
+Foundational policy and process documents
 
 ↓
 
@@ -81,6 +85,8 @@ Feature-specific documents
 README
 
 The authoritative ordering is defined by `docs/DOCUMENTATION.md`.
+
+Repository source and configuration remain authoritative implementation evidence when a current-state summary diverges from the implementation.
 
 ---
 
@@ -181,3 +187,37 @@ A new ADR should document only the unresolved decision delta. It should not repe
 Reason
 
 Living documentation and focused pull requests can close, supersede, or narrow earlier planning. A technically plausible recommendation is still wrong when it ignores the current repository history and governance.
+
+---
+
+# Lesson 013
+
+Long-term update policy and current technical versions must be maintained in separate documents.
+
+Use:
+
+- `docs/BUILD_TOOLCHAIN_AND_DEPENDENCY_POLICY.md` for update triggers, risk, compatibility, validation, release impact, rollback, and ADR rules.
+- `docs/state/BUILD_TOOLCHAIN_STATUS.md` for the versions and constraints currently implemented in the repository.
+- GitHub Issues or milestone planning for specific proposed upgrades.
+
+Do not treat an IDE update suggestion or a newly released version as an accepted project update.
+
+Do not record a proposed version as current before implementation, validation, documentation synchronization, and merge.
+
+Reason
+
+Combining policy, plans, and current state creates stale documentation, hides upgrade risk, and makes release reproducibility difficult to verify.
+
+---
+
+# Lesson 014
+
+An apparently unused infrastructure pin may still belong to release operations.
+
+The current Android NDK pin supports the verified release workflow because the release script resolves the matching `llvm-strip`, validates packaged native libraries, and records NDK evidence.
+
+Do not remove or update infrastructure configuration until its build, CI, packaging, signing, and release responsibilities have been reconstructed from the repository.
+
+Reason
+
+Judging configuration only from application source can remove an operational dependency that is essential to reproducible releases.

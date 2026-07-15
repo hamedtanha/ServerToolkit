@@ -8,7 +8,22 @@ The project follows Conventional Commits and Semantic Versioning principles.
 
 ## [Unreleased]
 
-No changes beyond version 0.4.0.
+### Added
+
+- Added a foundational build-toolchain and dependency policy covering update triggers, risk classification, compatibility clusters, validation, release impact, rollback, automation, and ADR boundaries.
+- Added a living build-toolchain status document recording the current Java, Gradle, Android, Kotlin, dependency, CI, Build Tools, NDK, and release-toolchain baseline from repository declarations.
+
+### Changed
+
+- Synchronized project state, documentation governance, development process, release process, README, and related document indexes with the new policy and current technical baseline.
+- Clarified that the pinned Android NDK currently supports the verified release workflow and required `llvm-strip`, even though project-owned C or C++ source is not currently documented.
+- Clarified that proposed dependency or toolchain versions are not current until implemented, validated, documented, and merged.
+- Clarified that toolchain changes capable of affecting a pending release artifact invalidate existing candidate evidence and require complete rebuild and verification.
+
+### Not Changed
+
+- No Java, Gradle, Android Gradle Plugin, Kotlin, KSP, Android SDK, Build Tools, NDK, or application dependency version was changed by this documentation update.
+- The immutable version 0.4.0 release tag, artifacts, checksums, and release evidence remain unchanged.
 
 ---
 
@@ -201,7 +216,6 @@ No changes beyond version 0.4.0.
 - Changed SSH workflow-exit navigation to wait for active-session cleanup and remain on the route when cleanup cannot complete.
 - Added deterministic disconnecting, close-failure retry, duplicate-exit suppression, and stale command-output cleanup behavior.
 - Synchronized project state, SSH status, roadmap, changelog, and engineering review documentation with runtime-verified workflow-exit cleanup.
-
 - Synchronized README and Documentation Governance indexes with the focused `docs/state/` documents.
 - Split detailed project state into focused current-state documents for Server Inventory and SSH while keeping `PROJECT_STATE.md` as the source-of-truth entry point.
 - Synchronized architecture and README documentation with the accepted SSH credential ownership, Android backup policy, host trust persistence, and ephemeral password SSH connection status.
@@ -215,7 +229,6 @@ No changes beyond version 0.4.0.
 - Replaced SSH placeholder connection metadata with resolved inventory-backed connection targets.
 - Moved SSH connection attempt orchestration from the ViewModel into a dedicated domain use case.
 - Updated the Server Toolkit database schema to version 2 for SSH trusted host keys.
-
 - Aligned package structure with the current implementation.
 - Replaced obsolete `feature/servers` package scaffolding with `feature/serverinventory`.
 - Removed obsolete placeholder navigation packages.

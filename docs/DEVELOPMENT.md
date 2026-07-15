@@ -3,7 +3,7 @@
 **Project:** Server Toolkit
 **Document Baseline:** 0.2.0-alpha
 **Status:** Foundational
-**Last Updated:** 2026-07-11
+**Last Updated:** 2026-07-15
 
 ---
 
@@ -95,6 +95,8 @@ Git Tag
 
 Every completed feature should leave the project in a releasable state.
 
+Engineering maintenance follows the same review discipline but may be initiated by security, supportability, platform, compatibility, CI, or release-toolchain requirements rather than by product roadmap scope.
+
 ---
 
 ## Git Workflow
@@ -133,10 +135,18 @@ Documentation:
 docs/<topic>
 ```
 
+Engineering maintenance:
+
+```text
+chore/update-<component>
+chore/upgrade-<toolchain-area>
+```
+
 Rules:
 
 - Never develop directly on `main`.
 - Every feature must have its own branch.
+- Every independently reviewable maintenance change must have its own branch.
 - Merge using `--no-ff` when preserving explicit merge history is useful.
 - Keep commit history meaningful.
 - The `main` branch must always remain releasable.
@@ -156,6 +166,8 @@ docs: update architecture
 refactor: simplify server inventory screen
 test: add repository tests
 chore: update dependencies
+chore(build): upgrade Gradle wrapper
+chore(deps): update Room dependencies
 ```
 
 Commit messages should be concise, descriptive, and written in English.
@@ -167,6 +179,7 @@ Commit messages should be concise, descriptive, and written in English.
 - Never commit directly to `main`.
 - Every feature starts from an up-to-date base branch.
 - Every feature is developed in a dedicated branch.
+- Every toolchain or dependency update is developed in a dedicated branch unless it is inseparable from one documented compatibility cluster.
 - Every feature is merged only after review.
 - The branch must build successfully before merge.
 
@@ -196,6 +209,28 @@ The workflow uses the committed Gradle Wrapper and the project's Java 17 toolcha
 A failed validation must be resolved before merge.
 
 Continuous integration complements local validation and manual Android runtime verification. It does not replace device- or emulator-based testing for user-facing workflows.
+
+---
+
+## Build Toolchain and Dependency Maintenance
+
+Build tools and dependencies must be updated through controlled, independently reviewable engineering changes.
+
+The complete strategy is defined in [Build Toolchain and Dependency Policy](BUILD_TOOLCHAIN_AND_DEPENDENCY_POLICY.md). The currently implemented versions are recorded in [Build Toolchain Status](state/BUILD_TOOLCHAIN_STATUS.md).
+
+Core rules:
+
+- Update only with a concrete security, supportability, compatibility, reliability, platform, or maintenance justification.
+- Do not update merely because a newer version exists.
+- Treat Java, Gradle, Android Gradle Plugin, Kotlin, and KSP as a compatibility cluster.
+- Treat Android SDK, Build Tools, NDK, packaging, and release scripts as a release-toolchain cluster.
+- Keep toolchain maintenance separate from product-feature implementation unless technical coupling is explicit and unavoidable.
+- Classify update risk before implementation.
+- Run validation proportional to the affected layer and risk.
+- Update the current technical baseline after accepted changes.
+- Review ADR need when a significant baseline or policy decision changes.
+
+The repository-controlled implementation is authoritative. Proposed versions must not be written into current-state documentation before they are implemented and merged.
 
 ---
 
@@ -247,7 +282,7 @@ counter++
 
 Documentation is considered part of the implementation.
 
-Every significant feature should update the relevant documentation.
+Every significant feature or engineering baseline change should update the relevant documentation.
 
 Possible documents include:
 
@@ -258,6 +293,8 @@ Possible documents include:
 - `CHANGELOG.md`
 - `SECURITY.md`
 - `RELEASES.md`
+- `BUILD_TOOLCHAIN_AND_DEPENDENCY_POLICY.md`
+- `state/BUILD_TOOLCHAIN_STATUS.md`
 - ADR documents
 
 Documentation should evolve together with the source code.
@@ -274,6 +311,8 @@ Likewise, no implemented feature should remain undocumented.
 
 Documentation always reflects the current state of the project.
 
+Long-term policy and current implementation state must remain separated so that stable rules do not become stale version inventories and living status documents do not become accidental governance.
+
 ---
 
 ## Architecture Decisions
@@ -288,6 +327,9 @@ Typical ADR topics include:
 - Security architecture.
 - Dependency injection.
 - Networking framework.
+- Significant Java, platform, build-system, dependency-governance, native-code, or compatibility baseline decisions.
+
+Routine compatible dependency updates do not require an ADR.
 
 ADRs document accepted decisions, not future ideas.
 
@@ -304,6 +346,8 @@ Planned testing levels:
 - UI tests.
 
 Testing coverage will increase as the project matures.
+
+Build-toolchain and dependency updates must additionally validate the layers they can affect, including generated code, persistence schemas, Android runtime behavior, security boundaries, CI, packaging, and release tooling where applicable.
 
 ---
 
@@ -353,6 +397,8 @@ Examples:
 
 Version numbers represent stable milestones in the project's evolution.
 
+Toolchain and dependency version changes do not automatically define a project release number. Release impact is determined by the accepted milestone and resulting application artifact.
+
 ---
 
 ## Release Strategy
@@ -376,6 +422,8 @@ v1.0.0  Initial Release
 
 Every tagged version represents a stable checkpoint in the project's history.
 
+A toolchain change that can affect artifact bytes, packaging, signing, native-library processing, or application metadata invalidates prior candidate evidence for the pending release and requires complete rebuild and verification.
+
 ---
 
 ## Security Principles
@@ -392,6 +440,8 @@ The following information must never be committed to Git:
 - Sensitive configuration files.
 
 Sensitive data should always be stored using secure Android mechanisms.
+
+Security-sensitive dependency updates may be prioritized ahead of roadmap work but must remain reviewable and validated.
 
 ---
 
@@ -422,6 +472,7 @@ A task is considered complete only when all of the following conditions are sati
 - ADRs have been updated when necessary.
 - `CHANGELOG.md` has been updated when applicable.
 - `PROJECT_STATE.md` reflects the current project status.
+- `state/BUILD_TOOLCHAIN_STATUS.md` reflects accepted toolchain or dependency baseline changes when applicable.
 - Commit messages follow Conventional Commits.
 - The project remains releasable.
 
@@ -439,6 +490,8 @@ The following engineering rules are mandatory:
 - Keep documentation synchronized with implementation.
 - Record important technical decisions using ADRs.
 - Never introduce breaking architectural changes without an ADR.
+- Follow `BUILD_TOOLCHAIN_AND_DEPENDENCY_POLICY.md` for toolchain and dependency changes.
+- Keep current technical versions synchronized in `state/BUILD_TOOLCHAIN_STATUS.md`.
 - Every release should be reproducible.
 - Every milestone should be taggable from a releasable state.
 
@@ -477,6 +530,7 @@ Documentation:
 
 - Living Documentation.
 - Architecture Decision Records.
+- Separation of foundational policy from living current-state documents.
 
 Versioning:
 
@@ -503,6 +557,7 @@ The project should continuously improve through:
 - Improved documentation.
 - Better testing.
 - Better developer experience.
+- Controlled toolchain and dependency maintenance.
 
 Continuous improvement is preferred over large-scale rewrites.
 
@@ -519,6 +574,8 @@ These documents define stable project rules and should rarely change:
 - `PRODUCT_VISION.md`
 - `ARCHITECTURE.md`
 - `DEVELOPMENT.md`
+- `ENGINEERING_STRATEGY.md`
+- `BUILD_TOOLCHAIN_AND_DEPENDENCY_POLICY.md`
 - `SECURITY.md`
 - `CONTRIBUTING.md`
 - `RELEASES.md`
@@ -528,6 +585,7 @@ These documents define stable project rules and should rarely change:
 These documents must change whenever implementation state changes:
 
 - `PROJECT_STATE.md`
+- Focused current-state documents under `docs/state/`.
 - `ROADMAP.md`
 - `CHANGELOG.md`
 
@@ -545,6 +603,9 @@ These documents support implementation and review:
 ## Related Documents
 
 - [Architecture](ARCHITECTURE.md)
+- [Engineering Strategy](ENGINEERING_STRATEGY.md)
+- [Build Toolchain and Dependency Policy](BUILD_TOOLCHAIN_AND_DEPENDENCY_POLICY.md)
+- [Build Toolchain Status](state/BUILD_TOOLCHAIN_STATUS.md)
 - [Roadmap](ROADMAP.md)
 - [Project State](PROJECT_STATE.md)
 - [Changelog](CHANGELOG.md)

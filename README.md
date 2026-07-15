@@ -20,9 +20,12 @@ The application is designed for system administrators, DevOps engineers, and inf
 - User-facing non-interactive SSH command execution workflow.
 - SSH command output display for stdout, stderr, and exit status.
 - Per-server SSH connection history presentation backed by automatic Room recording.
+- Repository-defined build-toolchain and dependency maintenance policy.
+- Living current-state documentation for the implemented Android, JVM, dependency, CI, and release-toolchain baseline.
 
 ## Planned Direction
 
+- Saved commands and repeatable operational workflows.
 - Ping and latency checks.
 - Server status monitoring.
 - Favorite servers.
@@ -44,14 +47,22 @@ The application is designed for system administrators, DevOps engineers, and inf
 - Flow
 - Material 3
 
+Detailed implemented versions are recorded in [Build Toolchain Status](docs/state/BUILD_TOOLCHAIN_STATUS.md).
+
 ---
 
 ## Project Status
 
 Current Version:
 
-```
+```text
 v0.4.0 (Released)
+```
+
+Next Milestone:
+
+```text
+v0.5.0-alpha — Operations
 ```
 
 ---
@@ -60,14 +71,17 @@ v0.4.0 (Released)
 
 Project documentation can be found inside the **docs** directory.
 
-- PROJECT_STATE.md
-- DOCUMENTATION.md
-- state/SERVER_INVENTORY_STATUS.md
-- state/SSH_STATUS.md
-- DEVELOPMENT.md
-- ARCHITECTURE.md
-- ROADMAP.md
-- CHANGELOG.md
+- [Project State](docs/PROJECT_STATE.md)
+- [Documentation Governance](docs/DOCUMENTATION.md)
+- [Build Toolchain and Dependency Policy](docs/BUILD_TOOLCHAIN_AND_DEPENDENCY_POLICY.md)
+- [Build Toolchain Status](docs/state/BUILD_TOOLCHAIN_STATUS.md)
+- [Server Inventory Status](docs/state/SERVER_INVENTORY_STATUS.md)
+- [SSH Status](docs/state/SSH_STATUS.md)
+- [Development Process](docs/DEVELOPMENT.md)
+- [Architecture](docs/ARCHITECTURE.md)
+- [Roadmap](docs/ROADMAP.md)
+- [Changelog](docs/CHANGELOG.md)
+- [Release Process](docs/RELEASES.md)
 
 ---
 
