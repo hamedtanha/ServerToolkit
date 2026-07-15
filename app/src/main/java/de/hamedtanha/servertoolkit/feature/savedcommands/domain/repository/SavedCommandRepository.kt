@@ -9,7 +9,7 @@ interface SavedCommandRepository {
 
     suspend fun getSavedCommand(savedCommandId: String): SavedCommand?
 
-    suspend fun saveSavedCommand(savedCommand: SavedCommand)
+    suspend fun createSavedCommand(savedCommand: SavedCommand)
 
     suspend fun deleteSavedCommand(savedCommandId: String)
 }
