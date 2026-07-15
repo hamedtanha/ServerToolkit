@@ -3,7 +3,7 @@
 **Project:** Server Toolkit
 **Version:** 0.4.0
 **Status:** Active
-**Last Updated:** 2026-07-14
+**Last Updated:** 2026-07-15
 
 ---
 
@@ -27,6 +27,24 @@ Development follows these principles:
 - Avoid unnecessary scope expansion.
 - Keep the application releasable.
 - Keep documentation synchronized with implementation.
+
+---
+
+## Cross-Milestone Engineering Maintenance
+
+Security, platform support, build compatibility, CI reliability, dependency maintenance, and release-toolchain work may be performed during any milestone when a concrete engineering trigger exists.
+
+This work is not automatically part of the functional scope or deliverable of the active milestone.
+
+Rules:
+
+- Keep maintenance changes independently reviewable from product features.
+- Do not update merely because a newer version exists.
+- Record current versions in [Build Toolchain Status](state/BUILD_TOOLCHAIN_STATUS.md).
+- Follow [Build Toolchain and Dependency Policy](BUILD_TOOLCHAIN_AND_DEPENDENCY_POLICY.md).
+- Track a specific upgrade in a GitHub Issue or focused plan.
+- Add an upgrade to this roadmap only when it materially affects milestone sequencing, supported platforms, architecture, release readiness, or product delivery.
+- Prioritize urgent security and supportability work when delaying it would create greater project risk.
 
 ---
 
@@ -340,3 +358,15 @@ Expected scope:
 Status:
 
 Planned.
+
+---
+
+## Related Documents
+
+- [Project State](PROJECT_STATE.md)
+- [Engineering Strategy](ENGINEERING_STRATEGY.md)
+- [Build Toolchain and Dependency Policy](BUILD_TOOLCHAIN_AND_DEPENDENCY_POLICY.md)
+- [Build Toolchain Status](state/BUILD_TOOLCHAIN_STATUS.md)
+- [Development Process](DEVELOPMENT.md)
+- [Release Process](RELEASES.md)
+- [Changelog](CHANGELOG.md)
