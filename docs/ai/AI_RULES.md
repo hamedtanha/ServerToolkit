@@ -71,12 +71,13 @@ At minimum, inspect:
 4. Recent merged pull requests and commits that changed the affected area.
 5. Relevant engineering review records under `docs/review/`.
 6. `docs/ai/AI_RULES.md` and `docs/ai/AI_MEMORY.md` when the recommendation affects project workflow, continuity, or AI collaboration.
+7. `docs/BUILD_TOOLCHAIN_AND_DEPENDENCY_POLICY.md` and `docs/state/BUILD_TOOLCHAIN_STATUS.md` when the recommendation adds, removes, or updates a dependency, build tool, Android platform level, CI action, or release-toolchain component.
 
 Before recommending a new ADR or document, verify that the proposed content is not already covered by an accepted decision, focused state document, closed review finding, or existing implementation boundary.
 
 Before reopening a closed review area, identify the concrete trigger, runtime evidence, repository change, or new scope that justifies reopening it.
 
-Do not infer the current project phase from one document, one pull request, a conversation summary, or assistant memory alone.
+Do not infer the current project phase or technical baseline from one document, one pull request, a conversation summary, an IDE suggestion, or assistant memory alone.
 
 State the reconstructed current phase and the evidence that supports the recommendation before proposing project-changing work.
 
@@ -98,6 +99,37 @@ For each relevant document, the assistant must state whether it changes or remai
 Do not treat documentation synchronization as an afterthought.
 
 Do not proceed directly to implementation when the repository state, affected files, affected documentation, or validation scope is unclear.
+
+---
+
+## Build Toolchain and Dependency Updates
+
+When proposing or applying a build-toolchain or dependency change, AI assistants must:
+
+1. Read `docs/BUILD_TOOLCHAIN_AND_DEPENDENCY_POLICY.md`.
+2. Reconstruct the current versions from repository-controlled configuration.
+3. Compare that evidence with `docs/state/BUILD_TOOLCHAIN_STATUS.md`.
+4. Identify the concrete security, supportability, compatibility, platform, reliability, or reproducibility trigger.
+5. Identify the affected compatibility cluster.
+6. Classify the update risk.
+7. Define validation and rollback requirements before implementation.
+8. Review CI, packaging, signing, and release impact when relevant.
+9. Keep the update independently reviewable from unrelated product work.
+10. Update the technical status and affected documentation only after the implemented versions are known.
+
+AI assistants must not:
+
+- Recommend updating merely because a newer version exists.
+- Treat an IDE suggestion as an accepted project decision.
+- Present a proposed version as the current baseline.
+- Batch unrelated updates for convenience.
+- Hide a toolchain update inside an Operations feature change.
+- Remove an apparently unused version pin without reconstructing its build, CI, packaging, signing, and release responsibilities.
+- Rewrite immutable historical release evidence after a later update.
+
+A significant Java, build-system, platform-support, native-code, dependency-governance, security-boundary, or release-signing decision requires ADR review.
+
+---
 
 ## Architecture
 
