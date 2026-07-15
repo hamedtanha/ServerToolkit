@@ -24,7 +24,7 @@ class RoomSavedCommandRepository @Inject constructor(
         return savedCommandDao.getSavedCommand(savedCommandId)?.toDomain()
     }
 
-    override suspend fun saveSavedCommand(savedCommand: SavedCommand) {
+    override suspend fun createSavedCommand(savedCommand: SavedCommand) {
         savedCommandDao.insertSavedCommand(savedCommand.toEntity())
     }
 
