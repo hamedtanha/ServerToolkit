@@ -23,7 +23,7 @@ data class SavedCommand(
         require(name == name.trim()) {
             "Saved command name must not contain leading or trailing whitespace."
         }
-        require(name.none(Char::isISOControl)) {
+        require(name.none { character -> character.isISOControl() }) {
             "Saved command name must not contain control characters."
         }
         require(name.length <= MAX_NAME_LENGTH) {
