@@ -85,15 +85,13 @@ app/src/main/java/de/hamedtanha/servertoolkit/
 
         ssh/
             data/
-                authentication/
-                hostkey/
                 local/
                     dao/
                     entity/
                 mapper/
                 repository/
                 service/
-                session/
+                source/
             di/
             domain/
                 model/
@@ -125,6 +123,8 @@ app/src/main/java/de/hamedtanha/servertoolkit/
     ui/
         theme/
 ```
+
+The layout intentionally summarizes verified responsibility packages rather than predicting every future subpackage.
 
 Only packages backed by implemented responsibilities should exist. Do not add speculative presentation, navigation, use-case, or shared packages before a concrete class requires them.
 
@@ -214,11 +214,27 @@ The name `serverinventory` remains intentional. A broader `inventory` boundary m
 
 ### SSH
 
-`feature/ssh` owns SSH trust, authentication, connection, session lifecycle, non-interactive command execution, and connection-history behavior.
+`feature/ssh` owns SSH trust, authentication, connection, session lifecycle, non-interactive command execution, private-key source ownership, and connection-history behavior.
+
+Verified responsibility packages include:
+
+```text
+feature/ssh/data/local/
+feature/ssh/data/mapper/
+feature/ssh/data/repository/
+feature/ssh/data/service/
+feature/ssh/data/source/
+feature/ssh/domain/model/
+feature/ssh/domain/repository/
+feature/ssh/domain/service/
+feature/ssh/domain/usecase/
+feature/ssh/navigation/
+feature/ssh/presentation/
+```
 
 Rules:
 
-- SSHJ and cryptographic integration remain in the data layer.
+- SSHJ, Android content access, and cryptographic integration remain in the data layer.
 - Project-owned service contracts, use cases, and result models remain in the domain layer.
 - Credential-bearing objects must not leak into presentation state.
 - Room-backed SSH trust and connection-history persistence remain feature-owned.
