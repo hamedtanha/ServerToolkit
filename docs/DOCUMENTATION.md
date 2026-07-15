@@ -2,7 +2,7 @@
 
 **Project:** Server Toolkit
 **Status:** Active
-**Last Updated:** 2026-07-08
+**Last Updated:** 2026-07-15
 
 ---
 
@@ -25,6 +25,7 @@ Documentation must follow these principles:
 - Do not leave implemented functionality undocumented.
 - Keep documentation synchronized with source code.
 - Keep architectural decisions traceable through ADRs.
+- Separate long-term policy from current implementation state.
 - Prefer small, precise documentation updates over broad rewrites.
 - Avoid mass replacement of version numbers.
 - Review related documents whenever one document changes.
@@ -35,19 +36,46 @@ Documentation must follow these principles:
 
 `PROJECT_STATE.md` is the primary source-of-truth entry point for the current implementation state.
 
-Detailed feature state may be maintained in focused documents under `docs/state/`.
+Detailed feature and engineering baseline state may be maintained in focused documents under `docs/state/`.
 
 When documentation conflicts exist, resolve them in this order:
 
 1. `PROJECT_STATE.md`
 2. Focused current-state documents under `docs/state/`
 3. Accepted ADRs
-4. `ROADMAP.md`
-5. `CHANGELOG.md`
-6. Feature-specific documents
-7. `README.md`
+4. Foundational policy and process documents
+5. `ROADMAP.md`
+6. `CHANGELOG.md`
+7. Feature-specific documents
+8. `README.md`
+
+Repository configuration and source code remain authoritative implementation evidence. Current-state documents summarize that evidence and must be corrected when they diverge from the repository.
 
 `README.md` should summarize the current public-facing state. It must not replace detailed project documentation.
+
+---
+
+## Policy and Current-State Separation
+
+Stable engineering rules and the currently implemented baseline must not be mixed into one document.
+
+Use this model:
+
+| Information type | Document type |
+|---|---|
+| Long-term rules and decision criteria | Foundational policy or process document |
+| Currently implemented versions and behavior | Living current-state document under `docs/state/` or `PROJECT_STATE.md` |
+| Significant accepted decision and rationale | ADR |
+| Planned milestone outcome | `ROADMAP.md` or an approved planning document |
+| Notable completed change | `CHANGELOG.md` |
+
+For build-toolchain and dependency maintenance:
+
+- `BUILD_TOOLCHAIN_AND_DEPENDENCY_POLICY.md` defines how updates are evaluated and performed.
+- `state/BUILD_TOOLCHAIN_STATUS.md` records the currently implemented versions and constraints.
+- Actual Gradle, CI, Android, and release configuration remains the implementation evidence.
+
+Proposed versions must not be recorded as current state before implementation and merge.
 
 ---
 
@@ -93,6 +121,14 @@ Examples:
 
 These references describe project history, not the current project version.
 
+### Technical Baseline Versions
+
+Toolchain and dependency versions are current implementation metadata, not project release numbers.
+
+They must be read from repository-controlled configuration and summarized in `state/BUILD_TOOLCHAIN_STATUS.md`.
+
+Do not infer a technical baseline from a release tag alone. Historical release evidence must remain unchanged after later toolchain updates.
+
 ---
 
 ## Changelog Rules
@@ -105,7 +141,7 @@ The changelog should follow these rules:
 - Group changes by type, such as Added, Changed, Fixed, Security, Deprecated, and Removed.
 - Write user-facing or project-facing changes, not raw git log entries.
 - Keep historical release entries unchanged.
-- Add documentation changes when they affect project governance, architecture, security, release process, or source-of-truth state.
+- Add documentation changes when they affect project governance, architecture, security, release process, technical baseline, or source-of-truth state.
 
 ---
 
@@ -125,6 +161,8 @@ During pre-1.0 development, minor versions represent major project milestones.
 
 Version metadata in documentation must not be confused with Android Gradle `versionCode` or `versionName`. Android application version metadata must be reviewed separately during release preparation.
 
+Toolchain and dependency updates do not automatically require a project-version change. Their release impact is determined by the resulting product artifact and release plan.
+
 ---
 
 ## ADR Rules
@@ -140,8 +178,9 @@ Use ADRs for:
 - SSH and networking decisions.
 - Backup, restore, credential, or trust-boundary decisions.
 - Major release or compatibility decisions.
+- Significant build-toolchain baseline or dependency-governance decisions.
 
-Do not use ADRs for minor implementation details.
+Do not use ADRs for minor implementation details or routine compatible dependency updates.
 
 Accepted ADRs should not be rewritten casually. If a decision changes, create a new ADR that supersedes or updates the previous decision.
 
@@ -177,6 +216,42 @@ The document is retained for reference but should not guide new work.
 
 ---
 
+## Document Classification
+
+### Level A — Foundational Documents
+
+These documents define stable project rules and should change only after focused review:
+
+- `PRODUCT_VISION.md`
+- `ARCHITECTURE.md`
+- `DEVELOPMENT.md`
+- `ENGINEERING_STRATEGY.md`
+- `BUILD_TOOLCHAIN_AND_DEPENDENCY_POLICY.md`
+- `SECURITY.md`
+- `CONTRIBUTING.md`
+- `RELEASES.md`
+
+### Level B — Living Project Documents
+
+These documents must change when the implementation or current baseline changes:
+
+- `PROJECT_STATE.md`
+- Focused status documents under `docs/state/`
+- `ROADMAP.md`
+- `CHANGELOG.md`
+
+### Level C — Supporting Documents
+
+These documents support implementation, decision history, review, and collaboration:
+
+- ADR documents.
+- AI collaboration documents.
+- Package structure documentation.
+- Review checklists.
+- Feature-specific operator and verification documents.
+
+---
+
 ## Update Rules
 
 When a document changes, check related documents for consistency.
@@ -185,11 +260,13 @@ At minimum:
 
 - Current implementation changes should update `PROJECT_STATE.md`.
 - Detailed feature-state changes should update the relevant documents under `docs/state/`.
+- Build-toolchain or dependency baseline changes should update `state/BUILD_TOOLCHAIN_STATUS.md`.
+- Build-toolchain update-policy changes should update `BUILD_TOOLCHAIN_AND_DEPENDENCY_POLICY.md` and affected process documents.
 - Notable changes should update `CHANGELOG.md`.
 - Roadmap changes should update `ROADMAP.md`.
 - Architecture decisions should update ADR files and `docs/adr/README.md`.
 - Security decisions should update `SECURITY.md`.
-- Release process changes should update `RELEASES.md`.
+- Release process or release-toolchain changes should update `RELEASES.md`.
 - AI collaboration rule changes should update files under `docs/ai/`.
 
 ---
@@ -201,9 +278,13 @@ Before committing documentation changes, verify:
 - The working branch is not `main`.
 - The changed documents match the current implementation.
 - Related documents were reviewed.
-- ADR index entries are synchronized.
+- Policy and current-state information remain separated.
+- Current toolchain versions match repository declarations.
+- Proposed versions are not presented as implemented.
+- ADR index entries are synchronized when applicable.
 - `PROJECT_STATE.md` remains factual and current.
 - `CHANGELOG.md` includes a relevant unreleased entry when needed.
+- Historical release evidence remains unchanged.
 - No backup files are committed.
 - `git diff --check` passes.
 
@@ -223,12 +304,15 @@ Before committing documentation changes, verify:
 - PROJECT_STATE.md
 - state/SERVER_INVENTORY_STATUS.md
 - state/SSH_STATUS.md
+- state/BUILD_TOOLCHAIN_STATUS.md
+- BUILD_TOOLCHAIN_AND_DEPENDENCY_POLICY.md
 - ROADMAP.md
 - CHANGELOG.md
 - ARCHITECTURE.md
 - SECURITY.md
 - RELEASES.md
 - DEVELOPMENT.md
+- ENGINEERING_STRATEGY.md
 - docs/adr/README.md
 - docs/ai/AI_RULES.md
 - docs/ai/AI_MEMORY.md
