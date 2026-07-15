@@ -3,7 +3,7 @@
 **Project:** Server Toolkit
 **Document Baseline:** 0.2.0-alpha
 **Status:** Foundational
-**Last Updated:** 2026-07-14
+**Last Updated:** 2026-07-15
 
 ---
 
@@ -131,6 +131,24 @@ Release candidate metadata:
 
 - `versionName`: `0.4.0`
 - `versionCode`: `2`
+
+---
+
+## Build Toolchain Baseline and Update Impact
+
+Build-toolchain and dependency updates must follow [Build Toolchain and Dependency Policy](BUILD_TOOLCHAIN_AND_DEPENDENCY_POLICY.md).
+
+The currently implemented Java, Gradle, Android, Kotlin, dependency, CI, Build Tools, and NDK baseline is recorded in [Build Toolchain Status](state/BUILD_TOOLCHAIN_STATUS.md).
+
+Release rules:
+
+- Repository configuration remains the authoritative implementation evidence.
+- The release candidate must be built with the accepted baseline from the exact intended source commit.
+- A proposed toolchain version is not part of a release until it is implemented, validated, documented, and merged.
+- A Java, Gradle, Android Gradle Plugin, Kotlin, KSP, SDK, Build Tools, NDK, packaging, or release-script change after candidate verification invalidates the existing candidate evidence when it can affect the artifact.
+- Invalidated candidate evidence requires a complete rebuild, signing pass, verification pass, checksum, and release-evidence regeneration.
+- Historical release tags, artifacts, checksums, and evidence remain immutable after later toolchain changes.
+- Build-toolchain maintenance should remain independently reviewable from product features unless compatibility coupling is explicit and documented.
 
 ---
 
@@ -275,6 +293,8 @@ Testing
 ↓
 Documentation Review
 ↓
+Confirm Accepted Build Toolchain Baseline
+↓
 Update CHANGELOG and PROJECT_STATE for Release Preparation
 ↓
 Update Version Metadata
@@ -296,6 +316,8 @@ A successfully verified candidate proves that the release workflow is operationa
 Finalize CHANGELOG Date and Release State
 ↓
 Merge Approved Final Release State to main
+↓
+Confirm No Toolchain Change Invalidated Candidate Evidence
 ↓
 Build Official APK from the Exact Final main Commit
 ↓
@@ -329,6 +351,9 @@ Before creating the Git tag and GitHub Release, verify:
 - Documentation is updated.
 - `CHANGELOG.md` is updated.
 - `PROJECT_STATE.md` is updated.
+- `state/BUILD_TOOLCHAIN_STATUS.md` matches the repository-controlled versions.
+- Any toolchain or dependency update followed `BUILD_TOOLCHAIN_AND_DEPENDENCY_POLICY.md`.
+- No post-candidate toolchain change has invalidated the recorded evidence.
 - Version metadata is updated where applicable.
 - The official signing workflow is available and fails closed when required signing material is unavailable or invalid.
 - The primary signing keystore and at least one recovery copy have been verified before first distribution.
@@ -367,6 +392,7 @@ Every release should include:
 - Security changes.
 - Breaking changes.
 - Known limitations.
+- Material toolchain or dependency changes that affect supportability, compatibility, security, or reproducibility.
 
 ---
 
@@ -437,6 +463,8 @@ Android Validation run: 29358724293
 Published assets: byte-for-byte verified
 ```
 
+The current implementation baseline used for future development is summarized in `state/BUILD_TOOLCHAIN_STATUS.md`. This does not rewrite the immutable `v0.4.0` release evidence above.
+
 ---
 
 ## Future Distribution Channels
@@ -459,12 +487,17 @@ Changes are allowed only when:
 - The release process changes.
 - The milestone versioning model changes.
 - Distribution strategy changes.
+- Release-toolchain policy or reproducibility requirements change.
 - An ADR or release decision requires an update.
+
+Historical candidate and official release evidence must not be rewritten during routine toolchain maintenance.
 
 ---
 
 ## Related Documents
 
+- [Build Toolchain and Dependency Policy](BUILD_TOOLCHAIN_AND_DEPENDENCY_POLICY.md)
+- [Build Toolchain Status](state/BUILD_TOOLCHAIN_STATUS.md)
 - [Changelog](CHANGELOG.md)
 - [Development Process](DEVELOPMENT.md)
 - [Roadmap](ROADMAP.md)
