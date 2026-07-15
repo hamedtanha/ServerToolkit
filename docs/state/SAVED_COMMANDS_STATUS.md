@@ -39,6 +39,7 @@ Current domain guardrails:
 - identifiers must not be blank;
 - names must not be blank;
 - names must not contain leading or trailing whitespace;
+- names must not contain control characters such as line breaks or tabs;
 - names are limited to `100` characters;
 - command text must not be blank;
 - command text is limited to `16,384` characters;
@@ -63,6 +64,7 @@ The project now includes:
 Persistence behavior:
 
 - saved commands are global and are not assigned to individual servers;
+- the repository exposes `createSavedCommand` rather than an update or upsert operation;
 - commands are observed newest-first;
 - the identifier provides a stable tie-breaker when timestamps match;
 - duplicate identifiers fail with a database constraint instead of replacing an existing command silently;
