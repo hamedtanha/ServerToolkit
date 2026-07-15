@@ -2,6 +2,8 @@ package de.hamedtanha.servertoolkit.core.database
 
 import androidx.room.Database
 import androidx.room.RoomDatabase
+import de.hamedtanha.servertoolkit.feature.savedcommands.data.local.dao.SavedCommandDao
+import de.hamedtanha.servertoolkit.feature.savedcommands.data.local.entity.SavedCommandEntity
 import de.hamedtanha.servertoolkit.feature.serverinventory.data.local.dao.ServerDao
 import de.hamedtanha.servertoolkit.feature.serverinventory.data.local.entity.ServerEntity
 import de.hamedtanha.servertoolkit.feature.ssh.data.local.dao.SshConnectionHistoryDao
@@ -14,8 +16,9 @@ import de.hamedtanha.servertoolkit.feature.ssh.data.local.entity.SshTrustedHostK
         ServerEntity::class,
         SshTrustedHostKeyEntity::class,
         SshConnectionHistoryEntity::class,
+        SavedCommandEntity::class,
     ],
-    version = 4,
+    version = 5,
     exportSchema = true,
 )
 abstract class ServerToolkitDatabase : RoomDatabase() {
@@ -25,4 +28,6 @@ abstract class ServerToolkitDatabase : RoomDatabase() {
     abstract fun sshTrustedHostKeyDao(): SshTrustedHostKeyDao
 
     abstract fun sshConnectionHistoryDao(): SshConnectionHistoryDao
+
+    abstract fun savedCommandDao(): SavedCommandDao
 }
