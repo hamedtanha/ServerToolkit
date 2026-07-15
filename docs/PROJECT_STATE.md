@@ -3,7 +3,7 @@
 **Project:** Server Toolkit
 **Version:** 0.4.0
 **Status:** Released
-**Last Updated:** 2026-07-14
+**Last Updated:** 2026-07-15
 
 ---
 
@@ -13,7 +13,7 @@ This document is the primary entry point for the current implementation state of
 
 It summarizes the current phase, implemented capability areas, active guardrails, intentionally excluded scope, and next planned work.
 
-Detailed feature status is maintained in the linked state documents.
+Detailed feature and engineering baseline status is maintained in the linked state documents.
 
 Engineering task selection and delivery rules are defined in [Engineering Strategy](ENGINEERING_STRATEGY.md).
 
@@ -33,6 +33,8 @@ Automated JVM coverage, Android runtime verification, and Android benchmark evid
 
 The repository includes a fail-closed local post-build Android APK signing workflow. Version 0.4.0 was officially built, signed, and independently verified from exact tagged commit `7be930f27cc19ea849d6ce720fb05fce074f3320`. The published APK SHA-256 is `5BA5187999AA93677802DCCC2D318A9AE098D67C551399FBBA9CD9F563151273`, and the accepted release certificate SHA-256 is `8EECDB2A84052ABCA92848B8E717A136C33F4A3D1CB85EE2AA77C4F3ED9424FC`. Android Validation run `29358724293` completed successfully for the same commit. Tag `v0.4.0`, the GitHub Release, and all three published assets were verified byte-for-byte against the local official outputs. Android NDK `28.2.13676358` remains pinned, native-library stripping succeeds with the matching `llvm-strip`, and signing validation fails closed when the NDK toolchain is missing or inconsistent.
 
+The project now defines a foundational build-toolchain and dependency update policy. The currently implemented Java, Gradle, Android, Kotlin, dependency, CI, and release-toolchain baseline is recorded in a focused living status document under `docs/state/`.
+
 Persistent credentials, terminal UI, saved command workflows, background monitoring, and Xray or x-ui management remain intentionally out of scope.
 
 ---
@@ -45,6 +47,8 @@ Persistent credentials, terminal UI, saved command workflows, background monitor
 | Server Inventory | Accepted baseline | See [Server Inventory Status](state/SERVER_INVENTORY_STATUS.md). |
 | SSH | Completed milestone | See [SSH Status](state/SSH_STATUS.md). |
 | Documentation Governance | Active | Source-of-truth ordering, version metadata rules, changelog usage, and ADR documentation boundaries are documented. |
+| Build Toolchain Governance | Active | Update triggers, risk classification, compatibility clusters, validation, release interaction, and ADR boundaries are defined. |
+| Build Toolchain Baseline | Current | See [Build Toolchain Status](state/BUILD_TOOLCHAIN_STATUS.md). |
 | Android Version Metadata | Current | Android `versionName` is synchronized with the current project milestone. |
 | Continuous Integration | Implemented | GitHub Actions validates Kotlin compilation, Android test compilation, unit tests, lint, and debug builds for pull requests and `main`. |
 | Android Release Signing | Implemented and published | The version 0.4.0 APK, checksum, and release evidence were signed, independently verified, published, and confirmed byte-for-byte against the official local outputs. |
@@ -66,6 +70,19 @@ The current SSH implementation must continue from the accepted architecture on `
 
 ---
 
+## Current Build Toolchain Guardrails
+
+The current implemented baseline is documented in [Build Toolchain Status](state/BUILD_TOOLCHAIN_STATUS.md), and all updates must follow [Build Toolchain and Dependency Policy](BUILD_TOOLCHAIN_AND_DEPENDENCY_POLICY.md).
+
+- Java source compatibility, Java target compatibility, Kotlin JVM toolchain, and CI JDK remain aligned on Java 17.
+- Gradle, Android Gradle Plugin, Kotlin, and KSP must be reviewed as a compatibility cluster.
+- Android Build Tools and NDK declarations used by the release workflow must remain synchronized with release scripts and documentation.
+- The pinned NDK must not be removed while release verification depends on its matching `llvm-strip`.
+- Toolchain and dependency updates must remain independently reviewable from Operations feature implementation.
+- Proposed versions must not be documented as current before they are implemented and merged.
+
+---
+
 ## Not Implemented Yet
 
 The following items are intentionally not implemented yet:
@@ -78,6 +95,8 @@ The following items are intentionally not implemented yet:
 - Xray or x-ui management workflow.
 - Room migrations beyond database version 4.
 - Migration tests beyond the trusted-host v1-to-v2, trusted-host v2-to-v3, and connection-history v3-to-v4 migrations.
+- Automated dependency-update governance.
+- An accepted Java, Gradle, Android Gradle Plugin, Kotlin, SDK, Build Tools, or NDK upgrade beyond the current baseline.
 
 ---
 
@@ -105,7 +124,8 @@ The next safe development steps are:
 1. Preserve tag `v0.4.0` and its published assets as the immutable released SSH baseline.
 2. Begin version 0.5.0-alpha Operations through a new reviewed planning and implementation slice.
 3. Define the first Operations increment before changing Android version metadata.
-4. Keep terminal UI, background monitoring, persistent credentials, and Xray or x-ui management outside the completed version 0.4.0 scope unless a future milestone explicitly accepts them.
+4. Evaluate any proposed build-toolchain or dependency maintenance separately under the accepted update policy and current baseline.
+5. Keep terminal UI, background monitoring, persistent credentials, and Xray or x-ui management outside the completed version 0.4.0 scope unless a future milestone explicitly accepts them.
 
 ---
 
@@ -131,12 +151,14 @@ Repository documentation is the source of truth over older uploaded snapshots, p
 
 - [Server Inventory Status](state/SERVER_INVENTORY_STATUS.md)
 - [SSH Status](state/SSH_STATUS.md)
+- [Build Toolchain Status](state/BUILD_TOOLCHAIN_STATUS.md)
 
 ---
 
 ## Related Documents
 
 - [Engineering Strategy](ENGINEERING_STRATEGY.md)
+- [Build Toolchain and Dependency Policy](BUILD_TOOLCHAIN_AND_DEPENDENCY_POLICY.md)
 - [Architecture](ARCHITECTURE.md)
 - [Roadmap](ROADMAP.md)
 - [Changelog](CHANGELOG.md)
