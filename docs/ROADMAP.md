@@ -229,13 +229,49 @@ Objective:
 
 Improve operational efficiency.
 
-Planned:
+Accepted first increment:
 
-- Saved commands.
+Saved Command Foundation.
+
+Implemented foundation:
+
+- Global saved-command ownership with server-specific assignment deferred.
+- Explicit execution safety: saved-command selection must never execute automatically.
+- Project-owned saved-command domain model and repository contract.
+- Room entity, DAO, mapper, repository implementation, and Hilt bindings.
+- Database migration from version `4` to version `5`.
+- Exported Room schema version `5`.
+- Domain, mapper, DAO, repository, and migration coverage.
+
+Next slice:
+
+- Saved Commands navigation destination and entry point.
+- Loading, empty, content, and failure states.
+- Create workflow.
+- Delete confirmation workflow.
+- Persistence verification after application restart.
+
+Later accepted slice:
+
+- Saved-command selection from the SSH workflow.
+- Population of the existing SSH command input.
+- Separate explicit user action for command execution.
+
+Remaining milestone direction:
+
 - Command categories.
 - Favorites.
 - Execution history.
 - Quick actions.
+
+Explicitly deferred from the first increment:
+
+- Saved-command editing.
+- Variables, templates, placeholders, or secret substitution.
+- Server-specific command assignment.
+- Automatic or background execution.
+- Import, export, synchronization, or backup behavior.
+- Persistent credential storage.
 
 Deliverable:
 
@@ -243,7 +279,7 @@ Repeatable operational workflows.
 
 Status:
 
-Planned.
+In progress.
 
 ---
 
@@ -367,6 +403,7 @@ Planned.
 - [Engineering Strategy](ENGINEERING_STRATEGY.md)
 - [Build Toolchain and Dependency Policy](BUILD_TOOLCHAIN_AND_DEPENDENCY_POLICY.md)
 - [Build Toolchain Status](state/BUILD_TOOLCHAIN_STATUS.md)
+- [Saved Commands Status](state/SAVED_COMMANDS_STATUS.md)
 - [Development Process](DEVELOPMENT.md)
 - [Release Process](RELEASES.md)
 - [Changelog](CHANGELOG.md)

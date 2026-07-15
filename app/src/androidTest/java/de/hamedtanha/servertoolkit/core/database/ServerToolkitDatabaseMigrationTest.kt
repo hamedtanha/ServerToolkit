@@ -97,7 +97,6 @@ class ServerToolkitDatabaseMigrationTest {
         }
     }
 
-
     @Test
     fun migrate3To4_createsConnectionHistoryTableAndCascadesWithServerDeletion() {
         helper.createDatabase(TEST_DATABASE_NAME, 3).apply {
@@ -134,6 +133,47 @@ class ServerToolkitDatabaseMigrationTest {
                 cursor.moveToFirst()
                 check(cursor.getInt(0) == 0) {
                     "Expected connection history to be cascade-deleted with its server."
+                }
+            }
+            close()
+        }
+    }
+
+    @Test
+    fun migrate4To5_createsSavedCommandsTableAndPreservesExactCommandText() {
+        helper.createDatabase(TEST_DATABASE_NAME, 4).apply {
+            close()
+        }
+
+        helper.runMigrationsAndValidate(
+            TEST_DATABASE_NAME,
+            5,
+            true,
+            MIGRATION_4_5,
+        ).apply {
+            val expectedCommand = "  printf 'line 1\\nline 2\\n'\n"
+            insertSavedCommand(
+                savedCommandId = "command-1",
+                name = "Print lines",
+                command = expectedCommand,
+                createdAtEpochMillis = 1_000,
+            )
+
+            query(
+                "SELECT name, command_text, created_at_epoch_millis " +
+                    "FROM saved_commands WHERE id = 'command-1'",
+            ).use { cursor ->
+                check(cursor.moveToFirst()) {
+                    "Expected saved command row to be inserted after migration."
+                }
+                check(cursor.getString(0) == "Print lines") {
+                    "Expected saved command name to be preserved."
+                }
+                check(cursor.getString(1) == expectedCommand) {
+                    "Expected saved command text to be preserved exactly."
+                }
+                check(cursor.getLong(2) == 1_000L) {
+                    "Expected saved command creation time to be preserved."
                 }
             }
             close()
@@ -197,7 +237,6 @@ class ServerToolkitDatabaseMigrationTest {
         )
     }
 
-
     private fun androidx.sqlite.db.SupportSQLiteDatabase.insertConnectionHistoryEntry(
         entryId: String,
         serverId: String,
@@ -227,6 +266,25 @@ class ServerToolkitDatabaseMigrationTest {
                 NULL
             )
             """.trimIndent(),
+        )
+    }
+
+    private fun androidx.sqlite.db.SupportSQLiteDatabase.insertSavedCommand(
+        savedCommandId: String,
+        name: String,
+        command: String,
+        createdAtEpochMillis: Long,
+    ) {
+        execSQL(
+            """
+            INSERT INTO saved_commands (
+                id,
+                name,
+                command_text,
+                created_at_epoch_millis
+            ) VALUES (?, ?, ?, ?)
+            """.trimIndent(),
+            arrayOf(savedCommandId, name, command, createdAtEpochMillis),
         )
     }
 

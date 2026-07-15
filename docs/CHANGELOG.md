@@ -12,6 +12,12 @@ The project follows Conventional Commits and Semantic Versioning principles.
 
 - Added a foundational build-toolchain and dependency policy covering update triggers, risk classification, compatibility clusters, validation, release impact, rollback, automation, and ADR boundaries.
 - Added a living build-toolchain status document recording the current Java, Gradle, Android, Kotlin, dependency, CI, Build Tools, NDK, and release-toolchain baseline from repository declarations.
+- Accepted the first version 0.5.0-alpha Operations increment as the global Saved Command Foundation.
+- Added the project-owned `SavedCommand` domain model and repository contract with explicit name, command-text, size, and creation-time boundaries.
+- Added Room-backed saved-command persistence with entity, DAO, exact domain/entity mapping, repository implementation, and Hilt bindings.
+- Added database migration `4 → 5`, exported Room schema version `5`, and the indexed `saved_commands` table.
+- Added domain, mapper, DAO, repository, and migration coverage for validation, exact command-text preservation, stable newest-first ordering, duplicate rejection, lookup, and deletion.
+- Added a focused Saved Commands current-state document and accepted delivery boundaries for management UI and later SSH input integration.
 
 ### Changed
 
@@ -19,10 +25,17 @@ The project follows Conventional Commits and Semantic Versioning principles.
 - Clarified that the pinned Android NDK currently supports the verified release workflow and required `llvm-strip`, even though project-owned C or C++ source is not currently documented.
 - Clarified that proposed dependency or toolchain versions are not current until implemented, validated, documented, and merged.
 - Clarified that toolchain changes capable of affecting a pending release artifact invalidate existing candidate evidence and require complete rebuild and verification.
+- Marked version 0.5.0 Operations as in progress while retaining Android application metadata at the released version 0.4.0 baseline.
+- Replaced the incomplete package-structure document with a factual current baseline covering Dashboard, Server Inventory, SSH, and the new `savedcommands` boundary.
+- Updated the Server Toolkit Room database from version `4` to version `5` without destructive fallback.
+- Synchronized README, project state, roadmap, changelog, documentation governance, package structure, and Saved Commands status with the implemented persistence foundation.
 
 ### Not Changed
 
-- No Java, Gradle, Android Gradle Plugin, Kotlin, KSP, Android SDK, Build Tools, NDK, or application dependency version was changed by this documentation update.
+- No Java, Gradle, Android Gradle Plugin, Kotlin, KSP, Android SDK, Build Tools, NDK, or application dependency version was changed by these updates.
+- Android `versionName` and `versionCode` remain unchanged.
+- No Saved Commands UI, navigation, editing, categories, favorites, templates, server assignment, SSH selection, automatic execution, background execution, or credential storage was added.
+- `ARCHITECTURE.md` and the ADR index remain unchanged because Slice 1 follows the accepted Room persistence and repository architecture without introducing a new significant decision.
 - The immutable version 0.4.0 release tag, artifacts, checksums, and release evidence remain unchanged.
 
 ---

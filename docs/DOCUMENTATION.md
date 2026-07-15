@@ -27,6 +27,7 @@ Documentation must follow these principles:
 - Keep architectural decisions traceable through ADRs.
 - Separate long-term policy from current implementation state.
 - Prefer small, precise documentation updates over broad rewrites.
+- Replace an incomplete or materially stale document when a focused patch would preserve contradictions.
 - Avoid mass replacement of version numbers.
 - Review related documents whenever one document changes.
 
@@ -75,7 +76,14 @@ For build-toolchain and dependency maintenance:
 - `state/BUILD_TOOLCHAIN_STATUS.md` records the currently implemented versions and constraints.
 - Actual Gradle, CI, Android, and release configuration remains the implementation evidence.
 
-Proposed versions must not be recorded as current state before implementation and merge.
+For feature implementation:
+
+- `PROJECT_STATE.md` summarizes the project-wide capability state.
+- A focused document under `docs/state/` records detailed implemented boundaries and explicit non-goals.
+- `ROADMAP.md` records accepted milestone sequencing and remaining direction.
+- Proposed UI or integration behavior must not be described as implemented before verification.
+
+Proposed versions or capabilities must not be recorded as current state before implementation and merge.
 
 ---
 
@@ -95,7 +103,9 @@ Use `Document Baseline` when a document was introduced or stabilized during a sp
 
 Example:
 
-    **Document Baseline:** 0.2.0-alpha
+```text
+**Document Baseline:** 0.2.0-alpha
+```
 
 A document baseline is historical metadata. It must not be mass-updated during routine version synchronization.
 
@@ -105,7 +115,9 @@ Use `Related Milestone` when a document or ADR belongs to a specific roadmap mil
 
 Example:
 
-    **Related Milestone:** Version 0.4.0 — SSH
+```text
+**Related Milestone:** Version 0.4.0 — SSH
+```
 
 This is common for ADRs and milestone-specific planning documents.
 
@@ -115,9 +127,11 @@ Do not rewrite historical version references during routine documentation update
 
 Examples:
 
-    v0.1.0 — Foundation
-    v0.2.0 — Android Architecture and Navigation
-    ## [0.1.0] - 2026-07-01
+```text
+v0.1.0 — Foundation
+v0.2.0 — Android Architecture and Navigation
+## [0.1.0] - 2026-07-01
+```
 
 These references describe project history, not the current project version.
 
@@ -141,7 +155,7 @@ The changelog should follow these rules:
 - Group changes by type, such as Added, Changed, Fixed, Security, Deprecated, and Removed.
 - Write user-facing or project-facing changes, not raw git log entries.
 - Keep historical release entries unchanged.
-- Add documentation changes when they affect project governance, architecture, security, release process, technical baseline, or source-of-truth state.
+- Add documentation changes when they affect project governance, architecture, security, release process, technical baseline, feature state, or source-of-truth state.
 
 ---
 
@@ -151,17 +165,23 @@ Server Toolkit follows Semantic Versioning.
 
 Version numbers should follow this structure:
 
-    MAJOR.MINOR.PATCH
+```text
+MAJOR.MINOR.PATCH
+```
 
 Pre-release identifiers may be used during active development:
 
-    0.x.y-alpha
+```text
+0.x.y-alpha
+```
 
 During pre-1.0 development, minor versions represent major project milestones.
 
 Version metadata in documentation must not be confused with Android Gradle `versionCode` or `versionName`. Android application version metadata must be reviewed separately during release preparation.
 
 Toolchain and dependency updates do not automatically require a project-version change. Their release impact is determined by the resulting product artifact and release plan.
+
+An implementation slice may begin under the next milestone while Android application metadata still identifies the latest released artifact. Metadata changes require their own accepted release-preparation step.
 
 ---
 
@@ -179,8 +199,9 @@ Use ADRs for:
 - Backup, restore, credential, or trust-boundary decisions.
 - Major release or compatibility decisions.
 - Significant build-toolchain baseline or dependency-governance decisions.
+- Significant feature ownership, execution-safety, synchronization, or secure-storage boundaries.
 
-Do not use ADRs for minor implementation details or routine compatible dependency updates.
+Do not use ADRs for minor implementation details, routine compatible dependency updates, or a new entity that follows an already accepted persistence and repository pattern.
 
 Accepted ADRs should not be rewritten casually. If a decision changes, create a new ADR that supersedes or updates the previous decision.
 
@@ -260,6 +281,7 @@ At minimum:
 
 - Current implementation changes should update `PROJECT_STATE.md`.
 - Detailed feature-state changes should update the relevant documents under `docs/state/`.
+- Package-boundary changes should update `PACKAGE_STRUCTURE.md`.
 - Build-toolchain or dependency baseline changes should update `state/BUILD_TOOLCHAIN_STATUS.md`.
 - Build-toolchain update-policy changes should update `BUILD_TOOLCHAIN_AND_DEPENDENCY_POLICY.md` and affected process documents.
 - Notable changes should update `CHANGELOG.md`.
@@ -268,6 +290,8 @@ At minimum:
 - Security decisions should update `SECURITY.md`.
 - Release process or release-toolchain changes should update `RELEASES.md`.
 - AI collaboration rule changes should update files under `docs/ai/`.
+
+Documents intentionally left unchanged should be named in the pull request with the reason.
 
 ---
 
@@ -281,8 +305,10 @@ Before committing documentation changes, verify:
 - Policy and current-state information remain separated.
 - Current toolchain versions match repository declarations.
 - Proposed versions are not presented as implemented.
+- Proposed UI and integration behavior are not presented as implemented.
 - ADR index entries are synchronized when applicable.
 - `PROJECT_STATE.md` remains factual and current.
+- The relevant focused state document exists and is indexed.
 - `CHANGELOG.md` includes a relevant unreleased entry when needed.
 - Historical release evidence remains unchanged.
 - No backup files are committed.
@@ -304,6 +330,7 @@ Before committing documentation changes, verify:
 - PROJECT_STATE.md
 - state/SERVER_INVENTORY_STATUS.md
 - state/SSH_STATUS.md
+- state/SAVED_COMMANDS_STATUS.md
 - state/BUILD_TOOLCHAIN_STATUS.md
 - BUILD_TOOLCHAIN_AND_DEPENDENCY_POLICY.md
 - ROADMAP.md
@@ -313,6 +340,7 @@ Before committing documentation changes, verify:
 - RELEASES.md
 - DEVELOPMENT.md
 - ENGINEERING_STRATEGY.md
+- ../PACKAGE_STRUCTURE.md
 - docs/adr/README.md
 - docs/ai/AI_RULES.md
 - docs/ai/AI_MEMORY.md

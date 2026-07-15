@@ -97,3 +97,24 @@ val MIGRATION_3_4 = object : Migration(3, 4) {
         )
     }
 }
+
+val MIGRATION_4_5 = object : Migration(4, 5) {
+
+    override fun migrate(db: SupportSQLiteDatabase) {
+        db.execSQL(
+            """
+            CREATE TABLE IF NOT EXISTS `saved_commands` (
+                `id` TEXT NOT NULL,
+                `name` TEXT NOT NULL,
+                `command_text` TEXT NOT NULL,
+                `created_at_epoch_millis` INTEGER NOT NULL,
+                PRIMARY KEY(`id`)
+            )
+            """.trimIndent(),
+        )
+        db.execSQL(
+            "CREATE INDEX IF NOT EXISTS `index_saved_commands_created_at_epoch_millis` " +
+                "ON `saved_commands` (`created_at_epoch_millis`)",
+        )
+    }
+}

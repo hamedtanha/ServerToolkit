@@ -20,12 +20,13 @@ The application is designed for system administrators, DevOps engineers, and inf
 - User-facing non-interactive SSH command execution workflow.
 - SSH command output display for stdout, stderr, and exit status.
 - Per-server SSH connection history presentation backed by automatic Room recording.
+- Saved-command domain and Room persistence foundation without user-facing management UI or automatic execution.
 - Repository-defined build-toolchain and dependency maintenance policy.
 - Living current-state documentation for the implemented Android, JVM, dependency, CI, and release-toolchain baseline.
 
 ## Planned Direction
 
-- Saved commands and repeatable operational workflows.
+- Saved-command management and explicit SSH input integration.
 - Ping and latency checks.
 - Server status monitoring.
 - Favorite servers.
@@ -77,6 +78,7 @@ Project documentation can be found inside the **docs** directory.
 - [Build Toolchain Status](docs/state/BUILD_TOOLCHAIN_STATUS.md)
 - [Server Inventory Status](docs/state/SERVER_INVENTORY_STATUS.md)
 - [SSH Status](docs/state/SSH_STATUS.md)
+- [Saved Commands Status](docs/state/SAVED_COMMANDS_STATUS.md)
 - [Development Process](docs/DEVELOPMENT.md)
 - [Architecture](docs/ARCHITECTURE.md)
 - [Roadmap](docs/ROADMAP.md)
