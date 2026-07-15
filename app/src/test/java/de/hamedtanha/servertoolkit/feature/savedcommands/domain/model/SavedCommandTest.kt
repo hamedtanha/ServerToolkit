@@ -38,6 +38,12 @@ class SavedCommandTest {
     }
 
     @Test
+    fun `rejects names containing control characters`() {
+        assertInvalidSavedCommand(name = "Disk\nusage")
+        assertInvalidSavedCommand(name = "Disk\tusage")
+    }
+
+    @Test
     fun `rejects names beyond the accepted boundary`() {
         assertInvalidSavedCommand(name = "a".repeat(SavedCommand.MAX_NAME_LENGTH + 1))
     }
