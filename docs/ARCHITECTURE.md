@@ -3,7 +3,7 @@
 **Project:** Server Toolkit  
 **Version:** 0.4.0
 **Status:** Active  
-**Last Updated:** 2026-07-14
+**Last Updated:** 2026-07-16
 
 ---
 
@@ -11,15 +11,17 @@
 
 This document defines the practical application architecture for the Server Toolkit Android application.
 
-It translates accepted Architecture Decision Records into implementation rules for project structure, layer responsibilities, dependency direction, data flow, navigation, dependency injection, and persistence.
+It translates accepted Architecture Decision Records into implementation rules for project structure, layer responsibilities, dependency direction, data flow, navigation, dependency injection, persistence, remote-capability boundaries, and support claims.
 
 This document describes the current implementation and accepted implementation direction. It must not advertise planned functionality as completed functionality.
 
 ---
 
-## Architecture Baseline
+## Product and Architecture Baseline
 
-Server Toolkit is a modern Android application for Linux server administration and infrastructure management.
+Server Toolkit is a platform-neutral remote systems operations application.
+
+The current verified remote-access capability is SSH. The architecture may support additional platforms, transports, and providers over time, but architectural extensibility is not a support claim.
 
 The application follows:
 
@@ -30,27 +32,26 @@ The application follows:
 - Repository Pattern.
 - Unidirectional Data Flow.
 - Hilt for dependency injection.
-- Jetpack Navigation Compose for screen navigation.
+- Jetpack Navigation Compose.
 - Room for local structured persistence.
+- Feature-first ownership where practical.
+- Platform-neutral Core concepts.
+- Incremental remote-capability gateways and providers only when justified by concrete features.
 
-The architecture is intentionally simple at the current project stage.
-
-The project must not introduce additional layers, frameworks, or abstractions unless they solve a real implementation problem.
+The project must not introduce additional layers, frameworks, generic base classes, empty package hierarchies, registries, or plugin abstractions unless they solve a real implementation problem.
 
 ---
 
 ## Accepted Architecture Decisions
 
-The current architecture is governed by the following ADRs:
-
-| ADR | Decision | Status |
+| ADR | Decision | Status / Relationship |
 |---|---|---|
-| ADR-001 | Project Vision | Accepted |
-| ADR-002 | Application Architecture | Accepted |
+| ADR-001 | Project Vision | Accepted; Linux-specific scope assumptions superseded by ADR-015 |
+| ADR-002 | Application Architecture | Accepted; refined by ADR-016 |
 | ADR-003 | Local Persistence with Room | Accepted |
 | ADR-004 | Navigation Strategy | Accepted |
 | ADR-005 | Dependency Injection Strategy | Accepted |
-| ADR-006 | Remote Connection Workflow Boundaries | Accepted |
+| ADR-006 | SSH Workflow and Security Boundaries | Accepted |
 | ADR-007 | Secure Storage Strategy | Accepted |
 | ADR-008 | SSH Client Library Selection | Accepted |
 | ADR-009 | SSH Host Trust and Authentication Input Strategy | Accepted |
@@ -58,8 +59,49 @@ The current architecture is governed by the following ADRs:
 | ADR-011 | SSH Credential Ownership and Secure Storage Strategy | Accepted |
 | ADR-012 | Android Backup and Data Extraction Policy | Accepted |
 | ADR-013 | Ephemeral SSH Private-Key Authentication Boundary | Accepted |
+| ADR-014 | Android Release Signing Strategy | Accepted |
+| ADR-015 | Platform-Neutral Remote Systems Product Direction | Accepted |
+| ADR-016 | Three-Level Remote Capability Architecture | Accepted |
 
-Accepted ADRs are the source of truth for architectural decisions. This document explains how those decisions are applied in the codebase.
+Accepted ADRs are the source of truth for architectural decisions. This document explains how those decisions apply to the current codebase and accepted future implementation direction.
+
+---
+
+## Two Complementary Architecture Views
+
+Server Toolkit uses two complementary architectural views.
+
+### Android Application Architecture
+
+This view governs UI, presentation state, domain contracts, repositories, persistence, navigation, and Android integration.
+
+```text
+UI
+ ↓
+Presentation
+ ↓
+Domain contracts and models
+ ↑
+Data implementations
+```
+
+### Remote Capability Architecture
+
+This view governs platform-neutral remote operations that require discovery, translation, routing, normalization, orchestration, or provider isolation.
+
+```text
+Presentation / Use Case
+        ↓
+Core capability contract
+        ↓
+Capability Gateway
+        ↓
+Provider / Adapter
+        ↓
+Transport or external system
+```
+
+The remote-capability view complements the Android application layers. It does not require every feature to use a Gateway.
 
 ---
 
@@ -67,287 +109,428 @@ Accepted ADRs are the source of truth for architectural decisions. This document
 
 The current implementation includes:
 
+### Foundation
+
 - Single Activity application entry point.
 - Hilt-enabled application setup.
 - App-level Navigation Compose infrastructure.
-- Dashboard route and screen.
-- Dashboard ViewModel and UI state.
-- Dashboard navigation action to Server Inventory.
+- Dashboard route, screen, ViewModel, UI state, and navigation action.
+- Repository-defined build-toolchain and dependency policy.
+- GitHub Actions Android validation.
+- Fail-closed Android release signing workflow.
+
+### Server Inventory
+
 - Server Inventory route, screen, ViewModel, UI state, and filter state.
-- Add Server route, ViewModel, shared Server Form screen, form state, form fields, and validation.
-- Edit Server route and ViewModel using the shared Server Form screen.
-- Delete server UI action with confirmation dialog.
-- Search and filtering behavior.
-- Server Inventory domain model and environment model.
-- Server repository contract.
-- In-memory Server repository implementation retained for development and testing support.
-- Room dependency setup with KSP.
-- Room schema export location configuration.
-- Server Toolkit Room database class.
-- Server entity.
-- Server DAO.
-- Server entity/domain mapper.
-- Room-backed Server repository implementation.
-- Hilt database, DAO, and repository wiring.
-- DAO, repository, mapper, and filter matcher tests.
-- Manual and automated verification for add, edit, delete, search, filtering, and shared server form naming cleanup.
-- SSH connection and per-server connection history navigation destinations, screens, ViewModels, and UI state.
-- Server Inventory Connect action that opens the SSH route.
-- Repository-backed per-server SSH connection history presentation without direct DAO access.
-- SSH domain connection request, result, error, and service contract models.
-- SSH UI connection status model and connection result mapper.
-- Test-only fake SSH connection service.
-- SSHJ dependency declaration through the Gradle version catalog.
-- SSHJ Android-compatible client factory with explicit Bouncy Castle provider registration and constrained key exchange defaults.
-- SSHJ-backed data-layer adapter boundary.
-- SSH connection service dependency injection binding.
-- SSH host trust persistence boundary.
-- SSH host trust decision workflow.
-- SSH explicit unknown-host trust confirmation workflow.
-- SSH changed-host-key blocking decision flow.
-- SSH ephemeral authentication input boundary.
-- SSH screen password input that forwards secrets through transient ViewModel events without storing them in UI state.
-- SSH credential-bearing connection request boundary.
-- SSH authentication input clearing behavior.
-- SSH project-owned one-shot private-key source and bounded content-reading boundary.
-- SSH Android cancellable private-key document content factory.
-- SSH system content-picker integration with immediate conversion to a project-owned source.
-- SSH ViewModel ownership of at most one pending private-key source outside observable and saved state.
-- SSH private-key source replacement, cancellation, workflow-exit, host-review, and one-attempt transfer handling.
-- SSHJ trusted host-key verifier boundary.
-- SSHJ trusted connection execution boundary.
-- SSHJ password authentication execution boundary.
-- Real ephemeral password-based SSH connection workflow.
-- SSHJ session ownership execution boundary.
-- SSH project-owned session handle model.
-- SSH session lifecycle service contract.
-- SSHJ session owner registry boundary.
-- SSH command channel execution strategy.
-- SSH command execution planning boundary.
-- SSH command execution result model.
-- SSHJ command channel planning boundary.
-- SSH command execution routing through the data-layer session owner registry.
-- SSHJ command channel lifecycle executor.
-- SSH command execution service contract.
-- SSHJ-backed command execution service.
-- SSH command execution service dependency injection binding.
-- SSH command execution use case.
-- SSH command execution presentation state and UI mapper.
-- SSH ViewModel command execution wiring through a private active session handle.
-- SSH command input, Run command control, and output rendering for non-interactive commands.
-- Android backup, cloud backup, and device transfer disabled for the alpha release.
-- SSH blank command idle-state handling and execution guard.
-- SSH command text edit suppression while command execution is running.
-- SSH command input disabling while command execution is running.
-- SSH ViewModel injection of the connection attempt use case.
-- SSH user-triggered connect event shell and Connect button with ephemeral password input.
-- SSH tests for domain models, presentation state, fake results, SSHJ adapter boundaries, host trust, authentication input, session ownership, command planning, and command execution lifecycle boundaries.
-- SSH host key observation verifier clarity hardening.
+- Add Server and Edit Server workflows using the shared Server Form screen.
+- Delete confirmation, search, and filtering behavior.
+- Server domain and environment models.
+- Project-owned Server repository contract.
+- Room-backed Server persistence.
+- In-memory repository retained for development and testing support.
+- DAO, repository, mapper, validation, filtering, and presentation coverage.
 
-The following items are intentionally not implemented yet:
+### SSH
 
-- Interactive terminal workflow for owned sessions.
-- Persistent credential storage.
-- Monitoring workflow.
-- Saved command workflow.
-- Xray or x-ui management workflow.
-- Room migrations beyond database version 4.
-- Migration tests beyond the trusted-host v1-to-v2, trusted-host v2-to-v3, and connection-history v3-to-v4 migrations.
+- Inventory-backed connection target resolution.
+- Host-key observation, review, confirmation, blocking, and trusted-host persistence.
+- Ephemeral password authentication.
+- Android document-picker private-key selection.
+- Project-owned one-shot private-key source and bounded in-memory parsing.
+- Verified encrypted and unencrypted OpenSSH v1 Ed25519 and RSA authentication.
+- Project-owned session handles and lifecycle contracts.
+- Deterministic cleanup before permanent workflow exit.
+- Explicit disconnect and reconnection support.
+- Non-interactive command execution through explicit user action.
+- stdout, stderr, and exit-status presentation.
+- Room-backed SSH connection history and per-server presentation.
+- Focused domain, presentation, adapter, lifecycle, persistence, migration, and runtime verification.
+
+### Saved Commands
+
+- Global `SavedCommand` domain model.
+- Project-owned `SavedCommandRepository` contract.
+- Room entity, DAO, mapper, repository implementation, and Hilt bindings.
+- Exact command-text preservation.
+- Creation-only persistence semantics with duplicate identifiers rejected.
+- Domain, mapper, DAO, repository, and migration coverage.
+- No user-facing management UI or SSH input integration yet.
+
+### Local Persistence
+
+- Room database version `5`.
+- Explicit migrations from version `1` through version `5`.
+- Exported Room schemas through version `5`.
+- Persisted server inventory, trusted SSH host keys, SSH connection history, and Saved Commands.
 
 ---
 
-## Naming Scope
+## Support Claims
 
-The current inventory-related implementation is intentionally named `serverinventory` because it manages one concrete asset type: `Server`.
+Architecture documentation and user-facing copy must distinguish:
 
-A broader `inventory` package or model should be introduced only after the application implements additional non-server asset types or shared inventory behavior that is no longer server-specific.
+- **Architecturally permitted:** the design can accommodate the platform or capability.
+- **Implemented:** a concrete workflow, provider, adapter, or transport exists.
+- **Verified:** automated or runtime evidence confirms documented behavior.
 
-The current naming rules are:
-
-- Use `Server` for the implemented domain model.
-- Use `ServerInventory` for the implemented feature scope.
-- Use `ServerForm` for UI and state shared by Add Server and Edit Server.
-- Do not introduce `Device`, `ServerDevice`, `InventoryItem`, or `feature/inventory` naming until the broader concept is implemented.
-
-This prevents premature abstraction while keeping the future inventory direction open.
+The current architecture is platform-neutral, but the repository does not claim universal operating-system, service-manager, transport, or vendor support.
 
 ---
 
 ## Application Layers
 
-Server Toolkit uses a pragmatic layered architecture.
+### UI Layer
 
-```text
-UI Layer
-   ↓
-Presentation Layer
-   ↓
-Domain Contracts / Models
-   ↓
-Data Layer
-   ↓
-Local Persistence / External Services
-```
-
-The dependency direction must remain downward from UI and presentation toward stable domain contracts and concrete data implementations.
-
-Lower-level implementation details must not leak into higher layers.
-
----
-
-## UI Layer
-
-The UI layer is responsible for rendering application screens and handling user interaction events.
-
-### Contains
+Contains:
 
 - Compose screens.
 - Reusable Compose components when reuse is real.
 - Theme definitions.
 - Navigation host integration.
-- UI-specific state rendering.
+- UI-specific rendering.
 
-### Rules
+Rules:
 
-- Composables must remain declarative.
-- Composables must not contain business logic.
-- Composables must not access Room DAOs directly.
-- Composables must not access repositories directly.
+- Composables remain declarative.
 - Composables receive state and emit events.
-- Screen-level behavior belongs in ViewModels.
-- Navigation actions should be passed down as lambdas where practical.
+- Composables must not access repositories, DAOs, providers, transports, or third-party clients directly.
+- UI must not parse raw command output or provider payloads to infer domain meaning.
+- Navigation actions should be passed as narrow callbacks where practical.
 
----
+### Presentation Layer
 
-## Presentation Layer
-
-The presentation layer coordinates UI state and user actions.
-
-### Contains
+Contains:
 
 - ViewModels.
-- UI state classes.
-- UI event handlers when needed.
-- Screen-specific state mapping.
+- Immutable UI state.
+- UI events.
+- Screen-specific mappers and coordination.
 
-### Rules
+Rules:
 
-- ViewModels expose immutable observable UI state.
-- ViewModels call repository contracts instead of data-source implementations.
-- ViewModels must not depend on Room DAOs.
-- ViewModels must not contain Android UI rendering logic.
-- ViewModels may perform simple presentation-specific validation.
-- Shared validation should be extracted into reusable domain or utility components when needed.
+- ViewModels call project-owned repositories, use cases, or capability contracts.
+- ViewModels must not depend on Room DAOs or concrete providers.
+- ViewModels must not expose credentials, private keys, passphrases, raw SDK errors, or provider-specific models in observable state.
+- Simple presentation validation may remain local.
+- Reusable business rules belong in domain-owned components when justified.
 
----
+### Domain Contracts and Models
 
-## Domain Model and Contracts
-
-At the current stage, Server Toolkit uses a lightweight domain model approach.
-
-A full domain layer with use cases is not mandatory yet.
-
-### Contains
+Contains:
 
 - Feature-owned domain models.
-- Repository interfaces when persistence or external data access is introduced.
-- Shared validation rules when they become reusable.
+- Repository contracts.
+- Capability contracts.
+- Use cases when logic is complex, reusable, security-sensitive, or orchestration-heavy.
+- Project-owned results and errors.
 
-### Rules
+Rules:
 
+- Domain types must not depend on Android, Compose, Room, SSHJ, provider SDKs, or concrete data implementations.
 - Do not create use cases only for theoretical purity.
-- Introduce use cases only when business logic becomes complex or reused.
-- Domain models must not depend on Room annotations.
-- Domain models must not depend on Compose, Android framework classes, or database implementation details.
+- Do not introduce broad models such as `Device`, `Resource`, or generic `Operation` until implemented behavior requires them.
+- Domain language must represent application meaning rather than command syntax or external payload structure.
 
-### Current Direction
+### Data Layer
 
-The Server Inventory feature uses clean domain models that represent application meaning, not database storage mechanics.
+Contains:
 
-Room entities are separate persistence models and are mapped explicitly to domain models.
+- Repository implementations.
+- Local and remote data sources.
+- Room DAOs and entities.
+- Entity/domain mapping.
+- SSHJ and Android platform adapters.
+- Concrete persistence and integration code.
+
+Rules:
+
+- Data implementations depend on project-owned domain contracts.
+- Room entities and SDK models must not leak into presentation.
+- Mapping across persistence or external integration boundaries remains explicit.
+- Repositories coordinate owned data access; they are not generic orchestration containers for unrelated capabilities.
 
 ---
 
-## Data Layer
+## Three-Level Remote Capability Architecture
 
-The data layer provides application data through repositories.
+The following levels apply only when a concrete remote capability requires translation, provider routing, discovery, normalization, orchestration, or external integration.
 
-### Contains
+### Level 1 — Core
 
-- Repository implementations.
-- Local data sources.
-- Room database definitions.
-- DAOs.
-- Entities.
-- Entity/domain mapping.
+Core owns platform-neutral meaning:
 
-### Rules
+- Capability contracts.
+- Domain models.
+- Normalized results and errors.
+- Support states.
+- Security and lifecycle policy independent from a provider.
+- Use cases when justified.
 
-- Repository implementations hide data-source details from ViewModels.
-- Room DAOs are internal persistence details.
-- ViewModels must depend on repositories, not DAOs.
-- Database entities must not leak into UI code.
-- Domain models and Room entities must remain separate.
-- Mapping must remain explicit when data crosses the persistence/domain boundary.
+Core must not import:
 
-### Repository Responsibility
+- Android or Compose types.
+- Room types.
+- SSHJ, WinRM, HTTP client, cloud SDK, or vendor SDK types.
+- Shell commands and output formats.
+- Platform-specific enums or response models.
 
-Repositories are responsible for:
+### Level 2 — Capability Gateway
 
-- Reading data from persistence.
-- Writing data to persistence.
-- Coordinating local data sources.
-- Returning domain-oriented data.
-- Hiding persistence implementation details.
+A Gateway may:
 
-Repositories are not responsible for:
+- Resolve target context.
+- Determine or consume capability support information.
+- Select an appropriate provider.
+- Translate a Core request.
+- Orchestrate required provider operations.
+- Apply safety and lifecycle policy.
+- Normalize provider results and errors.
 
-- Rendering UI.
-- Owning screen state.
-- Holding Android navigation logic.
-- Performing unrelated feature orchestration.
+A Gateway is introduced only when a concrete capability requires it.
+
+The following do not currently require a Gateway:
+
+- Saved Commands management.
+- Local favorites or tags.
+- Local search and filtering.
+- Room-backed local history.
+
+### Level 3 — Providers and Adapters
+
+Providers and Adapters own:
+
+- Transport implementations.
+- Operating-system and service-manager behavior.
+- Service- or vendor-specific APIs.
+- Command construction.
+- Output and payload parsing.
+- Third-party clients and SDKs.
+- Mapping raw failures to provider-level results.
+
+Examples such as systemd, OpenRC, Windows Service Control Manager, Docker, Kubernetes, or cloud providers describe possible boundaries only. They are not accepted implementation scope.
+
+---
+
+## Capability Support States
+
+Gateway-backed features use explicit project-owned support states:
+
+- **Supported:** an accepted implementation is available and support has been confirmed.
+- **Unsupported:** the target has been evaluated and lacks the capability through an accepted implementation.
+- **Unknown:** support has not been determined or evidence is insufficient.
+- **Unavailable:** the capability may exist but cannot currently be used due to permissions, connectivity, configuration, or dependency availability.
+
+Rules:
+
+- Unknown must not be treated as supported.
+- Unsupported must not trigger guessed commands or unsafe fallbacks.
+- UI consumes project-owned support state.
+- Provider output parsing remains inside the provider boundary.
+
+---
+
+## Dependency Direction
+
+Allowed directions:
+
+```text
+UI -> Presentation
+Presentation -> Domain contracts / Use cases
+Data -> Domain contracts
+Gateway -> Core contracts
+Provider / Adapter -> narrow provider contracts and external libraries
+Feature DI -> contracts and concrete implementations
+App navigation -> feature navigation entry points
+```
+
+Narrow Room aggregation exception:
+
+```text
+core/database -> feature-owned Room entities and DAOs
+```
+
+This exception exists because Room requires central schema aggregation. It does not transfer business ownership to `core/database`.
+
+Forbidden directions:
+
+```text
+Domain -> Data
+Domain -> Android framework
+Core capability contract -> Gateway
+Core capability contract -> Provider
+Presentation -> DAO
+Presentation -> concrete provider
+Presentation -> raw external payload
+Feature A data -> Feature B data
+Feature A presentation -> Feature B presentation
+```
+
+---
+
+## Feature-First Ownership
+
+The project remains feature-first where practical.
+
+Current feature boundaries:
+
+- `feature/dashboard`
+- `feature/serverinventory`
+- `feature/ssh`
+- `feature/savedcommands`
+
+Rules:
+
+- A feature owns its domain, data, navigation, and presentation responsibilities.
+- Packages exist only when implemented classes require them.
+- Do not create speculative `gateway`, `provider`, `platform`, or `operations` packages.
+- Shared contracts move to `core` only after genuine cross-feature reuse or application-wide ownership is demonstrated.
+- Cross-feature interaction uses explicit contracts or app-level navigation.
+
+---
+
+## Naming Scope
+
+`Server` and `ServerInventory` remain the current implemented inventory concepts.
+
+The platform-neutral product direction does not justify renaming the model to `Device`, `RemoteSystem`, `ManagedTarget`, or another broader abstraction before non-server asset behavior exists.
+
+Broader naming requires a concrete implementation need and a focused architecture review.
 
 ---
 
 ## Local Persistence
 
-Room is the accepted persistence technology for local structured data.
+Room is the accepted local structured-persistence technology.
 
-### Current Scope
+Current persisted areas:
 
-The current persistence scope includes server inventory data, SSH trusted host key material, and the storage foundation for SSH connection history.
+- Server inventory.
+- Trusted SSH host keys.
+- SSH connection history.
+- Saved Commands.
 
-The Room persistence implementation currently includes:
+Current database baseline:
 
-- `ServerToolkitDatabase`.
-- `ServerEntity`.
-- `ServerDao`.
-- `RoomServerRepository`.
-- Server entity/domain mapping.
-- SSH trusted host entity and DAO.
-- Room-backed SSH host trust repository.
-- SSH trusted host entity/domain mapping.
-- SSH connection history entity and DAO.
-- Room-backed SSH connection history repository.
-- SSH connection history entity/domain mapping.
-- Database migrations from version 1 through version 4.
-- Hilt providers for the database, DAOs, and repositories.
-- KSP schema export configuration.
+```text
+Database version: 5
+Latest migration: 4 -> 5
+Latest exported schema: 5.json
+```
 
-The database version is `4`.
+Persistence rules:
 
-The server inventory table stores server metadata only. It must not store credentials, private keys, passphrases, access tokens, certificates, or other secrets.
+- DAO access occurs through owned repository implementations.
+- Room entities remain separate from domain models.
+- Schema changes require explicit migrations unless a separately reviewed decision accepts destructive behavior.
+- Migration tests use exported schemas where appropriate.
+- Credentials, private keys, passphrases, access tokens, and other secrets must not be stored in ordinary Room tables.
+- Persistent credential storage requires a separate accepted secure-storage implementation.
 
-SSH credential ownership is separate from server inventory. Server inventory may store a non-sensitive username hint, but persistent credential metadata and secret material require a separate reviewed implementation. Secret material must be stored only through a dedicated secure storage boundary.
+---
 
-Trusted SSH host key material is stored separately from generic server inventory metadata.
+## Navigation
 
-SSH connection history records are stored separately and are lifecycle-bound to their owning server inventory entries through database referential integrity.
+Navigation Compose is the accepted screen-navigation mechanism.
 
-### Persistence Rules
+Rules:
 
-- Room database access must go through DAOs.
-- DAOs must be accessed through repository implementations.
-- Database schema changes require migrations unless destructive migration is explicitly justified for a pre-release stage.
-- Sensitive credentials must not be stored casually in plain Room tables.
-- Credential storage requires a separate security decision before implementation.
+- Feature destinations own route arguments and entry contracts.
+- Screens receive navigation callbacks rather than navigating through global state where practical.
+- Navigation must not occur until security- or lifecycle-critical cleanup completes.
+- Permanent exit from an active SSH workflow continues to wait for session cleanup.
+
+---
+
+## Dependency Injection
+
+Hilt is the accepted dependency-injection framework.
+
+Rules:
+
+- Domain models are not injected.
+- Feature-specific bindings remain in the owning feature.
+- Application-wide Room aggregation remains in `core/di` and `core/database` as required.
+- Gateways and providers are bound only after concrete implementations exist.
+- Dependency injection must not become a service locator or hide provider selection policy.
+
+---
+
+## Security Boundaries
+
+- Secret values remain transient and outside observable UI state.
+- Private-key material remains one-attempt, bounded, and non-persistent.
+- Host trust remains explicit and fail-closed.
+- Command execution remains explicit and non-interactive.
+- Selecting a Saved Command must never execute it automatically.
+- Unsupported or unknown capabilities must not fall back to guessed commands.
+- Automatic or background execution requires a separate accepted decision.
+- Optional integrations require focused security and lifecycle review.
+
+---
+
+## Testing and Verification
+
+Every behavior-changing slice must use the smallest relevant validation set.
+
+Expected coverage may include:
+
+- Domain and validation unit tests.
+- ViewModel and UI-state tests.
+- Mapper tests.
+- DAO and repository instrumentation tests.
+- Room migration tests.
+- Provider parser and mapping tests.
+- Gateway routing and support-state tests.
+- Runtime verification for newly claimed platform support.
+- Kotlin compilation, Android test compilation, unit tests, lint, and debug builds.
+
+A new provider must not create a support claim until its documented environment has verification evidence.
+
+---
+
+## Evolution Rules
+
+Before adding a gateway-backed capability:
+
+1. Define the platform-neutral user operation.
+2. Define Core models, results, and support states.
+3. Explain why a Gateway is required.
+4. Identify the first Provider or Adapter and transport.
+5. Define security and lifecycle boundaries.
+6. Define unsupported, unknown, and unavailable behavior.
+7. Define automated and runtime verification.
+8. Update ADR or architecture documentation when the decision is significant.
+
+Before adding a purely local feature, use the existing feature-owned domain/repository/presentation structure and avoid unnecessary capability abstractions.
+
+---
+
+## Current Non-Goals
+
+The current implementation does not include:
+
+- Universal multi-platform support.
+- Interactive terminal UI.
+- Persistent credential storage.
+- Background monitoring or execution.
+- Saved Commands management UI.
+- SSH Saved Command selection.
+- Operating-system discovery.
+- Capability Gateway production abstractions.
+- WinRM or additional transports.
+- Service management or monitoring providers.
+- Xray, x-ui, Docker, Kubernetes, certificate-authority, cloud-provider, or other named integrations.
+- A public plugin system.
+
+---
+
+## Related Documents
+
+- [Product Vision](PRODUCT_VISION.md)
+- [Project State](PROJECT_STATE.md)
+- [Engineering Strategy](ENGINEERING_STRATEGY.md)
+- [Package Structure](../PACKAGE_STRUCTURE.md)
+- [Roadmap](ROADMAP.md)
+- [Architecture Decision Records](adr/README.md)
+- [Saved Commands Status](state/SAVED_COMMANDS_STATUS.md)
+- [SSH Status](state/SSH_STATUS.md)

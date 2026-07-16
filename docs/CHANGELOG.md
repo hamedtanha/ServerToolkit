@@ -18,6 +18,8 @@ The project follows Conventional Commits and Semantic Versioning principles.
 - Added database migration `4 → 5`, exported Room schema version `5`, and the indexed `saved_commands` table.
 - Added domain, mapper, DAO, repository, and migration coverage for validation, exact command-text preservation, stable newest-first ordering, duplicate rejection, lookup, and deletion.
 - Added a focused Saved Commands current-state document and accepted delivery boundaries for management UI and later SSH input integration.
+- Added ADR-015 for the platform-neutral remote systems product direction and evidence-based support claims.
+- Added ADR-016 for the three-level Core, Capability Gateway, and Provider/Adapter remote capability architecture.
 
 ### Changed
 
@@ -29,13 +31,19 @@ The project follows Conventional Commits and Semantic Versioning principles.
 - Replaced the incomplete package-structure document with a factual current baseline covering Dashboard, Server Inventory, SSH, and the new `savedcommands` boundary.
 - Updated the Server Toolkit Room database from version `4` to version `5` without destructive fallback.
 - Synchronized README, project state, roadmap, changelog, documentation governance, package structure, and Saved Commands status with the implemented persistence foundation.
+- Refined the product direction from Linux-specific administration to platform-neutral remote systems operations without claiming universal platform support.
+- Defined separate architecturally permitted, implemented, and verified support states.
+- Defined Core, Capability Gateway, and Provider/Adapter responsibilities and inward dependency direction for gateway-backed remote capabilities.
+- Reframed named services and vendors as optional future integrations rather than committed Core roadmap direction.
+- Synchronized README, Product Vision, Architecture, Engineering Strategy, Project State, Roadmap, changelog, and the ADR index with ADR-015 and ADR-016.
+- Corrected stale architecture documentation to record Room database version `5` and the implemented Saved Commands persistence foundation.
 
 ### Not Changed
 
 - No Java, Gradle, Android Gradle Plugin, Kotlin, KSP, Android SDK, Build Tools, NDK, or application dependency version was changed by these updates.
 - Android `versionName` and `versionCode` remain unchanged.
 - No Saved Commands UI, navigation, editing, categories, favorites, templates, server assignment, SSH selection, automatic execution, background execution, or credential storage was added.
-- `ARCHITECTURE.md` and the ADR index remain unchanged because Slice 1 follows the accepted Room persistence and repository architecture without introducing a new significant decision.
+- No Android production code, package hierarchy, Capability Gateway implementation, Provider registry, platform detection, transport, monitoring, service-management workflow, or named-service integration was added by the architecture decision.
 - The immutable version 0.4.0 release tag, artifacts, checksums, and release evidence remain unchanged.
 
 ---
