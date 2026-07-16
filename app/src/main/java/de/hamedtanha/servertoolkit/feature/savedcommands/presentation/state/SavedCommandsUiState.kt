@@ -11,11 +11,19 @@ data class SavedCommandCreateFormUiState(
     val errorMessage: String? = null,
 )
 
+data class SavedCommandDeleteConfirmationUiState(
+    val savedCommandId: String,
+    val savedCommandName: String,
+    val isDeleting: Boolean = false,
+    val errorMessage: String? = null,
+)
+
 data class SavedCommandsUiState(
     val commands: List<SavedCommand> = emptyList(),
     val isLoading: Boolean = false,
     val errorMessage: String? = null,
     val createForm: SavedCommandCreateFormUiState? = null,
+    val deleteConfirmation: SavedCommandDeleteConfirmationUiState? = null,
 ) {
     val isEmpty: Boolean
         get() = commands.isEmpty() && !isLoading && errorMessage == null
@@ -31,4 +39,7 @@ data class SavedCommandsUiState(
 
     val isCreateVisible: Boolean
         get() = createForm != null
+
+    val isDeleteVisible: Boolean
+        get() = deleteConfirmation != null
 }

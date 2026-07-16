@@ -59,6 +59,19 @@ class SavedCommandsUiStateTest {
         )
     }
 
+    @Test
+    fun `delete visibility is derived from confirmation presence`() {
+        assertFalse(SavedCommandsUiState().isDeleteVisible)
+        assertTrue(
+            SavedCommandsUiState(
+                deleteConfirmation = SavedCommandDeleteConfirmationUiState(
+                    savedCommandId = "saved-command-1",
+                    savedCommandName = "List services",
+                ),
+            ).isDeleteVisible,
+        )
+    }
+
     private fun savedCommand(): SavedCommand {
         return SavedCommand(
             id = "saved-command-1",

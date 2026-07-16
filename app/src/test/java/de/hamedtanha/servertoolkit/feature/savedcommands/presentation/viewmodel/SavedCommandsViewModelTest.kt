@@ -333,6 +333,179 @@ class SavedCommandsViewModelTest {
         assertEquals(1, repository.createCallCount)
     }
 
+    @Test
+    fun `selects and cancels delete target without changing persistence`() = runTest {
+        val repository = FakeSavedCommandRepository(
+            initialCommands = listOf(savedCommand()),
+        )
+        val viewModel = createViewModel(repository)
+        viewModel.uiState.first { state -> state.hasCommands }
+
+        viewModel.onDeleteRequested("saved-command-1")
+
+        val confirmation = requireNotNull(
+            viewModel.uiState.value.deleteConfirmation,
+        )
+        assertEquals("saved-command-1", confirmation.savedCommandId)
+        assertEquals("List services", confirmation.savedCommandName)
+
+        viewModel.onCancelDelete()
+
+        assertFalse(viewModel.uiState.value.isDeleteVisible)
+        assertEquals(0, repository.deleteCallCount)
+        assertEquals(1, viewModel.uiState.value.commands.size)
+    }
+
+    @Test
+    fun `does not open delete confirmation for unknown identifier`() = runTest {
+        val repository = FakeSavedCommandRepository(
+            initialCommands = listOf(savedCommand()),
+        )
+        val viewModel = createViewModel(repository)
+        viewModel.uiState.first { state -> state.hasCommands }
+
+        viewModel.onDeleteRequested("missing-command")
+
+        assertFalse(viewModel.uiState.value.isDeleteVisible)
+        assertEquals(0, repository.deleteCallCount)
+    }
+
+    @Test
+    fun `does not expose create and delete workflows together`() = runTest {
+        val repository = FakeSavedCommandRepository(
+            initialCommands = listOf(savedCommand()),
+        )
+        val viewModel = createViewModel(repository)
+        viewModel.uiState.first { state -> state.hasCommands }
+
+        viewModel.onOpenCreate()
+        viewModel.onDeleteRequested("saved-command-1")
+
+        assertTrue(viewModel.uiState.value.isCreateVisible)
+        assertFalse(viewModel.uiState.value.isDeleteVisible)
+
+        viewModel.onCancelCreate()
+        viewModel.onDeleteRequested("saved-command-1")
+        viewModel.onOpenCreate()
+
+        assertFalse(viewModel.uiState.value.isCreateVisible)
+        assertTrue(viewModel.uiState.value.isDeleteVisible)
+    }
+
+    @Test
+    fun `confirmed deletion calls repository once and relies on observation`() = runTest {
+        val repository = FakeSavedCommandRepository(
+            initialCommands = listOf(savedCommand()),
+        )
+        val viewModel = createViewModel(repository)
+        viewModel.uiState.first { state -> state.hasCommands }
+
+        viewModel.onDeleteRequested("saved-command-1")
+        viewModel.onDeleteConfirmed()
+
+        val completedState = viewModel.uiState.first { state ->
+            !state.isDeleteVisible && state.isEmpty
+        }
+
+        assertTrue(completedState.commands.isEmpty())
+        assertEquals(1, repository.deleteCallCount)
+        assertEquals(listOf("saved-command-1"), repository.deleteArguments)
+    }
+
+    @Test
+    fun `deletion failure preserves loaded command and allows cancellation`() = runTest {
+        val repository = FakeSavedCommandRepository(
+            initialCommands = listOf(savedCommand()),
+        )
+        repository.deleteFailure = IllegalStateException("Database unavailable")
+        val viewModel = createViewModel(repository)
+        viewModel.uiState.first { state -> state.hasCommands }
+
+        viewModel.onDeleteRequested("saved-command-1")
+        viewModel.onDeleteConfirmed()
+
+        val failedState = viewModel.uiState.first { state ->
+            state.deleteConfirmation?.errorMessage != null
+        }
+        val confirmation = requireNotNull(failedState.deleteConfirmation)
+
+        assertEquals(1, failedState.commands.size)
+        assertEquals("saved-command-1", failedState.commands.single().id)
+        assertFalse(confirmation.isDeleting)
+        assertEquals(
+            "Saved command could not be deleted.",
+            confirmation.errorMessage,
+        )
+
+        viewModel.onCancelDelete()
+
+        assertFalse(viewModel.uiState.value.isDeleteVisible)
+        assertEquals(1, viewModel.uiState.value.commands.size)
+    }
+
+    @Test
+    fun `retries deletion after failure`() = runTest {
+        val repository = FakeSavedCommandRepository(
+            initialCommands = listOf(savedCommand()),
+        )
+        repository.deleteFailure = IllegalStateException("Database unavailable")
+        val viewModel = createViewModel(repository)
+        viewModel.uiState.first { state -> state.hasCommands }
+
+        viewModel.onDeleteRequested("saved-command-1")
+        viewModel.onDeleteConfirmed()
+        viewModel.uiState.first { state ->
+            state.deleteConfirmation?.errorMessage != null
+        }
+
+        repository.deleteFailure = null
+        viewModel.onDeleteConfirmed()
+
+        viewModel.uiState.first { state ->
+            !state.isDeleteVisible && state.isEmpty
+        }
+
+        assertEquals(2, repository.deleteCallCount)
+        assertEquals(
+            listOf("saved-command-1", "saved-command-1"),
+            repository.deleteArguments,
+        )
+    }
+
+    @Test
+    fun `prevents duplicate delete confirmation while deleting`() = runTest {
+        val repository = FakeSavedCommandRepository(
+            initialCommands = listOf(savedCommand()),
+        ).apply {
+            suspendDeleteOperations = true
+        }
+        val viewModel = createViewModel(repository)
+        viewModel.uiState.first { state -> state.hasCommands }
+
+        viewModel.onDeleteRequested("saved-command-1")
+        viewModel.onDeleteConfirmed()
+        repository.awaitDeleteStarted()
+
+        assertTrue(
+            requireNotNull(
+                viewModel.uiState.value.deleteConfirmation,
+            ).isDeleting,
+        )
+
+        viewModel.onDeleteConfirmed()
+        viewModel.onCancelDelete()
+
+        assertEquals(1, repository.deleteCallCount)
+        assertTrue(viewModel.uiState.value.isDeleteVisible)
+
+        repository.releaseDelete()
+        viewModel.uiState.first { state ->
+            !state.isDeleteVisible && state.isEmpty
+        }
+
+        assertEquals(1, repository.deleteCallCount)
+    }
+
     private fun createViewModel(
         repository: SavedCommandRepository,
     ): SavedCommandsViewModel {

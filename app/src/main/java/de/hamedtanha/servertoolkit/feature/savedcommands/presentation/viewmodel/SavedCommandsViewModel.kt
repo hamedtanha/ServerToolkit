@@ -7,6 +7,7 @@ import de.hamedtanha.servertoolkit.feature.savedcommands.domain.factory.SavedCom
 import de.hamedtanha.servertoolkit.feature.savedcommands.domain.model.SavedCommand
 import de.hamedtanha.servertoolkit.feature.savedcommands.domain.repository.SavedCommandRepository
 import de.hamedtanha.servertoolkit.feature.savedcommands.presentation.state.SavedCommandCreateFormUiState
+import de.hamedtanha.servertoolkit.feature.savedcommands.presentation.state.SavedCommandDeleteConfirmationUiState
 import de.hamedtanha.servertoolkit.feature.savedcommands.presentation.state.SavedCommandsUiState
 import javax.inject.Inject
 import kotlinx.coroutines.CancellationException
@@ -43,7 +44,10 @@ class SavedCommandsViewModel @Inject constructor(
 
     fun onOpenCreate() {
         _uiState.update { currentState ->
-            if (currentState.createForm != null) {
+            if (
+                currentState.createForm != null ||
+                currentState.deleteConfirmation != null
+            ) {
                 currentState
             } else {
                 currentState.copy(
@@ -160,6 +164,89 @@ class SavedCommandsViewModel @Inject constructor(
         }
     }
 
+    fun onDeleteRequested(savedCommandId: String) {
+        _uiState.update { currentState ->
+            if (
+                currentState.createForm != null ||
+                currentState.deleteConfirmation != null
+            ) {
+                return@update currentState
+            }
+
+            val target = currentState.commands.firstOrNull { command ->
+                command.id == savedCommandId
+            } ?: return@update currentState
+
+            currentState.copy(
+                deleteConfirmation = SavedCommandDeleteConfirmationUiState(
+                    savedCommandId = target.id,
+                    savedCommandName = target.name,
+                ),
+            )
+        }
+    }
+
+    fun onCancelDelete() {
+        _uiState.update { currentState ->
+            if (currentState.deleteConfirmation?.isDeleting == true) {
+                currentState
+            } else {
+                currentState.copy(deleteConfirmation = null)
+            }
+        }
+    }
+
+    fun onDeleteConfirmed() {
+        val confirmation = _uiState.value.deleteConfirmation ?: return
+        if (confirmation.isDeleting) {
+            return
+        }
+
+        _uiState.update { currentState ->
+            val currentConfirmation = currentState.deleteConfirmation
+                ?: return@update currentState
+
+            currentState.copy(
+                deleteConfirmation = currentConfirmation.copy(
+                    isDeleting = true,
+                    errorMessage = null,
+                ),
+            )
+        }
+
+        viewModelScope.launch {
+            try {
+                savedCommandRepository.deleteSavedCommand(
+                    confirmation.savedCommandId,
+                )
+                _uiState.update { currentState ->
+                    currentState.copy(deleteConfirmation = null)
+                }
+            } catch (error: CancellationException) {
+                throw error
+            } catch (_: Exception) {
+                _uiState.update { currentState ->
+                    val currentConfirmation = currentState.deleteConfirmation
+                        ?: return@update currentState
+
+                    if (
+                        currentConfirmation.savedCommandId !=
+                        confirmation.savedCommandId
+                    ) {
+                        return@update currentState
+                    }
+
+                    currentState.copy(
+                        deleteConfirmation = currentConfirmation.copy(
+                            isDeleting = false,
+                            errorMessage = DELETE_ERROR_MESSAGE,
+                        ),
+                    )
+                }
+            }
+        }
+    }
+
     private fun observeSavedCommands(
         showLoading: Boolean,
     ) {
@@ -223,6 +310,8 @@ class SavedCommandsViewModel @Inject constructor(
             "Saved commands could not be loaded."
         const val CREATE_ERROR_MESSAGE =
             "Saved command could not be created."
+        const val DELETE_ERROR_MESSAGE =
+            "Saved command could not be deleted."
         const val NAME_REQUIRED_MESSAGE =
             "Name is required."
         const val NAME_CONTROL_CHARACTER_MESSAGE =

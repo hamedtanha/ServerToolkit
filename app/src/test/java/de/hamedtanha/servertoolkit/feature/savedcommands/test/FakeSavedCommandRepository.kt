@@ -17,8 +17,11 @@ class FakeSavedCommandRepository(
     private var currentCommands: List<SavedCommand> = initialCommands
     private val createStartedSignal = CompletableDeferred<Unit>()
     private val createReleaseSignal = CompletableDeferred<Unit>()
+    private val deleteStartedSignal = CompletableDeferred<Unit>()
+    private val deleteReleaseSignal = CompletableDeferred<Unit>()
 
     val createArguments: MutableList<SavedCommand> = mutableListOf()
+    val deleteArguments: MutableList<String> = mutableListOf()
 
     var observeCallCount: Int = 0
         private set
@@ -26,8 +29,13 @@ class FakeSavedCommandRepository(
     var createCallCount: Int = 0
         private set
 
+    var deleteCallCount: Int = 0
+        private set
+
     var createFailure: Throwable? = null
+    var deleteFailure: Throwable? = null
     var suspendCreateOperations: Boolean = false
+    var suspendDeleteOperations: Boolean = false
 
     init {
         emitObservation(Result.success(currentCommands))
@@ -75,6 +83,18 @@ class FakeSavedCommandRepository(
     override suspend fun deleteSavedCommand(
         savedCommandId: String,
     ) {
+        deleteCallCount += 1
+        deleteArguments += savedCommandId
+        deleteStartedSignal.complete(Unit)
+
+        if (suspendDeleteOperations) {
+            deleteReleaseSignal.await()
+        }
+
+        deleteFailure?.let { failure ->
+            throw failure
+        }
+
         currentCommands = currentCommands.filterNot { command ->
             command.id == savedCommandId
         }
@@ -103,6 +123,14 @@ class FakeSavedCommandRepository(
 
     fun releaseCreate() {
         createReleaseSignal.complete(Unit)
+    }
+
+    suspend fun awaitDeleteStarted() {
+        deleteStartedSignal.await()
+    }
+
+    fun releaseDelete() {
+        deleteReleaseSignal.complete(Unit)
     }
 
     private fun emitObservation(
