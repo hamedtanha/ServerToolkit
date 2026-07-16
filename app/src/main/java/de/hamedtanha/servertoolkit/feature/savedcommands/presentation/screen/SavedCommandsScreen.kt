@@ -1,61 +1,262 @@
 package de.hamedtanha.servertoolkit.feature.savedcommands.presentation.screen
 
 import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.lazy.LazyColumn
+import androidx.compose.foundation.lazy.items
 import androidx.compose.material3.Button
+import androidx.compose.material3.Card
+import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.OutlinedButton
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
+import androidx.hilt.lifecycle.viewmodel.compose.hiltViewModel
+import androidx.lifecycle.compose.collectAsStateWithLifecycle
+import de.hamedtanha.servertoolkit.feature.savedcommands.domain.model.SavedCommand
+import de.hamedtanha.servertoolkit.feature.savedcommands.presentation.state.SavedCommandsUiState
+import de.hamedtanha.servertoolkit.feature.savedcommands.presentation.viewmodel.SavedCommandsViewModel
 
 @Composable
 fun SavedCommandsRoute(
     onNavigateBack: () -> Unit,
+    modifier: Modifier = Modifier,
+    viewModel: SavedCommandsViewModel = hiltViewModel(),
 ) {
+    val uiState by viewModel.uiState.collectAsStateWithLifecycle()
+
     SavedCommandsScreen(
+        uiState = uiState,
         onNavigateBack = onNavigateBack,
+        onRetryLoad = viewModel::onRetryLoad,
+        modifier = modifier,
     )
 }
 
 @Composable
 fun SavedCommandsScreen(
+    uiState: SavedCommandsUiState,
     onNavigateBack: () -> Unit,
+    onRetryLoad: () -> Unit,
     modifier: Modifier = Modifier,
 ) {
     Column(
         modifier = modifier
             .fillMaxSize()
             .padding(24.dp),
-        verticalArrangement = Arrangement.Center,
-        horizontalAlignment = Alignment.CenterHorizontally,
     ) {
         Text(
             text = "Saved Commands",
-            style = MaterialTheme.typography.headlineMedium,
-            textAlign = TextAlign.Center,
+            style = MaterialTheme.typography.titleLarge,
+        )
+
+        Spacer(modifier = Modifier.height(8.dp))
+
+        Text(
+            text = "Reusable command text stored locally on this device.",
+            style = MaterialTheme.typography.bodyMedium,
+            color = MaterialTheme.colorScheme.onSurfaceVariant,
         )
 
         Spacer(modifier = Modifier.height(16.dp))
 
-        Text(
-            text = "The Saved Commands management workflow is not implemented yet.",
-            style = MaterialTheme.typography.bodyMedium,
-            textAlign = TextAlign.Center,
-        )
+        when {
+            uiState.isLoading && !uiState.hasCommands -> {
+                SavedCommandsLoadingContent(
+                    modifier = Modifier
+                        .weight(1f)
+                        .fillMaxWidth(),
+                )
+            }
 
-        Spacer(modifier = Modifier.height(24.dp))
+            uiState.hasBlockingError -> {
+                SavedCommandsMessageContent(
+                    title = "Saved commands could not be loaded",
+                    message = requireNotNull(uiState.errorMessage),
+                    onRetryLoad = onRetryLoad,
+                    modifier = Modifier
+                        .weight(1f)
+                        .fillMaxWidth(),
+                )
+            }
 
-        Button(
+            uiState.isEmpty -> {
+                SavedCommandsMessageContent(
+                    title = "No saved commands",
+                    message = "No reusable command text has been saved yet.",
+                    modifier = Modifier
+                        .weight(1f)
+                        .fillMaxWidth(),
+                )
+            }
+
+            uiState.hasCommands -> {
+                SavedCommandsContent(
+                    uiState = uiState,
+                    onRetryLoad = onRetryLoad,
+                    modifier = Modifier
+                        .weight(1f)
+                        .fillMaxWidth(),
+                )
+            }
+        }
+
+        Spacer(modifier = Modifier.height(16.dp))
+
+        OutlinedButton(
             onClick = onNavigateBack,
+            modifier = Modifier.fillMaxWidth(),
         ) {
-            Text(text = "Back to dashboard")
+            Text(text = "Back")
+        }
+    }
+}
+
+@Composable
+private fun SavedCommandsLoadingContent(
+    modifier: Modifier = Modifier,
+) {
+    Box(
+        modifier = modifier,
+        contentAlignment = Alignment.Center,
+    ) {
+        CircularProgressIndicator()
+    }
+}
+
+@Composable
+private fun SavedCommandsMessageContent(
+    title: String,
+    message: String,
+    modifier: Modifier = Modifier,
+    onRetryLoad: (() -> Unit)? = null,
+) {
+    Box(
+        modifier = modifier,
+        contentAlignment = Alignment.Center,
+    ) {
+        Column(
+            horizontalAlignment = Alignment.CenterHorizontally,
+        ) {
+            Text(
+                text = title,
+                style = MaterialTheme.typography.titleMedium,
+                textAlign = TextAlign.Center,
+            )
+
+            Spacer(modifier = Modifier.height(8.dp))
+
+            Text(
+                text = message,
+                style = MaterialTheme.typography.bodyMedium,
+                textAlign = TextAlign.Center,
+                color = MaterialTheme.colorScheme.onSurfaceVariant,
+            )
+
+            onRetryLoad?.let { retry ->
+                Spacer(modifier = Modifier.height(16.dp))
+
+                Button(
+                    onClick = retry,
+                ) {
+                    Text(text = "Retry")
+                }
+            }
+        }
+    }
+}
+
+@Composable
+private fun SavedCommandsContent(
+    uiState: SavedCommandsUiState,
+    onRetryLoad: () -> Unit,
+    modifier: Modifier = Modifier,
+) {
+    Column(
+        modifier = modifier,
+    ) {
+        if (uiState.hasNonBlockingError) {
+            SavedCommandsObservationWarning(
+                message = requireNotNull(uiState.errorMessage),
+                onRetryLoad = onRetryLoad,
+            )
+
+            Spacer(modifier = Modifier.height(12.dp))
+        }
+
+        LazyColumn(
+            modifier = Modifier.fillMaxSize(),
+            verticalArrangement = Arrangement.spacedBy(12.dp),
+        ) {
+            items(
+                items = uiState.commands,
+                key = { command -> command.id },
+            ) { command ->
+                SavedCommandItem(command)
+            }
+        }
+    }
+}
+
+@Composable
+private fun SavedCommandsObservationWarning(
+    message: String,
+    onRetryLoad: () -> Unit,
+) {
+    Card(
+        modifier = Modifier.fillMaxWidth(),
+    ) {
+        Column(
+            modifier = Modifier.padding(16.dp),
+        ) {
+            Text(
+                text = message,
+                style = MaterialTheme.typography.bodyMedium,
+                color = MaterialTheme.colorScheme.error,
+            )
+
+            Spacer(modifier = Modifier.height(8.dp))
+
+            Button(
+                onClick = onRetryLoad,
+            ) {
+                Text(text = "Retry")
+            }
+        }
+    }
+}
+
+@Composable
+private fun SavedCommandItem(
+    command: SavedCommand,
+) {
+    Card(
+        modifier = Modifier.fillMaxWidth(),
+    ) {
+        Column(
+            modifier = Modifier.padding(16.dp),
+            verticalArrangement = Arrangement.spacedBy(8.dp),
+        ) {
+            Text(
+                text = command.name,
+                style = MaterialTheme.typography.titleMedium,
+            )
+
+            Text(
+                text = command.command,
+                style = MaterialTheme.typography.bodyMedium,
+            )
         }
     }
 }
