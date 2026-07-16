@@ -2,6 +2,7 @@ package de.hamedtanha.servertoolkit.feature.savedcommands.test
 
 import de.hamedtanha.servertoolkit.feature.savedcommands.domain.model.SavedCommand
 import de.hamedtanha.servertoolkit.feature.savedcommands.domain.repository.SavedCommandRepository
+import kotlinx.coroutines.CompletableDeferred
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.flow.map
@@ -14,9 +15,19 @@ class FakeSavedCommandRepository(
         MutableSharedFlow<Result<List<SavedCommand>>>(replay = 1)
 
     private var currentCommands: List<SavedCommand> = initialCommands
+    private val createStartedSignal = CompletableDeferred<Unit>()
+    private val createReleaseSignal = CompletableDeferred<Unit>()
+
+    val createArguments: MutableList<SavedCommand> = mutableListOf()
 
     var observeCallCount: Int = 0
         private set
+
+    var createCallCount: Int = 0
+        private set
+
+    var createFailure: Throwable? = null
+    var suspendCreateOperations: Boolean = false
 
     init {
         emitObservation(Result.success(currentCommands))
@@ -41,6 +52,18 @@ class FakeSavedCommandRepository(
     override suspend fun createSavedCommand(
         savedCommand: SavedCommand,
     ) {
+        createCallCount += 1
+        createArguments += savedCommand
+        createStartedSignal.complete(Unit)
+
+        if (suspendCreateOperations) {
+            createReleaseSignal.await()
+        }
+
+        createFailure?.let { failure ->
+            throw failure
+        }
+
         currentCommands = listOf(savedCommand) +
             currentCommands.filterNot { command ->
                 command.id == savedCommand.id
@@ -72,6 +95,14 @@ class FakeSavedCommandRepository(
         ),
     ) {
         emitObservation(Result.failure(error))
+    }
+
+    suspend fun awaitCreateStarted() {
+        createStartedSignal.await()
+    }
+
+    fun releaseCreate() {
+        createReleaseSignal.complete(Unit)
     }
 
     private fun emitObservation(

@@ -49,6 +49,16 @@ class SavedCommandsUiStateTest {
         assertFalse(state.hasBlockingError)
     }
 
+    @Test
+    fun `create visibility is derived from create form presence`() {
+        assertFalse(SavedCommandsUiState().isCreateVisible)
+        assertTrue(
+            SavedCommandsUiState(
+                createForm = SavedCommandCreateFormUiState(),
+            ).isCreateVisible,
+        )
+    }
+
     private fun savedCommand(): SavedCommand {
         return SavedCommand(
             id = "saved-command-1",

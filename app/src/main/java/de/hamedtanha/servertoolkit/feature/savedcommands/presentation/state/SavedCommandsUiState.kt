@@ -2,10 +2,20 @@ package de.hamedtanha.servertoolkit.feature.savedcommands.presentation.state
 
 import de.hamedtanha.servertoolkit.feature.savedcommands.domain.model.SavedCommand
 
+data class SavedCommandCreateFormUiState(
+    val name: String = "",
+    val command: String = "",
+    val nameError: String? = null,
+    val commandError: String? = null,
+    val isSaving: Boolean = false,
+    val errorMessage: String? = null,
+)
+
 data class SavedCommandsUiState(
     val commands: List<SavedCommand> = emptyList(),
     val isLoading: Boolean = false,
     val errorMessage: String? = null,
+    val createForm: SavedCommandCreateFormUiState? = null,
 ) {
     val isEmpty: Boolean
         get() = commands.isEmpty() && !isLoading && errorMessage == null
@@ -18,4 +28,7 @@ data class SavedCommandsUiState(
 
     val hasNonBlockingError: Boolean
         get() = commands.isNotEmpty() && errorMessage != null
+
+    val isCreateVisible: Boolean
+        get() = createForm != null
 }

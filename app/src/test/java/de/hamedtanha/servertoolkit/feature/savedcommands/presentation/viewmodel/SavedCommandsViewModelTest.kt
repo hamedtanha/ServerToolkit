@@ -1,6 +1,7 @@
 package de.hamedtanha.servertoolkit.feature.savedcommands.presentation.viewmodel
 
 import de.hamedtanha.servertoolkit.core.test.MainDispatcherRule
+import de.hamedtanha.servertoolkit.feature.savedcommands.domain.factory.SavedCommandFactory
 import de.hamedtanha.servertoolkit.feature.savedcommands.domain.model.SavedCommand
 import de.hamedtanha.servertoolkit.feature.savedcommands.domain.repository.SavedCommandRepository
 import de.hamedtanha.servertoolkit.feature.savedcommands.test.FakeSavedCommandRepository
@@ -22,9 +23,7 @@ class SavedCommandsViewModelTest {
 
     @Test
     fun `starts in loading state before repository emission`() = runTest {
-        val viewModel = SavedCommandsViewModel(
-            PendingSavedCommandRepository(),
-        )
+        val viewModel = createViewModel(PendingSavedCommandRepository())
 
         assertTrue(viewModel.uiState.value.isLoading)
         assertFalse(viewModel.uiState.value.isEmpty)
@@ -32,9 +31,7 @@ class SavedCommandsViewModelTest {
 
     @Test
     fun `exposes empty state for empty repository emission`() = runTest {
-        val viewModel = SavedCommandsViewModel(
-            FakeSavedCommandRepository(),
-        )
+        val viewModel = createViewModel(FakeSavedCommandRepository())
 
         val state = viewModel.uiState.first { currentState ->
             !currentState.isLoading
@@ -60,7 +57,7 @@ class SavedCommandsViewModelTest {
             ),
         )
 
-        val viewModel = SavedCommandsViewModel(repository)
+        val viewModel = createViewModel(repository)
 
         val state = viewModel.uiState.first { currentState ->
             currentState.hasCommands
@@ -77,7 +74,7 @@ class SavedCommandsViewModelTest {
         val repository = FakeSavedCommandRepository()
         repository.failObservation()
 
-        val viewModel = SavedCommandsViewModel(repository)
+        val viewModel = createViewModel(repository)
 
         val failedState = viewModel.uiState.first { currentState ->
             currentState.hasBlockingError
@@ -88,15 +85,11 @@ class SavedCommandsViewModelTest {
             failedState.errorMessage,
         )
 
-        repository.emitSavedCommands(
-            listOf(savedCommand()),
-        )
-
+        repository.emitSavedCommands(listOf(savedCommand()))
         viewModel.onRetryLoad()
 
         val recoveredState = viewModel.uiState.first { currentState ->
-            currentState.hasCommands &&
-                currentState.errorMessage == null
+            currentState.hasCommands && currentState.errorMessage == null
         }
 
         assertEquals("saved-command-1", recoveredState.commands.single().id)
@@ -108,13 +101,9 @@ class SavedCommandsViewModelTest {
         val repository = FakeSavedCommandRepository(
             initialCommands = listOf(savedCommand()),
         )
+        val viewModel = createViewModel(repository)
 
-        val viewModel = SavedCommandsViewModel(repository)
-
-        viewModel.uiState.first { currentState ->
-            currentState.hasCommands
-        }
-
+        viewModel.uiState.first { currentState -> currentState.hasCommands }
         repository.failObservation()
 
         val failedState = viewModel.uiState.first { currentState ->
@@ -131,6 +120,238 @@ class SavedCommandsViewModelTest {
         )
     }
 
+    @Test
+    fun `opens and cancels create form`() = runTest {
+        val viewModel = createViewModel(FakeSavedCommandRepository())
+        viewModel.uiState.first { state -> !state.isLoading }
+
+        viewModel.onOpenCreate()
+        assertTrue(viewModel.uiState.value.isCreateVisible)
+
+        viewModel.onCancelCreate()
+        assertFalse(viewModel.uiState.value.isCreateVisible)
+    }
+
+    @Test
+    fun `rejects blank normalized name`() = runTest {
+        val repository = FakeSavedCommandRepository()
+        val viewModel = createViewModel(repository)
+
+        openCreateForm(viewModel, name = "   ", command = "echo ok")
+        viewModel.onCreateConfirmed()
+
+        assertEquals(
+            "Name is required.",
+            viewModel.uiState.value.createForm?.nameError,
+        )
+        assertEquals(0, repository.createCallCount)
+    }
+
+    @Test
+    fun `rejects control characters in normalized name`() = runTest {
+        val repository = FakeSavedCommandRepository()
+        val viewModel = createViewModel(repository)
+
+        openCreateForm(
+            viewModel,
+            name = "List\u0000services",
+            command = "echo ok",
+        )
+        viewModel.onCreateConfirmed()
+
+        assertEquals(
+            "Name must not contain control characters.",
+            viewModel.uiState.value.createForm?.nameError,
+        )
+        assertEquals(0, repository.createCallCount)
+    }
+
+    @Test
+    fun `accepts name at maximum length`() = runTest {
+        val repository = FakeSavedCommandRepository()
+        val viewModel = createViewModel(repository)
+        val name = "n".repeat(SavedCommand.MAX_NAME_LENGTH)
+
+        openCreateForm(viewModel, name = name, command = "echo ok")
+        viewModel.onCreateConfirmed()
+
+        viewModel.uiState.first { state -> !state.isCreateVisible }
+        assertEquals(name, repository.createArguments.single().name)
+    }
+
+    @Test
+    fun `rejects name beyond maximum length`() = runTest {
+        val repository = FakeSavedCommandRepository()
+        val viewModel = createViewModel(repository)
+        val name = "n".repeat(SavedCommand.MAX_NAME_LENGTH + 1)
+
+        openCreateForm(viewModel, name = name, command = "echo ok")
+        viewModel.onCreateConfirmed()
+
+        assertEquals(
+            "Name must not exceed ${SavedCommand.MAX_NAME_LENGTH} characters.",
+            viewModel.uiState.value.createForm?.nameError,
+        )
+        assertEquals(0, repository.createCallCount)
+    }
+
+    @Test
+    fun `rejects blank command text`() = runTest {
+        val repository = FakeSavedCommandRepository()
+        val viewModel = createViewModel(repository)
+
+        openCreateForm(
+            viewModel,
+            name = "List services",
+            command = " \n\t ",
+        )
+        viewModel.onCreateConfirmed()
+
+        assertEquals(
+            "Command text is required.",
+            viewModel.uiState.value.createForm?.commandError,
+        )
+        assertEquals(0, repository.createCallCount)
+    }
+
+    @Test
+    fun `accepts command at maximum length`() = runTest {
+        val repository = FakeSavedCommandRepository()
+        val viewModel = createViewModel(repository)
+        val command = "x".repeat(SavedCommand.MAX_COMMAND_LENGTH)
+
+        openCreateForm(
+            viewModel,
+            name = "Maximum command",
+            command = command,
+        )
+        viewModel.onCreateConfirmed()
+
+        viewModel.uiState.first { state -> !state.isCreateVisible }
+        assertEquals(command, repository.createArguments.single().command)
+    }
+
+    @Test
+    fun `rejects command beyond maximum length`() = runTest {
+        val repository = FakeSavedCommandRepository()
+        val viewModel = createViewModel(repository)
+        val command = "x".repeat(SavedCommand.MAX_COMMAND_LENGTH + 1)
+
+        openCreateForm(
+            viewModel,
+            name = "Too large",
+            command = command,
+        )
+        viewModel.onCreateConfirmed()
+
+        assertEquals(
+            "Command text must not exceed ${SavedCommand.MAX_COMMAND_LENGTH} characters.",
+            viewModel.uiState.value.createForm?.commandError,
+        )
+        assertEquals(0, repository.createCallCount)
+    }
+
+    @Test
+    fun `trims name and preserves exact command through creation`() = runTest {
+        val repository = FakeSavedCommandRepository()
+        val viewModel = createViewModel(repository)
+        val exactCommand = "\n  printf 'hello'  \n"
+
+        openCreateForm(
+            viewModel,
+            name = "  Print greeting  ",
+            command = exactCommand,
+        )
+        viewModel.onCreateConfirmed()
+
+        val completedState = viewModel.uiState.first { state ->
+            !state.isCreateVisible && state.hasCommands
+        }
+        val createdCommand = repository.createArguments.single()
+
+        assertEquals("Print greeting", createdCommand.name)
+        assertEquals(exactCommand, createdCommand.command)
+        assertEquals("generated-saved-command", createdCommand.id)
+        assertEquals(4_000L, createdCommand.createdAtEpochMillis)
+        assertEquals(createdCommand, completedState.commands.single())
+    }
+
+    @Test
+    fun `creation failure preserves loaded commands and form input`() = runTest {
+        val repository = FakeSavedCommandRepository(
+            initialCommands = listOf(savedCommand()),
+        )
+        repository.createFailure = IllegalStateException("Database unavailable")
+        val viewModel = createViewModel(repository)
+
+        viewModel.uiState.first { state -> state.hasCommands }
+        openCreateForm(
+            viewModel,
+            name = "  Failed command  ",
+            command = "  echo failed  ",
+        )
+        viewModel.onCreateConfirmed()
+
+        val failedState = viewModel.uiState.first { state ->
+            state.createForm?.errorMessage != null
+        }
+
+        val failedForm = requireNotNull(failedState.createForm)
+
+        assertEquals(1, failedState.commands.size)
+        assertEquals("  Failed command  ", failedForm.name)
+        assertEquals("  echo failed  ", failedForm.command)
+        assertFalse(failedForm.isSaving)
+        assertEquals(
+            "Saved command could not be created.",
+            failedForm.errorMessage,
+        )
+    }
+
+    @Test
+    fun `prevents duplicate create confirmation while saving`() = runTest {
+        val repository = FakeSavedCommandRepository().apply {
+            suspendCreateOperations = true
+        }
+        val viewModel = createViewModel(repository)
+
+        openCreateForm(
+            viewModel,
+            name = "List services",
+            command = "systemctl list-units",
+        )
+        viewModel.onCreateConfirmed()
+        repository.awaitCreateStarted()
+
+        assertTrue(requireNotNull(viewModel.uiState.value.createForm).isSaving)
+
+        viewModel.onCreateConfirmed()
+        assertEquals(1, repository.createCallCount)
+
+        repository.releaseCreate()
+        viewModel.uiState.first { state -> !state.isCreateVisible }
+        assertEquals(1, repository.createCallCount)
+    }
+
+    private fun createViewModel(
+        repository: SavedCommandRepository,
+    ): SavedCommandsViewModel {
+        return SavedCommandsViewModel(
+            savedCommandRepository = repository,
+            savedCommandFactory = FixedSavedCommandFactory(),
+        )
+    }
+
+    private fun openCreateForm(
+        viewModel: SavedCommandsViewModel,
+        name: String,
+        command: String,
+    ) {
+        viewModel.onOpenCreate()
+        viewModel.onCreateNameChanged(name)
+        viewModel.onCreateCommandChanged(command)
+    }
+
     private fun savedCommand(
         id: String = "saved-command-1",
         createdAtEpochMillis: Long = 1_000L,
@@ -143,8 +364,22 @@ class SavedCommandsViewModelTest {
         )
     }
 
-    private class PendingSavedCommandRepository :
-        SavedCommandRepository {
+    private class FixedSavedCommandFactory : SavedCommandFactory {
+
+        override fun create(
+            name: String,
+            command: String,
+        ): SavedCommand {
+            return SavedCommand(
+                id = "generated-saved-command",
+                name = name,
+                command = command,
+                createdAtEpochMillis = 4_000L,
+            )
+        }
+    }
+
+    private class PendingSavedCommandRepository : SavedCommandRepository {
 
         override fun observeSavedCommands(): Flow<List<SavedCommand>> {
             return flow {
