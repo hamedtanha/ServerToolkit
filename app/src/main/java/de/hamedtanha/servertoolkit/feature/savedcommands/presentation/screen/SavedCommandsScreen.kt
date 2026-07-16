@@ -8,23 +8,30 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
+import androidx.compose.material3.AlertDialog
 import androidx.compose.material3.Button
 import androidx.compose.material3.Card
 import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.OutlinedButton
+import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.Text
+import androidx.compose.material3.TextButton
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
+import androidx.compose.ui.window.DialogProperties
 import androidx.hilt.lifecycle.viewmodel.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import de.hamedtanha.servertoolkit.feature.savedcommands.domain.model.SavedCommand
+import de.hamedtanha.servertoolkit.feature.savedcommands.presentation.state.SavedCommandCreateFormUiState
 import de.hamedtanha.servertoolkit.feature.savedcommands.presentation.state.SavedCommandsUiState
 import de.hamedtanha.servertoolkit.feature.savedcommands.presentation.viewmodel.SavedCommandsViewModel
 
@@ -40,6 +47,11 @@ fun SavedCommandsRoute(
         uiState = uiState,
         onNavigateBack = onNavigateBack,
         onRetryLoad = viewModel::onRetryLoad,
+        onOpenCreate = viewModel::onOpenCreate,
+        onCancelCreate = viewModel::onCancelCreate,
+        onCreateNameChanged = viewModel::onCreateNameChanged,
+        onCreateCommandChanged = viewModel::onCreateCommandChanged,
+        onCreateConfirmed = viewModel::onCreateConfirmed,
         modifier = modifier,
     )
 }
@@ -49,6 +61,11 @@ fun SavedCommandsScreen(
     uiState: SavedCommandsUiState,
     onNavigateBack: () -> Unit,
     onRetryLoad: () -> Unit,
+    onOpenCreate: () -> Unit,
+    onCancelCreate: () -> Unit,
+    onCreateNameChanged: (String) -> Unit,
+    onCreateCommandChanged: (String) -> Unit,
+    onCreateConfirmed: () -> Unit,
     modifier: Modifier = Modifier,
 ) {
     Column(
@@ -68,6 +85,18 @@ fun SavedCommandsScreen(
             style = MaterialTheme.typography.bodyMedium,
             color = MaterialTheme.colorScheme.onSurfaceVariant,
         )
+
+        Spacer(modifier = Modifier.height(16.dp))
+
+        Button(
+            onClick = onOpenCreate,
+            enabled = !uiState.isLoading &&
+                !uiState.hasBlockingError &&
+                !uiState.isCreateVisible,
+            modifier = Modifier.fillMaxWidth(),
+        ) {
+            Text(text = "Add saved command")
+        }
 
         Spacer(modifier = Modifier.height(16.dp))
 
@@ -94,7 +123,7 @@ fun SavedCommandsScreen(
             uiState.isEmpty -> {
                 SavedCommandsMessageContent(
                     title = "No saved commands",
-                    message = "No reusable command text has been saved yet.",
+                    message = "Create a saved command to reuse operational text later.",
                     modifier = Modifier
                         .weight(1f)
                         .fillMaxWidth(),
@@ -121,6 +150,120 @@ fun SavedCommandsScreen(
             Text(text = "Back")
         }
     }
+
+    uiState.createForm?.let { createForm ->
+        SavedCommandCreateDialog(
+            form = createForm,
+            onNameChanged = onCreateNameChanged,
+            onCommandChanged = onCreateCommandChanged,
+            onCancel = onCancelCreate,
+            onCreate = onCreateConfirmed,
+        )
+    }
+}
+
+@Composable
+private fun SavedCommandCreateDialog(
+    form: SavedCommandCreateFormUiState,
+    onNameChanged: (String) -> Unit,
+    onCommandChanged: (String) -> Unit,
+    onCancel: () -> Unit,
+    onCreate: () -> Unit,
+) {
+    AlertDialog(
+        onDismissRequest = {
+            if (!form.isSaving) {
+                onCancel()
+            }
+        },
+        title = {
+            Text(text = "Create saved command")
+        },
+        text = {
+            Column(
+                verticalArrangement = Arrangement.spacedBy(12.dp),
+            ) {
+                Text(
+                    text = "The command is stored as entered and is not executed.",
+                    style = MaterialTheme.typography.bodyMedium,
+                    color = MaterialTheme.colorScheme.onSurfaceVariant,
+                )
+
+                OutlinedTextField(
+                    value = form.name,
+                    onValueChange = onNameChanged,
+                    label = {
+                        Text(text = "Name")
+                    },
+                    supportingText = form.nameError?.let { nameError ->
+                        {
+                            Text(text = nameError)
+                        }
+                    },
+                    isError = form.nameError != null,
+                    enabled = !form.isSaving,
+                    singleLine = true,
+                    modifier = Modifier.fillMaxWidth(),
+                )
+
+                OutlinedTextField(
+                    value = form.command,
+                    onValueChange = onCommandChanged,
+                    label = {
+                        Text(text = "Command text")
+                    },
+                    supportingText = form.commandError?.let { commandError ->
+                        {
+                            Text(text = commandError)
+                        }
+                    },
+                    isError = form.commandError != null,
+                    enabled = !form.isSaving,
+                    minLines = 4,
+                    maxLines = 10,
+                    modifier = Modifier.fillMaxWidth(),
+                )
+
+                form.errorMessage?.let { errorMessage ->
+                    Text(
+                        text = errorMessage,
+                        style = MaterialTheme.typography.bodyMedium,
+                        color = MaterialTheme.colorScheme.error,
+                    )
+                }
+            }
+        },
+        confirmButton = {
+            Button(
+                onClick = onCreate,
+                enabled = !form.isSaving,
+            ) {
+                if (form.isSaving) {
+                    CircularProgressIndicator(
+                        modifier = Modifier.size(18.dp),
+                        color = MaterialTheme.colorScheme.onPrimary,
+                        strokeWidth = 2.dp,
+                    )
+                    Spacer(modifier = Modifier.width(8.dp))
+                    Text(text = "Saving")
+                } else {
+                    Text(text = "Create")
+                }
+            }
+        },
+        dismissButton = {
+            TextButton(
+                onClick = onCancel,
+                enabled = !form.isSaving,
+            ) {
+                Text(text = "Cancel")
+            }
+        },
+        properties = DialogProperties(
+            dismissOnBackPress = !form.isSaving,
+            dismissOnClickOutside = !form.isSaving,
+        ),
+    )
 }
 
 @Composable
