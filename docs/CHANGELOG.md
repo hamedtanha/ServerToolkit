@@ -37,10 +37,14 @@ The project follows Conventional Commits and Semantic Versioning principles.
 - Reframed named services and vendors as optional future integrations rather than committed Core roadmap direction.
 - Synchronized README, Product Vision, Architecture, Engineering Strategy, Project State, Roadmap, changelog, and the ADR index with ADR-015 and ADR-016.
 - Corrected stale architecture documentation to record Room database version `5` and the implemented Saved Commands persistence foundation.
+- Updated the core Android build cluster to Gradle `9.5.0`, Android Gradle Plugin `9.3.0`, Kotlin `2.4.10`, and KSP `2.3.10`.
+- Regenerated the Gradle Wrapper, removed the obsolete `android.disallowKotlinSourceSets=false` compatibility option, and aligned tracked IDE language and bytecode metadata with Java `17`.
+- Added an explicit `Any?` bind-argument type in the migration test for Kotlin `2.4.10` compatibility without changing migration behavior.
 
 ### Not Changed
 
-- No Java, Gradle, Android Gradle Plugin, Kotlin, KSP, Android SDK, Build Tools, NDK, or application dependency version was changed by these updates.
+- Java source and target compatibility and the Kotlin JVM toolchain remain on `17`; Gradle daemon JVM criteria remain on `21`.
+- Android compile SDK, target SDK, minimum SDK, Build Tools, NDK, application version metadata, and application-library versions remain unchanged by the core build-cluster update.
 - Android `versionName` and `versionCode` remain unchanged.
 - No Saved Commands UI, navigation, editing, categories, favorites, templates, server assignment, SSH selection, automatic execution, background execution, or credential storage was added.
 - No Android production code, package hierarchy, Capability Gateway implementation, Provider registry, platform detection, transport, monitoring, service-management workflow, or named-service integration was added by the architecture decision.

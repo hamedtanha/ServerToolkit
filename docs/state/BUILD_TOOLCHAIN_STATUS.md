@@ -2,7 +2,7 @@
 
 **Project:** Server Toolkit  
 **Status:** Active  
-**Last Updated:** 2026-07-15
+**Last Updated:** 2026-07-16
 
 ---
 
@@ -54,19 +54,22 @@ Android version metadata is release metadata, not a dependency version. It is in
 | Java source compatibility | `17` | `app/build.gradle.kts` |
 | Java target compatibility | `17` | `app/build.gradle.kts` |
 | Kotlin JVM toolchain | `17` | `app/build.gradle.kts` |
-| CI JDK | Temurin `17` | `.github/workflows/android-validation.yml` |
-| Gradle Wrapper | `9.4.1` | `gradle/wrapper/gradle-wrapper.properties` |
-| Android Gradle Plugin | `9.2.1` | `gradle/libs.versions.toml` |
-| Kotlin | `2.2.10` | `gradle/libs.versions.toml` |
-| KSP | `2.2.10-2.0.2` | `gradle/libs.versions.toml` |
+| CI launcher JDK | Temurin `17` | `.github/workflows/android-validation.yml` |
+| Gradle daemon JVM criteria | `21` | `gradle/gradle-daemon-jvm.properties` |
+| Gradle Wrapper | `9.5.0` | `gradle/wrapper/gradle-wrapper.properties` |
+| Android Gradle Plugin | `9.3.0` | `gradle/libs.versions.toml` |
+| Kotlin | `2.4.10` | `gradle/libs.versions.toml` |
+| KSP | `2.3.10` | `gradle/libs.versions.toml` |
 
 ### Current Alignment
 
-The Java source level, Java target level, Kotlin JVM toolchain, and CI JDK are aligned on Java 17.
+Java source compatibility, Java target compatibility, and the Kotlin JVM toolchain remain aligned on Java `17`.
 
-Android Gradle Plugin, Kotlin, and KSP form a compatibility cluster. They must not be updated independently without checking their supported version relationship.
+CI installs Temurin `17` as the launcher JDK. The repository separately pins Gradle daemon JVM criteria to Java `21` through `gradle/gradle-daemon-jvm.properties`. The daemon runtime is distinct from the application compilation target.
 
-No Java, Gradle, Android Gradle Plugin, Kotlin, or KSP upgrade is currently accepted merely by the existence of a newer release.
+Gradle `9.5.0`, Android Gradle Plugin `9.3.0`, Kotlin `2.4.10`, and KSP `2.3.10` form the implemented core build compatibility cluster.
+
+No further Java, Gradle, Android Gradle Plugin, Kotlin, or KSP upgrade is accepted merely because a newer release exists.
 
 ---
 
@@ -193,17 +196,32 @@ Local SDK installation paths, workstation-specific environment variables, creden
 
 ## Current Upgrade Decisions
 
-No toolchain or dependency version upgrade is accepted by this document.
+The core Android build compatibility cluster was updated on 2026-07-16:
 
-The next upgrade must begin with an explicit engineering trigger and follow [Build Toolchain and Dependency Policy](../BUILD_TOOLCHAIN_AND_DEPENDENCY_POLICY.md).
+- Gradle Wrapper `9.4.1 → 9.5.0`;
+- Android Gradle Plugin `9.2.1 → 9.3.0`;
+- Kotlin `2.2.10 → 2.4.10`;
+- KSP `2.2.10-2.0.2 → 2.3.10`.
 
-Potential versions discovered by IDE suggestions, dependency reports, or automated tools remain proposals until reviewed, implemented, validated, and merged.
+Java source compatibility, Java target compatibility, and the Kotlin JVM toolchain remain on Java `17`. Gradle daemon JVM criteria remain on Java `21`.
+
+The update also:
+
+- regenerated the Gradle Wrapper using Gradle `9.5.0`;
+- retained repository-consistent line endings for wrapper scripts;
+- removed the obsolete `android.disallowKotlinSourceSets=false` project option;
+- aligned tracked IDE language and bytecode metadata with Java `17`;
+- made the heterogeneous SQLite migration-test bind array explicitly `Array<Any?>` for Kotlin `2.4.10` compatibility without changing migration behavior.
+
+The upgrade requires clean local validation, release-signing validation mode, GitHub Actions validation, and documentation synchronization before merge.
+
+Potential versions discovered by IDE suggestions, dependency reports, or automated tools remain proposals until reviewed, implemented, validated, documented, and merged.
 
 ---
 
 ## Current Technical Guardrails
 
-- Keep Java source, target, Kotlin JVM toolchain, and CI JDK aligned.
+- Keep Java source compatibility, Java target compatibility, and the Kotlin JVM toolchain aligned; document launcher and daemon JVM requirements separately.
 - Treat Gradle, Android Gradle Plugin, Kotlin, and KSP as a compatibility cluster.
 - Keep the release Build Tools declaration synchronized with release scripts and documentation.
 - Keep the NDK declaration synchronized between the Android build and release configuration.
