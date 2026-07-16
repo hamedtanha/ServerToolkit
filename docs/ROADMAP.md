@@ -1,8 +1,8 @@
 # Roadmap
 
-**Project:** Server Toolkit  
-**Version:** 0.4.0  
-**Status:** Active  
+**Project:** Server Toolkit
+**Version:** 0.4.0
+**Status:** Active
 **Last Updated:** 2026-07-16
 
 ---

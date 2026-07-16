@@ -1,8 +1,8 @@
 # Project State
 
-**Project:** Server Toolkit  
-**Version:** 0.4.0  
-**Status:** Released  
+**Project:** Server Toolkit
+**Version:** 0.4.0
+**Status:** Released
 **Last Updated:** 2026-07-16
 
 ---

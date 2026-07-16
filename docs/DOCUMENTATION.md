@@ -1,7 +1,7 @@
 # Documentation Governance
 
-**Project:** Server Toolkit  
-**Status:** Active  
+**Project:** Server Toolkit
+**Status:** Active
 **Last Updated:** 2026-07-16
 
 ---

@@ -1,8 +1,8 @@
 # Product Vision
 
-**Project:** Server Toolkit  
-**Document Baseline:** 0.4.0  
-**Status:** Foundational  
+**Project:** Server Toolkit
+**Document Baseline:** 0.4.0
+**Status:** Foundational
 **Last Updated:** 2026-07-16
 
 ---
