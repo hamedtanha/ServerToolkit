@@ -284,7 +284,7 @@ class ServerToolkitDatabaseMigrationTest {
                 created_at_epoch_millis
             ) VALUES (?, ?, ?, ?)
             """.trimIndent(),
-            arrayOf(savedCommandId, name, command, createdAtEpochMillis),
+            arrayOf<Any?>(savedCommandId, name, command, createdAtEpochMillis),
         )
     }
 
