@@ -14,6 +14,7 @@ import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.material3.AlertDialog
 import androidx.compose.material3.Button
+import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.Card
 import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.MaterialTheme
@@ -32,6 +33,7 @@ import androidx.hilt.lifecycle.viewmodel.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import de.hamedtanha.servertoolkit.feature.savedcommands.domain.model.SavedCommand
 import de.hamedtanha.servertoolkit.feature.savedcommands.presentation.state.SavedCommandCreateFormUiState
+import de.hamedtanha.servertoolkit.feature.savedcommands.presentation.state.SavedCommandDeleteConfirmationUiState
 import de.hamedtanha.servertoolkit.feature.savedcommands.presentation.state.SavedCommandsUiState
 import de.hamedtanha.servertoolkit.feature.savedcommands.presentation.viewmodel.SavedCommandsViewModel
 
@@ -52,6 +54,9 @@ fun SavedCommandsRoute(
         onCreateNameChanged = viewModel::onCreateNameChanged,
         onCreateCommandChanged = viewModel::onCreateCommandChanged,
         onCreateConfirmed = viewModel::onCreateConfirmed,
+        onDeleteRequested = viewModel::onDeleteRequested,
+        onCancelDelete = viewModel::onCancelDelete,
+        onDeleteConfirmed = viewModel::onDeleteConfirmed,
         modifier = modifier,
     )
 }
@@ -66,6 +71,9 @@ fun SavedCommandsScreen(
     onCreateNameChanged: (String) -> Unit,
     onCreateCommandChanged: (String) -> Unit,
     onCreateConfirmed: () -> Unit,
+    onDeleteRequested: (String) -> Unit,
+    onCancelDelete: () -> Unit,
+    onDeleteConfirmed: () -> Unit,
     modifier: Modifier = Modifier,
 ) {
     Column(
@@ -92,7 +100,8 @@ fun SavedCommandsScreen(
             onClick = onOpenCreate,
             enabled = !uiState.isLoading &&
                 !uiState.hasBlockingError &&
-                !uiState.isCreateVisible,
+                !uiState.isCreateVisible &&
+                !uiState.isDeleteVisible,
             modifier = Modifier.fillMaxWidth(),
         ) {
             Text(text = "Add saved command")
@@ -134,6 +143,7 @@ fun SavedCommandsScreen(
                 SavedCommandsContent(
                     uiState = uiState,
                     onRetryLoad = onRetryLoad,
+                    onDeleteRequested = onDeleteRequested,
                     modifier = Modifier
                         .weight(1f)
                         .fillMaxWidth(),
@@ -158,6 +168,14 @@ fun SavedCommandsScreen(
             onCommandChanged = onCreateCommandChanged,
             onCancel = onCancelCreate,
             onCreate = onCreateConfirmed,
+        )
+    }
+
+    uiState.deleteConfirmation?.let { confirmation ->
+        SavedCommandDeleteDialog(
+            confirmation = confirmation,
+            onCancel = onCancelDelete,
+            onDelete = onDeleteConfirmed,
         )
     }
 }
@@ -267,6 +285,88 @@ private fun SavedCommandCreateDialog(
 }
 
 @Composable
+private fun SavedCommandDeleteDialog(
+    confirmation: SavedCommandDeleteConfirmationUiState,
+    onCancel: () -> Unit,
+    onDelete: () -> Unit,
+) {
+    AlertDialog(
+        onDismissRequest = {
+            if (!confirmation.isDeleting) {
+                onCancel()
+            }
+        },
+        title = {
+            Text(text = "Delete saved command?")
+        },
+        text = {
+            Column(
+                verticalArrangement = Arrangement.spacedBy(12.dp),
+            ) {
+                Text(
+                    text = "Delete \"${confirmation.savedCommandName}\" from this device?",
+                    style = MaterialTheme.typography.bodyMedium,
+                )
+
+                Text(
+                    text = "This action cannot be undone.",
+                    style = MaterialTheme.typography.bodyMedium,
+                    color = MaterialTheme.colorScheme.error,
+                )
+
+                confirmation.errorMessage?.let { errorMessage ->
+                    Text(
+                        text = errorMessage,
+                        style = MaterialTheme.typography.bodyMedium,
+                        color = MaterialTheme.colorScheme.error,
+                    )
+                }
+            }
+        },
+        confirmButton = {
+            Button(
+                onClick = onDelete,
+                enabled = !confirmation.isDeleting,
+                colors = ButtonDefaults.buttonColors(
+                    containerColor = MaterialTheme.colorScheme.error,
+                    contentColor = MaterialTheme.colorScheme.onError,
+                ),
+            ) {
+                if (confirmation.isDeleting) {
+                    CircularProgressIndicator(
+                        modifier = Modifier.size(18.dp),
+                        color = MaterialTheme.colorScheme.onError,
+                        strokeWidth = 2.dp,
+                    )
+                    Spacer(modifier = Modifier.width(8.dp))
+                    Text(text = "Deleting")
+                } else {
+                    Text(
+                        text = if (confirmation.errorMessage == null) {
+                            "Delete"
+                        } else {
+                            "Retry"
+                        },
+                    )
+                }
+            }
+        },
+        dismissButton = {
+            TextButton(
+                onClick = onCancel,
+                enabled = !confirmation.isDeleting,
+            ) {
+                Text(text = "Cancel")
+            }
+        },
+        properties = DialogProperties(
+            dismissOnBackPress = !confirmation.isDeleting,
+            dismissOnClickOutside = !confirmation.isDeleting,
+        ),
+    )
+}
+
+@Composable
 private fun SavedCommandsLoadingContent(
     modifier: Modifier = Modifier,
 ) {
@@ -324,6 +424,7 @@ private fun SavedCommandsMessageContent(
 private fun SavedCommandsContent(
     uiState: SavedCommandsUiState,
     onRetryLoad: () -> Unit,
+    onDeleteRequested: (String) -> Unit,
     modifier: Modifier = Modifier,
 ) {
     Column(
@@ -346,7 +447,10 @@ private fun SavedCommandsContent(
                 items = uiState.commands,
                 key = { command -> command.id },
             ) { command ->
-                SavedCommandItem(command)
+                SavedCommandItem(
+                    command = command,
+                    onDeleteRequested = onDeleteRequested,
+                )
             }
         }
     }
@@ -383,6 +487,7 @@ private fun SavedCommandsObservationWarning(
 @Composable
 private fun SavedCommandItem(
     command: SavedCommand,
+    onDeleteRequested: (String) -> Unit,
 ) {
     Card(
         modifier = Modifier.fillMaxWidth(),
@@ -400,6 +505,18 @@ private fun SavedCommandItem(
                 text = command.command,
                 style = MaterialTheme.typography.bodyMedium,
             )
+
+            OutlinedButton(
+                onClick = {
+                    onDeleteRequested(command.id)
+                },
+                colors = ButtonDefaults.outlinedButtonColors(
+                    contentColor = MaterialTheme.colorScheme.error,
+                ),
+                modifier = Modifier.fillMaxWidth(),
+            ) {
+                Text(text = "Delete")
+            }
         }
     }
 }
