@@ -20,27 +20,44 @@ The project needs a restrained architecture that isolates those details without 
 
 # Decision
 
-Server Toolkit adopts a **three-level remote capability architecture** for features that require platform discovery, translation, routing, orchestration, policy enforcement, or external-system access.
+Server Toolkit adopts a **three-level remote capability architecture** for features that require platform discovery, translation, routing, normalization, orchestration, policy enforcement, or external-system access.
 
-The three levels are:
+The three responsibility levels are:
 
 1. **Core**
 2. **Capability Gateway**
 3. **Providers and Adapters**
 
-Dependencies point inward toward stable, project-owned Core contracts.
+## Runtime Operation Flow
+
+A typical operation is invoked through a Core-owned capability port and fulfilled through the Gateway and a concrete provider.
 
 ```text
 Presentation / Use Case
-        ↓
-Core capability contract
-        ↓
+        ↓ invokes
+Core capability port
+        ↓ implemented by
 Capability Gateway
-        ↓
+        ↓ calls
+Provider port
+        ↓ implemented by
 Provider / Adapter
-        ↓
+        ↓ accesses
 Transport or external system
 ```
+
+## Compile-Time Dependency Direction
+
+Source dependencies point inward toward stable, project-owned abstractions.
+
+```text
+Presentation / Use Case ───────→ Core
+Capability Gateway ────────────→ Core
+Provider / Adapter ────────────→ Gateway-owned provider port
+Provider / Adapter ────────────→ external transport or SDK
+```
+
+Core never depends on a Gateway, provider, transport, Android implementation, or third-party client.
 
 This architecture complements rather than replaces the accepted Android application layers.
 
@@ -53,11 +70,11 @@ Core owns platform-neutral application meaning.
 ## Responsibilities
 
 - Domain models and value objects.
-- Capability contracts.
+- Capability ports and contracts.
 - Use cases when orchestration or reusable business rules justify them.
 - Normalized operation results and errors.
 - Capability support states.
-- Security, lifecycle, and policy rules that are independent from a concrete provider.
+- Security, lifecycle, and policy rules independent from a concrete provider.
 
 ## Prohibited Dependencies
 
@@ -68,7 +85,7 @@ Core must not depend on:
 - SSHJ, WinRM, HTTP client, cloud SDK, or vendor SDK types;
 - shell commands or command-output formats;
 - operating-system, service-manager, or provider-specific response models;
-- concrete provider implementations.
+- concrete Gateway or provider implementations.
 
 Core contracts describe **what the application means**, not **how a target system implements it**.
 
@@ -80,18 +97,21 @@ The Capability Gateway is the translation, routing, normalization, orchestration
 
 ## Responsibilities
 
-- Resolve the target system context required by the capability.
+- Implement a Core-owned capability port.
+- Resolve target-system context required by the capability.
 - Determine or consume capability support information.
 - Select an appropriate provider or adapter.
 - Translate a Core request into a provider request.
-- Coordinate multiple provider operations when the capability requires it.
+- Coordinate multiple provider operations when required.
 - Enforce capability-specific safety and lifecycle guardrails.
 - Normalize provider results and failures into project-owned Core results.
 - Prevent platform-, transport-, and service-specific details from leaking upward.
 
+The Gateway may own narrow provider ports that concrete providers implement. Those provider ports express only what the Gateway needs and must not expose external SDK types.
+
 ## Gateway Introduction Rule
 
-A gateway is justified only when a concrete capability requires one or more of the following:
+A Gateway is justified only when a concrete capability requires one or more of the following:
 
 - provider selection;
 - platform or environment discovery;
@@ -101,9 +121,9 @@ A gateway is justified only when a concrete capability requires one or more of t
 - policy enforcement across implementations;
 - external integration abstraction.
 
-A gateway must not be introduced only to satisfy a theoretical pattern.
+A Gateway must not be introduced only to satisfy a theoretical pattern.
 
-Purely local features such as Saved Commands management, server favorites, local tags, search, filtering, or Room-backed history continue to use their direct feature-owned domain and repository boundaries unless a real translation or routing requirement appears.
+Purely local features such as Saved Commands management, server favorites, local tags, search, filtering, or Room-backed history continue to use direct feature-owned domain and repository boundaries unless a real translation or routing requirement appears.
 
 ---
 
@@ -113,6 +133,7 @@ Providers and Adapters own concrete external access and implementation-specific 
 
 ## Responsibilities
 
+- Implement narrow provider ports owned by the Gateway boundary.
 - Transport implementations such as SSH, WinRM, or HTTP APIs.
 - Operating-system and service-manager behavior.
 - Vendor- or service-specific integrations.
@@ -124,13 +145,13 @@ Providers and Adapters own concrete external access and implementation-specific 
 
 Examples such as systemd, OpenRC, Windows Service Control Manager, Docker, Kubernetes, or cloud-provider adapters illustrate the boundary only. They are not accepted roadmap commitments by this ADR.
 
-Provider-specific models must remain inside the provider boundary unless deliberately mapped to a project-owned Core model.
+Provider-specific models remain inside the provider boundary unless explicitly mapped to a project-owned Core or Gateway-owned port model.
 
 ---
 
 # Capability Support States
 
-Gateway-backed capabilities must represent support explicitly.
+Gateway-backed capabilities represent support explicitly.
 
 The baseline semantic states are:
 
@@ -150,31 +171,34 @@ Presentation consumes project-owned support states and operation results. It mus
 The application continues to use feature-first MVVM with presentation, domain-oriented contracts, and data implementations.
 
 ```text
-Android application concern:
-UI → Presentation → Domain contracts/models ← Data implementations
+Android application dependencies:
+UI → Presentation → Domain contracts/models
+Data implementation → Domain contracts/models
 
-Remote capability concern:
-Core contract ← Capability Gateway ← Provider/Adapter ← External system
+Remote capability dependencies when a Gateway is required:
+Capability Gateway → Core
+Provider / Adapter → Gateway-owned provider port
 ```
 
-A feature may contain all three remote-capability levels when the behavior is feature-owned, or shared capability contracts may move to an appropriate shared package after reuse is proven.
+A feature may contain the remote-capability responsibilities while they are feature-owned. Shared contracts move to an appropriate shared package only after genuine cross-feature ownership or reuse is demonstrated.
 
 The architecture does not require a new Gradle module or root package immediately.
 
-No empty package hierarchy, generic base gateway, generic base provider, registry framework, or plugin system is created until concrete implementation needs justify it.
+No empty package hierarchy, generic base Gateway, generic base Provider, registry framework, or plugin system is created until concrete implementation needs justify it.
 
 ---
 
 # Dependency Rules
 
-- Core owns stable interfaces and normalized models.
-- Gateways depend on Core contracts and narrow provider contracts.
-- Providers implement narrow provider contracts and may depend on transport or third-party libraries.
-- Dependency injection wires implementations to contracts at the application boundary.
-- Presentation depends on project-owned use cases, repositories, or Core contracts, never concrete providers.
+- Core owns stable capability ports, normalized models, results, and policies.
+- Gateways implement Core capability ports.
+- Gateways depend on Core contracts and define narrow provider ports when required.
+- Providers implement Gateway-owned provider ports and may depend on transports or third-party libraries.
+- Dependency injection wires implementations to ports at the application composition boundary.
+- Presentation depends on project-owned use cases, repositories, or Core capability ports, never concrete Gateways or providers.
 - Raw stdout, stderr, API payloads, SDK exceptions, and provider enums must not become presentation state.
-- Platform-specific parsing belongs to the relevant provider or adapter.
-- Feature A must not access Feature B's concrete provider or data implementation directly.
+- Platform-specific parsing belongs to the relevant Provider or Adapter.
+- Feature A must not access Feature B's concrete Provider or data implementation directly.
 - Cross-feature use requires an explicit stable contract or navigation boundary.
 
 ---
@@ -203,11 +227,11 @@ Model every remote capability as a repository and place concrete behavior direct
 
 ### Cons
 
-- Does not clearly separate persistence/data retrieval from capability translation and provider routing.
+- Does not clearly separate persistence and data ownership from capability translation and provider routing.
 - Encourages large repository implementations with mixed responsibilities.
 - Makes multi-provider normalization and support-state handling unclear.
 
-Rejected as the general remote-capability model. Repositories remain appropriate for persistence and data ownership.
+Rejected as the general remote-capability model. Repositories remain appropriate for persistence and owned data access.
 
 ---
 
@@ -233,7 +257,7 @@ Rejected.
 
 ## Generic Plugin Framework
 
-Create a universal plugin registry, base gateway, base provider, and dynamic extension mechanism immediately.
+Create a universal plugin registry, base Gateway, base Provider, and dynamic extension mechanism immediately.
 
 ### Pros
 
@@ -245,7 +269,7 @@ Create a universal plugin registry, base gateway, base provider, and dynamic ext
 - Premature abstraction without implemented capability diversity.
 - High complexity and testing cost.
 - Unclear Android lifecycle and dependency-injection behavior.
-- Risks creating infrastructure before product needs are known.
+- Creates infrastructure before product needs are known.
 
 Rejected for the current project stage.
 
@@ -260,12 +284,12 @@ Introduce Core, Gateway, and Provider responsibilities only as concrete capabili
 - Preserves platform neutrality.
 - Keeps dependencies and ownership explicit.
 - Supports multiple implementations without leaking details.
-- Avoids forcing gateway abstractions onto local features.
+- Avoids forcing Gateway abstractions onto local features.
 - Allows incremental testing and documentation.
 
 ### Cons
 
-- Requires careful judgement about when a gateway is justified.
+- Requires careful judgement about when a Gateway is justified.
 - Adds mapping and normalization work for external capabilities.
 - Provider support matrices and runtime evidence must be maintained.
 
@@ -282,11 +306,11 @@ Accepted.
 - Unsupported behavior becomes explicit and testable.
 - New transports or providers can be added incrementally.
 - Local features remain simple.
-- Service-specific integrations cannot silently redefine the product core.
+- Service-specific integrations cannot silently redefine the product Core.
 
 ## Negative
 
-- Gateway-backed capabilities require additional contracts and mappings.
+- Gateway-backed capabilities require additional ports and mappings.
 - Capability discovery and support-state handling add implementation work.
 - Incorrect boundary placement could create unnecessary abstraction.
 - Documentation must remain synchronized with implemented and verified providers.
@@ -295,14 +319,15 @@ Accepted.
 
 # Implementation Guidance
 
-The first implementation using this architecture must begin with a concrete user-facing capability and a focused issue.
+The first implementation using this architecture must begin with a concrete user-facing capability and a focused Issue.
 
-Before creating packages or contracts, that issue must define:
+Before creating packages or contracts, that Issue must define:
 
 - the platform-neutral Core operation;
 - the required support states;
 - why a Gateway is necessary;
 - the first Provider or Adapter;
+- the provider port owned by the Gateway boundary;
 - the transport and security boundaries;
 - automated and runtime verification;
 - the factual support claim after completion.
