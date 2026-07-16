@@ -195,13 +195,18 @@ Implemented foundation:
 - Exported Room schema version `5`.
 - Domain, mapper, DAO, repository, and migration coverage.
 
-Next slice — Saved Commands Management:
+Implemented management slice:
 
-- Navigation destination and entry point.
-- Loading, empty, content, and failure states.
-- Create workflow with validation.
-- Delete confirmation workflow.
-- Persistence verification after application restart.
+- Feature-owned navigation destination and Dashboard entry point.
+- Loading, empty, content, blocking-failure, and non-blocking observation-failure states.
+- Create workflow with field-level validation and exact command-text preservation.
+- Duplicate create-submission prevention.
+- Stable-identifier delete selection and explicit confirmation.
+- Duplicate delete-confirmation prevention.
+- Retryable mutation failures that preserve loaded content.
+- Focused UI-state and ViewModel coverage.
+- Physical-device persistence verification after application restart.
+- No SSH connection or command-execution path is introduced by the management slice.
 
 Later accepted slice — SSH Input Integration:
 

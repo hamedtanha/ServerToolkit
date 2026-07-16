@@ -18,6 +18,11 @@ The project follows Conventional Commits and Semantic Versioning principles.
 - Added database migration `4 → 5`, exported Room schema version `5`, and the indexed `saved_commands` table.
 - Added domain, mapper, DAO, repository, and migration coverage for validation, exact command-text preservation, stable newest-first ordering, duplicate rejection, lookup, and deletion.
 - Added a focused Saved Commands current-state document and accepted delivery boundaries for management UI and later SSH input integration.
+- Added a feature-owned Saved Commands navigation destination and Dashboard entry while preserving Server Inventory navigation.
+- Added repository-observed loading, empty, content, blocking-failure, and non-blocking observation-failure states.
+- Added a validated Saved Command create workflow with exact command-text preservation, visible persistence failures, and duplicate-submission prevention.
+- Added stable-identifier delete actions with explicit confirmation, deletion progress, retryable failure handling, cancellation, and duplicate-confirmation prevention.
+- Added focused Saved Commands UI-state and ViewModel coverage for observation, creation, deletion, failure containment, retry, and loaded-content preservation.
 - Added ADR-015 for the platform-neutral remote systems product direction and evidence-based support claims.
 - Added ADR-016 for the three-level Core, Capability Gateway, and Provider/Adapter remote capability architecture.
 
@@ -40,13 +45,15 @@ The project follows Conventional Commits and Semantic Versioning principles.
 - Updated the core Android build cluster to Gradle `9.5.0`, Android Gradle Plugin `9.3.0`, Kotlin `2.4.10`, and KSP `2.3.10`.
 - Regenerated the Gradle Wrapper, removed the obsolete `android.disallowKotlinSourceSets=false` compatibility option, and aligned tracked IDE language and bytecode metadata with Java `17`.
 - Added an explicit `Any?` bind-argument type in the migration test for Kotlin `2.4.10` compatibility without changing migration behavior.
+- Manually verified Saved Command persistence after restart, exact command-text storage, and confirmed deletion after a second restart on a physical Android device.
+- Synchronized Saved Commands status, project state, roadmap, changelog, package structure, README, and architecture documentation with the implemented management workflow.
 
 ### Not Changed
 
 - Java source and target compatibility and the Kotlin JVM toolchain remain on `17`; Gradle daemon JVM criteria remain on `21`.
 - Android compile SDK, target SDK, minimum SDK, Build Tools, NDK, application version metadata, and application-library versions remain unchanged by the core build-cluster update.
 - Android `versionName` and `versionCode` remain unchanged.
-- No Saved Commands UI, navigation, editing, categories, favorites, templates, server assignment, SSH selection, automatic execution, background execution, or credential storage was added.
+- No Saved Command editing, categories, favorites, templates, server assignment, SSH input selection, automatic execution, background execution, synchronization, backup, or credential storage was added.
 - No Android production code, package hierarchy, Capability Gateway implementation, Provider registry, platform detection, transport, monitoring, service-management workflow, or named-service integration was added by the architecture decision.
 - The immutable version 0.4.0 release tag, artifacts, checksums, and release evidence remain unchanged.
 

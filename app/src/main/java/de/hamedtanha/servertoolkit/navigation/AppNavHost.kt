@@ -5,6 +5,8 @@ import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
 import de.hamedtanha.servertoolkit.feature.dashboard.presentation.screen.DashboardRoute
+import de.hamedtanha.servertoolkit.feature.savedcommands.navigation.SavedCommandsDestination
+import de.hamedtanha.servertoolkit.feature.savedcommands.presentation.screen.SavedCommandsRoute
 import de.hamedtanha.servertoolkit.feature.serverinventory.presentation.screen.AddServerRoute
 import de.hamedtanha.servertoolkit.feature.serverinventory.presentation.screen.EditServerRoute
 import de.hamedtanha.servertoolkit.feature.serverinventory.presentation.screen.ServerInventoryRoute
@@ -25,6 +27,19 @@ fun AppNavHost() {
                     navController.navigate(ServerInventoryDestination.route) {
                         launchSingleTop = true
                     }
+                },
+                onOpenSavedCommands = {
+                    navController.navigate(SavedCommandsDestination.route) {
+                        launchSingleTop = true
+                    }
+                },
+            )
+        }
+
+        composable(route = SavedCommandsDestination.route) {
+            SavedCommandsRoute(
+                onNavigateBack = {
+                    navController.navigateUp()
                 },
             )
         }

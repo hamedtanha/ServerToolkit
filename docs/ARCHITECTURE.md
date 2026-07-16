@@ -150,11 +150,16 @@ The current implementation includes:
 
 - Global `SavedCommand` domain model.
 - Project-owned `SavedCommandRepository` contract.
+- Minimal feature-owned `SavedCommandFactory` contract with concrete UUID and timestamp generation in the data layer.
 - Room entity, DAO, mapper, repository implementation, and Hilt bindings.
-- Exact command-text preservation.
-- Creation-only persistence semantics with duplicate identifiers rejected.
-- Domain, mapper, DAO, repository, and migration coverage.
-- No user-facing management UI or SSH input integration yet.
+- Feature-owned navigation destination registered through the app-level Navigation Compose boundary.
+- Dashboard entry that preserves Server Inventory navigation.
+- Repository-observed loading, empty, content, and failure states.
+- Validated create workflow with exact command-text preservation and duplicate-submission prevention.
+- Stable-identifier deletion with explicit confirmation, retryable failure handling, and duplicate-confirmation prevention.
+- Domain, mapper, DAO, repository, migration, UI-state, and ViewModel coverage.
+- Physical-device verification of persistence across restart and confirmed deletion across a second restart.
+- No SSH input integration or command execution from Saved Commands.
 
 ### Local Persistence
 
