@@ -186,6 +186,8 @@ The architecture does not require a new Gradle module or root package immediatel
 
 No empty package hierarchy, generic base Gateway, generic base Provider, registry framework, or plugin system is created until concrete implementation needs justify it.
 
+The completed SSH milestone remains governed by its accepted ADRs and current project-owned domain, service, repository, and data-adapter boundaries. This ADR does not require a cosmetic or speculative retrofit of existing SSH code. SSH is restructured only when a concrete multi-provider requirement, reusable capability boundary, or demonstrated architecture defect justifies a focused change.
+
 ---
 
 # Dependency Rules
