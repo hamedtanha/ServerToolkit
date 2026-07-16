@@ -160,7 +160,9 @@ Future gateway-backed remote capabilities must follow ADR-015 and ADR-016.
 
 The implemented baseline is documented in [Build Toolchain Status](state/BUILD_TOOLCHAIN_STATUS.md), and all updates follow [Build Toolchain and Dependency Policy](BUILD_TOOLCHAIN_AND_DEPENDENCY_POLICY.md).
 
-- Java source compatibility, Java target compatibility, Kotlin JVM toolchain, and CI JDK remain aligned on Java `17`.
+- Java source compatibility, Java target compatibility, and the Kotlin JVM toolchain remain aligned on Java `17`.
+- CI uses Temurin `17` as the launcher JDK; repository-controlled Gradle daemon JVM criteria remain on Java `21`.
+- The implemented compatibility cluster is Gradle `9.5.0`, Android Gradle Plugin `9.3.0`, Kotlin `2.4.10`, and KSP `2.3.10`.
 - Gradle, Android Gradle Plugin, Kotlin, and KSP are reviewed as a compatibility cluster.
 - Android Build Tools and NDK declarations used by release workflows remain synchronized with scripts and documentation.
 - The pinned NDK remains required while release verification depends on its matching `llvm-strip`.
@@ -214,7 +216,7 @@ The following items are intentionally not implemented:
 - Xray, x-ui, Docker, Kubernetes, certificate-authority, cloud-provider, or another named integration.
 - A public plugin framework.
 - Room migrations beyond database version `5`.
-- Accepted toolchain upgrades beyond the current recorded baseline.
+- Toolchain upgrades beyond the currently recorded Gradle `9.5.0`, Android Gradle Plugin `9.3.0`, Kotlin `2.4.10`, and KSP `2.3.10` baseline.
 
 ---
 
