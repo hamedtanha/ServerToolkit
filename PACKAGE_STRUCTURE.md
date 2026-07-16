@@ -2,7 +2,7 @@
 
 **Project:** Server Toolkit  
 **Status:** Active  
-**Last Updated:** 2026-07-15
+**Last Updated:** 2026-07-16
 
 ---
 
@@ -109,6 +109,7 @@ app/src/main/java/de/hamedtanha/servertoolkit/
 
         savedcommands/
             data/
+                factory/
                 local/
                     dao/
                     entity/
@@ -116,8 +117,14 @@ app/src/main/java/de/hamedtanha/servertoolkit/
                 repository/
             di/
             domain/
+                factory/
                 model/
                 repository/
+            navigation/
+            presentation/
+                screen/
+                state/
+                viewmodel/
 
     navigation/
     ui/
@@ -244,11 +251,13 @@ Rules:
 
 `feature/savedcommands` owns reusable operational command definitions.
 
-Implemented Slice 1 structure:
+Implemented structure:
 
 ```text
 feature/savedcommands/
     data/
+        factory/
+            DefaultSavedCommandFactory.kt
         local/
             dao/
                 SavedCommandDao.kt
@@ -262,19 +271,33 @@ feature/savedcommands/
         SavedCommandsDatabaseModule.kt
         SavedCommandsModule.kt
     domain/
+        factory/
+            SavedCommandFactory.kt
         model/
             SavedCommand.kt
         repository/
             SavedCommandRepository.kt
+    navigation/
+        SavedCommandsDestination.kt
+    presentation/
+        screen/
+            SavedCommandsScreen.kt
+        state/
+            SavedCommandsUiState.kt
+        viewmodel/
+            SavedCommandsViewModel.kt
 ```
 
 Current rules:
 
 - Saved commands are global; server-specific assignment is not implemented.
-- The domain layer owns validation boundaries and the repository contract.
+- The domain layer owns model invariants, the repository contract, and the minimal factory contract used for testable identifier and timestamp generation.
 - Room types remain in the data layer.
+- `DefaultSavedCommandFactory` owns concrete UUID and timestamp generation.
 - Persistence stores command text exactly and does not parse, rewrite, or execute it.
-- No `presentation` or `navigation` package should be added until the management workflow is implemented.
+- Presentation depends on `SavedCommandRepository` and `SavedCommandFactory`, not DAO, entity, or concrete Room repository types.
+- Navigation remains feature-owned and is registered through the app-level Navigation Compose boundary.
+- Create and delete workflows use immutable UI state and ViewModel-controlled unidirectional data flow.
 - Saved Commands must not depend on SSHJ or SSH data-layer classes.
 - Future SSH input integration must use a narrow project-owned boundary and must never trigger automatic execution.
 - Do not introduce `feature/operations` until multiple implemented Operations capabilities require a shared boundary.

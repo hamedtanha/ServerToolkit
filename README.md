@@ -40,6 +40,7 @@ The product direction is defined by:
 - SSH command output display for stdout, stderr, and exit status.
 - Per-server SSH connection history presentation backed by automatic Room recording.
 - Global Saved Command domain and Room persistence foundation.
+- Saved Commands management with Dashboard navigation, persisted list states, validated creation, explicit deletion, and restart persistence verification.
 - Database version `5` with explicit migrations and exported schemas.
 - Repository-defined build-toolchain and dependency maintenance policy.
 - Living current-state documentation for the Android, JVM, dependency, CI, and release-toolchain baseline.
@@ -54,15 +55,15 @@ The platform-neutral architecture permits additional target families and transpo
 
 ## Planned Direction
 
-The next accepted product slice is the Saved Commands Management workflow:
+The next accepted product slice is SSH Saved Command Input Integration:
 
-- Saved Commands navigation destination and entry point.
-- Loading, empty, content, and failure states.
-- Create workflow with validation.
-- Delete confirmation workflow.
-- Persistence verification after application restart.
+- select a saved command from the existing SSH workflow;
+- populate the existing command input without automatic execution;
+- preserve user editing before execution;
+- execute only through the existing explicit Run action;
+- preserve execution-state blocking, session lifecycle, cleanup, and stale-result guardrails.
 
-A later independent slice will allow a user to select a saved command from the SSH workflow, populate the existing command input, and execute it only through the existing explicit Run action.
+Saved Command editing, categories, favorites, templates, server assignment, synchronization, and automatic or background execution remain outside the implemented scope.
 
 Future gateway-backed capabilities must be selected through focused planning and must define their Core contract, support states, Gateway responsibility, first Provider or Adapter, security boundary, and verification evidence before implementation begins.
 
