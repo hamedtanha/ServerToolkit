@@ -8,7 +8,7 @@ data class SshUiState(
     val status: SshConnectionStatus = SshConnectionStatus.NotStarted,
     val statusLabel: String = "Not connected",
     val message: String = "Ready to start an SSH connection attempt.",
-    val detail: String = "The workflow opens a project-owned SSH session for non-interactive command execution. Terminal UI, saved commands, and persistent credentials are intentionally out of scope.",
+    val detail: String = "The workflow opens a project-owned SSH session for non-interactive command execution. Saved Commands can populate the command input, while terminal UI and persistent credentials remain intentionally out of scope.",
     val hostKeyReview: SshHostKeyReviewUiState? = null,
     val authenticationInput: SshAuthenticationInputUiState = SshAuthenticationInputUiState(),
     val commandExecution: SshCommandExecutionUiState = SshCommandExecutionUiState(),

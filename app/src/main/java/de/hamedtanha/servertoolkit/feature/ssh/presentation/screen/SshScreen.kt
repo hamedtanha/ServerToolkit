@@ -17,6 +17,7 @@ import androidx.compose.foundation.verticalScroll
 import androidx.compose.material3.Button
 import androidx.compose.material3.FilterChip
 import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.OutlinedButton
 import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
@@ -30,6 +31,7 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.text.input.PasswordVisualTransformation
 import androidx.compose.ui.text.style.TextAlign
@@ -39,10 +41,10 @@ import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import de.hamedtanha.servertoolkit.feature.ssh.data.source.AndroidSshPrivateKeySourceFactory
 import de.hamedtanha.servertoolkit.feature.ssh.domain.model.SshAuthenticationMethod
 import de.hamedtanha.servertoolkit.feature.ssh.presentation.state.SshAuthenticationInputUiState
-import de.hamedtanha.servertoolkit.feature.ssh.presentation.state.SshCommandExecutionStatus
 import de.hamedtanha.servertoolkit.feature.ssh.presentation.state.SshCommandExecutionUiState
 import de.hamedtanha.servertoolkit.feature.ssh.presentation.state.SshConnectionStatus
 import de.hamedtanha.servertoolkit.feature.ssh.presentation.state.SshHostKeyReviewUiState
+import de.hamedtanha.servertoolkit.feature.ssh.presentation.state.SshSavedCommandSelectorUiState
 import de.hamedtanha.servertoolkit.feature.ssh.presentation.state.SshUiState
 import de.hamedtanha.servertoolkit.feature.ssh.presentation.viewmodel.SshViewModel
 import kotlinx.coroutines.currentCoroutineContext
@@ -91,8 +93,16 @@ fun SshRoute(
         }
     }
 
+    fun handleBack() {
+        if (uiState.savedCommandSelector.isVisible) {
+            viewModel.onCancelSavedCommandSelector()
+        } else {
+            requestWorkflowExit(onNavigateBack)
+        }
+    }
+
     BackHandler {
-        requestWorkflowExit(onNavigateBack)
+        handleBack()
     }
 
     SshScreen(
@@ -108,12 +118,16 @@ fun SshRoute(
         onPasswordChange = viewModel::onPasswordChanged,
         onPrivateKeyPassphraseChange = viewModel::onPrivateKeyPassphraseChanged,
         onCommandChange = viewModel::onCommandChanged,
+        onOpenSavedCommandSelector = viewModel::onOpenSavedCommandSelector,
+        onRetrySavedCommandSelector = viewModel::onRetrySavedCommandSelector,
+        onCancelSavedCommandSelector = viewModel::onCancelSavedCommandSelector,
+        onSavedCommandSelect = viewModel::onSavedCommandSelected,
         onExecuteCommandClick = viewModel::onExecuteCommandClicked,
         onOpenConnectionHistory = {
             requestWorkflowExit(onOpenConnectionHistory)
         },
         onNavigateBack = {
-            requestWorkflowExit(onNavigateBack)
+            handleBack()
         },
         modifier = modifier,
     )
@@ -131,6 +145,10 @@ fun SshScreen(
     onPasswordChange: (String) -> Unit,
     onPrivateKeyPassphraseChange: (String) -> Unit,
     onCommandChange: (String) -> Unit,
+    onOpenSavedCommandSelector: () -> Unit,
+    onRetrySavedCommandSelector: () -> Unit,
+    onCancelSavedCommandSelector: () -> Unit,
+    onSavedCommandSelect: (String) -> Unit,
     onExecuteCommandClick: () -> Unit,
     onOpenConnectionHistory: () -> Unit,
     onNavigateBack: () -> Unit,
@@ -281,9 +299,15 @@ fun SshScreen(
 
         CommandExecutionContent(
             commandExecution = uiState.commandExecution,
+            savedCommandSelector = uiState.savedCommandSelector,
+            canEditCommandInput = uiState.canEditCommandInput,
+            canOpenSavedCommandSelector = uiState.canOpenSavedCommandSelector,
             canExecuteCommand = uiState.canExecuteCommand,
-            isConnected = uiState.status == SshConnectionStatus.Connected,
             onCommandChange = onCommandChange,
+            onOpenSavedCommandSelector = onOpenSavedCommandSelector,
+            onRetrySavedCommandSelector = onRetrySavedCommandSelector,
+            onCancelSavedCommandSelector = onCancelSavedCommandSelector,
+            onSavedCommandSelect = onSavedCommandSelect,
             onExecuteCommandClick = onExecuteCommandClick,
         )
 
@@ -426,9 +450,15 @@ private fun AuthenticationInputContent(
 @Composable
 private fun CommandExecutionContent(
     commandExecution: SshCommandExecutionUiState,
+    savedCommandSelector: SshSavedCommandSelectorUiState,
+    canEditCommandInput: Boolean,
+    canOpenSavedCommandSelector: Boolean,
     canExecuteCommand: Boolean,
-    isConnected: Boolean,
     onCommandChange: (String) -> Unit,
+    onOpenSavedCommandSelector: () -> Unit,
+    onRetrySavedCommandSelector: () -> Unit,
+    onCancelSavedCommandSelector: () -> Unit,
+    onSavedCommandSelect: (String) -> Unit,
     onExecuteCommandClick: () -> Unit,
 ) {
     Text(
@@ -457,10 +487,36 @@ private fun CommandExecutionContent(
         placeholder = {
             Text(text = "uptime")
         },
-        enabled = isConnected && commandExecution.status != SshCommandExecutionStatus.Running,
-        singleLine = true,
-        modifier = Modifier.fillMaxWidth(),
+        enabled = canEditCommandInput,
+        minLines = 1,
+        maxLines = 6,
+        modifier = Modifier
+            .fillMaxWidth()
+            .testTag(SSH_COMMAND_INPUT_TEST_TAG),
     )
+
+    Spacer(modifier = Modifier.height(8.dp))
+
+    if (savedCommandSelector.isVisible) {
+        SshSavedCommandSelectorContent(
+            selector = savedCommandSelector,
+            onRetry = onRetrySavedCommandSelector,
+            onCancel = onCancelSavedCommandSelector,
+            onSelect = onSavedCommandSelect,
+        )
+    } else {
+        OutlinedButton(
+            onClick = onOpenSavedCommandSelector,
+            enabled = canOpenSavedCommandSelector,
+            modifier = Modifier
+                .fillMaxWidth()
+                .testTag(
+                    SSH_OPEN_SAVED_COMMAND_SELECTOR_TEST_TAG,
+                ),
+        ) {
+            Text(text = "Use saved command")
+        }
+    }
 
     Spacer(modifier = Modifier.height(8.dp))
 
