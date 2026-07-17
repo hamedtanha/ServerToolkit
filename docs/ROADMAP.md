@@ -3,7 +3,7 @@
 **Project:** Server Toolkit
 **Version:** 0.4.0
 **Status:** Active
-**Last Updated:** 2026-07-16
+**Last Updated:** 2026-07-17
 
 ---
 
@@ -208,12 +208,16 @@ Implemented management slice:
 - Physical-device persistence verification after application restart.
 - No SSH connection or command-execution path is introduced by the management slice.
 
-Later accepted slice — SSH Input Integration:
+Implemented SSH Input Integration:
 
-- Saved Command selection from the existing SSH workflow.
-- Population of the existing command input.
-- Separate explicit Run action for execution.
-- Preservation of command editing, execution-state blocking, session lifecycle, cleanup, and stale-result guardrails.
+- Inline Saved Command selection from the existing SSH workflow.
+- Lazy repository observation with loading, empty, failure, retry, cancellation, and later-failure preservation.
+- Stable-identifier presentation in repository order.
+- Exact replacement of the existing multiline command input without trimming, normalization, parsing, interpolation, or appending.
+- Continued manual command editing before execution.
+- Separate explicit Run action as the only execution trigger.
+- Preservation of execution-state blocking, session lifecycle, cleanup, and stale-result guardrails.
+- Focused ViewModel coverage and five passing targeted Compose tests on the Pixel 9 Android Virtual Device.
 
 Deferred from the first increment:
 

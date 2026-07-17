@@ -23,6 +23,9 @@ The project follows Conventional Commits and Semantic Versioning principles.
 - Added a validated Saved Command create workflow with exact command-text preservation, visible persistence failures, and duplicate-submission prevention.
 - Added stable-identifier delete actions with explicit confirmation, deletion progress, retryable failure handling, cancellation, and duplicate-confirmation prevention.
 - Added focused Saved Commands UI-state and ViewModel coverage for observation, creation, deletion, failure containment, retry, and loaded-content preservation.
+- Added SSH Saved Command input integration with lazy repository observation, repository-order presentation, stable-identifier selection, exact command-input replacement, cancellation, retry, later-failure preservation, and no automatic execution.
+- Added an inline Saved Command selector adjacent to the multiline SSH command input while retaining manual editing and the explicit Run action.
+- Added focused selector ViewModel coverage and five passing targeted Compose instrumentation tests on the Pixel 9 Android Virtual Device.
 - Added ADR-015 for the platform-neutral remote systems product direction and evidence-based support claims.
 - Added ADR-016 for the three-level Core, Capability Gateway, and Provider/Adapter remote capability architecture.
 
@@ -47,13 +50,16 @@ The project follows Conventional Commits and Semantic Versioning principles.
 - Added an explicit `Any?` bind-argument type in the migration test for Kotlin `2.4.10` compatibility without changing migration behavior.
 - Manually verified Saved Command persistence after restart, exact command-text storage, and confirmed deletion after a second restart on a physical Android device.
 - Synchronized Saved Commands status, project state, roadmap, changelog, package structure, README, and architecture documentation with the implemented management workflow.
+- Updated the SSH command field from single-line to bounded multiline presentation so exact persisted multiline commands remain visible and editable.
+- Updated AndroidX JUnit from `1.1.5` to `1.3.0` and Espresso Core from `3.5.1` to `3.7.0` to align Compose instrumentation with the current Android emulator runtime.
+- Synchronized Saved Commands status, SSH status, project state, roadmap, changelog, README, architecture, and package structure with the implemented SSH input integration.
 
 ### Not Changed
 
 - Java source and target compatibility and the Kotlin JVM toolchain remain on `17`; Gradle daemon JVM criteria remain on `21`.
 - Android compile SDK, target SDK, minimum SDK, Build Tools, NDK, application version metadata, and application-library versions remain unchanged by the core build-cluster update.
 - Android `versionName` and `versionCode` remain unchanged.
-- No Saved Command editing, categories, favorites, templates, server assignment, SSH input selection, automatic execution, background execution, synchronization, backup, or credential storage was added.
+- No Saved Command editing, categories, favorites, templates, variables, server assignment, automatic execution, background execution, synchronization, backup, or credential storage was added.
 - No Android production code, package hierarchy, Capability Gateway implementation, Provider registry, platform detection, transport, monitoring, service-management workflow, or named-service integration was added by the architecture decision.
 - The immutable version 0.4.0 release tag, artifacts, checksums, and release evidence remain unchanged.
 

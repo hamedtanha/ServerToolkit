@@ -3,7 +3,7 @@
 **Project:** Server Toolkit
 **Version:** 0.4.0
 **Status:** Released
-**Last Updated:** 2026-07-16
+**Last Updated:** 2026-07-17
 
 ---
 
@@ -37,8 +37,10 @@ Implemented slices now include:
 - Explicit delete confirmation with retryable failure handling.
 - Focused domain, persistence, UI-state, and ViewModel coverage.
 - Manual persistence verification after application restart on a physical Android device.
-
-SSH Saved Command input integration is not implemented yet.
+- SSH Saved Command selector backed by direct repository-domain observation.
+- Exact replacement of the existing editable command input without automatic execution.
+- Loading, empty, failure, retry, cancellation, later-failure preservation, and repository-order presentation.
+- Focused ViewModel and Compose instrumentation coverage, including five passing targeted emulator tests.
 
 The project has now accepted a platform-neutral product direction and a three-level remote capability architecture through ADR-015 and ADR-016.
 
@@ -73,7 +75,7 @@ The repository does not claim universal Linux, Windows, BSD, appliance, cloud-pr
 | Remote Capability Architecture | Accepted | ADR-016 defines Core, Capability Gateway, and Provider/Adapter responsibilities without adding production abstractions. |
 | Server Inventory | Accepted baseline | See [Server Inventory Status](state/SERVER_INVENTORY_STATUS.md). |
 | SSH | Completed milestone | See [SSH Status](state/SSH_STATUS.md). |
-| Saved Commands | Management workflow implemented | Global domain, Room persistence, Dashboard navigation, list states, validated creation, explicit deletion, and restart persistence verification are implemented; SSH input integration remains planned. See [Saved Commands Status](state/SAVED_COMMANDS_STATUS.md). |
+| Saved Commands | Management and SSH input workflows implemented | Global domain, Room persistence, Dashboard navigation, list states, validated creation, explicit deletion, restart persistence verification, and exact SSH command-input selection without automatic execution are implemented. See [Saved Commands Status](state/SAVED_COMMANDS_STATUS.md). |
 | Local Persistence | Current | Room database version `5`, explicit migrations through `4 → 5`, and exported schema `5`. |
 | Documentation Governance | Active | Source-of-truth, version metadata, ADR, changelog, and factual documentation boundaries are defined. |
 | Build Toolchain Governance | Active | Update triggers, risk classification, compatibility clusters, validation, release interaction, and ADR boundaries are defined. |
@@ -125,6 +127,8 @@ The current SSH implementation must continue from the accepted architecture on `
 - Private-key documents, loaded key material, and passphrases remain one-attempt and non-persistent.
 - Credential persistence requires a separate reviewed secure-storage implementation.
 - SSH command execution remains explicit, non-interactive, and project-owned.
+- Saved Command selection may replace the editable command input exactly but must never trigger execution.
+- SSH presentation may depend on the project-owned `SavedCommandRepository` domain contract but not Saved Commands DAO, entity, concrete repository, screen, or ViewModel types.
 - Active session cleanup completes before permanent workflow exit.
 - Automatic or background command execution remains out of scope.
 
@@ -141,8 +145,8 @@ The current implementation is documented in [Saved Commands Status](state/SAVED_
 - Creating, viewing, and deleting saved commands never execute command text.
 - The management workflow uses feature-owned navigation, presentation, domain, repository, and Room boundaries.
 - Presentation depends on `SavedCommandRepository`, not DAO, entity, or concrete Room types.
-- SSH input integration remains a later independent slice and must not execute automatically.
-- Saved Commands management does not require a Capability Gateway.
+- SSH input integration uses the same project-owned repository contract, preserves exact text, and does not execute automatically.
+- Saved Commands management and SSH input integration do not require a Capability Gateway.
 
 ---
 
@@ -209,7 +213,6 @@ Room tables must not be used for persistent credentials, private keys, passphras
 The following items are intentionally not implemented:
 
 - Saved Command editing, categories, favorites, templates, variables, server assignment, import, export, synchronization, or backup.
-- SSH Saved Command selection and command-input population.
 - Interactive terminal UI.
 - Persistent credential storage.
 - Automatic or background command execution.
@@ -259,8 +262,13 @@ The Saved Command Foundation includes:
 - Validated create workflow with exact command-text preservation.
 - Explicit delete confirmation with retryable mutation failure handling.
 - Focused automated coverage and physical-device restart verification.
+- SSH Saved Command Input Integration tracked by Issue `#133`.
+- Inline selector with repository-order observation and stable-identifier selection.
+- Exact command-input replacement with continued manual editing.
+- Explicit Run-only execution with no connection, authentication, session, history, or automatic-execution side effects.
+- Focused ViewModel coverage and five passing targeted Compose tests on the Pixel 9 Android Virtual Device.
 
-The next product slice is SSH Saved Command Input Integration.
+The next Operations slice has not yet been selected.
 
 ---
 
@@ -287,10 +295,10 @@ No Android production code or package structure is introduced by this decision w
 The next safe development steps are:
 
 1. Keep Android version metadata unchanged at the released `0.4.0` baseline.
-2. Plan SSH Saved Command Input Integration as a separate focused issue and implementation slice.
-3. Preserve the existing explicit Run action, editable command input, execution-state blocking, session lifecycle, cleanup, and stale-result guardrails.
-4. Keep Saved Commands management independent from SSH data-layer implementations and automatic execution.
-5. Select the first gateway-backed capability only through a separate focused planning decision after the Saved Commands increment or when roadmap priority explicitly changes.
+2. Complete final review and merge validation for SSH Saved Command Input Integration.
+3. Preserve the explicit Run action, editable command input, exact-text replacement, execution-state blocking, session lifecycle, cleanup, and stale-result guardrails.
+4. Keep Saved Commands management and persistence independent from SSH data-layer implementations and automatic execution.
+5. Select the next Operations slice and the first gateway-backed capability only through separate focused planning decisions.
 6. Keep named integrations outside the committed core direction until individually accepted.
 
 ---

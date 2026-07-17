@@ -3,7 +3,7 @@
 **Project:** Server Toolkit  
 **Version:** 0.4.0
 **Status:** Active  
-**Last Updated:** 2026-07-16
+**Last Updated:** 2026-07-17
 
 ---
 
@@ -142,6 +142,8 @@ The current implementation includes:
 - Deterministic cleanup before permanent workflow exit.
 - Explicit disconnect and reconnection support.
 - Non-interactive command execution through explicit user action.
+- Inline Saved Command selector backed by direct `SavedCommandRepository` domain-contract observation.
+- Exact replacement of the editable multiline command input without automatic execution.
 - stdout, stderr, and exit-status presentation.
 - Room-backed SSH connection history and per-server presentation.
 - Focused domain, presentation, adapter, lifecycle, persistence, migration, and runtime verification.
@@ -159,7 +161,11 @@ The current implementation includes:
 - Stable-identifier deletion with explicit confirmation, retryable failure handling, and duplicate-confirmation prevention.
 - Domain, mapper, DAO, repository, migration, UI-state, and ViewModel coverage.
 - Physical-device verification of persistence across restart and confirmed deletion across a second restart.
-- No SSH input integration or command execution from Saved Commands.
+- SSH presentation integration through the project-owned `SavedCommandRepository` domain contract.
+- Repository-order selector presentation with loading, empty, failure, retry, cancellation, and later-failure preservation.
+- Stable-identifier selection and exact command-input replacement.
+- No automatic execution from Saved Commands; the existing explicit Run action remains the only execution trigger.
+- No dependency from SSH presentation on Saved Commands DAO, entity, concrete repository, screen, or ViewModel types.
 
 ### Local Persistence
 
@@ -518,8 +524,6 @@ The current implementation does not include:
 - Interactive terminal UI.
 - Persistent credential storage.
 - Background monitoring or execution.
-- Saved Commands management UI.
-- SSH Saved Command selection.
 - Operating-system discovery.
 - Capability Gateway production abstractions.
 - WinRM or additional transports.

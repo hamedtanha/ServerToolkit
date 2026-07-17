@@ -4,6 +4,7 @@ import androidx.lifecycle.SavedStateHandle
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import dagger.hilt.android.lifecycle.HiltViewModel
+import de.hamedtanha.servertoolkit.feature.savedcommands.domain.repository.SavedCommandRepository
 import de.hamedtanha.servertoolkit.feature.ssh.domain.model.SshAuthenticationInput
 import de.hamedtanha.servertoolkit.feature.ssh.domain.model.SshAuthenticationMethod
 import de.hamedtanha.servertoolkit.feature.ssh.domain.model.SshCommandExecutionError
@@ -21,6 +22,7 @@ import de.hamedtanha.servertoolkit.feature.ssh.domain.usecase.SshCommandExecutio
 import de.hamedtanha.servertoolkit.feature.ssh.domain.usecase.SshConnectionAttemptUseCase
 import de.hamedtanha.servertoolkit.feature.ssh.presentation.state.SshAuthenticationInputUiState
 import de.hamedtanha.servertoolkit.feature.ssh.presentation.state.SshConnectionStatus
+import de.hamedtanha.servertoolkit.feature.ssh.presentation.state.SshSavedCommandSelectorUiState
 import de.hamedtanha.servertoolkit.feature.ssh.presentation.state.SshUiState
 import de.hamedtanha.servertoolkit.feature.ssh.presentation.state.asRunning
 import de.hamedtanha.servertoolkit.feature.ssh.presentation.state.asSessionUnavailable
@@ -31,14 +33,17 @@ import de.hamedtanha.servertoolkit.feature.ssh.presentation.state.withHostTrustD
 import de.hamedtanha.servertoolkit.navigation.SshDestination
 import javax.inject.Inject
 import kotlinx.coroutines.CancellationException
+import kotlinx.coroutines.Job
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
+import kotlinx.coroutines.flow.collect
 import kotlinx.coroutines.launch
 
 @HiltViewModel
 class SshViewModel @Inject constructor(
     savedStateHandle: SavedStateHandle,
+    private val savedCommandRepository: SavedCommandRepository,
     private val connectionAttemptUseCase: SshConnectionAttemptUseCase,
     private val confirmHostTrustUseCase: ConfirmSshHostTrustUseCase,
     private val commandExecutionUseCase: SshCommandExecutionUseCase,
@@ -54,6 +59,8 @@ class SshViewModel @Inject constructor(
     private var isHostKeyConfirmationInProgress: Boolean = false
 
     private var isSessionCloseInProgress: Boolean = false
+
+    private var savedCommandObservationJob: Job? = null
 
     private var activeSessionHandle: SshSessionHandle? = null
 
@@ -186,6 +193,7 @@ class SshViewModel @Inject constructor(
             return false
         }
 
+        closeSavedCommandSelector()
         clearAuthenticationInputState()
 
         if (isConnectionAttemptInProgress) {
@@ -212,6 +220,7 @@ class SshViewModel @Inject constructor(
             return
         }
 
+        closeSavedCommandSelector()
         clearAuthenticationInputState()
 
         if (isConnectionAttemptInProgress) {
@@ -371,13 +380,105 @@ class SshViewModel @Inject constructor(
     }
 
     fun onCommandChanged(command: String) {
-        if (isCommandExecutionInProgress) {
+        updateCommandText(command)
+    }
+
+    fun onOpenSavedCommandSelector() {
+        if (!_uiState.value.canOpenSavedCommandSelector) {
             return
         }
 
         _uiState.value = _uiState.value.copy(
-            commandExecution = _uiState.value.commandExecution.withCommandText(command),
+            savedCommandSelector = SshSavedCommandSelectorUiState.Loading,
         )
+
+        observeSavedCommands()
+    }
+
+    fun onRetrySavedCommandSelector() {
+        val currentState = _uiState.value
+
+        if (!currentState.canEditCommandInput) {
+            return
+        }
+
+        val retryState = when (
+            val selector = currentState.savedCommandSelector
+        ) {
+            is SshSavedCommandSelectorUiState.Content -> {
+                if (
+                    selector.errorMessage == null ||
+                    selector.isRetrying
+                ) {
+                    return
+                }
+
+                selector.copy(
+                    errorMessage = null,
+                    isRetrying = true,
+                )
+            }
+
+            is SshSavedCommandSelectorUiState.Failure -> {
+                if (selector.isRetrying) {
+                    return
+                }
+
+                selector.copy(isRetrying = true)
+            }
+
+            SshSavedCommandSelectorUiState.Hidden,
+            SshSavedCommandSelectorUiState.Loading,
+            SshSavedCommandSelectorUiState.Empty,
+            -> return
+        }
+
+        _uiState.value = currentState.copy(
+            savedCommandSelector = retryState,
+        )
+
+        observeSavedCommands()
+    }
+
+    fun onCancelSavedCommandSelector() {
+        if (!_uiState.value.savedCommandSelector.isVisible) {
+            return
+        }
+
+        closeSavedCommandSelector()
+    }
+
+    fun onSavedCommandSelected(savedCommandId: String) {
+        val currentState = _uiState.value
+        val selector = currentState.savedCommandSelector
+
+        if (
+            !currentState.canEditCommandInput ||
+            !selector.isVisible
+        ) {
+            return
+        }
+
+        val savedCommand = selector.selectableCommands.firstOrNull { command ->
+            command.id == savedCommandId
+        }
+
+        if (savedCommand == null) {
+            if (selector is SshSavedCommandSelectorUiState.Content) {
+                _uiState.value = currentState.copy(
+                    savedCommandSelector = selector.copy(
+                        errorMessage = SAVED_COMMAND_SELECTION_ERROR_MESSAGE,
+                        isRetrying = false,
+                    ),
+                )
+            }
+
+            return
+        }
+
+        if (updateCommandText(savedCommand.command)) {
+            closeSavedCommandSelector()
+        }
     }
 
     fun onExecuteCommandClicked() {
@@ -425,6 +526,7 @@ class SshViewModel @Inject constructor(
     }
 
     internal fun onConnectionResultReceived(result: SshConnectionResult) {
+        closeSavedCommandSelector()
         pendingObservedHostKey = null
         clearAuthenticationInputState()
         activeSessionHandle = when (result) {
@@ -454,6 +556,7 @@ class SshViewModel @Inject constructor(
     }
 
     internal fun onHostTrustDecisionReceived(decision: SshHostTrustDecision) {
+        closeSavedCommandSelector()
         activeSessionHandle = null
         clearAuthenticationInputState()
 
@@ -491,6 +594,7 @@ class SshViewModel @Inject constructor(
             return
         }
 
+        closeSavedCommandSelector()
         isCommandExecutionInProgress = true
 
         try {
@@ -542,8 +646,93 @@ class SshViewModel @Inject constructor(
     }
 
     override fun onCleared() {
+        savedCommandObservationJob?.cancel()
+        savedCommandObservationJob = null
         clearAuthenticationInputState()
         super.onCleared()
+    }
+
+    private fun updateCommandText(command: String): Boolean {
+        if (isCommandExecutionInProgress) {
+            return false
+        }
+
+        val currentState = _uiState.value
+
+        _uiState.value = currentState.copy(
+            commandExecution = currentState.commandExecution.withCommandText(command),
+        )
+
+        return true
+    }
+
+    private fun observeSavedCommands() {
+        savedCommandObservationJob?.cancel()
+
+        savedCommandObservationJob = viewModelScope.launch {
+            try {
+                savedCommandRepository
+                    .observeSavedCommands()
+                    .collect { commands ->
+                        val currentState = _uiState.value
+
+                        if (!currentState.savedCommandSelector.isVisible) {
+                            return@collect
+                        }
+
+                        val selector = if (commands.isEmpty()) {
+                            SshSavedCommandSelectorUiState.Empty
+                        } else {
+                            SshSavedCommandSelectorUiState.Content(
+                                commands = commands,
+                            )
+                        }
+
+                        _uiState.value = currentState.copy(
+                            savedCommandSelector = selector,
+                        )
+                    }
+            } catch (error: CancellationException) {
+                throw error
+            } catch (_: Exception) {
+                val currentState = _uiState.value
+
+                if (!currentState.savedCommandSelector.isVisible) {
+                    return@launch
+                }
+
+                val loadedCommands =
+                    currentState.savedCommandSelector.selectableCommands
+
+                val failureState = if (loadedCommands.isEmpty()) {
+                    SshSavedCommandSelectorUiState.Failure(
+                        errorMessage = SAVED_COMMAND_LOAD_ERROR_MESSAGE,
+                    )
+                } else {
+                    SshSavedCommandSelectorUiState.Content(
+                        commands = loadedCommands,
+                        errorMessage = SAVED_COMMAND_LOAD_ERROR_MESSAGE,
+                    )
+                }
+
+                _uiState.value = currentState.copy(
+                    savedCommandSelector = failureState,
+                )
+            }
+        }
+    }
+
+    private fun closeSavedCommandSelector() {
+        savedCommandObservationJob?.cancel()
+        savedCommandObservationJob = null
+
+        if (!_uiState.value.savedCommandSelector.isVisible) {
+            return
+        }
+
+        _uiState.value = _uiState.value.copy(
+            savedCommandSelector = SshSavedCommandSelectorUiState.Hidden,
+        )
     }
 
     private fun clearPendingHostKeyReview(
@@ -604,6 +793,14 @@ class SshViewModel @Inject constructor(
         _uiState.value = _uiState.value.copy(
             authenticationInput = SshAuthenticationInputUiState(),
         )
+    }
+
+    private companion object {
+        const val SAVED_COMMAND_LOAD_ERROR_MESSAGE =
+            "Saved commands could not be loaded."
+
+        const val SAVED_COMMAND_SELECTION_ERROR_MESSAGE =
+            "Saved command is no longer available."
     }
 }
 

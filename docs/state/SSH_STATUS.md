@@ -2,9 +2,9 @@
 
 **Project:** Server Toolkit
 **Feature Area:** SSH
-**Status:** Milestone Complete
+**Status:** Milestone Complete with Operations Integration
 **Related Milestone:** Version 0.4.0 — SSH
-**Last Updated:** 2026-07-14
+**Last Updated:** 2026-07-17
 
 ---
 
@@ -20,7 +20,7 @@ The high-level project state remains documented in [Project State](../PROJECT_ST
 
 The SSH milestone implementation for version 0.4.0 is complete. Official release preparation remains in progress until the signed and verified APK and required release evidence are complete.
 
-The current implementation supports real ephemeral password-based and private-key SSH authentication, user-facing non-interactive command execution behind project-owned SSH session handles, deterministic workflow-exit cleanup, and explicit disconnection while remaining on the SSH screen.
+The current implementation supports real ephemeral password-based and private-key SSH authentication, user-facing non-interactive command execution behind project-owned SSH session handles, deterministic workflow-exit cleanup, explicit disconnection while remaining on the SSH screen, and exact Saved Command selection into the existing editable command input without automatic execution.
 
 The ADR-013 ephemeral private-key workflow is implemented end to end. The implementation includes the one-shot source, bounded key-document reading, Android system-picker integration, private ViewModel pending-source ownership, in-memory SSHJ key-provider creation, stable project-owned failure mapping, and authentication without temporary private-key files.
 
@@ -28,7 +28,7 @@ Automated JVM coverage, Android runtime verification, full unit tests, lint, and
 
 The current timeout, cleanup, cancellation, and failure-mapping hardening coverage pass is complete. Future SSH hardening must be driven by concrete runtime evidence, current repository inspection, or a newly recorded focused review finding.
 
-Persistent credentials, terminal UI, saved command workflows, background monitoring, and Xray or x-ui management remain intentionally out of scope.
+Persistent credentials, terminal UI, Saved Command editing or automation, background monitoring, and Xray or x-ui management remain intentionally out of scope.
 
 ---
 
@@ -91,7 +91,7 @@ The Android runtime verification also confirmed:
 ### Navigation and Presentation
 
 - SSH navigation destination.
-- SSH screen with ephemeral password input, host-key review actions, connection status, explicit disconnect control, non-interactive command controls, and connection history navigation.
+- SSH screen with ephemeral password input, host-key review actions, connection status, explicit disconnect control, non-interactive command controls, inline Saved Command selection, and connection history navigation.
 - SSH ViewModel and UI state for connection attempts, host-key review, authentication input, and command execution.
 - Per-server SSH connection history destination and read-only screen.
 - Connection history ViewModel and UI state backed by repository observation.
@@ -236,7 +236,14 @@ The Android runtime verification also confirmed:
 - SSH command execution use case.
 - SSH command execution presentation state and UI mapper.
 - SSH ViewModel command execution wiring through an active project-owned session handle.
-- SSH command input and Run command UI controls.
+- SSH multiline command input and Run command UI controls.
+- Inline Saved Command selector adjacent to the command input.
+- Lazy `SavedCommandRepository` observation with loading, empty, content, failure, later-failure preservation, retry, and cancellation states.
+- Stable-identifier selection that replaces the current command input with exact persisted text.
+- Manual command editing remains available while Saved Commands load or fail.
+- Saved Command selection never invokes execution; Run remains the only execution trigger.
+- Selector closure on execution start and relevant SSH lifecycle transitions.
+- Back closes the visible selector before permanent workflow-exit cleanup is requested.
 - SSH command output rendering for stdout, stderr, and exit status.
 - SSH blank command idle-state handling and execution guard.
 - SSH command text edit suppression while command execution is running.
@@ -268,6 +275,9 @@ The Android runtime verification also confirmed:
 - SSH command cancellation cleanup-failure regression test.
 - SSH command cancellation tests.
 - SSH duplicate host-key confirmation regression test.
+- Saved Command selector ViewModel coverage for lazy observation, ordering, exact replacement, cancellation, retry idempotency, later-failure preservation, manual input, execution separation, and lifecycle closure.
+- Saved Command selector Compose instrumentation coverage for availability, disabled state, loading-time manual input, selection without execution, retry, and cancellation.
+- Five passing targeted Compose tests on the Pixel 9 Android Virtual Device.
 - Manual SSH route verification.
 - Automated SSH route verification through unit tests and debug build.
 - One-shot private-key source lifecycle, concurrency, size-limit, failure-mapping, resource-closing, redaction, cancellation, and buffer-clearing unit tests.
@@ -301,7 +311,7 @@ The Android runtime verification also confirmed:
 - SSH connection history must contain non-sensitive resolved target metadata and result classification only.
 - Target-resolution failures and host-trust decision outcomes must not create incomplete connection history entries.
 - Connection history persistence failures must not replace the primary SSH outcome or cancellation.
-- Terminal UI, saved commands, background monitoring, and persistent credentials remain out of scope.
+- Terminal UI, Saved Command editing or automation, background monitoring, and persistent credentials remain out of scope.
 
 ---
 
@@ -323,9 +333,10 @@ The following items are intentionally not implemented yet:
 
 The next safe development steps are:
 
-1. Preserve version 0.4.0 SSH as the accepted baseline for the version 0.5.0 Operations milestone.
-2. Reopen SSH hardening only from concrete runtime evidence, current repository inspection, or a newly recorded focused review finding.
-3. Keep terminal UI, background monitoring, persistent credentials, and Xray or x-ui management outside the completed version 0.4.0 scope.
+1. Preserve version 0.4.0 SSH as the accepted baseline while retaining the version 0.5.0 Saved Command input integration as an additive Operations workflow.
+2. Preserve exact input replacement, manual editing, explicit Run-only execution, execution-state blocking, session lifecycle, cleanup, and stale-result guardrails.
+3. Reopen SSH hardening only from concrete runtime evidence, current repository inspection, or a newly recorded focused review finding.
+4. Keep terminal UI, background monitoring, persistent credentials, Saved Command automation, and Xray or x-ui management outside the accepted scope.
 
 ---
 
