@@ -1,6 +1,7 @@
 package de.hamedtanha.servertoolkit.feature.ssh.presentation.viewmodel
 
 import androidx.lifecycle.SavedStateHandle
+import de.hamedtanha.servertoolkit.feature.savedcommands.test.FakeSavedCommandRepository
 import de.hamedtanha.servertoolkit.core.connection.domain.model.ConnectionTargetInvalidReason
 import de.hamedtanha.servertoolkit.core.connection.domain.model.ConnectionTargetResolution
 import de.hamedtanha.servertoolkit.core.connection.domain.model.RemoteConnectionTarget
@@ -957,6 +958,7 @@ class SshViewModelTest {
             savedStateHandle = SavedStateHandle(
                 mapOf(SshDestination.SERVER_ID_ARGUMENT to serverId),
             ),
+            savedCommandRepository = FakeSavedCommandRepository(),
             connectionAttemptUseCase = SshConnectionAttemptUseCase(
                 connectionTargetResolver = resolver,
                 connectionService = service,

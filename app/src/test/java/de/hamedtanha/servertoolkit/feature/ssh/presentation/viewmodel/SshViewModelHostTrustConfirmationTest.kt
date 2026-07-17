@@ -1,6 +1,7 @@
 package de.hamedtanha.servertoolkit.feature.ssh.presentation.viewmodel
 
 import androidx.lifecycle.SavedStateHandle
+import de.hamedtanha.servertoolkit.feature.savedcommands.test.FakeSavedCommandRepository
 import de.hamedtanha.servertoolkit.core.connection.domain.model.ConnectionTargetResolution
 import de.hamedtanha.servertoolkit.core.connection.domain.model.RemoteConnectionTarget
 import de.hamedtanha.servertoolkit.feature.ssh.domain.model.SshCommandExecutionOutput
@@ -135,6 +136,7 @@ class SshViewModelHostTrustConfirmationTest {
             savedStateHandle = SavedStateHandle(
                 mapOf(SshDestination.SERVER_ID_ARGUMENT to "server-1"),
             ),
+            savedCommandRepository = FakeSavedCommandRepository(),
             connectionAttemptUseCase = SshConnectionAttemptUseCase(
                 connectionTargetResolver = FakeConnectionTargetResolver(resolvedTarget()),
                 connectionService = FakeSshConnectionService(sshConnectedResult()),

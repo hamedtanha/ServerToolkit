@@ -12,6 +12,8 @@ data class SshUiState(
     val hostKeyReview: SshHostKeyReviewUiState? = null,
     val authenticationInput: SshAuthenticationInputUiState = SshAuthenticationInputUiState(),
     val commandExecution: SshCommandExecutionUiState = SshCommandExecutionUiState(),
+    val savedCommandSelector: SshSavedCommandSelectorUiState =
+        SshSavedCommandSelectorUiState.Hidden,
 ) {
 
     val isHostKeyReviewRequired: Boolean
@@ -32,6 +34,13 @@ data class SshUiState(
     val canDisconnect: Boolean
         get() = status == SshConnectionStatus.Connected &&
             commandExecution.status != SshCommandExecutionStatus.Running
+
+    val canEditCommandInput: Boolean
+        get() = status == SshConnectionStatus.Connected &&
+            commandExecution.status != SshCommandExecutionStatus.Running
+
+    val canOpenSavedCommandSelector: Boolean
+        get() = canEditCommandInput && !savedCommandSelector.isVisible
 
     val canExecuteCommand: Boolean
         get() = status == SshConnectionStatus.Connected && commandExecution.canExecute
