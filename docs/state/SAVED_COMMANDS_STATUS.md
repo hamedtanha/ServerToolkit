@@ -2,8 +2,8 @@
 
 **Project:** Server Toolkit  
 **Milestone:** 0.5.0-alpha — Operations  
-**Status:** Management Workflow Implemented and Manually Verified
-**Last Updated:** 2026-07-16
+**Status:** Management and SSH Input Workflows Implemented and Verified
+**Last Updated:** 2026-07-17
 
 ---
 
@@ -11,7 +11,7 @@
 
 This document records the current implemented state of the Saved Commands capability.
 
-It is a living current-state document. It must describe implemented behavior only and must not present planned management UI or SSH integration as complete.
+It is a living current-state document. It must describe implemented behavior only and must not present deferred editing, automation, templating, assignment, or synchronization behavior as complete.
 
 ---
 
@@ -21,9 +21,9 @@ The accepted first Operations increment is the Saved Command Foundation defined 
 
 Slice 1 established the domain and persistence foundation.
 
-Slice 2, tracked by GitHub Issue `#129`, now implements the user-visible Saved Commands management workflow. Users can navigate to Saved Commands, observe persisted commands, create validated commands with exact command-text preservation, and delete commands through explicit confirmation.
+Slice 2, tracked by GitHub Issue `#129`, implements the user-visible Saved Commands management workflow. Users can navigate to Saved Commands, observe persisted commands, create validated commands with exact command-text preservation, and delete commands through explicit confirmation.
 
-SSH command-input integration remains a later independent slice. Selecting or managing a saved command must never execute it automatically.
+Slice 3, tracked by GitHub Issue `#133`, integrates persisted Saved Commands with the existing SSH command input. Users can open an inline selector, inspect commands in repository order, replace the current input with the exact selected command text, continue editing manually, and execute only through the existing explicit Run action.
 
 ---
 
@@ -95,6 +95,29 @@ The management workflow never parses, rewrites, previews, or executes command te
 
 ---
 
+## Implemented SSH Input Integration
+
+The existing SSH workflow now includes:
+
+- a selector action adjacent to the existing command input;
+- lazy observation through the project-owned `SavedCommandRepository` contract;
+- repository-order preservation without presentation-layer sorting;
+- stable identifier selection from the currently visible command list;
+- visible Saved Command names and exact command text;
+- loading, empty, blocking-failure, retry, and non-blocking later-failure presentation;
+- preservation of already loaded commands when a later observation fails;
+- cancellation that leaves the current command input unchanged;
+- exact input replacement without trimming, normalization, parsing, interpolation, or appending;
+- continued manual input editing while the selector loads or reports an error;
+- multiline command-input presentation for exact multiline command text;
+- selector closure when execution begins or the SSH workflow changes lifecycle state;
+- Back behavior that closes the selector before requesting permanent SSH workflow exit;
+- execution only through the existing explicit Run action.
+
+SSH owns mutable command input, execution, session lifecycle, and output. Saved Commands continues to own persistence and observation. SSH presentation depends directly on the project-owned `SavedCommandRepository` domain contract and does not depend on Saved Commands DAO, entity, concrete repository, screen, or ViewModel types.
+
+---
+
 ## Database State
 
 The Server Toolkit Room database is now version `5`.
@@ -136,6 +159,14 @@ Implemented automated coverage includes:
 - delete selection, cancellation, success, failure containment, retry, and duplicate-confirmation prevention;
 - preservation of loaded content during observation and mutation failures.
 
+SSH input integration verification now includes:
+
+- selector UI-state invariants and editability rules;
+- lazy repository observation, retry idempotency, ordering, exact selection, cancellation, and later-failure preservation;
+- proof that selection does not invoke command execution or mutate SSH connection, authentication, session, or history behavior;
+- Compose instrumentation coverage for selector availability, disabled state, loading-time manual input, stable-identifier selection, retry, cancellation, and execution separation;
+- five passing targeted Compose tests on the Pixel 9 Android Virtual Device.
+
 Manual verification on a physical Android device confirmed:
 
 - exact persisted command text after application force-stop and relaunch;
@@ -151,7 +182,6 @@ Repository Android Validation run `29514594720` completed successfully for commi
 The following behavior remains outside the implemented management slice:
 
 - Saved-command editing.
-- SSH command-input selection or population.
 - Any command execution from Saved Commands.
 - Command categories.
 - Favorites.
@@ -176,23 +206,20 @@ Reason:
 - the implementation follows the existing project-owned repository and feature-first MVVM patterns;
 - navigation uses the accepted app-level Navigation Compose boundary;
 - presentation depends on `SavedCommandRepository`, not Room types;
-- no Capability Gateway, Provider, Adapter, SSH coupling, secure-storage boundary, or external-library decision is introduced.
+- SSH presentation consumes the existing project-owned `SavedCommandRepository` domain contract without depending on Saved Commands data or presentation implementations;
+- no Capability Gateway, Provider, Adapter, secure-storage boundary, or new production library decision is introduced.
 
 A new ADR must be reviewed if later work changes ownership, secure-storage boundaries, execution safety, server assignment, synchronization, or another significant architectural decision.
 
 ---
 
-## Next Safe Slice
+## Next Safe Work
 
-The next accepted slice is SSH Saved Command Input Integration:
+The accepted SSH Saved Command Input Integration slice is implemented.
 
-- select a saved command from the existing SSH workflow;
-- populate the existing command input without automatic execution;
-- preserve user editing before execution;
-- retain the existing explicit Run action;
-- retain command-execution blocking, session lifecycle, cleanup, and stale-result guardrails.
+The next Operations slice must be selected through a separate focused issue. Editing, categories, favorites, templates, variables, server assignment, synchronization, backup, credential storage, and automatic or background execution remain deferred.
 
-The management workflow remains independent from SSH data-layer implementations.
+Saved Commands management and persistence remain independent from SSH data-layer implementations.
 
 ---
 

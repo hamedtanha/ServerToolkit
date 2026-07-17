@@ -2,7 +2,7 @@
 
 **Project:** Server Toolkit  
 **Status:** Active  
-**Last Updated:** 2026-07-16
+**Last Updated:** 2026-07-17
 
 ---
 
@@ -221,7 +221,7 @@ The name `serverinventory` remains intentional. A broader `inventory` boundary m
 
 ### SSH
 
-`feature/ssh` owns SSH trust, authentication, connection, session lifecycle, non-interactive command execution, private-key source ownership, and connection-history behavior.
+`feature/ssh` owns SSH trust, authentication, connection, session lifecycle, non-interactive command execution, private-key source ownership, connection-history behavior, mutable command input, and the Saved Command selector presentation integrated with that input.
 
 Verified responsibility packages include:
 
@@ -245,6 +245,8 @@ Rules:
 - Project-owned service contracts, use cases, and result models remain in the domain layer.
 - Credential-bearing objects must not leak into presentation state.
 - Room-backed SSH trust and connection-history persistence remain feature-owned.
+- SSH presentation may depend on the `SavedCommandRepository` domain contract for selection data.
+- SSH must not depend on Saved Commands DAO, entity, concrete repository, screen, or ViewModel types.
 - Active-session ownership and cleanup stay behind project-owned boundaries.
 
 ### Saved Commands
@@ -299,7 +301,7 @@ Current rules:
 - Navigation remains feature-owned and is registered through the app-level Navigation Compose boundary.
 - Create and delete workflows use immutable UI state and ViewModel-controlled unidirectional data flow.
 - Saved Commands must not depend on SSHJ or SSH data-layer classes.
-- Future SSH input integration must use a narrow project-owned boundary and must never trigger automatic execution.
+- Implemented SSH input integration uses the existing project-owned `SavedCommandRepository` domain contract, preserves exact command text, and never triggers automatic execution.
 - Do not introduce `feature/operations` until multiple implemented Operations capabilities require a shared boundary.
 
 ---
