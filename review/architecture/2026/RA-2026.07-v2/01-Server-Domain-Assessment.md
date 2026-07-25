@@ -337,7 +337,7 @@ The endpoint-edit scenario also destroys all retained history. Whether old endpo
 
 ### Required Correction Boundary
 
-A focused defect Issue is required independently from broader Server Profile or workspace design.
+The bounded implementation defect is tracked by Issue `#140`, independently from broader Server Profile or workspace design.
 
 The correction must:
 
@@ -350,6 +350,8 @@ The correction must:
 7. synchronize current-state documentation after implementation evidence passes.
 
 The review does not select the exact DAO mechanism yet. `@Update`, Room upsert semantics, or a transaction-based alternative must be compared against current Room behavior and regression requirements before implementation.
+
+Issue `#140` owns the implementation acceptance criteria. No production correction belongs on the architecture-review branch.
 
 ## Documentation Consistency Finding
 

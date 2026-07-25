@@ -22,7 +22,7 @@ The Server Inventory 0.3.0 baseline remains the accepted historical foundation.
 
 The feature provides local server inventory management backed by Room persistence.
 
-A focused Room instrumentation probe on 2026-07-25 verified a current persistence defect: saving an existing Server through the Room replacement path deletes associated SSH trusted-host-key and connection-history rows, including during metadata-only edits. The defect is documented under **Known Persistence Defect** and requires a focused correction.
+A focused Room instrumentation probe on 2026-07-25 verified a current persistence defect: saving an existing Server through the Room replacement path deletes associated SSH trusted-host-key and connection-history rows, including during metadata-only edits. The defect is documented under **Known Persistence Defect** and is tracked by Issue `#140` for a focused correction.
 
 ---
 
@@ -137,6 +137,8 @@ Required correction constraints:
 - Permanent instrumentation regression coverage is required.
 
 The exact DAO correction is not yet selected. This document does not authorize a schema migration or change explicit Server-deletion behavior.
+
+Implementation tracking: Issue `#140`.
 
 ## Accepted Baseline
 

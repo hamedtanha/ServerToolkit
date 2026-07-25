@@ -8,7 +8,7 @@
 
 ## Current Phase
 
-Focused persistence evidence and current-state synchronization.
+Profile, platform, capability, freshness, and invalidation assessment.
 
 ## Completed
 
@@ -32,6 +32,8 @@ Focused persistence evidence and current-state synchronization.
 - [x] Verify endpoint Server replacement deletes both trust and history children.
 - [x] Classify generic Server replacement as a current correctness, security, and retention defect.
 - [x] Synchronize Server Inventory current-state documentation with implemented SSH history and the verified defect.
+- [x] Create focused defect Issue `#140` with correction acceptance criteria.
+- [x] Separate defect implementation ownership from review PR `#139`.
 
 ## Current Evidence Documents
 
@@ -63,7 +65,7 @@ Current provisional direction:
 - [x] Map current SSH workflow and lifecycle invariants.
 - [x] Compare focused-screen and Server-workspace UX alternatives.
 - [x] Assess compact and expanded-window behavior.
-- [ ] Define a focused defect Issue and correction acceptance criteria.
+- [x] Define focused defect Issue `#140` and correction acceptance criteria.
 - [ ] Compare safe Room update mechanisms while preserving explicit-delete semantics.
 - [ ] Complete persistence, migration, security, and support-claim implications.
 - [ ] Produce evidence-backed decision recommendations.
