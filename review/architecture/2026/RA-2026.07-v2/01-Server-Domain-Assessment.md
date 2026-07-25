@@ -276,7 +276,7 @@ Saved Commands are global and do not currently participate in Server identity or
 | Historical observations | SSH connection history only | SSH | Verified |
 | Transient session state | Not represented in Server persistence | SSH runtime/presentation boundaries | Verified separation at persistence level |
 
-## Persistence Risk Requiring Evidence
+## Verified Server Replacement Defect
 
 ### Server Save Strategy
 
@@ -288,24 +288,68 @@ INSERT with OnConflictStrategy.REPLACE
 
 The trusted-key and connection-history tables use cascading foreign keys to `servers.id`.
 
-The current DAO test verifies that the Server row itself is replaced, but it does not verify preservation or deletion of existing child trust/history records during replacement.
+### Focused Runtime Evidence
+
+On 2026-07-25, a temporary instrumentation test executed against the actual Room database configuration on `emulator-5554`.
+
+Evidence conditions:
+
+- Room database version `5`;
+- SQLite foreign keys verified enabled with `PRAGMA foreign_keys = 1`;
+- one parent Server row;
+- one trusted-host-key child row;
+- one connection-history child row;
+- replacement save using the existing `ServerDao.upsertServer()` path;
+- two independent scenarios;
+- two tests completed with zero failures;
+- temporary evidence test removed after execution;
+- repository HEAD and working tree remained unchanged.
+
+Observed outcomes:
+
+```text
+ROOM_FOREIGN_KEYS_ENABLED=1
+SERVER_REPLACE_METADATA_CHILD_EVIDENCE=DELETED_BOTH
+SERVER_REPLACE_ENDPOINT_CHILD_EVIDENCE=DELETED_BOTH
+CONCLUSION=VERIFIED_REPLACE_DELETES_TRUST_AND_HISTORY_CHILDREN
+```
+
+The metadata-only scenario changed only Server name and description while preserving id and endpoint.
+
+The endpoint scenario preserved Server id while changing host, port, and username.
+
+In both cases, Room replaced the parent row and SQLite cascade processing deleted:
+
+- the associated trusted SSH host key;
+- the associated SSH connection-history entry.
 
 ### Classification
 
-**Needs More Evidence**
+```text
+Verified current correctness, security, and data-retention defect
+```
 
-This review must not claim that editing a Server either preserves or deletes child records until an instrumentation test proves the behavior of the actual Room and SQLite configuration.
+This is not merely an endpoint-lifecycle ambiguity.
 
-Required focused evidence:
+A metadata-only edit currently destroys endpoint trust evidence and operational history even though neither relationship was intentionally changed.
 
-1. insert a Server;
-2. insert one trusted host key and one connection-history record;
-3. save an updated Server with the same id;
-4. verify the resulting Server, trusted-key, and history rows;
-5. repeat with endpoint-only and metadata-only changes;
-6. record the observed behavior before persistence recommendations are accepted.
+The endpoint-edit scenario also destroys all retained history. Whether old endpoint trust should be removed, archived, or explicitly replaced remains a separate product and security decision, but implicit deletion through generic Server save is not an acceptable ownership mechanism.
 
-If child rows are removed during replacement, that is a current correctness and retention defect requiring a focused Issue independent from broader Server Profile design.
+### Required Correction Boundary
+
+A focused defect Issue is required independently from broader Server Profile or workspace design.
+
+The correction must:
+
+1. preserve trusted-host-key and connection-history child rows during metadata-only Server updates;
+2. preserve connection history during endpoint updates;
+3. make endpoint-trust replacement or invalidation explicit rather than an incidental cascade side effect;
+4. preserve intentional cascade behavior for explicit Server deletion unless a separately accepted retention decision changes it;
+5. add permanent Room instrumentation regression coverage for metadata-only and endpoint updates;
+6. avoid a schema migration unless the selected correction genuinely requires one;
+7. synchronize current-state documentation after implementation evidence passes.
+
+The review does not select the exact DAO mechanism yet. `@Update`, Room upsert semantics, or a transaction-based alternative must be compared against current Room behavior and regression requirements before implementation.
 
 ## Documentation Consistency Finding
 
@@ -449,15 +493,16 @@ The following direction is provisional and must be confirmed through the remaini
 
 Before final Server-domain recommendations:
 
-- prove child-record behavior during Server replacement;
+- define the focused defect Issue and correction acceptance criteria;
+- compare safe Room update mechanisms without changing explicit-delete semantics;
 - inspect Add/Edit Server validation and mutation behavior;
 - inspect Server deletion UX and retention expectations;
 - map ephemeral password and private-key authentication ownership;
 - determine whether any durable authentication-reference use case exists;
 - determine whether multiple endpoint use cases exist;
-- map operational UX ownership in the separate UX assessment;
 - define endpoint-change and host-key-rotation user flows;
-- assess whether connection history should survive Server deletion;
+- assess whether connection history should survive explicit Server deletion;
+- complete profile, platform, capability, freshness, and invalidation assessment;
 - review current-state documents for additional inconsistencies.
 
 ## Assessment Boundary
@@ -473,4 +518,4 @@ This assessment does not authorize:
 - Server workspace implementation;
 - Gateway, Provider, Adapter, registry, or plugin implementation.
 
-Final decisions remain pending the operational-UX assessment, focused persistence evidence, and the decision-recommendation document.
+Final decisions remain pending profile and capability assessment, retention decisions, correction planning for the verified persistence defect, and the decision-recommendation document.

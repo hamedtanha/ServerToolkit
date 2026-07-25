@@ -4,7 +4,7 @@
 **Feature Area:** Server Inventory
 **Status:** Accepted Baseline
 **Related Milestone:** Version 0.3.0 — Server Inventory Foundation
-**Last Updated:** 2026-07-12
+**Last Updated:** 2026-07-25
 
 ---
 
@@ -18,9 +18,11 @@ The high-level project state remains documented in [Project State](../PROJECT_ST
 
 ## Current Status
 
-The Server Inventory 0.3.0 baseline is accepted.
+The Server Inventory 0.3.0 baseline remains the accepted historical foundation.
 
 The feature provides local server inventory management backed by Room persistence.
+
+A focused Room instrumentation probe on 2026-07-25 verified a current persistence defect: saving an existing Server through the Room replacement path deletes associated SSH trusted-host-key and connection-history rows, including during metadata-only edits. The defect is documented under **Known Persistence Defect** and requires a focused correction.
 
 ---
 
@@ -80,6 +82,7 @@ The feature provides local server inventory management backed by Room persistenc
 - Hilt database and DAO providers.
 - Server Inventory repository dependency injection binding.
 - Server Inventory ViewModel repository observation.
+- Existing-Server saves currently use the Room DAO replacement conflict strategy.
 
 ### Delete Workflow
 
@@ -99,8 +102,41 @@ The feature provides local server inventory management backed by Room persistenc
 - DAO instrumentation tests for insert, replace, and delete behavior.
 - Room-backed repository instrumentation tests for save, replace, and delete behavior.
 - Server entity/domain mapper unit tests.
+- Focused temporary Room instrumentation evidence with foreign keys enabled verified that metadata-only and endpoint replacements delete both trusted-host-key and connection-history child rows.
 
 ---
+
+## Known Persistence Defect
+
+The current `ServerDao.upsertServer()` path uses `OnConflictStrategy.REPLACE`.
+
+Trusted SSH host keys and SSH connection history reference `servers.id` with `ON DELETE CASCADE`.
+
+Focused instrumentation evidence produced these outcomes:
+
+```text
+ROOM_FOREIGN_KEYS_ENABLED=1
+SERVER_REPLACE_METADATA_CHILD_EVIDENCE=DELETED_BOTH
+SERVER_REPLACE_ENDPOINT_CHILD_EVIDENCE=DELETED_BOTH
+CONCLUSION=VERIFIED_REPLACE_DELETES_TRUST_AND_HISTORY_CHILDREN
+```
+
+Consequences:
+
+- Editing only Server name or description deletes stored SSH trust.
+- Editing only Server name or description deletes retained SSH connection history.
+- Editing endpoint fields also deletes both child record types.
+- The deletion occurs implicitly as a save side effect rather than through an explicit user-facing trust, retention, or Server-deletion decision.
+
+Required correction constraints:
+
+- Metadata-only edits must preserve trust and history.
+- Endpoint edits must preserve history.
+- Endpoint trust invalidation or replacement must be explicit.
+- Explicit Server deletion semantics remain a separate retention decision.
+- Permanent instrumentation regression coverage is required.
+
+The exact DAO correction is not yet selected. This document does not authorize a schema migration or change explicit Server-deletion behavior.
 
 ## Accepted Baseline
 
@@ -132,7 +168,7 @@ The following items are intentionally not implemented in the Server Inventory ba
 - Non-server inventory asset types.
 - Generic inventory package or model.
 - Credential storage inside the server inventory table.
-- Connection history.
+- Server Inventory-owned connection history. Per-server SSH connection history is implemented and owned by the SSH feature.
 - Monitoring data.
 - Server grouping beyond the currently implemented metadata fields.
 

@@ -8,7 +8,7 @@
 
 ## Current Phase
 
-Operational UX evidence assessment.
+Focused persistence evidence and current-state synchronization.
 
 ## Completed
 
@@ -27,6 +27,11 @@ Operational UX evidence assessment.
 - [x] Record cleanup-before-navigation as a current lifecycle invariant.
 - [x] Compare focused destination, capability-owned workspace, generic workspace, and application-wide shell alternatives.
 - [x] Record compact and expanded-layout implications without selecting an implementation framework.
+- [x] Execute focused Room instrumentation evidence with foreign keys enabled.
+- [x] Verify metadata-only Server replacement deletes both trust and history children.
+- [x] Verify endpoint Server replacement deletes both trust and history children.
+- [x] Classify generic Server replacement as a current correctness, security, and retention defect.
+- [x] Synchronize Server Inventory current-state documentation with implemented SSH history and the verified defect.
 
 ## Current Evidence Documents
 
@@ -40,7 +45,8 @@ Current provisional direction:
 - keep SSH trust separate and endpoint-bound;
 - require explicit endpoint lifecycle rules;
 - defer multiple endpoints without a concrete user need;
-- prove `REPLACE` plus cascading-child behavior before persistence decisions.
+- treat `REPLACE`-driven trust and history deletion as a verified defect;
+- require an explicit correction path and permanent regression coverage;
 - preserve focused compact navigation until a concrete workspace need exists;
 - prefer a Server workspace shell with capability-owned content as the scalable target candidate;
 - keep SSH lifecycle and secrets inside the SSH capability boundary;
@@ -57,6 +63,8 @@ Current provisional direction:
 - [x] Map current SSH workflow and lifecycle invariants.
 - [x] Compare focused-screen and Server-workspace UX alternatives.
 - [x] Assess compact and expanded-window behavior.
+- [ ] Define a focused defect Issue and correction acceptance criteria.
+- [ ] Compare safe Room update mechanisms while preserving explicit-delete semantics.
 - [ ] Complete persistence, migration, security, and support-claim implications.
 - [ ] Produce evidence-backed decision recommendations.
 - [ ] Identify ADR and bounded follow-up Issue requirements.
