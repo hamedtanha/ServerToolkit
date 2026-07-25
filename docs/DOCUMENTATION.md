@@ -2,7 +2,7 @@
 
 **Project:** Server Toolkit
 **Status:** Active
-**Last Updated:** 2026-07-16
+**Last Updated:** 2026-07-25
 
 ---
 
@@ -46,11 +46,14 @@ When documentation conflicts exist, resolve them in this order:
 2. `PROJECT_STATE.md`.
 3. Focused current-state documents under `docs/state/`.
 4. Accepted ADRs for decision authority.
-5. Foundational policy and process documents.
-6. `ROADMAP.md`.
-7. `CHANGELOG.md`.
-8. Feature-specific documents.
-9. `README.md`.
+5. `ARCHITECTURE.md` for practical architecture boundaries.
+6. `ARCHITECTURE_ATLAS.md` for the integrated current-state map.
+7. Foundational policy and process documents.
+8. `ROADMAP.md`.
+9. `CHANGELOG.md`.
+10. Feature-specific documents.
+11. `README.md`.
+12. Published `review/` records as time-bound historical evidence.
 
 Current-state documents summarize repository evidence and must be corrected when they diverge from it.
 
@@ -67,6 +70,7 @@ Use the following document ownership model:
 | Long-term product direction | `PRODUCT_VISION.md` and product-direction ADRs |
 | Significant accepted decision and rationale | ADR |
 | Practical implementation architecture | `ARCHITECTURE.md` |
+| Integrated current-state architecture map | `ARCHITECTURE_ATLAS.md` |
 | Engineering selection and delivery rules | `ENGINEERING_STRATEGY.md` |
 | Currently implemented versions and behavior | `PROJECT_STATE.md` and `docs/state/` |
 | Planned milestone outcome | `ROADMAP.md` or accepted planning Issue |
@@ -304,6 +308,7 @@ These define stable project rules and require focused review:
 These change with implementation or the current baseline:
 
 - `PROJECT_STATE.md`
+- `ARCHITECTURE_ATLAS.md`
 - Focused status documents under `docs/state/`
 - `ROADMAP.md`
 - `CHANGELOG.md`
@@ -331,6 +336,8 @@ At minimum:
 - Current implementation changes update `PROJECT_STATE.md`.
 - Detailed feature-state changes update the relevant `docs/state/` document.
 - Package-boundary changes update `PACKAGE_STRUCTURE.md`.
+- Changes to mapped ownership, dependencies, navigation, persistence, runtime lifecycles, CI, release paths, or architecture invariants update `ARCHITECTURE_ATLAS.md`.
+- Published review records remain immutable; corrections or later assessments require a new review version.
 - Build-toolchain baseline changes update `state/BUILD_TOOLCHAIN_STATUS.md`.
 - Build-toolchain policy changes update the policy and affected process documents.
 - Notable changes update `CHANGELOG.md`.
@@ -382,6 +389,8 @@ Before merging documentation changes, verify:
 - `PRODUCT_VISION.md`
 - `PROJECT_STATE.md`
 - `ARCHITECTURE.md`
+- `ARCHITECTURE_ATLAS.md`
+- `engineering/README.md`
 - `ENGINEERING_STRATEGY.md`
 - `ROADMAP.md`
 - `CHANGELOG.md`
@@ -397,3 +406,4 @@ Before merging documentation changes, verify:
 - `adr/README.md`
 - `ai/AI_RULES.md`
 - `ai/AI_MEMORY.md`
+- `../review/INDEX.md`

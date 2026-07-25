@@ -3,7 +3,7 @@
 **Project:** Server Toolkit
 **Version:** 0.4.0
 **Status:** Released
-**Last Updated:** 2026-07-17
+**Last Updated:** 2026-07-25
 
 ---
 
@@ -77,7 +77,7 @@ The repository does not claim universal Linux, Windows, BSD, appliance, cloud-pr
 | SSH | Completed milestone | See [SSH Status](state/SSH_STATUS.md). |
 | Saved Commands | Management and SSH input workflows implemented | Global domain, Room persistence, Dashboard navigation, list states, validated creation, explicit deletion, restart persistence verification, and exact SSH command-input selection without automatic execution are implemented. See [Saved Commands Status](state/SAVED_COMMANDS_STATUS.md). |
 | Local Persistence | Current | Room database version `5`, explicit migrations through `4 → 5`, and exported schema `5`. |
-| Documentation Governance | Active | Source-of-truth, version metadata, ADR, changelog, and factual documentation boundaries are defined. |
+| Documentation Governance | Active | Source-of-truth, Architecture Atlas, engineering-handbook navigation, immutable review history, version metadata, ADR, changelog, and factual documentation boundaries are defined. |
 | Build Toolchain Governance | Active | Update triggers, risk classification, compatibility clusters, validation, release interaction, and ADR boundaries are defined. |
 | Continuous Integration | Implemented | Pull requests and `main` validate Kotlin compilation, Android test compilation, unit tests, lint, and debug builds. |
 | Android Release Signing | Implemented and published | The version `0.4.0` release artifacts and signing evidence are published and verified. |
@@ -262,7 +262,7 @@ The Saved Command Foundation includes:
 - Validated create workflow with exact command-text preservation.
 - Explicit delete confirmation with retryable mutation failure handling.
 - Focused automated coverage and physical-device restart verification.
-- SSH Saved Command Input Integration tracked by Issue `#133`.
+- Completed SSH Saved Command Input Integration tracked by Issue `#133` and merged through PR `#134`.
 - Inline selector with repository-order observation and stable-identifier selection.
 - Exact command-input replacement with continued manual editing.
 - Explicit Run-only execution with no connection, authentication, session, history, or automatic-execution side effects.
@@ -288,6 +288,10 @@ The documentation-only implementation includes:
 
 No Android production code or package structure is introduced by this decision work.
 
+Issue `#135` establishes the Architecture Atlas, engineering-handbook entry point, and immutable architecture-review structure against evidence baseline `0135faf89b1035fd91c75b37a25ec51bc7c71074`.
+
+This architecture knowledge work does not implement a Server Profile, capability discovery, command catalog, navigation redesign, Room migration, or production package change.
+
 ---
 
 ## Next Planned Work
@@ -295,9 +299,9 @@ No Android production code or package structure is introduced by this decision w
 The next safe development steps are:
 
 1. Keep Android version metadata unchanged at the released `0.4.0` baseline.
-2. Complete final review and merge validation for SSH Saved Command Input Integration.
-3. Preserve the explicit Run action, editable command input, exact-text replacement, execution-state blocking, session lifecycle, cleanup, and stale-result guardrails.
-4. Keep Saved Commands management and persistence independent from SSH data-layer implementations and automatic execution.
+2. Use the Architecture Atlas and `RA-2026.07-v1` evidence as the starting point for a separate Server Domain and UX Architecture Review.
+3. Define Server identity, endpoint ownership, profile layers, capability evidence, freshness, persistence implications, and UI workflow ownership before production implementation.
+4. Preserve the explicit Run action, editable command input, exact-text replacement, session lifecycle, cleanup, and stale-result guardrails.
 5. Select the next Operations slice and the first gateway-backed capability only through separate focused planning decisions.
 6. Keep named integrations outside the committed core direction until individually accepted.
 

@@ -4,7 +4,7 @@
 **Feature Area:** SSH
 **Status:** Milestone Complete with Operations Integration
 **Related Milestone:** Version 0.4.0 — SSH
-**Last Updated:** 2026-07-17
+**Last Updated:** 2026-07-25
 
 ---
 
@@ -18,7 +18,7 @@ The high-level project state remains documented in [Project State](../PROJECT_ST
 
 ## Current Status
 
-The SSH milestone implementation for version 0.4.0 is complete. Official release preparation remains in progress until the signed and verified APK and required release evidence are complete.
+The SSH milestone implementation for version 0.4.0 is complete. The signed and verified version 0.4.0 APK, tag, checksums, and required release evidence are published.
 
 The current implementation supports real ephemeral password-based and private-key SSH authentication, user-facing non-interactive command execution behind project-owned SSH session handles, deterministic workflow-exit cleanup, explicit disconnection while remaining on the SSH screen, and exact Saved Command selection into the existing editable command input without automatic execution.
 
@@ -322,10 +322,11 @@ The following items are intentionally not implemented yet:
 - Interactive terminal workflow for owned sessions.
 - Persistent credential storage implementation.
 - Monitoring workflow.
-- Saved command workflow.
+- Saved Command editing, categories, favorites, templates, variables, Server assignment, synchronization, or automatic execution.
+- Operating-system or service-manager discovery.
 - Xray or x-ui management workflow.
-- Room migrations beyond database version 4.
-- Migration tests beyond the trusted-host v1-to-v2, trusted-host v2-to-v3, and connection-history v3-to-v4 migrations.
+- Room migrations beyond database version 5.
+- Migration tests beyond the trusted-host `1 -> 2`, trusted-host `2 -> 3`, connection-history `3 -> 4`, and Saved Commands `4 -> 5` migrations.
 
 ---
 

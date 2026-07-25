@@ -28,6 +28,8 @@ The project follows Conventional Commits and Semantic Versioning principles.
 - Added focused selector ViewModel coverage and five passing targeted Compose instrumentation tests on the Pixel 9 Android Virtual Device.
 - Added ADR-015 for the platform-neutral remote systems product direction and evidence-based support claims.
 - Added ADR-016 for the three-level Core, Capability Gateway, and Provider/Adapter remote capability architecture.
+- Added an evidence-bound Architecture Atlas covering current ownership, dependencies, navigation, persistence, SSH lifecycles, Saved Commands integration, CI, release, and documentation topology.
+- Added an engineering-handbook entry point and immutable versioned architecture-review structure governed by Issue `#135`.
 
 ### Changed
 
@@ -53,6 +55,8 @@ The project follows Conventional Commits and Semantic Versioning principles.
 - Updated the SSH command field from single-line to bounded multiline presentation so exact persisted multiline commands remain visible and editable.
 - Updated AndroidX JUnit from `1.1.5` to `1.3.0` and Espresso Core from `3.5.1` to `3.7.0` to align Compose instrumentation with the current Android emulator runtime.
 - Synchronized Saved Commands status, SSH status, project state, roadmap, changelog, README, architecture, and package structure with the implemented SSH input integration.
+- Registered the Architecture Atlas and published-review roles in documentation governance and primary documentation navigation.
+- Corrected stale Project State, SSH Status, and Release Process claims against evidence baseline `0135faf89b1035fd91c75b37a25ec51bc7c71074`.
 
 ### Not Changed
 
