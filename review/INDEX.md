@@ -12,9 +12,10 @@
 Current documents:
 
 - `architecture/2026/RA-2026.07-v2/00-Review-Charter.md`
+- `architecture/2026/RA-2026.07-v2/01-Server-Domain-Assessment.md`
 - `architecture/2026/RA-2026.07-v2/STATUS.md`
 
-Assessment and recommendation documents will be created only as evidence-backed content becomes available. Empty placeholder review documents are not used.
+Additional assessment and recommendation documents will be created only as evidence-backed content becomes available. Empty placeholder review documents are not used.
 
 ## Published Reviews
 

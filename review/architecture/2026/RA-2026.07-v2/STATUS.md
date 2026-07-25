@@ -8,7 +8,7 @@
 
 ## Current Phase
 
-Review charter and evidence-collection plan.
+Server domain evidence assessment.
 
 ## Completed
 
@@ -18,18 +18,35 @@ Review charter and evidence-collection plan.
 - [x] Record exact evidence baseline.
 - [x] Define review scope, non-goals, evidence hierarchy, claim labels, decision model, and completion boundary.
 - [x] Register the active review in review navigation.
+- [x] Record the current Server domain, Room, endpoint, trust, and history baseline.
+- [x] Record identity alternatives and provisional constraints without authorizing implementation.
+- [x] Identify the Server replacement and cascade-preservation evidence gap.
+- [x] Identify the stale Server Inventory connection-history status statement.
+
+## Current Evidence Document
+
+- `01-Server-Domain-Assessment.md`
+
+Current provisional direction:
+
+- preserve opaque `Server.id`;
+- do not derive Server identity from endpoint or host-key data;
+- keep SSH trust separate and endpoint-bound;
+- require explicit endpoint lifecycle rules;
+- defer multiple endpoints without a concrete user need;
+- prove `REPLACE` plus cascading-child behavior before persistence decisions.
 
 ## Pending Evidence Work
 
-- [ ] Collect current Server domain and persistence evidence.
-- [ ] Map current endpoint, trust, authentication, history, and session ownership.
-- [ ] Compare stable Server identity alternatives.
+- [x] Collect current Server domain and persistence evidence.
+- [ ] Complete endpoint, trust, authentication, history, and session ownership mapping.
+- [x] Compare stable Server identity alternatives.
 - [ ] Assess profile-layer ownership, persistence, freshness, and invalidation.
 - [ ] Assess platform-identification and capability-discovery boundaries.
 - [ ] Map current SSH workflow and lifecycle invariants.
 - [ ] Compare focused-screen and Server-workspace UX alternatives.
 - [ ] Assess compact and expanded-window behavior.
-- [ ] Identify persistence, migration, security, and support-claim implications.
+- [ ] Complete persistence, migration, security, and support-claim implications.
 - [ ] Produce evidence-backed decision recommendations.
 - [ ] Identify ADR and bounded follow-up Issue requirements.
 - [ ] Review living documentation for consistency.
