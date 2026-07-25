@@ -141,6 +141,8 @@ Project documentation can be found inside the **docs** directory.
 - [Product Vision](docs/PRODUCT_VISION.md)
 - [Project State](docs/PROJECT_STATE.md)
 - [Architecture](docs/ARCHITECTURE.md)
+- [Architecture Atlas](docs/ARCHITECTURE_ATLAS.md)
+- [Engineering Handbook](docs/engineering/README.md)
 - [Engineering Strategy](docs/ENGINEERING_STRATEGY.md)
 - [Roadmap](docs/ROADMAP.md)
 - [Architecture Decision Records](docs/adr/README.md)
@@ -153,6 +155,7 @@ Project documentation can be found inside the **docs** directory.
 - [Development Process](docs/DEVELOPMENT.md)
 - [Changelog](docs/CHANGELOG.md)
 - [Release Process](docs/RELEASES.md)
+- [Architecture Review Index](review/INDEX.md)
 
 ---
 

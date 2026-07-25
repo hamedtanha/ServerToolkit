@@ -27,6 +27,7 @@ When ownership is unclear, resolve the boundary before adding another model, dep
 | Product direction and product principles | `docs/PRODUCT_VISION.md` |
 | Accepted durable decisions and rationale | `docs/adr/` |
 | Practical application and remote-capability architecture | `docs/ARCHITECTURE.md` |
+| Integrated current-state architecture map | `docs/ARCHITECTURE_ATLAS.md` |
 | Engineering selection and delivery rules | `docs/ENGINEERING_STRATEGY.md` |
 | Documentation authority and synchronization | `docs/DOCUMENTATION.md` |
 | Current implemented project state | `docs/PROJECT_STATE.md` |
@@ -58,3 +59,5 @@ Every behavior, architecture, security, persistence, workflow, build, or documen
 This directory currently provides navigation and governance context only. Focused engineering policy documents should be added here only when a concrete review or implementation need demonstrates distinct ownership and avoids duplicating existing authoritative documents.
 
 Issue `#135` governs the initial Architecture Atlas and engineering-review framework work.
+
+Published architecture reviews are indexed in `review/INDEX.md`. Review records provide time-bound evidence and proposals; they do not replace living current-state documents or accepted ADRs.

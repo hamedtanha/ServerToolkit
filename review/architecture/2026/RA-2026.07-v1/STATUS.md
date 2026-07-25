@@ -14,16 +14,22 @@
 - [x] Immutable review policy established.
 - [x] Engineering-handbook navigation introduced.
 
+## Completed in the Review Branch
+
+- [x] Complete repository and runtime evidence collection.
+- [x] Draft the current-state Architecture Atlas.
+- [x] Draft the executive summary.
+- [x] Draft the detailed current-repository assessment.
+- [x] Register Atlas and review roles in documentation governance.
+- [x] Correct verified stale current-state claims in focused scope.
+- [x] Review related documentation for consistency.
+
 ## In Progress
 
-- [ ] Complete repository and runtime evidence collection.
-- [ ] Publish the current-state Architecture Atlas.
-- [ ] Publish the executive summary.
-- [ ] Publish the detailed current-repository assessment.
-- [ ] Register Atlas and review roles in documentation governance.
-- [ ] Correct verified stale current-state claims in focused scope.
-- [ ] Review related documentation for consistency.
-- [ ] Run documentation and repository validation.
+- [ ] Run local documentation integrity checks.
+- [ ] Run repository Android Validation.
+- [ ] Complete pull-request review.
+- [ ] Merge the review package into `main`.
 
 ## Publication Gate
 

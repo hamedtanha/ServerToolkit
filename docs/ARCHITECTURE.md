@@ -3,7 +3,7 @@
 **Project:** Server Toolkit  
 **Version:** 0.4.0
 **Status:** Active  
-**Last Updated:** 2026-07-17
+**Last Updated:** 2026-07-25
 
 ---
 
@@ -537,9 +537,12 @@ The current implementation does not include:
 
 - [Product Vision](PRODUCT_VISION.md)
 - [Project State](PROJECT_STATE.md)
+- [Architecture Atlas](ARCHITECTURE_ATLAS.md)
+- [Engineering Handbook](engineering/README.md)
 - [Engineering Strategy](ENGINEERING_STRATEGY.md)
 - [Package Structure](../PACKAGE_STRUCTURE.md)
 - [Roadmap](ROADMAP.md)
 - [Architecture Decision Records](adr/README.md)
+- [Architecture Review Index](../review/INDEX.md)
 - [Saved Commands Status](state/SAVED_COMMANDS_STATUS.md)
 - [SSH Status](state/SSH_STATUS.md)

@@ -3,7 +3,7 @@
 **Project:** Server Toolkit
 **Document Baseline:** 0.2.0-alpha
 **Status:** Foundational
-**Last Updated:** 2026-07-15
+**Last Updated:** 2026-07-25
 
 ---
 
@@ -105,10 +105,10 @@ v0.3.0  Server Inventory Foundation
 v0.4.0  SSH
 v0.5.0  Operations
 v0.6.0  Dashboard Evolution
-v0.7.0  Monitoring
-v0.8.0  Infrastructure Helpers
+v0.7.0  Remote Capability Foundation
+v0.8.0  Operational Insights
 v0.9.0  Stabilization
-v1.0.0  Initial Release
+v1.0.0  Initial Production Release
 ```
 
 This model must stay synchronized with `ROADMAP.md`.
