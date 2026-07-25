@@ -7,7 +7,7 @@
 - **Issue state:** Closed as completed
 - **Acceptance PR:** `#136`
 - **Acceptance merge:** `619a9cb42876f4d25f0d78e59644ad66b219a404`
-- **Publication PR:** Pending
+- **Publication PR:** `#137`
 
 ## Completed
 
@@ -46,7 +46,7 @@
 
 This metadata-only change publishes review version `RA-2026.07-v1`.
 
-`Publication PR` remains `Pending` only until the Draft publication pull request number is known. That field must be replaced with the exact PR number before this change is accepted for merge.
+Publication PR `#137` carries this metadata-only publication change. Its required Android Validation check must pass on the current head before merge.
 
 No substantive review-content change is permitted in the publication pull request.
 
