@@ -2,7 +2,7 @@
 
 > **Atlas version:** `2026.07`
 >
-> **Status:** Accepted current-state baseline
+> **Status:** Published current-state baseline
 >
 > **Evidence baseline:** `0135faf89b1035fd91c75b37a25ec51bc7c71074`
 >
