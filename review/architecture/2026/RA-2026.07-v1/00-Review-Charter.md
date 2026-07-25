@@ -2,7 +2,7 @@
 
 > **Review ID:** `RA-2026.07-v1`
 >
-> **Status:** In Progress
+> **Status:** Accepted
 >
 > **Evidence baseline:** `0135faf89b1035fd91c75b37a25ec51bc7c71074`
 >
@@ -151,4 +151,5 @@ Only accepted decisions may update governing ADRs or authorize focused implement
 - related documentation is reviewed for consistency;
 - `git diff --check` passes;
 - repository Android Validation passes;
-- review status is changed to `Published` only after merge-ready evidence is complete.
+- review status is changed to `Accepted` only after merge-ready evidence is complete;
+- `Published` is reserved for a metadata-only publication change after the accepted review package is merged into `main`.

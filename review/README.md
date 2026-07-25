@@ -19,11 +19,19 @@ The authority order is:
 
 Accepted recommendations must be translated into the appropriate ADRs, current-state documents, roadmap decisions, and focused implementation Issues before production changes begin.
 
+## Review Lifecycle
+
+| Status | Meaning | Change policy |
+|---|---|---|
+| `In Progress` | Evidence collection, assessment, or review content is still evolving. | Review content may change and must be revalidated. |
+| `Accepted` | Scope, evidence, findings, and conclusions are approved and merge-ready. | Review content is frozen; only publication metadata may change. A substantive correction returns the review to `In Progress` and requires re-review. |
+| `Published` | The accepted review version has been merged into `main` through its publication pull request. | The review version is immutable. Corrections or changed conclusions require a new review version. |
+
 ## Immutability
 
-A published review version is immutable.
+A `Published` review version is immutable.
 
-Corrections, later evidence, changed conclusions, or a new assessment require a new review version. Draft review files may evolve only while their `STATUS.md` remains `In Progress`.
+Corrections, later evidence, changed conclusions, or a new assessment require a new review version. Review files may evolve while `In Progress`; accepted files remain content-frozen until publication.
 
 ## Naming
 
