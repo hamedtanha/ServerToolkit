@@ -61,6 +61,7 @@ The project follows Conventional Commits and Semantic Versioning principles.
 - Corrected stale Project State, SSH Status, and Release Process claims against evidence baseline `0135faf89b1035fd91c75b37a25ec51bc7c71074`.
 - Synchronized Server Inventory current-state documentation with implemented per-server SSH connection history and the verified existing-Server `REPLACE` defect tracked by Issue `#140`.
 - Synchronized Project State with the active `RA-2026.07-v2` review, bounded defect handoff, completed decision synthesis, and remaining validation and acceptance work.
+- Corrected the stale milestone names in the Development Process release roadmap so versions `0.7.0`, `0.8.0`, and `1.0.0` match the current Roadmap and Release Process documents.
 
 ### Not Changed
 

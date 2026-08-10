@@ -8,7 +8,7 @@
 
 ## Current Phase
 
-Local documentation-integrity checks and repository Android Validation.
+Acceptance preparation.
 
 ## Completed
 
@@ -44,6 +44,9 @@ Local documentation-integrity checks and repository Android Validation.
 - [x] Identify ADR and bounded follow-up Issue requirements.
 - [x] Preserve the current roadmap boundary while defining a future visual/UX readiness boundary.
 - [x] Review living documentation for consistency and synchronize Project State and Changelog without promoting review recommendations to accepted implementation state.
+- [x] Correct stale Development Process milestone names against the current Roadmap and Release Process.
+- [x] Pass local documentation-integrity validation across 57 Markdown files and 148 inspected Markdown links.
+- [x] Pass repository Android Validation using the same six Gradle tasks defined by the GitHub Actions workflow.
 
 ## Current Evidence Documents
 
@@ -84,8 +87,8 @@ Current provisional direction:
 - [x] Produce evidence-backed decision recommendations.
 - [x] Identify ADR and bounded follow-up Issue requirements.
 - [x] Review living documentation for consistency.
-- [ ] Run local documentation-integrity checks.
-- [ ] Run repository Android Validation.
+- [x] Run local documentation-integrity checks.
+- [x] Run repository Android Validation.
 - [ ] Complete review and acceptance.
 - [ ] Publish the accepted review version.
 
