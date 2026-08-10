@@ -17,7 +17,7 @@ Current documents:
 - `architecture/2026/RA-2026.07-v2/03-Decision-Recommendations.md`
 - `architecture/2026/RA-2026.07-v2/STATUS.md`
 
-The evidence is sufficient for decision synthesis. The review remains `In Progress` while living-document consistency review, validation, acceptance, and publication remain incomplete.
+Decision synthesis, living-document consistency review, local documentation-integrity validation, and repository Android Validation are complete for the current review head. The review remains `In Progress` pending final acceptance; publication follows the accepted review reaching `main`.
 
 ## Published Reviews
 

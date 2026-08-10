@@ -476,9 +476,9 @@ Assessment:
 Not recommended by current evidence
 ```
 
-## Provisional Architecture Direction
+## Assessment-Stage Architecture Direction
 
-The following direction is provisional and must be confirmed through the remaining review:
+The following direction records the provisional position reached during the Server-domain assessment stage. Final recommendation classifications are recorded in `03-Decision-Recommendations.md`; where this assessment-stage direction differs from that document, the decision-recommendation document governs.
 
 1. Preserve the opaque Server id as the stable inventory identity.
 2. Do not derive Server identity from host, port, username, or trusted host key.
@@ -830,21 +830,39 @@ It selects the required semantics:
 
 No Room schema migration is currently justified by this correction.
 
-## Required Next Evidence
+## Assessment Closure
 
-The Server-domain evidence needed for identity, endpoint ownership, profile
-layers, freshness, invalidation, authentication-reference deferral, history
-retention, and safe-update semantics is now sufficient for decision synthesis.
+The Server-domain evidence required for this review is complete.
 
-Before final Server-domain recommendations:
+Decision synthesis in `03-Decision-Recommendations.md` now classifies the
+identity, endpoint, trust, history, authentication-reference, platform,
+capability, freshness, invalidation, persistence, migration, security,
+retention, and support-claim directions.
 
-- complete persistence, migration, security, retention, and support-claim
-  implications across the accepted and deferred directions;
-- identify which endpoint and trust lifecycle recommendations require an ADR
-  rather than only bounded implementation acceptance criteria;
-- review living current-state documents for additional inconsistencies;
-- keep Issue `#140` as the bounded implementation owner for the verified
-  replacement defect rather than selecting production code in this review.
+The completed synthesis:
+
+- preserves opaque `Server.id` as stable inventory identity;
+- preserves one active endpoint in the current model without accepting a
+  separate endpoint table or multiple endpoints;
+- keeps SSH trust endpoint-bound and separate from generic Server metadata;
+- treats username-only changes as trust-neutral and host/port changes as
+  active-endpoint changes;
+- preserves connection-history snapshots during Server updates;
+- keeps current explicit Server-deletion cascade as the baseline while
+  deferring independent audit-retention requirements;
+- defers durable authentication references;
+- rejects adding observed platform or capability facts directly to the flat
+  Server row;
+- requires source, timestamp, freshness, and invalidation semantics before
+  future observed evidence is persisted;
+- leaves Issue `#140` as the bounded implementation owner for the verified
+  replacement defect without selecting production code in this review.
+
+No additional Server-domain evidence is required before acceptance.
+
+If materially contradictory repository evidence appears before acceptance, the
+review must return to evidence assessment rather than silently changing these
+conclusions.
 
 ## Assessment Boundary
 

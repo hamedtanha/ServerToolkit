@@ -607,12 +607,12 @@ Assessment:
 Rejected for the current project stage
 ```
 
-## Provisional UX Direction
+## Assessment-Stage UX Direction
 
-The following direction is provisional and must be confirmed in the decision-recommendation document:
+The following direction records the provisional position reached during the Operational UX assessment stage. Final recommendation classifications are recorded in `03-Decision-Recommendations.md`; where this assessment-stage direction differs from that document, the decision-recommendation document governs.
 
 1. Preserve the current focused-destination implementation until a concrete additional Server-scoped capability justifies a workspace.
-2. Treat a Server workspace shell with capability-owned content as the preferred scalable target candidate.
+2. Retain a capability-owned Server workspace as a deferred scalable candidate rather than an implementation commitment; reconsider it only when a concrete additional Server-scoped capability establishes the need.
 3. Do not create a generic workspace ViewModel that owns SSH session, secrets, history, profile, and future capabilities.
 4. Keep SSH session lifecycle inside the SSH capability boundary.
 5. Keep authentication secrets attempt-scoped and outside shared workspace state.
@@ -787,20 +787,31 @@ The accepted current UX baseline should preserve:
 This creates a safe boundary for a later visual UX foundation without forcing
 unfinished Server Profile or workspace architecture into that effort.
 
-## Required Next Evidence
+## Assessment Closure
 
-No additional runtime UX evidence is required to preserve the current
-focused-destination architecture for this review.
+The UX evidence required to classify the current navigation and lifecycle
+direction is complete.
 
-Before final UX recommendations:
+Decision synthesis in `03-Decision-Recommendations.md` now:
 
-- identify which accepted navigation or lifecycle statements require an ADR;
-- keep Server switching inside the current destination model unless a future
-  workspace requirement introduces an explicit in-workspace Server switch;
-- keep session continuity across sections deferred because no current product
-  requirement justifies changing cleanup-before-navigation.
+- preserves the focused-destination model for the current product;
+- keeps SSH lifecycle, session state, and attempt-scoped secrets inside the SSH
+  capability boundary;
+- preserves cleanup-before-navigation;
+- keeps Connection History repository-owned and read-only;
+- defers a Server workspace until a concrete additional Server-scoped
+  capability establishes the need;
+- defers session continuity across sections until a concrete workflow justifies
+  the expanded lifecycle and security surface;
+- rejects generic workspace state ownership and application-wide persistent
+  operational state;
+- defers adaptive navigation or pane infrastructure to a separately bounded
+  visual/adaptive evidence task.
 
-The following evidence is explicitly deferred to the future visual/UX
+No additional runtime UX evidence is required before accepting the current
+focused-navigation architecture.
+
+The following evidence remains explicitly deferred to the future visual/UX
 foundation or a separately bounded adaptive-layout task:
 
 - representative narrow, medium, and expanded Android window testing;
@@ -813,8 +824,8 @@ foundation or a separately bounded adaptive-layout task:
 - selection of adaptive breakpoints, pane scaffolds, navigation components, or
   new adaptive dependencies.
 
-These deferred items must not be treated as implemented behavior or as blockers
-for accepting the current focused-navigation baseline.
+These deferred items are not implemented behavior and are not blockers for
+accepting the current focused-navigation baseline.
 
 ## ADR Impact Assessment
 
@@ -826,7 +837,7 @@ Pure internal Compose decomposition without changed ownership or behavior would 
 
 ### ADR Review Required
 
-A new ADR or explicit update to current SSH decisions is required before accepting:
+A new ADR or explicit update to current SSH decisions is required before any future acceptance of:
 
 - SSH session continuity across destination or section changes;
 - a parent workspace owner for an active SSH capability;

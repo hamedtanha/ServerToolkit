@@ -234,7 +234,8 @@ The review may move from `In Progress` to `Accepted` only when:
 - security and support-claim boundaries are explicit;
 - speculative abstractions are rejected or deferred;
 - ADR requirements are identified per accepted recommendation;
-- follow-up work is bounded and created only after review acceptance;
+- recommendation-derived follow-up work is bounded and created only after review acceptance;
+- a verified current-state defect discovered during evidence collection may be handed off before acceptance only when the defect Issue is explicitly non-authorizing and implementation remains gated on the final review state;
 - related living documentation is reviewed for consistency;
 - documentation integrity checks pass;
 - repository Android Validation passes on the final review head;
