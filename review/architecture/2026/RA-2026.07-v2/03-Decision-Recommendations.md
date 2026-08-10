@@ -2,7 +2,7 @@
 
 > **Review ID:** `RA-2026.07-v2`
 >
-> **Status:** In Progress
+> **Status:** Accepted
 >
 > **Evidence baseline:** `ca10ef764b500e5f4a9c87e558ab45412832e9a9`
 >
@@ -443,31 +443,36 @@ It must not silently change:
 
 ## Decision Synthesis Conclusion
 
-Current evidence is sufficient to move the review from open-ended architecture
-assessment into consistency review and validation.
+The review evidence, living-document consistency work, documentation-integrity
+validation, and repository Android Validation are complete.
 
-The review recommends preserving the existing restrained architecture while
-making Server identity, endpoint, trust, retention, and future evidence
+The accepted recommendations preserve the existing restrained architecture
+while making Server identity, endpoint, trust, retention, and future evidence
 lifecycles explicit.
 
 The review rejects speculative profile, workspace, multi-endpoint, capability
 registry, credential-persistence, and background-session infrastructure.
 
-The next review work is not additional architecture exploration.
+Acceptance freezes the substantive review content for merge through PR `#139`.
+It does not authorize production implementation.
 
-It is:
+The next architecture-governance work is:
 
-1. living-document consistency review;
-2. local documentation-integrity validation;
-3. repository Android Validation;
-4. acceptance preparation.
+1. merge the accepted review package;
+2. publish the merged review through a metadata-only follow-up;
+3. translate the accepted Server identity, endpoint, and evidence-lifecycle
+   recommendations into a focused ADR;
+4. keep Issue `#140` as a separately bounded defect implementation;
+5. create the bounded platform-neutral Add Server copy follow-up.
 
 ## Authorization Boundary
 
-This recommendation document does not authorize production implementation.
+This accepted recommendation document does not authorize production
+implementation.
 
-Until review acceptance and the required translation work occur, it does not
-authorize:
+Review acceptance freezes the recommendation set; production work still
+requires the identified ADRs, bounded Issues, implementation evidence, tests,
+and validation. This review does not authorize:
 
 - production code changes;
 - Room schema changes;

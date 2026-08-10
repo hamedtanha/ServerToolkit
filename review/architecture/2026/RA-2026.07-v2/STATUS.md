@@ -1,14 +1,14 @@
 # RA-2026.07-v2 Status
 
 - **Review:** Server Domain and Operational UX Architecture
-- **Status:** In Progress
+- **Status:** Accepted
 - **Evidence baseline:** `ca10ef764b500e5f4a9c87e558ab45412832e9a9`
 - **Governing Issue:** `#138`
 - **Review branch:** `docs/server-domain-operational-ux-review`
 
 ## Current Phase
 
-Acceptance preparation.
+Accepted for merge.
 
 ## Completed
 
@@ -56,7 +56,7 @@ Acceptance preparation.
 - `02-Operational-UX-Assessment.md`
 - `03-Decision-Recommendations.md`
 
-Current provisional direction:
+Accepted review direction:
 
 - preserve opaque `Server.id`;
 - do not derive Server identity from endpoint or host-key data;
@@ -91,12 +91,43 @@ Current provisional direction:
 - [x] Review living documentation for consistency.
 - [x] Run local documentation-integrity checks.
 - [x] Run repository Android Validation.
-- [ ] Complete review and acceptance.
+- [x] Complete review and acceptance.
 - [ ] Publish the accepted review version.
+
+## Acceptance Evidence
+
+- Final substantive review head: `0af71c70133e8fd27277ef50cf4b801fd0c3a618`.
+- Local documentation-integrity validation passed across 57 Markdown files and
+  148 inspected Markdown links with zero backup files present.
+- Local Android Validation passed using the same six Gradle tasks defined by
+  the repository GitHub Actions workflow.
+- GitHub Android Validation run `#88` (`31387194139`) completed
+  successfully on the final substantive review head.
+- Pull-request scope contains documentation and review evidence only; no Android
+  production code, Room schema, migration, navigation behavior, or support
+  claim was changed.
+- PR `#139` is the acceptance PR for this review package.
+
+## Publication Handoff
+
+The accepted review content is frozen for merge through PR `#139`.
+
+The required Android Validation check must remain successful on the current PR
+head before merge.
+
+After PR `#139` reaches `main`, a metadata-only publication pull request must:
+
+1. change review status from `Accepted` to `Published`;
+2. record the acceptance merge and publication evidence;
+3. close governing Issue `#138` after publication requirements are satisfied.
+
+No substantive review-content change is permitted while the status is
+`Accepted`. A required substantive correction returns the review to
+`In Progress` and requires renewed validation and review.
 
 ## Current Authorization Boundary
 
-This review authorizes evidence collection and architecture assessment only.
+This accepted review records architecture recommendations and acceptance evidence only.
 
 It does not authorize:
 

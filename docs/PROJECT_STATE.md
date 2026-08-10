@@ -290,7 +290,7 @@ No Android production code or package structure is introduced by this decision w
 
 Issue `#135` establishes the Architecture Atlas, engineering-handbook entry point, and immutable architecture-review structure against evidence baseline `0135faf89b1035fd91c75b37a25ec51bc7c71074`.
 
-The active Server Domain and Operational UX Architecture Review is `RA-2026.07-v2`, governed by Issue `#138` and Draft PR `#139`.
+The Server Domain and Operational UX Architecture Review `RA-2026.07-v2` is accepted and content-frozen for merge through PR `#139`, governed by Issue `#138`.
 
 Current review evidence has:
 
@@ -303,11 +303,11 @@ Current review evidence has:
 - identified a bounded platform-neutral Add Server copy correction;
 - preserved the current roadmap milestone names and sequencing.
 
-The review remains `In Progress`.
+The review is `Accepted`. Final substantive head `0af71c70133e8fd27277ef50cf4b801fd0c3a618` passed documentation-integrity validation and GitHub Android Validation run `#88`.
 
 Its recommendations do not authorize production code, a Room schema change, Server Profile implementation, multiple endpoints, Server Workspace implementation, platform or capability persistence, credential persistence, session-continuity changes, or new support claims.
 
-The current review recommendations conclude that a future visual/UX quality initiative does not require speculative Server Profile, multi-endpoint, workspace, or capability infrastructure before visual work begins. This remains a review conclusion until `RA-2026.07-v2` is accepted.
+The accepted review concludes that a future visual/UX quality initiative does not require speculative Server Profile, multi-endpoint, workspace, or capability infrastructure before visual work begins. This is an accepted architecture recommendation, not production implementation authorization.
 
 ---
 
@@ -316,8 +316,8 @@ The current review recommendations conclude that a future visual/UX quality init
 The next safe development steps are:
 
 1. Keep Android version metadata unchanged at the released `0.4.0` baseline.
-2. Complete documentation-integrity and repository Android Validation for `RA-2026.07-v2`.
-3. Complete review acceptance without treating review recommendations as production authorization.
+2. Merge the accepted `RA-2026.07-v2` package without substantive review-content changes.
+3. Publish the merged review through a metadata-only follow-up and close governing Issue `#138` only after publication requirements are satisfied.
 4. Translate accepted significant Server identity, endpoint, and evidence-lifecycle recommendations into a focused ADR before related architecture implementation.
 5. Implement Issue `#140` on a separate focused branch with permanent Room regression coverage and without absorbing broader Server Profile, workspace, or capability scope.
 6. Correct the Linux-specific Add Server copy through a separately bounded production follow-up.
