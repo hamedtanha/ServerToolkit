@@ -3,7 +3,7 @@
 **Project:** Server Toolkit
 **Version:** 0.4.0
 **Status:** Released
-**Last Updated:** 2026-07-25
+**Last Updated:** 2026-08-10
 
 ---
 
@@ -290,7 +290,24 @@ No Android production code or package structure is introduced by this decision w
 
 Issue `#135` establishes the Architecture Atlas, engineering-handbook entry point, and immutable architecture-review structure against evidence baseline `0135faf89b1035fd91c75b37a25ec51bc7c71074`.
 
-This architecture knowledge work does not implement a Server Profile, capability discovery, command catalog, navigation redesign, Room migration, or production package change.
+The active Server Domain and Operational UX Architecture Review is `RA-2026.07-v2`, governed by Issue `#138` and Draft PR `#139`.
+
+Current review evidence has:
+
+- assessed stable Server identity, endpoint ownership, trust, history, authentication, session, and operational UX boundaries;
+- verified that the current Room `REPLACE` path deletes SSH trust and connection-history children during existing-Server saves;
+- handed the bounded persistence defect to Issue `#140`;
+- completed profile-layer, platform-versus-capability, freshness, invalidation, persistence, migration, security, retention, and support-claim assessment;
+- produced evidence-backed decision recommendations;
+- identified a required future Server identity, endpoint, and evidence-lifecycle ADR;
+- identified a bounded platform-neutral Add Server copy correction;
+- preserved the current roadmap milestone names and sequencing.
+
+The review remains `In Progress`.
+
+Its recommendations do not authorize production code, a Room schema change, Server Profile implementation, multiple endpoints, Server Workspace implementation, platform or capability persistence, credential persistence, session-continuity changes, or new support claims.
+
+The current review recommendations conclude that a future visual/UX quality initiative does not require speculative Server Profile, multi-endpoint, workspace, or capability infrastructure before visual work begins. This remains a review conclusion until `RA-2026.07-v2` is accepted.
 
 ---
 
@@ -299,11 +316,15 @@ This architecture knowledge work does not implement a Server Profile, capability
 The next safe development steps are:
 
 1. Keep Android version metadata unchanged at the released `0.4.0` baseline.
-2. Use the Architecture Atlas and `RA-2026.07-v1` evidence as the starting point for a separate Server Domain and UX Architecture Review.
-3. Define Server identity, endpoint ownership, profile layers, capability evidence, freshness, persistence implications, and UI workflow ownership before production implementation.
-4. Preserve the explicit Run action, editable command input, exact-text replacement, session lifecycle, cleanup, and stale-result guardrails.
-5. Select the next Operations slice and the first gateway-backed capability only through separate focused planning decisions.
-6. Keep named integrations outside the committed core direction until individually accepted.
+2. Complete documentation-integrity and repository Android Validation for `RA-2026.07-v2`.
+3. Complete review acceptance without treating review recommendations as production authorization.
+4. Translate accepted significant Server identity, endpoint, and evidence-lifecycle recommendations into a focused ADR before related architecture implementation.
+5. Implement Issue `#140` on a separate focused branch with permanent Room regression coverage and without absorbing broader Server Profile, workspace, or capability scope.
+6. Correct the Linux-specific Add Server copy through a separately bounded production follow-up.
+7. Preserve the explicit Run action, editable command input, exact-text replacement, session lifecycle, cleanup, and stale-result guardrails.
+8. Select the next Operations slice and the first gateway-backed capability only through separate focused planning decisions.
+9. Keep the existing `0.6.0 — Dashboard Evolution` roadmap objective unchanged unless a separate product-planning decision explicitly revises it.
+10. Keep named integrations outside the committed core direction until individually accepted.
 
 ---
 
