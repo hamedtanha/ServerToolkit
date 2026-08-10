@@ -290,7 +290,7 @@ No Android production code or package structure is introduced by this decision w
 
 Issue `#135` establishes the Architecture Atlas, engineering-handbook entry point, and immutable architecture-review structure against evidence baseline `0135faf89b1035fd91c75b37a25ec51bc7c71074`.
 
-The Server Domain and Operational UX Architecture Review `RA-2026.07-v2` is accepted and content-frozen for merge through PR `#139`, governed by Issue `#138`.
+The Server Domain and Operational UX Architecture Review `RA-2026.07-v2` is published through this metadata-only follow-up after acceptance PR `#139` was squash-merged into `main` as `8070830dfae14f908b9dd128846f66112b36423e`. Governing Issue `#138` closes only after the publication change reaches `main`.
 
 Current review evidence has:
 
@@ -303,11 +303,11 @@ Current review evidence has:
 - identified a bounded platform-neutral Add Server copy correction;
 - preserved the current roadmap milestone names and sequencing.
 
-The review is `Accepted`. Final substantive head `0af71c70133e8fd27277ef50cf4b801fd0c3a618` passed documentation-integrity validation and GitHub Android Validation run `#88`.
+The review is `Published` through this metadata-only follow-up. Final substantive head `0af71c70133e8fd27277ef50cf4b801fd0c3a618` passed documentation-integrity validation and GitHub Android Validation run `#88`; accepted head `f569e96245e2a552028d1ec22fb560762adb2e1c` passed run `#89`; the acceptance merge `8070830dfae14f908b9dd128846f66112b36423e` passed main run `#90`.
 
 Its recommendations do not authorize production code, a Room schema change, Server Profile implementation, multiple endpoints, Server Workspace implementation, platform or capability persistence, credential persistence, session-continuity changes, or new support claims.
 
-The accepted review concludes that a future visual/UX quality initiative does not require speculative Server Profile, multi-endpoint, workspace, or capability infrastructure before visual work begins. This is an accepted architecture recommendation, not production implementation authorization.
+The published review records that a future visual/UX quality initiative does not require speculative Server Profile, multi-endpoint, workspace, or capability infrastructure before visual work begins. This is an architecture recommendation, not production implementation authorization.
 
 ---
 
@@ -316,15 +316,13 @@ The accepted review concludes that a future visual/UX quality initiative does no
 The next safe development steps are:
 
 1. Keep Android version metadata unchanged at the released `0.4.0` baseline.
-2. Merge the accepted `RA-2026.07-v2` package without substantive review-content changes.
-3. Publish the merged review through a metadata-only follow-up and close governing Issue `#138` only after publication requirements are satisfied.
-4. Translate accepted significant Server identity, endpoint, and evidence-lifecycle recommendations into a focused ADR before related architecture implementation.
-5. Implement Issue `#140` on a separate focused branch with permanent Room regression coverage and without absorbing broader Server Profile, workspace, or capability scope.
-6. Correct the Linux-specific Add Server copy through a separately bounded production follow-up.
-7. Preserve the explicit Run action, editable command input, exact-text replacement, session lifecycle, cleanup, and stale-result guardrails.
-8. Select the next Operations slice and the first gateway-backed capability only through separate focused planning decisions.
-9. Keep the existing `0.6.0 — Dashboard Evolution` roadmap objective unchanged unless a separate product-planning decision explicitly revises it.
-10. Keep named integrations outside the committed core direction until individually accepted.
+2. Translate the published significant Server identity, endpoint, and evidence-lifecycle recommendations into a focused ADR before related architecture implementation.
+3. Implement Issue `#140` on a separate focused branch with permanent Room regression coverage and without absorbing broader Server Profile, workspace, or capability scope.
+4. Correct the Linux-specific Add Server copy through a separately bounded production follow-up.
+5. Preserve the explicit Run action, editable command input, exact-text replacement, session lifecycle, cleanup, and stale-result guardrails.
+6. Select the next Operations slice and the first gateway-backed capability only through separate focused planning decisions.
+7. Keep the existing `0.6.0 — Dashboard Evolution` roadmap objective unchanged unless a separate product-planning decision explicitly revises it.
+8. Keep named integrations outside the committed core direction until individually accepted.
 
 ---
 

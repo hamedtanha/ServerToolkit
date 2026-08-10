@@ -1,14 +1,14 @@
 # RA-2026.07-v2 Status
 
 - **Review:** Server Domain and Operational UX Architecture
-- **Status:** Accepted
+- **Status:** Published
 - **Evidence baseline:** `ca10ef764b500e5f4a9c87e558ab45412832e9a9`
 - **Governing Issue:** `#138`
 - **Review branch:** `docs/server-domain-operational-ux-review`
 
 ## Current Phase
 
-Accepted for merge.
+Publication metadata.
 
 ## Completed
 
@@ -92,42 +92,50 @@ Accepted review direction:
 - [x] Run local documentation-integrity checks.
 - [x] Run repository Android Validation.
 - [x] Complete review and acceptance.
-- [ ] Publish the accepted review version.
+- [x] Prepare publication metadata for the accepted review version.
 
-## Acceptance Evidence
+## Acceptance and Merge Evidence
 
 - Final substantive review head: `0af71c70133e8fd27277ef50cf4b801fd0c3a618`.
 - Local documentation-integrity validation passed across 57 Markdown files and
   148 inspected Markdown links with zero backup files present.
 - Local Android Validation passed using the same six Gradle tasks defined by
   the repository GitHub Actions workflow.
-- GitHub Android Validation run `#88` (`31387194139`) completed
-  successfully on the final substantive review head.
-- Pull-request scope contains documentation and review evidence only; no Android
+- GitHub Android Validation run `#88` (`31387194139`) completed successfully on
+  the final substantive review head.
+- Accepted review head `f569e96245e2a552028d1ec22fb560762adb2e1c` passed GitHub Android Validation run
+  `#89` (`31388113069`).
+- Acceptance PR `#139` was squash-merged into `main` as
+  `8070830dfae14f908b9dd128846f66112b36423e` on `2026-08-10T12:43:15Z`.
+- The acceptance merge on `main` passed GitHub Android Validation run `#90`
+  (`31389350520`).
+- The accepted package and this publication metadata introduce no Android
   production code, Room schema, migration, navigation behavior, or support
-  claim was changed.
-- PR `#139` is the acceptance PR for this review package.
+  claim change.
 
-## Publication Handoff
+## Publication
 
-The accepted review content is frozen for merge through PR `#139`.
+The accepted review package has reached `main` through PR `#139`.
 
-The required Android Validation check must remain successful on the current PR
-head before merge.
+This metadata-only change records review version `RA-2026.07-v2` as
+`Published`. The publication pull request must contain no substantive
+review-content changes and must pass the required Android Validation check on
+its current head before merge.
 
-After PR `#139` reaches `main`, a metadata-only publication pull request must:
+Governing Issue `#138` remains open until this publication metadata reaches
+`main`. After publication merges, close Issue `#138` as completed.
 
-1. change review status from `Accepted` to `Published`;
-2. record the acceptance merge and publication evidence;
-3. close governing Issue `#138` after publication requirements are satisfied.
+Issue `#140` remains open as the separately bounded Server-update persistence
+defect. Publication does not authorize its implementation mechanism and does
+not resolve the inactive-endpoint trust lifecycle.
 
-No substantive review-content change is permitted while the status is
-`Accepted`. A required substantive correction returns the review to
-`In Progress` and requires renewed validation and review.
+Once this publication metadata reaches `main`, review version
+`RA-2026.07-v2` is immutable. Corrections, later evidence, or changed
+conclusions require a new review version.
 
 ## Current Authorization Boundary
 
-This accepted review records architecture recommendations and acceptance evidence only.
+This published review records architecture recommendations and review evidence only.
 
 It does not authorize:
 
@@ -149,4 +157,4 @@ In Progress -> Accepted -> Published
 
 `Accepted` freezes substantive review content for merge.
 
-`Published` is reserved for a metadata-only publication change after the accepted review package reaches `main`. A published review version is immutable.
+`Published` records that the accepted review package reached `main` and the publication metadata has been prepared. Once this publication change reaches `main`, the review version is immutable.
