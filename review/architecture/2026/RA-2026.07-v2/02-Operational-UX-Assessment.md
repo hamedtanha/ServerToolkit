@@ -865,4 +865,4 @@ This assessment does not authorize:
 - Room schema changes;
 - new capability claims.
 
-Final decisions remain pending focused persistence evidence, profile and capability assessment, and the decision-recommendation document.
+Final recommendation classifications are recorded in `03-Decision-Recommendations.md`. This assessment remains evidence context and does not independently authorize implementation.

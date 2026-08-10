@@ -48,6 +48,7 @@ Acceptance preparation.
 - [x] Pass local documentation-integrity validation across 57 Markdown files and 148 inspected Markdown links.
 - [x] Pass repository Android Validation using the same six Gradle tasks defined by the GitHub Actions workflow.
 - [x] Complete final acceptance-readiness review of repository scope, assessment-stage wording, review-index state, and follow-up governance.
+- [x] Remove residual pre-synthesis decision-pending wording from the Server-domain and Operational UX assessment boundaries.
 
 ## Current Evidence Documents
 

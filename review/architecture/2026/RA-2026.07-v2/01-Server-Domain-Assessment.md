@@ -877,4 +877,4 @@ This assessment does not authorize:
 - Server workspace implementation;
 - Gateway, Provider, Adapter, registry, or plugin implementation.
 
-Final decisions remain pending profile and capability assessment, retention decisions, correction planning for the verified persistence defect, and the decision-recommendation document.
+Final recommendation classifications are recorded in `03-Decision-Recommendations.md`. This assessment remains evidence context and does not independently authorize implementation.
