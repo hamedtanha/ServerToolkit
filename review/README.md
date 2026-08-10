@@ -52,10 +52,16 @@ Each review records:
 
 ## Current Review
 
-The initial ServerToolkit architecture-knowledge review is:
+The active ServerToolkit architecture review is:
+
+```text
+review/architecture/2026/RA-2026.07-v2/
+```
+
+It is governed by GitHub Issue `#138` and is `Accepted`, with substantive content frozen for merge through PR `#139`. Publication remains a metadata-only follow-up after the accepted package reaches `main`.
+
+The previously published architecture-knowledge review remains immutable at:
 
 ```text
 review/architecture/2026/RA-2026.07-v1/
 ```
-
-It is governed by GitHub Issue `#135`.

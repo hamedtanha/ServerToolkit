@@ -30,6 +30,8 @@ The project follows Conventional Commits and Semantic Versioning principles.
 - Added ADR-016 for the three-level Core, Capability Gateway, and Provider/Adapter remote capability architecture.
 - Added an evidence-bound Architecture Atlas covering current ownership, dependencies, navigation, persistence, SSH lifecycles, Saved Commands integration, CI, release, and documentation topology.
 - Added an engineering-handbook entry point and immutable versioned architecture-review structure governed by Issue `#135`.
+- Added architecture review `RA-2026.07-v2` for Server identity, endpoint lifecycle, profile-layer ownership, operational UX, persistence, security, retention, platform/capability evidence, freshness, and invalidation under Issue `#138` and PR `#139`.
+- Added evidence-backed decision recommendations for the Server domain and operational UX, including ADR and bounded follow-up requirements without authorizing production implementation.
 
 ### Changed
 
@@ -57,6 +59,9 @@ The project follows Conventional Commits and Semantic Versioning principles.
 - Synchronized Saved Commands status, SSH status, project state, roadmap, changelog, README, architecture, and package structure with the implemented SSH input integration.
 - Registered the Architecture Atlas and published-review roles in documentation governance and primary documentation navigation.
 - Corrected stale Project State, SSH Status, and Release Process claims against evidence baseline `0135faf89b1035fd91c75b37a25ec51bc7c71074`.
+- Synchronized Server Inventory current-state documentation with implemented per-server SSH connection history and the verified existing-Server `REPLACE` defect tracked by Issue `#140`.
+- Synchronized Project State with accepted review `RA-2026.07-v2`, bounded defect handoff, completed decision synthesis, final documentation-integrity validation, and successful Android Validation run `#88` on substantive head `0af71c70133e8fd27277ef50cf4b801fd0c3a618`.
+- Corrected the stale milestone names in the Development Process release roadmap so versions `0.7.0`, `0.8.0`, and `1.0.0` match the current Roadmap and Release Process documents.
 
 ### Not Changed
 
