@@ -14,9 +14,10 @@ Current documents:
 - `architecture/2026/RA-2026.07-v2/00-Review-Charter.md`
 - `architecture/2026/RA-2026.07-v2/01-Server-Domain-Assessment.md`
 - `architecture/2026/RA-2026.07-v2/02-Operational-UX-Assessment.md`
+- `architecture/2026/RA-2026.07-v2/03-Decision-Recommendations.md`
 - `architecture/2026/RA-2026.07-v2/STATUS.md`
 
-The decision-recommendation document will be created only when the remaining evidence is sufficient. Empty placeholder review documents are not used.
+The evidence is sufficient for decision synthesis. The review remains `In Progress` while living-document consistency review, validation, acceptance, and publication remain incomplete.
 
 ## Published Reviews
 

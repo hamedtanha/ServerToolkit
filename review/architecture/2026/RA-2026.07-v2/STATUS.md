@@ -8,7 +8,7 @@
 
 ## Current Phase
 
-Persistence, migration, security, retention, and decision-recommendation assessment.
+Living-document consistency review and validation.
 
 ## Completed
 
@@ -39,11 +39,16 @@ Persistence, migration, security, retention, and decision-recommendation assessm
 - [x] Define freshness and invalidation semantics for future observed evidence.
 - [x] Compare safe existing-Server update mechanisms without selecting implementation.
 - [x] Record the platform-neutral Add Server UI-copy inconsistency.
+- [x] Complete persistence, migration, security, retention, and support-claim implications.
+- [x] Produce evidence-backed decision recommendations.
+- [x] Identify ADR and bounded follow-up Issue requirements.
+- [x] Preserve the current roadmap boundary while defining a future visual/UX readiness boundary.
 
 ## Current Evidence Documents
 
 - `01-Server-Domain-Assessment.md`
 - `02-Operational-UX-Assessment.md`
+- `03-Decision-Recommendations.md`
 
 Current provisional direction:
 
@@ -74,9 +79,9 @@ Current provisional direction:
 - [x] Assess compact and expanded-window behavior.
 - [x] Define focused defect Issue `#140` and correction acceptance criteria.
 - [x] Compare safe Room update mechanisms while preserving explicit-delete semantics.
-- [ ] Complete persistence, migration, security, and support-claim implications.
-- [ ] Produce evidence-backed decision recommendations.
-- [ ] Identify ADR and bounded follow-up Issue requirements.
+- [x] Complete persistence, migration, security, and support-claim implications.
+- [x] Produce evidence-backed decision recommendations.
+- [x] Identify ADR and bounded follow-up Issue requirements.
 - [ ] Review living documentation for consistency.
 - [ ] Run local documentation-integrity checks.
 - [ ] Run repository Android Validation.
