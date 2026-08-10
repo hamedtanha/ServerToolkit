@@ -649,22 +649,172 @@ Before accepting a workspace target, the product must select one of these behavi
 
 Current evidence supports only close-on-workflow-exit behavior.
 
+
+## Remaining Product and UX Decision Assessment
+
+### Additional Server-Scoped Capability
+
+No concrete additional Server-scoped remote capability has been accepted after
+the current SSH and Connection History workflows.
+
+The roadmap intentionally leaves the first gateway-backed remote capability
+unselected.
+
+Therefore, current evidence does not justify introducing a Server Workspace
+only to prepare for hypothetical future capabilities.
+
+Assessment:
+
+```text
+Preserve focused destinations now.
+
+Keep a capability-owned Server Workspace as a deferred target candidate rather
+than an implementation commitment.
+```
+
+### History During an Active SSH Session
+
+Current implementation closes the active SSH workflow before navigating to
+Connection History.
+
+No current product requirement or runtime evidence establishes that History
+must remain accessible while an SSH session stays active.
+
+Assessment:
+
+```text
+Preserve cleanup-before-navigation.
+
+Defer session continuity across sections until a concrete workflow requires it.
+```
+
+This avoids expanding session lifetime, secret lifetime, process-death
+behavior, and cleanup policy without user value.
+
+### Minimum Server Context During Operations
+
+The current SSH screen exposes a raw Server id as presentation context.
+
+A future visual and UX polish pass may improve the visible Server context
+without changing ownership or navigation architecture.
+
+The minimum useful operational context is expected to be derived from existing
+implemented inventory data rather than speculative profile information.
+
+Candidate presentation data includes:
+
+- Server display name;
+- active host;
+- SSH port;
+- username when present.
+
+This is a presentation concern unless it changes ownership, lifecycle, or
+navigation semantics.
+
+### Platform-Neutral UI Copy Finding
+
+`AddServerViewModel` initializes the default `ServerFormUiState`.
+
+That default state currently contains:
+
+```text
+Enter the connection details for a Linux server.
+```
+
+ADR-015 supersedes Linux-specific product-scope assumptions and defines
+Server Toolkit as platform-neutral.
+
+Classification:
+
+```text
+Verified production UI-copy inconsistency.
+```
+
+This review PR must not modify production Compose or presentation code.
+
+The correction should be translated into a bounded implementation follow-up
+after review acceptance.
+
+The replacement copy must describe implemented behavior without claiming
+unsupported platform compatibility.
+
+### Adaptive Presentation Decision
+
+No adaptive-layout framework is accepted by current evidence.
+
+The current compact focused-destination semantics remain valid.
+
+Exact medium and expanded layouts require runtime and visual evidence, but that
+evidence is not required to accept a speculative workspace architecture because
+the workspace itself remains deferred.
+
+Representative window testing should therefore be performed as part of the
+future visual/UX foundation or a focused adaptive-layout task before selecting:
+
+- breakpoints;
+- pane scaffolds;
+- navigation rails;
+- permanent Server context panes;
+- adaptive dependencies.
+
+Assessment:
+
+```text
+Compact focused navigation: preserve.
+
+Medium/expanded visual structure: Needs More Evidence.
+
+Adaptive framework selection: deferred.
+```
+
+### UX Review Conclusion
+
+The review can reach a stable pre-visual-design boundary without implementing a
+Server Workspace.
+
+The accepted current UX baseline should preserve:
+
+1. focused capability ownership;
+2. SSH cleanup-before-navigation;
+3. attempt-scoped secrets;
+4. explicit Run-only command execution;
+5. repository-owned read-only History;
+6. single-pane compact semantics;
+7. platform-neutral user-facing copy;
+8. visual redesign freedom that does not silently alter architecture or
+   lifecycle behavior.
+
+This creates a safe boundary for a later visual UX foundation without forcing
+unfinished Server Profile or workspace architecture into that effort.
+
 ## Required Next Evidence
+
+No additional runtime UX evidence is required to preserve the current
+focused-destination architecture for this review.
 
 Before final UX recommendations:
 
-- identify the next concrete Server-scoped capability after SSH and History;
-- determine whether users need History while an SSH session remains active;
-- verify expected behavior when switching Server context;
-- define Back and Up behavior for compact and expanded layouts;
-- test representative narrow, medium, and expanded Android windows;
-- assess command-output readability and action reachability with large output;
-- assess whether an intermediate Server Overview improves or slows the primary Connect flow;
-- determine the minimum Server context visible during operations;
-- decide whether session continuity across workspace sections is a real requirement;
-- determine whether the current SSH screen should be decomposed into internal components without changing ownership;
-- review accessibility, keyboard, landscape, and large-screen behavior;
-- identify which navigation or lifecycle decisions require an ADR.
+- identify which accepted navigation or lifecycle statements require an ADR;
+- keep Server switching inside the current destination model unless a future
+  workspace requirement introduces an explicit in-workspace Server switch;
+- keep session continuity across sections deferred because no current product
+  requirement justifies changing cleanup-before-navigation.
+
+The following evidence is explicitly deferred to the future visual/UX
+foundation or a separately bounded adaptive-layout task:
+
+- representative narrow, medium, and expanded Android window testing;
+- command-output readability and action reachability with large output;
+- accessibility, keyboard, landscape, and large-screen behavior;
+- exact Back and Up presentation for any future expanded workspace;
+- whether an intermediate Server Overview improves the primary Connect flow;
+- whether internal SSH Compose decomposition improves presentation without
+  changing ownership or lifecycle;
+- selection of adaptive breakpoints, pane scaffolds, navigation components, or
+  new adaptive dependencies.
+
+These deferred items must not be treated as implemented behavior or as blockers
+for accepting the current focused-navigation baseline.
 
 ## ADR Impact Assessment
 

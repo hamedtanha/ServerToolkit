@@ -491,21 +491,360 @@ The following direction is provisional and must be confirmed through the remaini
 9. Do not introduce a Capability Gateway for identity or local persistence modelling alone.
 10. Do not retrofit existing SSH boundaries cosmetically; restructure only for a concrete accepted requirement or verified defect.
 
+
+## Profile, Platform, Capability, Freshness, and Invalidation Assessment
+
+### Profile-Layer Ownership
+
+Current evidence does not support turning the flat `Server` row into a
+catch-all Server Profile.
+
+The following ownership model is the current evidence-backed direction:
+
+| Layer | Owner | Persistence | Freshness | Invalidation |
+|---|---|---|---|---|
+| User-defined inventory metadata | Server Inventory | Durable | Not freshness-based | Explicit user edit or Server deletion |
+| Active connection endpoint | Server Inventory | Durable | Not freshness-based | Explicit endpoint edit or Server deletion |
+| SSH trust evidence | SSH | Durable | Not time-expiring by default | Endpoint identity change, explicit trust replacement, or Server deletion |
+| Authentication secrets | SSH attempt boundary | Never durable | Attempt-scoped | Attempt completion, cancellation, method change, workflow exit, or host-key review |
+| Authentication references | Not implemented | None | Undefined | Deferred until a concrete durable use case exists |
+| Observed platform facts | Not implemented | None | Required if introduced | Must be defined before persistence |
+| Observed capability evidence | Not implemented | None | Required if introduced | Must be defined before persistence |
+| Operational preferences | Server Inventory only for current metadata | Durable where implemented | Not observation freshness | Explicit user edit |
+| Connection history | SSH | Durable snapshot | Historical, not freshness-based | Current implementation deletes with owning Server |
+| Active session and command state | SSH workflow | Never durable | Runtime-only | Session close, workflow exit, cancellation, or lifecycle cleanup |
+
+This model preserves ownership rather than requiring all Server-related
+information to live in the `Server` aggregate or `servers` table.
+
+### User-Defined Data Versus Observed Evidence
+
+User-defined inventory values and remotely observed evidence have different
+semantics.
+
+Current Server fields such as:
+
+- name;
+- environment;
+- category;
+- tags;
+- favorite state;
+- description;
+- host;
+- SSH port;
+- SSH username;
+
+are user-managed configuration or metadata.
+
+They must not be treated as automatically verified remote-system facts.
+
+Future observed platform or capability information requires, at minimum:
+
+- an evidence source;
+- an observation timestamp;
+- a project-owned normalized value;
+- an explicit support or confidence classification where applicable;
+- freshness semantics;
+- invalidation semantics.
+
+Observed facts must not be added to the current flat Server row merely because
+they are displayed on a future Server screen.
+
+### Platform Identification Boundary
+
+Platform identification answers what the remote target has been observed to be.
+
+Examples may eventually include normalized operating-system family or another
+stable platform characteristic.
+
+Platform identification must not imply capability support.
+
+For example, observing a Linux-family target would not prove:
+
+- a particular service manager;
+- a package manager;
+- a shell;
+- a command location;
+- a monitoring interface;
+- support for a future operational capability.
+
+ADR-015 therefore remains the governing product rule: architectural
+extensibility and platform identification are not verified support claims.
+
+### Capability Discovery Boundary
+
+Capability discovery answers whether a concrete project-owned operation can be
+performed through an accepted implementation.
+
+Future capability evidence must use the ADR-016 support semantics:
+
+```text
+Supported
+Unsupported
+Unknown
+Unavailable
+```
+
+Capability support must not be inferred solely from a platform label.
+
+A Capability Gateway is justified only when a concrete capability requires
+discovery, translation, provider selection, normalization, orchestration,
+policy enforcement, or external integration.
+
+No generic Server Profile Gateway, Provider registry, platform registry, or
+capability table is justified by current evidence.
+
+### Freshness Model
+
+Current persisted Server metadata, endpoint configuration, SSH trust, and
+connection-history snapshots do not require a generic time-based freshness
+model.
+
+Future observed platform and capability evidence does.
+
+The review distinguishes:
+
+```text
+Current
+  Evidence remains within its accepted freshness policy.
+
+Stale
+  Evidence was previously valid but is older than the accepted freshness
+  policy. It may be displayed with explicit stale meaning but must not be used
+  as fresh operational proof.
+
+Invalid
+  Evidence no longer applies to the active target context and must not be used
+  for capability or support decisions.
+
+Unknown
+  No sufficient evidence currently exists.
+```
+
+A single generic freshness duration is not accepted. Freshness belongs to the
+owning observed fact or capability because different evidence may have
+different validity periods.
+
+### Invalidation Triggers
+
+The following invalidation direction is supported by current evidence.
+
+#### Metadata-Only Server Edit
+
+Changing user-defined metadata such as name, description, environment,
+category, tags, or favorite state must not invalidate:
+
+- SSH trust;
+- SSH connection history;
+- future platform evidence;
+- future capability evidence;
+
+unless a separately defined relationship proves otherwise.
+
+#### SSH Username Change
+
+SSH host trust identity currently excludes username.
+
+Therefore, changing only `sshUsername` must not invalidate the trusted host key
+for an unchanged `serverId + host + port`.
+
+Historical connection records retain their original username snapshot and must
+not be rewritten.
+
+#### Host or SSH Port Change
+
+Changing host or SSH port changes the current SSH trust lookup endpoint.
+
+Trust for the old endpoint must never authorize the new endpoint implicitly.
+
+The new endpoint must enter the normal SSH trust-evaluation path.
+
+Because the current product supports one active endpoint per Server, retention
+or removal of the old endpoint trust record must be an explicit operation
+rather than an incidental parent-row cascade.
+
+The exact transactional implementation belongs to Issue `#140`.
+
+#### Host-Key Change on the Same Endpoint
+
+A changed host key remains governed by the existing SSH trust contract.
+
+It must remain blocked until an explicit reviewed replacement action occurs.
+
+Silent trust replacement is prohibited.
+
+#### Remote-System Replacement or Reinstallation
+
+If future evidence establishes that the remote system represented by the active
+endpoint has been replaced or reinstalled, previously observed platform and
+capability evidence must not remain authoritative automatically.
+
+The first implementation that introduces such evidence must define the concrete
+replacement signal and invalidation transaction.
+
+#### Temporary Connectivity Failure
+
+A temporary connectivity failure does not by itself prove that persisted
+platform evidence is invalid.
+
+For capability presentation, the appropriate runtime state may be
+`Unavailable` while previously observed evidence remains separately classified
+according to its freshness policy.
+
+### Authentication-Reference Assessment
+
+Current implementation provides no durable authentication-reference use case.
+
+Password values, private-key sources, private-key material, and passphrases are
+attempt-scoped and deliberately non-persistent.
+
+Introducing a durable authentication reference now would create schema,
+security, lifecycle, deletion, and UX responsibilities without an implemented
+consumer.
+
+Assessment:
+
+```text
+Deferred until a concrete credential-selection workflow requires it.
+```
+
+This does not weaken the existing prohibition on persistent credentials.
+
+### Connection-History Retention Assessment
+
+Current SSH connection history is operational history associated with a Server
+record, not an independent immutable audit log.
+
+Each entry already preserves its endpoint and username snapshot.
+
+Current evidence does not establish a product requirement for history to
+survive explicit Server deletion.
+
+Assessment:
+
+```text
+Preserve the current explicit-Server-deletion cascade for the present
+architecture.
+
+Defer independent history retention until a concrete audit, export, recovery,
+or compliance requirement exists.
+```
+
+Issue `#140` must preserve this explicit deletion behavior while removing
+unintended deletion during ordinary updates.
+
+### Existing-Server Update Mechanism Assessment
+
+The required semantic change is clear:
+
+```text
+Existing Server modification must use parent-row update semantics,
+not delete-and-reinsert replacement semantics.
+```
+
+The exact Room API remains an implementation decision for Issue `#140`.
+
+#### Candidate A — Explicit Insert and Update Operations
+
+Use an insert operation for new Server rows and an update operation for existing
+rows.
+
+Advantages:
+
+- makes create and modify semantics explicit;
+- maps directly to the domain distinction already present in Add Server and
+  Edit Server workflows;
+- avoids parent-row deletion semantics during ordinary updates;
+- is straightforward to verify with the required child-preservation tests.
+
+Limitations:
+
+- repository implementation must select the correct operation;
+- update-not-found behavior must be defined explicitly.
+
+Assessment:
+
+```text
+Preferred implementation candidate.
+```
+
+#### Candidate B — Room Upsert Semantics
+
+Use Room's upsert support if its generated and runtime behavior is verified to
+preserve child records for the current Room version and schema.
+
+Advantages:
+
+- preserves a single repository save entry point;
+- may reduce explicit insert/update branching.
+
+Limitations:
+
+- the review must not assume generated SQL behavior;
+- Issue `#140` explicitly requires verification against the actual database;
+- endpoint-trust invalidation still requires separate explicit logic.
+
+Assessment:
+
+```text
+Viable candidate only after generated/runtime behavior is verified.
+```
+
+#### Candidate C — Transaction-Based Update and Trust Handling
+
+Use an explicit transaction when Server endpoint modification and trust
+invalidation must commit atomically.
+
+Advantages:
+
+- can make endpoint and trust lifecycle changes atomic;
+- supports explicit old-endpoint trust cleanup when required.
+
+Limitations:
+
+- unnecessary for metadata-only updates;
+- must not become a broad Server persistence transaction containing unrelated
+  feature behavior;
+- cross-feature ownership must remain explicit.
+
+Assessment:
+
+```text
+Use only if the accepted endpoint-trust policy requires atomic coordination.
+```
+
+### Update-Mechanism Review Conclusion
+
+The review does not select a Room annotation or generated implementation.
+
+It selects the required semantics:
+
+1. ordinary Server updates must not delete and recreate the parent row;
+2. metadata-only edits preserve SSH trust and history;
+3. username-only edits preserve SSH host trust;
+4. host or port edits preserve history snapshots;
+5. old endpoint trust must never authorize a new endpoint;
+6. explicit Server deletion retains current cascade semantics;
+7. Issue `#140` must prove the selected mechanism through permanent Room
+   instrumentation and repository tests.
+
+No Room schema migration is currently justified by this correction.
+
 ## Required Next Evidence
+
+The Server-domain evidence needed for identity, endpoint ownership, profile
+layers, freshness, invalidation, authentication-reference deferral, history
+retention, and safe-update semantics is now sufficient for decision synthesis.
 
 Before final Server-domain recommendations:
 
-- define the focused defect Issue and correction acceptance criteria;
-- compare safe Room update mechanisms without changing explicit-delete semantics;
-- inspect Add/Edit Server validation and mutation behavior;
-- inspect Server deletion UX and retention expectations;
-- map ephemeral password and private-key authentication ownership;
-- determine whether any durable authentication-reference use case exists;
-- determine whether multiple endpoint use cases exist;
-- define endpoint-change and host-key-rotation user flows;
-- assess whether connection history should survive explicit Server deletion;
-- complete profile, platform, capability, freshness, and invalidation assessment;
-- review current-state documents for additional inconsistencies.
+- complete persistence, migration, security, retention, and support-claim
+  implications across the accepted and deferred directions;
+- identify which endpoint and trust lifecycle recommendations require an ADR
+  rather than only bounded implementation acceptance criteria;
+- review living current-state documents for additional inconsistencies;
+- keep Issue `#140` as the bounded implementation owner for the verified
+  replacement defect rather than selecting production code in this review.
 
 ## Assessment Boundary
 

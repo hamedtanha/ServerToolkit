@@ -8,7 +8,7 @@
 
 ## Current Phase
 
-Profile, platform, capability, freshness, and invalidation assessment.
+Persistence, migration, security, retention, and decision-recommendation assessment.
 
 ## Completed
 
@@ -34,6 +34,11 @@ Profile, platform, capability, freshness, and invalidation assessment.
 - [x] Synchronize Server Inventory current-state documentation with implemented SSH history and the verified defect.
 - [x] Create focused defect Issue `#140` with correction acceptance criteria.
 - [x] Separate defect implementation ownership from review PR `#139`.
+- [x] Assess Server Profile layer ownership and durable/transient boundaries.
+- [x] Define platform-identification versus capability-discovery boundaries.
+- [x] Define freshness and invalidation semantics for future observed evidence.
+- [x] Compare safe existing-Server update mechanisms without selecting implementation.
+- [x] Record the platform-neutral Add Server UI-copy inconsistency.
 
 ## Current Evidence Documents
 
@@ -50,23 +55,25 @@ Current provisional direction:
 - treat `REPLACE`-driven trust and history deletion as a verified defect;
 - require an explicit correction path and permanent regression coverage;
 - preserve focused compact navigation until a concrete workspace need exists;
-- prefer a Server workspace shell with capability-owned content as the scalable target candidate;
+- retain a capability-owned Server workspace as a deferred scalable candidate rather than an implementation commitment;
 - keep SSH lifecycle and secrets inside the SSH capability boundary;
 - reject generic workspace and application-wide operational-state owners;
-- require an explicit decision before session continuity across sections.
+- preserve cleanup-before-navigation and defer session continuity across sections until a concrete workflow requires it;
+- keep future platform and capability observations source-aware, freshness-aware, and explicitly invalidated;
+- defer durable authentication references until a concrete credential-selection workflow exists.
 
 ## Pending Evidence Work
 
 - [x] Collect current Server domain and persistence evidence.
 - [x] Complete endpoint, trust, authentication, history, and session ownership mapping.
 - [x] Compare stable Server identity alternatives.
-- [ ] Assess profile-layer ownership, persistence, freshness, and invalidation.
-- [ ] Assess platform-identification and capability-discovery boundaries.
+- [x] Assess profile-layer ownership, persistence, freshness, and invalidation.
+- [x] Assess platform-identification and capability-discovery boundaries.
 - [x] Map current SSH workflow and lifecycle invariants.
 - [x] Compare focused-screen and Server-workspace UX alternatives.
 - [x] Assess compact and expanded-window behavior.
 - [x] Define focused defect Issue `#140` and correction acceptance criteria.
-- [ ] Compare safe Room update mechanisms while preserving explicit-delete semantics.
+- [x] Compare safe Room update mechanisms while preserving explicit-delete semantics.
 - [ ] Complete persistence, migration, security, and support-claim implications.
 - [ ] Produce evidence-backed decision recommendations.
 - [ ] Identify ADR and bounded follow-up Issue requirements.
