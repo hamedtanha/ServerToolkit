@@ -1,9 +1,8 @@
 package de.hamedtanha.servertoolkit.feature.serverinventory.data.local.dao
 
 import androidx.room.Dao
-import androidx.room.Insert
-import androidx.room.OnConflictStrategy
 import androidx.room.Query
+import androidx.room.Upsert
 import de.hamedtanha.servertoolkit.feature.serverinventory.data.local.entity.ServerEntity
 import kotlinx.coroutines.flow.Flow
 
@@ -16,7 +15,7 @@ interface ServerDao {
     @Query("SELECT * FROM servers WHERE id = :serverId LIMIT 1")
     suspend fun getServerById(serverId: String): ServerEntity?
 
-    @Insert(onConflict = OnConflictStrategy.REPLACE)
+    @Upsert
     suspend fun upsertServer(server: ServerEntity)
 
     @Query("DELETE FROM servers WHERE id = :serverId")
