@@ -38,6 +38,7 @@ import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.hilt.lifecycle.viewmodel.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
+import de.hamedtanha.servertoolkit.ui.designsystem.theme.ServerToolkitButtonShape
 import de.hamedtanha.servertoolkit.feature.ssh.data.source.AndroidSshPrivateKeySourceFactory
 import de.hamedtanha.servertoolkit.feature.ssh.domain.model.SshAuthenticationMethod
 import de.hamedtanha.servertoolkit.feature.ssh.presentation.state.SshAuthenticationInputUiState
@@ -227,6 +228,7 @@ fun SshScreen(
 
         if (uiState.isHostKeyReviewRequired) {
             Button(
+                shape = ServerToolkitButtonShape,
                 onClick = onConfirmHostKeyClick,
                 modifier = Modifier.fillMaxWidth(),
             ) {
@@ -236,6 +238,8 @@ fun SshScreen(
             Spacer(modifier = Modifier.height(8.dp))
 
             Button(
+
+                shape = ServerToolkitButtonShape,
                 onClick = onCancelHostKeyReviewClick,
                 modifier = Modifier.fillMaxWidth(),
             ) {
@@ -266,6 +270,7 @@ fun SshScreen(
                 uiState.status == SshConnectionStatus.Disconnecting
             ) {
                 Button(
+                    shape = ServerToolkitButtonShape,
                     onClick = onDisconnectClick,
                     enabled = uiState.canDisconnect,
                     modifier = Modifier.fillMaxWidth(),
@@ -282,6 +287,7 @@ fun SshScreen(
                 }
             } else {
                 Button(
+                    shape = ServerToolkitButtonShape,
                     onClick = {
                         onConnectClick()
                         password = ""
@@ -314,6 +320,8 @@ fun SshScreen(
         Spacer(modifier = Modifier.height(24.dp))
 
         Button(
+
+            shape = ServerToolkitButtonShape,
             onClick = onOpenConnectionHistory,
             modifier = Modifier.fillMaxWidth(),
         ) {
@@ -323,6 +331,8 @@ fun SshScreen(
         Spacer(modifier = Modifier.height(8.dp))
 
         Button(
+
+            shape = ServerToolkitButtonShape,
             onClick = onNavigateBack,
             modifier = Modifier.fillMaxWidth(),
         ) {
@@ -401,6 +411,7 @@ private fun AuthenticationInputContent(
 
         SshAuthenticationMethod.PRIVATE_KEY -> {
             Button(
+                shape = ServerToolkitButtonShape,
                 onClick = onPrivateKeySelectClick,
                 enabled = canEditAuthenticationInput,
                 modifier = Modifier.fillMaxWidth(),
@@ -506,6 +517,7 @@ private fun CommandExecutionContent(
         )
     } else {
         OutlinedButton(
+            shape = ServerToolkitButtonShape,
             onClick = onOpenSavedCommandSelector,
             enabled = canOpenSavedCommandSelector,
             modifier = Modifier
@@ -521,6 +533,8 @@ private fun CommandExecutionContent(
     Spacer(modifier = Modifier.height(8.dp))
 
     Button(
+
+        shape = ServerToolkitButtonShape,
         onClick = onExecuteCommandClick,
         enabled = canExecuteCommand,
         modifier = Modifier.fillMaxWidth(),

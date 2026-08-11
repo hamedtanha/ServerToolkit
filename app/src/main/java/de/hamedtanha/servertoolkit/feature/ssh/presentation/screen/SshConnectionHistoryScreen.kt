@@ -23,6 +23,7 @@ import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.hilt.lifecycle.viewmodel.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
+import de.hamedtanha.servertoolkit.ui.designsystem.theme.ServerToolkitButtonShape
 import de.hamedtanha.servertoolkit.feature.ssh.domain.model.SshConnectionHistoryStatus
 import de.hamedtanha.servertoolkit.feature.ssh.presentation.state.SshConnectionHistoryItemUiState
 import de.hamedtanha.servertoolkit.feature.ssh.presentation.state.SshConnectionHistoryUiState
@@ -116,6 +117,8 @@ fun SshConnectionHistoryScreen(
         Spacer(modifier = Modifier.height(16.dp))
 
         Button(
+
+            shape = ServerToolkitButtonShape,
             onClick = onNavigateBack,
             modifier = Modifier.fillMaxWidth(),
         ) {

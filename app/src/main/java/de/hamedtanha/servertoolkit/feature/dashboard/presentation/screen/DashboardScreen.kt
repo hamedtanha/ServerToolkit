@@ -17,6 +17,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.text.style.TextAlign
 import androidx.hilt.lifecycle.viewmodel.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
+import de.hamedtanha.servertoolkit.ui.designsystem.theme.ServerToolkitButtonShape
 import de.hamedtanha.servertoolkit.feature.dashboard.presentation.state.DashboardUiState
 import de.hamedtanha.servertoolkit.feature.dashboard.presentation.viewmodel.DashboardViewModel
 import de.hamedtanha.servertoolkit.ui.designsystem.theme.ServerToolkitDesignSystem
@@ -77,6 +78,8 @@ fun DashboardScreen(
         Spacer(modifier = Modifier.height(spacing.extraLarge))
 
         Button(
+
+            shape = ServerToolkitButtonShape,
             onClick = onOpenServerInventory,
         ) {
             Text(text = "Open server inventory")
@@ -85,6 +88,8 @@ fun DashboardScreen(
         Spacer(modifier = Modifier.height(spacing.medium))
 
         OutlinedButton(
+
+            shape = ServerToolkitButtonShape,
             onClick = onOpenSavedCommands,
         ) {
             Text(text = "Manage saved commands")
