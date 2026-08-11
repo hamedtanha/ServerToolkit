@@ -1,4 +1,4 @@
-package de.hamedtanha.servertoolkit.ui.theme
+package de.hamedtanha.servertoolkit.ui.designsystem.theme
 
 import androidx.compose.ui.graphics.Color
 
