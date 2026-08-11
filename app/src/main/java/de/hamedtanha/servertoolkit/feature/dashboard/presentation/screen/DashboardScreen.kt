@@ -15,11 +15,11 @@ import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.text.style.TextAlign
-import androidx.compose.ui.unit.dp
 import androidx.hilt.lifecycle.viewmodel.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import de.hamedtanha.servertoolkit.feature.dashboard.presentation.state.DashboardUiState
 import de.hamedtanha.servertoolkit.feature.dashboard.presentation.viewmodel.DashboardViewModel
+import de.hamedtanha.servertoolkit.ui.designsystem.theme.ServerToolkitDesignSystem
 
 @Composable
 fun DashboardRoute(
@@ -43,10 +43,12 @@ fun DashboardScreen(
     onOpenSavedCommands: () -> Unit,
     modifier: Modifier = Modifier,
 ) {
+    val spacing = ServerToolkitDesignSystem.spacing
+
     Column(
         modifier = modifier
             .fillMaxSize()
-            .padding(24.dp),
+            .padding(spacing.extraLarge),
         verticalArrangement = Arrangement.Center,
         horizontalAlignment = Alignment.CenterHorizontally,
     ) {
@@ -56,7 +58,7 @@ fun DashboardScreen(
             textAlign = TextAlign.Center,
         )
 
-        Spacer(modifier = Modifier.height(16.dp))
+        Spacer(modifier = Modifier.height(spacing.large))
 
         Text(
             text = "Choose a destination",
@@ -64,7 +66,7 @@ fun DashboardScreen(
             textAlign = TextAlign.Center,
         )
 
-        Spacer(modifier = Modifier.height(8.dp))
+        Spacer(modifier = Modifier.height(spacing.small))
 
         Text(
             text = "Open server inventory or manage reusable command text.",
@@ -72,7 +74,7 @@ fun DashboardScreen(
             textAlign = TextAlign.Center,
         )
 
-        Spacer(modifier = Modifier.height(24.dp))
+        Spacer(modifier = Modifier.height(spacing.extraLarge))
 
         Button(
             onClick = onOpenServerInventory,
@@ -80,7 +82,7 @@ fun DashboardScreen(
             Text(text = "Open server inventory")
         }
 
-        Spacer(modifier = Modifier.height(12.dp))
+        Spacer(modifier = Modifier.height(spacing.medium))
 
         OutlinedButton(
             onClick = onOpenSavedCommands,

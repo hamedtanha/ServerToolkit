@@ -4,7 +4,7 @@ import android.os.Bundle
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import de.hamedtanha.servertoolkit.navigation.AppNavHost
-import de.hamedtanha.servertoolkit.ui.theme.ServerToolkitTheme
+import de.hamedtanha.servertoolkit.ui.designsystem.theme.ServerToolkitTheme
 import dagger.hilt.android.AndroidEntryPoint
 
 @AndroidEntryPoint
