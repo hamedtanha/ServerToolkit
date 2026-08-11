@@ -2,7 +2,7 @@
 
 > **Review ID:** `RA-2026.07-v2`
 >
-> **Status:** Accepted
+> **Status:** Published
 >
 > **Evidence baseline:** `ca10ef764b500e5f4a9c87e558ab45412832e9a9`
 >
