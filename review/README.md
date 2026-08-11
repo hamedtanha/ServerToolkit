@@ -52,7 +52,7 @@ Each review records:
 
 ## Current Review
 
-The active ServerToolkit architecture review is:
+The current ServerToolkit architecture review is:
 
 ```text
 review/architecture/2026/RA-2026.07-v2/
