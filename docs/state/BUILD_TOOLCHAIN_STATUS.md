@@ -2,7 +2,7 @@
 
 **Project:** Server Toolkit  
 **Status:** Active  
-**Last Updated:** 2026-07-16
+**Last Updated:** 2026-08-11
 
 ---
 
@@ -57,7 +57,7 @@ Android version metadata is release metadata, not a dependency version. It is in
 | CI launcher JDK | Temurin `17` | `.github/workflows/android-validation.yml` |
 | Gradle daemon JVM criteria | `21` | `gradle/gradle-daemon-jvm.properties` |
 | Gradle Wrapper | `9.5.0` | `gradle/wrapper/gradle-wrapper.properties` |
-| Android Gradle Plugin | `9.3.0` | `gradle/libs.versions.toml` |
+| Android Gradle Plugin | `9.3.1` | `gradle/libs.versions.toml` |
 | Kotlin | `2.4.10` | `gradle/libs.versions.toml` |
 | KSP | `2.3.10` | `gradle/libs.versions.toml` |
 
@@ -67,7 +67,7 @@ Java source compatibility, Java target compatibility, and the Kotlin JVM toolcha
 
 CI installs Temurin `17` as the launcher JDK. The repository separately pins Gradle daemon JVM criteria to Java `21` through `gradle/gradle-daemon-jvm.properties`. The daemon runtime is distinct from the application compilation target.
 
-Gradle `9.5.0`, Android Gradle Plugin `9.3.0`, Kotlin `2.4.10`, and KSP `2.3.10` form the implemented core build compatibility cluster.
+Gradle `9.5.0`, Android Gradle Plugin `9.3.1`, Kotlin `2.4.10`, and KSP `2.3.10` form the implemented core build compatibility cluster.
 
 No further Java, Gradle, Android Gradle Plugin, Kotlin, or KSP upgrade is accepted merely because a newer release exists.
 

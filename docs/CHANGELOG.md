@@ -35,6 +35,7 @@ The project follows Conventional Commits and Semantic Versioning principles.
 
 ### Changed
 
+- Updated Android Gradle Plugin from `9.3.0` to `9.3.1` and validated unit tests, lint, and debug assembly with Gradle `9.5.0`.
 - Replaced destructive existing-Server Room `REPLACE` persistence with non-destructive `@Upsert` semantics, preserving SSH trust and connection-history rows across Server updates while retaining explicit Server-delete cascades, without changing Room schema version `5`.
 - Tightened ADR governance so ordinary implementation defaults to no new ADR, accepted ADRs remain immutable decision records, and implementation plans, test evidence, benchmarks, and current-state reporting stay in their appropriate living documents.
 - Synchronized project state, documentation governance, development process, release process, README, and related document indexes with the new policy and current technical baseline.
