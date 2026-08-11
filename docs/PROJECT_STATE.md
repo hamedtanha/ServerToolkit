@@ -302,7 +302,7 @@ Current review evidence has:
 - completed profile-layer, platform-versus-capability, freshness, invalidation, persistence, migration, security, retention, and support-claim assessment;
 - produced evidence-backed decision recommendations;
 - identified Server identity, endpoint, and evidence-lifecycle topics that remain subject to the current ADR admission gate before any future architecture change;
-- identified a bounded platform-neutral Add Server copy correction;
+- identified a bounded platform-neutral Add Server copy correction, now completed in production copy;
 - preserved the current roadmap milestone names and sequencing.
 
 The review is `Published` through this metadata-only follow-up. Final substantive head `0af71c70133e8fd27277ef50cf4b801fd0c3a618` passed documentation-integrity validation and GitHub Android Validation run `#88`; accepted head `f569e96245e2a552028d1ec22fb560762adb2e1c` passed run `#89`; the acceptance merge `8070830dfae14f908b9dd128846f66112b36423e` passed main run `#90`.
@@ -319,11 +319,10 @@ The next safe development steps are:
 
 1. Keep Android version metadata unchanged at the released `0.4.0` baseline.
 2. Apply the ADR admission gate to any future Server identity, endpoint, or evidence-lifecycle architecture change; ordinary implementation work does not require a new ADR.
-3. Correct the Linux-specific Add Server copy through a separately bounded production follow-up.
-4. Preserve the explicit Run action, editable command input, exact-text replacement, session lifecycle, cleanup, and stale-result guardrails.
-5. Select the next Operations slice and the first gateway-backed capability only through separate focused planning decisions.
-6. Keep the existing `0.6.0 — Dashboard Evolution` roadmap objective unchanged unless a separate product-planning decision explicitly revises it.
-7. Keep named integrations outside the committed core direction until individually accepted.
+3. Preserve the explicit Run action, editable command input, exact-text replacement, session lifecycle, cleanup, and stale-result guardrails.
+4. Select the next Operations slice and the first gateway-backed capability only through separate focused planning decisions.
+5. Keep the existing `0.6.0 — Dashboard Evolution` roadmap objective unchanged unless a separate product-planning decision explicitly revises it.
+6. Keep named integrations outside the committed core direction until individually accepted.
 
 ---
 
