@@ -2,7 +2,7 @@ package de.hamedtanha.servertoolkit.feature.serverinventory.presentation.state
 
 data class ServerFormUiState(
     val title: String = "Add server",
-    val description: String = "Enter the connection details for a Linux server.",
+    val description: String = "Enter the connection details for this server.",
     val name: String = "",
     val host: String = "",
     val port: String = "22",
