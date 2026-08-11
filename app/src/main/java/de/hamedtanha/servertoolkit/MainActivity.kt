@@ -3,6 +3,10 @@ package de.hamedtanha.servertoolkit
 import android.os.Bundle
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
+import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.Surface
+import androidx.compose.ui.Modifier
 import de.hamedtanha.servertoolkit.navigation.AppNavHost
 import de.hamedtanha.servertoolkit.ui.designsystem.theme.ServerToolkitTheme
 import dagger.hilt.android.AndroidEntryPoint
@@ -15,7 +19,13 @@ class MainActivity : ComponentActivity() {
 
         setContent {
             ServerToolkitTheme {
-                AppNavHost()
+                Surface(
+                    modifier = Modifier.fillMaxSize(),
+                    color = MaterialTheme.colorScheme.background,
+                    contentColor = MaterialTheme.colorScheme.onBackground,
+                ) {
+                    AppNavHost()
+                }
             }
         }
     }

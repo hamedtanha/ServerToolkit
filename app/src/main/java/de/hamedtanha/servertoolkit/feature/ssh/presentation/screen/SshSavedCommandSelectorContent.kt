@@ -20,6 +20,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.text.font.FontFamily
 import androidx.compose.ui.unit.dp
+import de.hamedtanha.servertoolkit.ui.designsystem.theme.ServerToolkitButtonShape
 import de.hamedtanha.servertoolkit.feature.savedcommands.domain.model.SavedCommand
 import de.hamedtanha.servertoolkit.feature.ssh.presentation.state.SshSavedCommandSelectorUiState
 
@@ -112,6 +113,8 @@ internal fun SshSavedCommandSelectorContent(
             }
 
             OutlinedButton(
+
+                shape = ServerToolkitButtonShape,
                 onClick = onCancel,
                 modifier = Modifier.fillMaxWidth(),
             ) {
@@ -158,6 +161,8 @@ private fun SavedCommandSelectorErrorContent(
     }
 
     Button(
+
+        shape = ServerToolkitButtonShape,
         onClick = onRetry,
         enabled = !isRetrying,
         modifier = Modifier.fillMaxWidth(),
@@ -196,6 +201,8 @@ private fun SavedCommandSelectionItem(
             )
 
             OutlinedButton(
+
+                shape = ServerToolkitButtonShape,
                 onClick = {
                     onSelect(command.id)
                 },

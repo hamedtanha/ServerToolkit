@@ -31,6 +31,7 @@ import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.hilt.lifecycle.viewmodel.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
+import de.hamedtanha.servertoolkit.ui.designsystem.theme.ServerToolkitButtonShape
 import de.hamedtanha.servertoolkit.feature.serverinventory.domain.model.Server
 import de.hamedtanha.servertoolkit.feature.serverinventory.domain.model.ServerEnvironment
 import de.hamedtanha.servertoolkit.feature.serverinventory.presentation.state.ServerInventoryFilter
@@ -132,6 +133,7 @@ private fun ServerInventoryEmptyContent(
         modifier = modifier,
         action = {
             Button(
+                shape = ServerToolkitButtonShape,
                 onClick = onAddServerClick,
             ) {
                 Text(text = "Add server")
@@ -223,6 +225,8 @@ private fun ServerInventoryLoadedContent(
         Spacer(modifier = Modifier.height(16.dp))
 
         Button(
+
+            shape = ServerToolkitButtonShape,
             onClick = onAddServerClick,
             modifier = Modifier.fillMaxWidth(),
         ) {

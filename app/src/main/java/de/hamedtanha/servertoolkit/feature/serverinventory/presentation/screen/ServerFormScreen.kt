@@ -22,6 +22,7 @@ import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.hilt.lifecycle.viewmodel.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
+import de.hamedtanha.servertoolkit.ui.designsystem.theme.ServerToolkitButtonShape
 import de.hamedtanha.servertoolkit.feature.serverinventory.presentation.state.ServerFormUiState
 import de.hamedtanha.servertoolkit.feature.serverinventory.presentation.viewmodel.AddServerViewModel
 import de.hamedtanha.servertoolkit.feature.serverinventory.presentation.viewmodel.EditServerViewModel
@@ -200,6 +201,8 @@ fun ServerFormScreen(
         }
 
         Button(
+
+            shape = ServerToolkitButtonShape,
             onClick = onSaveClicked,
             modifier = Modifier.fillMaxWidth(),
             enabled = uiState.canSave,
@@ -216,6 +219,8 @@ fun ServerFormScreen(
         Spacer(modifier = Modifier.height(12.dp))
 
         Button(
+
+            shape = ServerToolkitButtonShape,
             onClick = onNavigateBack,
             modifier = Modifier.fillMaxWidth(),
         ) {

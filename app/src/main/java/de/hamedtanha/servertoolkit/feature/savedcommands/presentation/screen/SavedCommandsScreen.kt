@@ -31,6 +31,7 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.window.DialogProperties
 import androidx.hilt.lifecycle.viewmodel.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
+import de.hamedtanha.servertoolkit.ui.designsystem.theme.ServerToolkitButtonShape
 import de.hamedtanha.servertoolkit.feature.savedcommands.domain.model.SavedCommand
 import de.hamedtanha.servertoolkit.feature.savedcommands.presentation.state.SavedCommandCreateFormUiState
 import de.hamedtanha.servertoolkit.feature.savedcommands.presentation.state.SavedCommandDeleteConfirmationUiState
@@ -97,6 +98,8 @@ fun SavedCommandsScreen(
         Spacer(modifier = Modifier.height(16.dp))
 
         Button(
+
+            shape = ServerToolkitButtonShape,
             onClick = onOpenCreate,
             enabled = !uiState.isLoading &&
                 !uiState.hasBlockingError &&
@@ -154,6 +157,8 @@ fun SavedCommandsScreen(
         Spacer(modifier = Modifier.height(16.dp))
 
         OutlinedButton(
+
+            shape = ServerToolkitButtonShape,
             onClick = onNavigateBack,
             modifier = Modifier.fillMaxWidth(),
         ) {
@@ -253,6 +258,7 @@ private fun SavedCommandCreateDialog(
         },
         confirmButton = {
             Button(
+                shape = ServerToolkitButtonShape,
                 onClick = onCreate,
                 enabled = !form.isSaving,
             ) {
@@ -325,6 +331,7 @@ private fun SavedCommandDeleteDialog(
         },
         confirmButton = {
             Button(
+                shape = ServerToolkitButtonShape,
                 onClick = onDelete,
                 enabled = !confirmation.isDeleting,
                 colors = ButtonDefaults.buttonColors(
@@ -411,6 +418,8 @@ private fun SavedCommandsMessageContent(
                 Spacer(modifier = Modifier.height(16.dp))
 
                 Button(
+
+                    shape = ServerToolkitButtonShape,
                     onClick = retry,
                 ) {
                     Text(text = "Retry")
@@ -476,6 +485,8 @@ private fun SavedCommandsObservationWarning(
             Spacer(modifier = Modifier.height(8.dp))
 
             Button(
+
+                shape = ServerToolkitButtonShape,
                 onClick = onRetryLoad,
             ) {
                 Text(text = "Retry")
@@ -507,6 +518,8 @@ private fun SavedCommandItem(
             )
 
             OutlinedButton(
+
+                shape = ServerToolkitButtonShape,
                 onClick = {
                     onDeleteRequested(command.id)
                 },
