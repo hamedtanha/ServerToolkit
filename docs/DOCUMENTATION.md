@@ -2,7 +2,7 @@
 
 **Project:** Server Toolkit
 **Status:** Active
-**Last Updated:** 2026-07-25
+**Last Updated:** 2026-08-11
 
 ---
 
@@ -228,6 +228,12 @@ Toolchain and documentation changes do not automatically require a project-versi
 
 Architecture Decision Records document accepted significant decisions.
 
+The default for ordinary implementation work is **no new ADR**.
+
+Create an ADR only when the work makes or changes a durable decision that materially constrains future implementation; materially affects architecture, ownership, security, persistence, lifecycle, compatibility, or release boundaries; selects among meaningful alternatives; or refines or supersedes an accepted ADR.
+
+Before creating a new ADR, verify that the decision is not already governed by an accepted ADR or living architecture document.
+
 Use ADRs for:
 
 - Product-direction changes.
@@ -248,8 +254,13 @@ Do not use ADRs for:
 - Routine compatible dependency updates.
 - A new entity that follows an accepted persistence and repository pattern.
 - Speculative package structures without a concrete implementation need.
+- Implementation plans, delivery slices, acceptance criteria, or test matrices.
+- Runtime validation evidence, benchmark results, implementation status, or current-state reporting.
+- Individual API calls, DAO mechanisms, constants, or framework details unless they establish a durable cross-cutting architectural constraint.
 
-Accepted ADRs must not be rewritten casually.
+Accepted ADRs are immutable decision records.
+
+After acceptance, implementation status, verification evidence, and benchmark results belong in Issues, pull requests, or other appropriate implementation evidence. Current behavior belongs in `PROJECT_STATE.md`, focused `docs/state/` documents, the Changelog when notable, or other appropriate living documentation. None of these should be appended to the accepted ADR.
 
 When a decision changes:
 

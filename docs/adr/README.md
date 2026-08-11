@@ -3,7 +3,7 @@
 **Project:** Server Toolkit
 **Version:** 0.4.0
 **Status:** Active
-**Last Updated:** 2026-07-16
+**Last Updated:** 2026-08-11
 
 ---
 
@@ -12,6 +12,16 @@
 This directory contains all Architecture Decision Records for the Server Toolkit project.
 
 Accepted ADRs are immutable decision records. A later ADR may refine, extend, or supersede an earlier decision, but historical ADR text must not be rewritten to hide the original context.
+
+## ADR Admission Gate
+
+The default for ordinary implementation work is **no new ADR**.
+
+Create an ADR only when a durable architectural decision is genuinely required and existing accepted ADRs do not already govern the decision.
+
+An ADR records the decision, meaningful alternatives, rationale, and durable consequences. It is not the home for implementation plans, delivery slices, acceptance criteria, test matrices, runtime evidence, benchmark results, or implementation status.
+
+After an ADR is accepted, implementation and verification evidence must be recorded in the appropriate Issue, pull request, current-state documentation, or Changelog without rewriting the accepted decision record.
 
 ---
 
