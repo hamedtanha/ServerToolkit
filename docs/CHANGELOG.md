@@ -35,6 +35,7 @@ The project follows Conventional Commits and Semantic Versioning principles.
 
 ### Changed
 
+- Tightened ADR governance so ordinary implementation defaults to no new ADR, accepted ADRs remain immutable decision records, and implementation plans, test evidence, benchmarks, and current-state reporting stay in their appropriate living documents.
 - Synchronized project state, documentation governance, development process, release process, README, and related document indexes with the new policy and current technical baseline.
 - Clarified that the pinned Android NDK currently supports the verified release workflow and required `llvm-strip`, even though project-owned C or C++ source is not currently documented.
 - Clarified that proposed dependency or toolchain versions are not current until implemented, validated, documented, and merged.
