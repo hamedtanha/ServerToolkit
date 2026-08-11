@@ -4,7 +4,7 @@
 **Feature Area:** Server Inventory
 **Status:** Accepted Baseline
 **Related Milestone:** Version 0.3.0 — Server Inventory Foundation
-**Last Updated:** 2026-07-25
+**Last Updated:** 2026-08-11
 
 ---
 
@@ -22,7 +22,7 @@ The Server Inventory 0.3.0 baseline remains the accepted historical foundation.
 
 The feature provides local server inventory management backed by Room persistence.
 
-A focused Room instrumentation probe on 2026-07-25 verified a current persistence defect: saving an existing Server through the Room replacement path deletes associated SSH trusted-host-key and connection-history rows, including during metadata-only edits. The defect is documented under **Known Persistence Defect** and is tracked by Issue `#140` for a focused correction.
+The previously verified existing-Server persistence defect tracked by Issue `#140` has been corrected. Existing Server saves now use Room upsert semantics that update the existing parent row instead of replacement semantics, preserving SSH trust and connection-history children according to their accepted lifecycle boundaries.
 
 ---
 
@@ -82,7 +82,7 @@ A focused Room instrumentation probe on 2026-07-25 verified a current persistenc
 - Hilt database and DAO providers.
 - Server Inventory repository dependency injection binding.
 - Server Inventory ViewModel repository observation.
-- Existing-Server saves currently use the Room DAO replacement conflict strategy.
+- Existing-Server saves use Room `@Upsert` semantics so existing rows are updated without destructive parent replacement.
 
 ### Delete Workflow
 
@@ -99,44 +99,34 @@ A focused Room instrumentation probe on 2026-07-25 verified a current persistenc
 - Automated shared Server Form naming verification through unit tests, instrumented tests, and debug build.
 - Server Inventory filter matcher unit tests.
 - Server Inventory UI-state regression tests for inventory-empty and filter-result-empty semantics.
-- DAO instrumentation tests for insert, replace, and delete behavior.
-- Room-backed repository instrumentation tests for save, replace, and delete behavior.
+- DAO instrumentation tests for insert, non-destructive update, repeated update, and explicit delete behavior.
+- Room-backed repository instrumentation tests for save and non-destructive update behavior.
+- Permanent Room regression coverage verifies that metadata-only and username-only updates preserve trusted-host-key and connection-history children.
+- Permanent Room regression coverage verifies that endpoint updates preserve connection-history snapshots, do not cascade-delete old-endpoint trust, and do not authorize that trust for the new endpoint.
+- Explicit Server deletion regression coverage verifies that the existing trusted-host-key and connection-history cascade behavior remains intact.
 - Server entity/domain mapper unit tests.
-- Focused temporary Room instrumentation evidence with foreign keys enabled verified that metadata-only and endpoint replacements delete both trusted-host-key and connection-history child rows.
+- Historical focused Room instrumentation evidence with foreign keys enabled verified the destructive replacement behavior that Issue `#140` corrects.
 
 ---
 
-## Known Persistence Defect
+## Resolved Persistence Defect
 
-The current `ServerDao.upsertServer()` path uses `OnConflictStrategy.REPLACE`.
+Issue `#140` corrects the destructive existing-Server save path by replacing `OnConflictStrategy.REPLACE` with Room `@Upsert`.
 
-Trusted SSH host keys and SSH connection history reference `servers.id` with `ON DELETE CASCADE`.
+For an existing `Server.id`, Room now generates an update path instead of deleting and recreating the parent row.
 
-Focused instrumentation evidence produced these outcomes:
+Current verified behavior:
 
-```text
-ROOM_FOREIGN_KEYS_ENABLED=1
-SERVER_REPLACE_METADATA_CHILD_EVIDENCE=DELETED_BOTH
-SERVER_REPLACE_ENDPOINT_CHILD_EVIDENCE=DELETED_BOTH
-CONCLUSION=VERIFIED_REPLACE_DELETES_TRUST_AND_HISTORY_CHILDREN
-```
+- Metadata-only edits preserve trusted SSH host keys and SSH connection history.
+- Username-only edits preserve trusted SSH host keys and SSH connection history.
+- Host or SSH-port edits preserve the stable Server id and existing connection-history snapshots.
+- Endpoint edits no longer delete old-endpoint trust through incidental parent-row cascade behavior.
+- Trust remains keyed by `serverId + host + port`, so trust for an old endpoint does not authorize a new endpoint.
+- Explicit Server deletion retains the existing trusted-host-key and connection-history cascade behavior.
 
-Consequences:
+The inactive-old-endpoint trust retention, removal, archival, or cleanup lifecycle remains unresolved and is not selected by this correction.
 
-- Editing only Server name or description deletes stored SSH trust.
-- Editing only Server name or description deletes retained SSH connection history.
-- Editing endpoint fields also deletes both child record types.
-- The deletion occurs implicitly as a save side effect rather than through an explicit user-facing trust, retention, or Server-deletion decision.
-
-Required correction constraints:
-
-- Metadata-only edits must preserve trust and history.
-- Endpoint edits must preserve history.
-- Endpoint trust invalidation or replacement must be explicit.
-- Explicit Server deletion semantics remain a separate retention decision.
-- Permanent instrumentation regression coverage is required.
-
-The exact DAO correction is not yet selected. This document does not authorize a schema migration or change explicit Server-deletion behavior.
+The Room database remains at version `5`; exported schema `5` is unchanged and no migration is required.
 
 Implementation tracking: Issue `#140`.
 

@@ -4,7 +4,7 @@
 **Feature Area:** SSH
 **Status:** Milestone Complete with Operations Integration
 **Related Milestone:** Version 0.4.0 — SSH
-**Last Updated:** 2026-07-25
+**Last Updated:** 2026-08-11
 
 ---
 
@@ -153,6 +153,8 @@ The Android runtime verification also confirmed:
 - SSH host-key fingerprints use SHA256 values for observation and trusted verification.
 - SSH host key observation verifier clarity hardening.
 - SSH trusted-host cascade delete behavior when the owning server is deleted.
+- Existing-Server updates no longer delete trusted-host rows through incidental parent replacement.
+- SSH trust remains endpoint-keyed by Server id, host, and port, so old-endpoint trust does not authorize a different active endpoint.
 - SSH duplicate host-key confirmation guard at the ViewModel boundary.
 - SSH trusted-host accepted message aligned with the current connection workflow.
 
@@ -268,6 +270,7 @@ The Android runtime verification also confirmed:
 - SSH failure UI mapper state coverage.
 - SSH host trust domain and connection attempt unit tests.
 - SSH host-key observation and trusted verifier unit tests.
+- Server-update Room regression coverage verifies preservation of trusted-host and connection-history rows across metadata, username, endpoint, and repeated updates while retaining explicit Server-delete cascades.
 - SSH trusted connection cancellation cleanup-failure regression test.
 - SSH command execution service tests.
 - SSH command channel lifecycle tests.
@@ -309,6 +312,7 @@ The Android runtime verification also confirmed:
 - Credential persistence requires a separate reviewed implementation slice with a secure storage boundary.
 - SSH command execution remains non-interactive and must continue to use project-owned session handles.
 - SSH connection history must contain non-sensitive resolved target metadata and result classification only.
+- Existing connection-history snapshot rows must not be rewritten or deleted as a side effect of Server metadata, username, host, or port updates.
 - Target-resolution failures and host-trust decision outcomes must not create incomplete connection history entries.
 - Connection history persistence failures must not replace the primary SSH outcome or cancellation.
 - Terminal UI, Saved Command editing or automation, background monitoring, and persistent credentials remain out of scope.

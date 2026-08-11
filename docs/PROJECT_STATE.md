@@ -3,7 +3,7 @@
 **Project:** Server Toolkit
 **Version:** 0.4.0
 **Status:** Released
-**Last Updated:** 2026-08-10
+**Last Updated:** 2026-08-11
 
 ---
 
@@ -204,6 +204,8 @@ Current persisted areas:
 - SSH connection history.
 - Saved Commands.
 
+Existing Server saves use non-destructive Room upsert semantics. Metadata-only and username-only updates preserve SSH trust and connection history; endpoint updates preserve history and do not transfer old-endpoint trust to the new endpoint; explicit Server deletion retains the existing child cascade behavior.
+
 Room tables must not be used for persistent credentials, private keys, passphrases, access tokens, or other secret material without an accepted secure-storage boundary.
 
 ---
@@ -290,16 +292,16 @@ No Android production code or package structure is introduced by this decision w
 
 Issue `#135` establishes the Architecture Atlas, engineering-handbook entry point, and immutable architecture-review structure against evidence baseline `0135faf89b1035fd91c75b37a25ec51bc7c71074`.
 
-The Server Domain and Operational UX Architecture Review `RA-2026.07-v2` is published through this metadata-only follow-up after acceptance PR `#139` was squash-merged into `main` as `8070830dfae14f908b9dd128846f66112b36423e`. Governing Issue `#138` closes only after the publication change reaches `main`.
+The Server Domain and Operational UX Architecture Review `RA-2026.07-v2` is published. Acceptance PR `#139` was squash-merged into `main` as `8070830dfae14f908b9dd128846f66112b36423e`, publication PR `#142` was squash-merged as `0a159394e228bb2847bb3600b59058bff1be1c96`, and governing Issue `#138` is closed as completed.
 
 Current review evidence has:
 
 - assessed stable Server identity, endpoint ownership, trust, history, authentication, session, and operational UX boundaries;
-- verified that the current Room `REPLACE` path deletes SSH trust and connection-history children during existing-Server saves;
-- handed the bounded persistence defect to Issue `#140`;
+- verified that the former Room `REPLACE` path deleted SSH trust and connection-history children during existing-Server saves;
+- handed the bounded persistence defect to Issue `#140`, which now implements the focused non-destructive save correction without a schema migration;
 - completed profile-layer, platform-versus-capability, freshness, invalidation, persistence, migration, security, retention, and support-claim assessment;
 - produced evidence-backed decision recommendations;
-- identified a required future Server identity, endpoint, and evidence-lifecycle ADR;
+- identified Server identity, endpoint, and evidence-lifecycle topics that remain subject to the current ADR admission gate before any future architecture change;
 - identified a bounded platform-neutral Add Server copy correction;
 - preserved the current roadmap milestone names and sequencing.
 
@@ -316,13 +318,12 @@ The published review records that a future visual/UX quality initiative does not
 The next safe development steps are:
 
 1. Keep Android version metadata unchanged at the released `0.4.0` baseline.
-2. Translate the published significant Server identity, endpoint, and evidence-lifecycle recommendations into a focused ADR before related architecture implementation.
-3. Implement Issue `#140` on a separate focused branch with permanent Room regression coverage and without absorbing broader Server Profile, workspace, or capability scope.
-4. Correct the Linux-specific Add Server copy through a separately bounded production follow-up.
-5. Preserve the explicit Run action, editable command input, exact-text replacement, session lifecycle, cleanup, and stale-result guardrails.
-6. Select the next Operations slice and the first gateway-backed capability only through separate focused planning decisions.
-7. Keep the existing `0.6.0 — Dashboard Evolution` roadmap objective unchanged unless a separate product-planning decision explicitly revises it.
-8. Keep named integrations outside the committed core direction until individually accepted.
+2. Apply the ADR admission gate to any future Server identity, endpoint, or evidence-lifecycle architecture change; ordinary implementation work does not require a new ADR.
+3. Correct the Linux-specific Add Server copy through a separately bounded production follow-up.
+4. Preserve the explicit Run action, editable command input, exact-text replacement, session lifecycle, cleanup, and stale-result guardrails.
+5. Select the next Operations slice and the first gateway-backed capability only through separate focused planning decisions.
+6. Keep the existing `0.6.0 — Dashboard Evolution` roadmap objective unchanged unless a separate product-planning decision explicitly revises it.
+7. Keep named integrations outside the committed core direction until individually accepted.
 
 ---
 
