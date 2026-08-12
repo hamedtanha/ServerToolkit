@@ -10,6 +10,7 @@ The project follows Conventional Commits and Semantic Versioning principles.
 
 ### Added
 
+- Added the Server Toolkit application launcher identity with a project-owned geometric mark, adaptive foreground/background resources, Android themed-icon monochrome support, and canonical vector artwork.
 - Added a foundational build-toolchain and dependency policy covering update triggers, risk classification, compatibility clusters, validation, release impact, rollback, automation, and ADR boundaries.
 - Added a living build-toolchain status document recording the current Java, Gradle, Android, Kotlin, dependency, CI, Build Tools, NDK, and release-toolchain baseline from repository declarations.
 - Accepted the first version 0.5.0-alpha Operations increment as the global Saved Command Foundation.
