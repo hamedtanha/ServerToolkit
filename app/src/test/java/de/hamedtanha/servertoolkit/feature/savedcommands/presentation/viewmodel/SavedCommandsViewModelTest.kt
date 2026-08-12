@@ -572,6 +572,12 @@ class SavedCommandsViewModelTest {
             error("Not used in this test.")
         }
 
+        override suspend fun updateSavedCommand(
+            savedCommand: SavedCommand,
+        ) {
+            error("Not used in this test.")
+        }
+
         override suspend fun deleteSavedCommand(
             savedCommandId: String,
         ) {

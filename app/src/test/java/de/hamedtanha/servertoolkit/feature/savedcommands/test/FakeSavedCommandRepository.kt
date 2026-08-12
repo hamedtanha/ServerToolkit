@@ -80,6 +80,24 @@ class FakeSavedCommandRepository(
         emitObservation(Result.success(currentCommands))
     }
 
+    override suspend fun updateSavedCommand(
+        savedCommand: SavedCommand,
+    ) {
+        val existingIndex = currentCommands.indexOfFirst { command ->
+            command.id == savedCommand.id
+        }
+
+        check(existingIndex >= 0) {
+            "Saved command update target does not exist."
+        }
+
+        currentCommands = currentCommands.toMutableList().also { commands ->
+            commands[existingIndex] = savedCommand
+        }
+
+        emitObservation(Result.success(currentCommands))
+    }
+
     override suspend fun deleteSavedCommand(
         savedCommandId: String,
     ) {

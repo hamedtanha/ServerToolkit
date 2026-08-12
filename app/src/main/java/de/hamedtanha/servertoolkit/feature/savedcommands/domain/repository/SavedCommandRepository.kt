@@ -11,5 +11,7 @@ interface SavedCommandRepository {
 
     suspend fun createSavedCommand(savedCommand: SavedCommand)
 
+    suspend fun updateSavedCommand(savedCommand: SavedCommand)
+
     suspend fun deleteSavedCommand(savedCommandId: String)
 }
