@@ -60,6 +60,20 @@ class SavedCommandsUiStateTest {
     }
 
     @Test
+    fun `edit visibility is derived from edit form presence`() {
+        assertFalse(SavedCommandsUiState().isEditVisible)
+        assertTrue(
+            SavedCommandsUiState(
+                editForm = SavedCommandEditFormUiState(
+                    savedCommandId = "saved-command-1",
+                    name = "List services",
+                    command = "systemctl list-units --type=service",
+                ),
+            ).isEditVisible,
+        )
+    }
+
+    @Test
     fun `delete visibility is derived from confirmation presence`() {
         assertFalse(SavedCommandsUiState().isDeleteVisible)
         assertTrue(
