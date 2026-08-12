@@ -3,7 +3,7 @@
 **Project:** Server Toolkit
 **Version:** 0.4.0
 **Status:** Active
-**Last Updated:** 2026-07-17
+**Last Updated:** 2026-08-12
 
 ---
 
@@ -208,6 +208,15 @@ Implemented management slice:
 - Physical-device persistence verification after application restart.
 - No SSH connection or command-execution path is introduced by the management slice.
 
+Implemented editing slice:
+
+- Explicit per-command edit workflow.
+- Stable identifier and original creation-timestamp preservation.
+- Shared create/edit validation and name normalization.
+- Exact command-text preservation without parsing or execution.
+- Duplicate-save prevention and retryable mutation failures that preserve edited input.
+- Focused ViewModel and Compose instrumentation coverage.
+
 Implemented SSH Input Integration:
 
 - Inline Saved Command selection from the existing SSH workflow.
@@ -221,7 +230,6 @@ Implemented SSH Input Integration:
 
 Deferred from the first increment:
 
-- Editing.
 - Categories and favorites.
 - Variables, templates, placeholders, or secret substitution.
 - Server-specific assignment.

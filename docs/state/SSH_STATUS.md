@@ -4,7 +4,7 @@
 **Feature Area:** SSH
 **Status:** Milestone Complete with Operations Integration
 **Related Milestone:** Version 0.4.0 — SSH
-**Last Updated:** 2026-08-11
+**Last Updated:** 2026-08-12
 
 ---
 
@@ -28,7 +28,7 @@ Automated JVM coverage, Android runtime verification, full unit tests, lint, and
 
 The current timeout, cleanup, cancellation, and failure-mapping hardening coverage pass is complete. Future SSH hardening must be driven by concrete runtime evidence, current repository inspection, or a newly recorded focused review finding.
 
-Persistent credentials, terminal UI, Saved Command editing or automation, background monitoring, and Xray or x-ui management remain intentionally out of scope.
+Persistent credentials, terminal UI, Saved Command automation, background monitoring, and Xray or x-ui management remain intentionally out of scope.
 
 ---
 
@@ -315,7 +315,7 @@ The Android runtime verification also confirmed:
 - Existing connection-history snapshot rows must not be rewritten or deleted as a side effect of Server metadata, username, host, or port updates.
 - Target-resolution failures and host-trust decision outcomes must not create incomplete connection history entries.
 - Connection history persistence failures must not replace the primary SSH outcome or cancellation.
-- Terminal UI, Saved Command editing or automation, background monitoring, and persistent credentials remain out of scope.
+- Terminal UI, Saved Command automation, background monitoring, and persistent credentials remain out of scope.
 
 ---
 
@@ -326,7 +326,7 @@ The following items are intentionally not implemented yet:
 - Interactive terminal workflow for owned sessions.
 - Persistent credential storage implementation.
 - Monitoring workflow.
-- Saved Command editing, categories, favorites, templates, variables, Server assignment, synchronization, or automatic execution.
+- Saved Command categories, favorites, templates, variables, Server assignment, synchronization, or automatic execution.
 - Operating-system or service-manager discovery.
 - Xray or x-ui management workflow.
 - Room migrations beyond database version 5.

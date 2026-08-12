@@ -2,8 +2,8 @@
 
 **Project:** Server Toolkit  
 **Milestone:** 0.5.0-alpha — Operations  
-**Status:** Management and SSH Input Workflows Implemented and Verified
-**Last Updated:** 2026-07-17
+**Status:** Management, Editing, and SSH Input Workflows Implemented and Verified
+**Last Updated:** 2026-08-12
 
 ---
 
@@ -11,7 +11,7 @@
 
 This document records the current implemented state of the Saved Commands capability.
 
-It is a living current-state document. It must describe implemented behavior only and must not present deferred editing, automation, templating, assignment, or synchronization behavior as complete.
+It is a living current-state document. It must describe implemented behavior only and must not present deferred automation, templating, assignment, or synchronization behavior as complete.
 
 ---
 
@@ -24,6 +24,8 @@ Slice 1 established the domain and persistence foundation.
 Slice 2, tracked by GitHub Issue `#129`, implements the user-visible Saved Commands management workflow. Users can navigate to Saved Commands, observe persisted commands, create validated commands with exact command-text preservation, and delete commands through explicit confirmation.
 
 Slice 3, tracked by GitHub Issue `#133`, integrates persisted Saved Commands with the existing SSH command input. Users can open an inline selector, inspect commands in repository order, replace the current input with the exact selected command text, continue editing manually, and execute only through the existing explicit Run action.
+
+Slice 4, tracked by GitHub Issue `#150`, implements explicit Saved Command editing. Users can edit the existing name and exact command text while preserving the stable identifier and original creation timestamp.
 
 ---
 
@@ -58,7 +60,7 @@ The project now includes:
 
 - `SavedCommandRepository` as the project-owned domain contract;
 - `SavedCommandEntity` as the Room representation;
-- `SavedCommandDao` for observation, lookup, insert, and deletion;
+- `SavedCommandDao` for observation, lookup, insert, update, and deletion;
 - `SavedCommandEntityMapper` for domain/entity conversion;
 - `RoomSavedCommandRepository` as the Room-backed implementation;
 - Hilt provisioning for the DAO and repository binding.
@@ -66,7 +68,7 @@ The project now includes:
 Persistence behavior:
 
 - saved commands are global and are not assigned to individual servers;
-- the repository exposes `createSavedCommand` rather than an update or upsert operation;
+- the repository exposes explicit `createSavedCommand` and `updateSavedCommand` operations, and updates fail when the stable target identifier no longer exists;
 - commands are observed newest-first;
 - the identifier provides a stable tie-breaker when timestamps match;
 - duplicate identifiers fail with a database constraint instead of replacing an existing command silently;
@@ -85,11 +87,15 @@ The project now includes:
 - field-level validation and visible persistence failures;
 - exact command-text transfer through the domain and repository boundaries;
 - duplicate create-submission prevention;
+- explicit per-command editing with pre-populated name and exact command text;
+- stable identifier and original creation-timestamp preservation during editing;
+- shared create/edit validation rules and name normalization;
+- duplicate edit-submission prevention and retryable update failures that preserve edited input;
 - per-command delete actions identified by stable saved-command identifiers;
 - explicit delete confirmation containing the selected command name;
 - duplicate delete-confirmation prevention;
 - visible delete failures with retry and cancellation;
-- repository-observed list updates after successful creation or deletion.
+- repository-observed list updates after successful creation, editing, or deletion.
 
 The management workflow never parses, rewrites, previews, or executes command text.
 
@@ -151,11 +157,13 @@ Implemented automated coverage includes:
 
 - saved-command domain invariant tests;
 - exact command-text mapper round-trip tests;
-- DAO insert, lookup, observation ordering, duplicate rejection, and delete tests;
+- DAO insert, lookup, observation ordering, duplicate rejection, update, missing-update-target, and delete tests;
 - Room-backed repository mapping and persistence tests;
 - migration `4 → 5` validation using the exported Room schemas;
 - initial loading, empty, content, observation-failure, and retry presentation behavior;
 - create-form visibility, validation boundaries, exact command-text preservation, failure containment, and duplicate-submission prevention;
+- edit-form visibility, pre-population, validation, stable identity and creation-time preservation, exact command-text preservation, failure containment, retry, and duplicate-submission prevention;
+- Compose instrumentation coverage for edit selection, pre-populated values, save and cancel actions, saving-state lockout, and retryable failure presentation;
 - delete selection, cancellation, success, failure containment, retry, and duplicate-confirmation prevention;
 - preservation of loaded content during observation and mutation failures.
 
@@ -181,7 +189,6 @@ Repository Android Validation run `29514594720` completed successfully for commi
 
 The following behavior remains outside the implemented management slice:
 
-- Saved-command editing.
 - Any command execution from Saved Commands.
 - Command categories.
 - Favorites.
@@ -215,9 +222,9 @@ A new ADR must be reviewed if later work changes ownership, secure-storage bound
 
 ## Next Safe Work
 
-The accepted SSH Saved Command Input Integration slice is implemented.
+The Saved Command editing workflow tracked by GitHub Issue `#150` is implemented and verified.
 
-The next Operations slice must be selected through a separate focused issue. Editing, categories, favorites, templates, variables, server assignment, synchronization, backup, credential storage, and automatic or background execution remain deferred.
+The next Operations slice must be selected through a separate focused issue. Categories, favorites, templates, variables, server assignment, synchronization, backup, credential storage, and automatic or background execution remain deferred.
 
 Saved Commands management and persistence remain independent from SSH data-layer implementations.
 

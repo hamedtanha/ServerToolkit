@@ -22,6 +22,7 @@ The project follows Conventional Commits and Semantic Versioning principles.
 - Added repository-observed loading, empty, content, blocking-failure, and non-blocking observation-failure states.
 - Added a validated Saved Command create workflow with exact command-text preservation, visible persistence failures, and duplicate-submission prevention.
 - Added stable-identifier delete actions with explicit confirmation, deletion progress, retryable failure handling, cancellation, and duplicate-confirmation prevention.
+- Added explicit Saved Command editing with pre-populated values, shared validation, stable identifier and creation-time preservation, exact command-text updates, duplicate-save prevention, retryable failures, and focused ViewModel and Compose coverage.
 - Added focused Saved Commands UI-state and ViewModel coverage for observation, creation, deletion, failure containment, retry, and loaded-content preservation.
 - Added SSH Saved Command input integration with lazy repository observation, repository-order presentation, stable-identifier selection, exact command-input replacement, cancellation, retry, later-failure preservation, and no automatic execution.
 - Added an inline Saved Command selector adjacent to the multiline SSH command input while retaining manual editing and the explicit Run action.
@@ -73,7 +74,7 @@ The project follows Conventional Commits and Semantic Versioning principles.
 - Java source and target compatibility and the Kotlin JVM toolchain remain on `17`; Gradle daemon JVM criteria remain on `21`.
 - Android compile SDK, target SDK, minimum SDK, Build Tools, NDK, application version metadata, and application-library versions remain unchanged by the core build-cluster update.
 - Android `versionName` and `versionCode` remain unchanged.
-- No Saved Command editing, categories, favorites, templates, variables, server assignment, automatic execution, background execution, synchronization, backup, or credential storage was added.
+- No Saved Command categories, favorites, templates, variables, server assignment, automatic execution, background execution, synchronization, backup, or credential storage was added.
 - No Android production code, package hierarchy, Capability Gateway implementation, Provider registry, platform detection, transport, monitoring, service-management workflow, or named-service integration was added by the architecture decision.
 - The immutable version 0.4.0 release tag, artifacts, checksums, and release evidence remain unchanged.
 

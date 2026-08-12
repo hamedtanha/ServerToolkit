@@ -3,7 +3,7 @@
 **Project:** Server Toolkit
 **Version:** 0.4.0
 **Status:** Released
-**Last Updated:** 2026-08-11
+**Last Updated:** 2026-08-12
 
 ---
 
@@ -34,6 +34,7 @@ Implemented slices now include:
 - Saved Commands navigation from the Dashboard.
 - Loading, empty, content, and failure presentation states.
 - Validated create workflow with exact command-text preservation.
+- Explicit Saved Command editing with stable identity, creation-time preservation, exact command-text handling, and retryable failure containment.
 - Explicit delete confirmation with retryable failure handling.
 - Focused domain, persistence, UI-state, and ViewModel coverage.
 - Manual persistence verification after application restart on a physical Android device.
@@ -75,7 +76,7 @@ The repository does not claim universal Linux, Windows, BSD, appliance, cloud-pr
 | Remote Capability Architecture | Accepted | ADR-016 defines Core, Capability Gateway, and Provider/Adapter responsibilities without adding production abstractions. |
 | Server Inventory | Accepted baseline | See [Server Inventory Status](state/SERVER_INVENTORY_STATUS.md). |
 | SSH | Completed milestone | See [SSH Status](state/SSH_STATUS.md). |
-| Saved Commands | Management and SSH input workflows implemented | Global domain, Room persistence, Dashboard navigation, list states, validated creation, explicit deletion, restart persistence verification, and exact SSH command-input selection without automatic execution are implemented. See [Saved Commands Status](state/SAVED_COMMANDS_STATUS.md). |
+| Saved Commands | Management and SSH input workflows implemented | Global domain, Room persistence, Dashboard navigation, list states, validated creation and editing, explicit deletion, restart persistence verification, and exact SSH command-input selection without automatic execution are implemented. See [Saved Commands Status](state/SAVED_COMMANDS_STATUS.md). |
 | Local Persistence | Current | Room database version `5`, explicit migrations through `4 → 5`, and exported schema `5`. |
 | Documentation Governance | Active | Source-of-truth, Architecture Atlas, engineering-handbook navigation, immutable review history, version metadata, ADR, changelog, and factual documentation boundaries are defined. |
 | Build Toolchain Governance | Active | Update triggers, risk classification, compatibility clusters, validation, release interaction, and ADR boundaries are defined. |
@@ -142,7 +143,7 @@ The current implementation is documented in [Saved Commands Status](state/SAVED_
 - Saved Commands contain operational text, not credentials or secure secret storage.
 - Command text is preserved exactly and is not parsed, rewritten, or executed by persistence code.
 - Duplicate identifiers fail closed instead of replacing an existing command silently.
-- Creating, viewing, and deleting saved commands never execute command text.
+- Creating, editing, viewing, and deleting saved commands never execute command text.
 - The management workflow uses feature-owned navigation, presentation, domain, repository, and Room boundaries.
 - Presentation depends on `SavedCommandRepository`, not DAO, entity, or concrete Room types.
 - SSH input integration uses the same project-owned repository contract, preserves exact text, and does not execute automatically.
@@ -214,7 +215,7 @@ Room tables must not be used for persistent credentials, private keys, passphras
 
 The following items are intentionally not implemented:
 
-- Saved Command editing, categories, favorites, templates, variables, server assignment, import, export, synchronization, or backup.
+- Saved Command categories, favorites, templates, variables, server assignment, import, export, synchronization, or backup.
 - Interactive terminal UI.
 - Persistent credential storage.
 - Automatic or background command execution.
@@ -262,6 +263,7 @@ The Saved Command Foundation includes:
 - Feature-owned navigation and Dashboard entry.
 - Repository-observed loading, empty, content, and failure states.
 - Validated create workflow with exact command-text preservation.
+- Saved Command editing tracked by Issue `#150`, preserving stable identifiers, original creation timestamps, and exact command text with retryable mutation failure handling.
 - Explicit delete confirmation with retryable mutation failure handling.
 - Focused automated coverage and physical-device restart verification.
 - Completed SSH Saved Command Input Integration tracked by Issue `#133` and merged through PR `#134`.
@@ -270,7 +272,7 @@ The Saved Command Foundation includes:
 - Explicit Run-only execution with no connection, authentication, session, history, or automatic-execution side effects.
 - Focused ViewModel coverage and five passing targeted Compose tests on the Pixel 9 Android Virtual Device.
 
-The next Operations slice has not yet been selected.
+The next Operations slice after Saved Command editing has not yet been selected.
 
 ---
 
