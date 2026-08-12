@@ -90,6 +90,46 @@ class RoomSavedCommandRepositoryTest {
     }
 
     @Test
+    fun updateSavedCommand_whenCommandExists_persistsExactUpdatedDomainModel() = runBlocking {
+        val originalCommand = savedCommand()
+        val updatedCommand = originalCommand.copy(
+            name = "Filesystem usage",
+            command = "  df -hT\n",
+        )
+
+        repository.createSavedCommand(originalCommand)
+
+        repository.updateSavedCommand(updatedCommand)
+
+        val persistedCommand =
+            repository.getSavedCommand("command-1")
+
+        assertEquals(updatedCommand, persistedCommand)
+        assertEquals(
+            originalCommand.id,
+            persistedCommand?.id,
+        )
+        assertEquals(
+            originalCommand.createdAtEpochMillis,
+            persistedCommand?.createdAtEpochMillis,
+        )
+    }
+
+    @Test
+    fun updateSavedCommand_whenCommandDoesNotExist_failsWithoutCreatingCommand() = runBlocking {
+        val command = savedCommand()
+
+        try {
+            repository.updateSavedCommand(command)
+            fail("Expected IllegalStateException")
+        } catch (_: IllegalStateException) {
+            assertNull(
+                repository.getSavedCommand("command-1"),
+            )
+        }
+    }
+
+    @Test
     fun deleteSavedCommand_whenCommandExists_removesDomainModel() = runBlocking {
         repository.createSavedCommand(savedCommand())
 

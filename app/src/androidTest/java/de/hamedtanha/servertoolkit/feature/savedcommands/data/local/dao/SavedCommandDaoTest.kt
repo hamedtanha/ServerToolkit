@@ -108,6 +108,37 @@ class SavedCommandDaoTest {
     }
 
     @Test
+    fun updateSavedCommand_whenCommandExists_updatesExactEntityAndReturnsOne() = runBlocking {
+        val originalEntity = savedCommandEntity()
+        val updatedEntity = originalEntity.copy(
+            name = "Filesystem usage",
+            command = "  df -hT\n",
+        )
+
+        savedCommandDao.insertSavedCommand(originalEntity)
+
+        val updatedRowCount =
+            savedCommandDao.updateSavedCommand(updatedEntity)
+
+        assertEquals(1, updatedRowCount)
+        assertEquals(
+            updatedEntity,
+            savedCommandDao.getSavedCommand("command-1"),
+        )
+    }
+
+    @Test
+    fun updateSavedCommand_whenCommandDoesNotExist_returnsZeroWithoutInserting() = runBlocking {
+        val entity = savedCommandEntity()
+
+        val updatedRowCount =
+            savedCommandDao.updateSavedCommand(entity)
+
+        assertEquals(0, updatedRowCount)
+        assertNull(savedCommandDao.getSavedCommand("command-1"))
+    }
+
+    @Test
     fun deleteSavedCommand_whenCommandExists_removesEntity() = runBlocking {
         savedCommandDao.insertSavedCommand(savedCommandEntity())
 

@@ -8,6 +8,7 @@ import de.hamedtanha.servertoolkit.feature.savedcommands.domain.model.SavedComma
 import de.hamedtanha.servertoolkit.feature.savedcommands.domain.repository.SavedCommandRepository
 import de.hamedtanha.servertoolkit.feature.savedcommands.presentation.state.SavedCommandCreateFormUiState
 import de.hamedtanha.servertoolkit.feature.savedcommands.presentation.state.SavedCommandDeleteConfirmationUiState
+import de.hamedtanha.servertoolkit.feature.savedcommands.presentation.state.SavedCommandEditFormUiState
 import de.hamedtanha.servertoolkit.feature.savedcommands.presentation.state.SavedCommandsUiState
 import javax.inject.Inject
 import kotlinx.coroutines.CancellationException
@@ -46,6 +47,7 @@ class SavedCommandsViewModel @Inject constructor(
         _uiState.update { currentState ->
             if (
                 currentState.createForm != null ||
+                currentState.editForm != null ||
                 currentState.deleteConfirmation != null
             ) {
                 currentState
@@ -164,10 +166,190 @@ class SavedCommandsViewModel @Inject constructor(
         }
     }
 
+    fun onEditRequested(savedCommandId: String) {
+        _uiState.update { currentState ->
+            if (
+                currentState.createForm != null ||
+                currentState.editForm != null ||
+                currentState.deleteConfirmation != null
+            ) {
+                return@update currentState
+            }
+
+            val target = currentState.commands.firstOrNull { command ->
+                command.id == savedCommandId
+            } ?: return@update currentState
+
+            currentState.copy(
+                editForm = SavedCommandEditFormUiState(
+                    savedCommandId = target.id,
+                    name = target.name,
+                    command = target.command,
+                ),
+            )
+        }
+    }
+
+    fun onCancelEdit() {
+        _uiState.update { currentState ->
+            if (currentState.editForm?.isSaving == true) {
+                currentState
+            } else {
+                currentState.copy(editForm = null)
+            }
+        }
+    }
+
+    fun onEditNameChanged(name: String) {
+        _uiState.update { currentState ->
+            val form = currentState.editForm ?: return@update currentState
+            if (form.isSaving) {
+                currentState
+            } else {
+                currentState.copy(
+                    editForm = form.copy(
+                        name = name,
+                        nameError = null,
+                        errorMessage = null,
+                    ),
+                )
+            }
+        }
+    }
+
+    fun onEditCommandChanged(command: String) {
+        _uiState.update { currentState ->
+            val form = currentState.editForm ?: return@update currentState
+            if (form.isSaving) {
+                currentState
+            } else {
+                currentState.copy(
+                    editForm = form.copy(
+                        command = command,
+                        commandError = null,
+                        errorMessage = null,
+                    ),
+                )
+            }
+        }
+    }
+
+    fun onEditConfirmed() {
+        val form = _uiState.value.editForm ?: return
+        if (form.isSaving) {
+            return
+        }
+
+        val normalizedName = form.name.trim()
+        val nameError = validateName(normalizedName)
+        val commandError = validateCommand(form.command)
+
+        if (nameError != null || commandError != null) {
+            _uiState.update { currentState ->
+                val currentForm = currentState.editForm
+                    ?: return@update currentState
+
+                if (currentForm.savedCommandId != form.savedCommandId) {
+                    return@update currentState
+                }
+
+                currentState.copy(
+                    editForm = currentForm.copy(
+                        nameError = nameError,
+                        commandError = commandError,
+                        errorMessage = null,
+                    ),
+                )
+            }
+            return
+        }
+
+        val target = _uiState.value.commands.firstOrNull { command ->
+            command.id == form.savedCommandId
+        }
+
+        if (target == null) {
+            _uiState.update { currentState ->
+                val currentForm = currentState.editForm
+                    ?: return@update currentState
+
+                if (currentForm.savedCommandId != form.savedCommandId) {
+                    return@update currentState
+                }
+
+                currentState.copy(
+                    editForm = currentForm.copy(
+                        errorMessage = UPDATE_ERROR_MESSAGE,
+                    ),
+                )
+            }
+            return
+        }
+
+        val updatedCommand = target.copy(
+            name = normalizedName,
+            command = form.command,
+        )
+
+        _uiState.update { currentState ->
+            val currentForm = currentState.editForm
+                ?: return@update currentState
+
+            if (currentForm.savedCommandId != form.savedCommandId) {
+                return@update currentState
+            }
+
+            currentState.copy(
+                editForm = currentForm.copy(
+                    isSaving = true,
+                    nameError = null,
+                    commandError = null,
+                    errorMessage = null,
+                ),
+            )
+        }
+
+        viewModelScope.launch {
+            try {
+                savedCommandRepository.updateSavedCommand(updatedCommand)
+
+                _uiState.update { currentState ->
+                    val currentForm = currentState.editForm
+                        ?: return@update currentState
+
+                    if (currentForm.savedCommandId != form.savedCommandId) {
+                        return@update currentState
+                    }
+
+                    currentState.copy(editForm = null)
+                }
+            } catch (error: CancellationException) {
+                throw error
+            } catch (_: Exception) {
+                _uiState.update { currentState ->
+                    val currentForm = currentState.editForm
+                        ?: return@update currentState
+
+                    if (currentForm.savedCommandId != form.savedCommandId) {
+                        return@update currentState
+                    }
+
+                    currentState.copy(
+                        editForm = currentForm.copy(
+                            isSaving = false,
+                            errorMessage = UPDATE_ERROR_MESSAGE,
+                        ),
+                    )
+                }
+            }
+        }
+    }
+
     fun onDeleteRequested(savedCommandId: String) {
         _uiState.update { currentState ->
             if (
                 currentState.createForm != null ||
+                currentState.editForm != null ||
                 currentState.deleteConfirmation != null
             ) {
                 return@update currentState
@@ -310,6 +492,8 @@ class SavedCommandsViewModel @Inject constructor(
             "Saved commands could not be loaded."
         const val CREATE_ERROR_MESSAGE =
             "Saved command could not be created."
+        const val UPDATE_ERROR_MESSAGE =
+            "Saved command could not be updated."
         const val DELETE_ERROR_MESSAGE =
             "Saved command could not be deleted."
         const val NAME_REQUIRED_MESSAGE =

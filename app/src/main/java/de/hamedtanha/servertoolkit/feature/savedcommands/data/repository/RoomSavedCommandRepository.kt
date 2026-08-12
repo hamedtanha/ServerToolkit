@@ -28,6 +28,15 @@ class RoomSavedCommandRepository @Inject constructor(
         savedCommandDao.insertSavedCommand(savedCommand.toEntity())
     }
 
+    override suspend fun updateSavedCommand(savedCommand: SavedCommand) {
+        val updatedRowCount =
+            savedCommandDao.updateSavedCommand(savedCommand.toEntity())
+
+        check(updatedRowCount == 1) {
+            "Saved command update expected one row but updated $updatedRowCount."
+        }
+    }
+
     override suspend fun deleteSavedCommand(savedCommandId: String) {
         savedCommandDao.deleteSavedCommand(savedCommandId)
     }

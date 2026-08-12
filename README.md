@@ -47,7 +47,7 @@ Server Toolkit currently provides:
 
 - **Saved Commands**
   - local persisted reusable command text;
-  - validated creation and explicit deletion;
+  - validated creation, editing, and explicit deletion;
   - inline selection from the SSH workflow;
   - exact command-input replacement without automatic execution;
   - continued manual editing of the SSH command input before the explicit Run action.

@@ -4,6 +4,7 @@ import androidx.room.Dao
 import androidx.room.Insert
 import androidx.room.OnConflictStrategy
 import androidx.room.Query
+import androidx.room.Update
 import de.hamedtanha.servertoolkit.feature.savedcommands.data.local.entity.SavedCommandEntity
 import kotlinx.coroutines.flow.Flow
 
@@ -29,6 +30,9 @@ interface SavedCommandDao {
 
     @Insert(onConflict = OnConflictStrategy.ABORT)
     suspend fun insertSavedCommand(entity: SavedCommandEntity)
+
+    @Update(onConflict = OnConflictStrategy.ABORT)
+    suspend fun updateSavedCommand(entity: SavedCommandEntity): Int
 
     @Query(
         """

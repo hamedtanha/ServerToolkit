@@ -600,6 +600,12 @@ class SshViewModelSavedCommandSelectorTest {
             error("Saved command creation must not be used.")
         }
 
+        override suspend fun updateSavedCommand(
+            savedCommand: SavedCommand,
+        ) {
+            error("Saved command update must not be used.")
+        }
+
         override suspend fun deleteSavedCommand(
             savedCommandId: String,
         ) {
@@ -638,6 +644,12 @@ class SshViewModelSavedCommandSelectorTest {
             savedCommand: SavedCommand,
         ) {
             error("Saved command creation is not part of SSH selection.")
+        }
+
+        override suspend fun updateSavedCommand(
+            savedCommand: SavedCommand,
+        ) {
+            error("Saved command update is not part of SSH selection.")
         }
 
         override suspend fun deleteSavedCommand(

@@ -26,6 +26,7 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.window.DialogProperties
@@ -35,6 +36,7 @@ import de.hamedtanha.servertoolkit.ui.designsystem.theme.ServerToolkitButtonShap
 import de.hamedtanha.servertoolkit.feature.savedcommands.domain.model.SavedCommand
 import de.hamedtanha.servertoolkit.feature.savedcommands.presentation.state.SavedCommandCreateFormUiState
 import de.hamedtanha.servertoolkit.feature.savedcommands.presentation.state.SavedCommandDeleteConfirmationUiState
+import de.hamedtanha.servertoolkit.feature.savedcommands.presentation.state.SavedCommandEditFormUiState
 import de.hamedtanha.servertoolkit.feature.savedcommands.presentation.state.SavedCommandsUiState
 import de.hamedtanha.servertoolkit.feature.savedcommands.presentation.viewmodel.SavedCommandsViewModel
 
@@ -55,6 +57,11 @@ fun SavedCommandsRoute(
         onCreateNameChanged = viewModel::onCreateNameChanged,
         onCreateCommandChanged = viewModel::onCreateCommandChanged,
         onCreateConfirmed = viewModel::onCreateConfirmed,
+        onEditRequested = viewModel::onEditRequested,
+        onCancelEdit = viewModel::onCancelEdit,
+        onEditNameChanged = viewModel::onEditNameChanged,
+        onEditCommandChanged = viewModel::onEditCommandChanged,
+        onEditConfirmed = viewModel::onEditConfirmed,
         onDeleteRequested = viewModel::onDeleteRequested,
         onCancelDelete = viewModel::onCancelDelete,
         onDeleteConfirmed = viewModel::onDeleteConfirmed,
@@ -72,6 +79,11 @@ fun SavedCommandsScreen(
     onCreateNameChanged: (String) -> Unit,
     onCreateCommandChanged: (String) -> Unit,
     onCreateConfirmed: () -> Unit,
+    onEditRequested: (String) -> Unit,
+    onCancelEdit: () -> Unit,
+    onEditNameChanged: (String) -> Unit,
+    onEditCommandChanged: (String) -> Unit,
+    onEditConfirmed: () -> Unit,
     onDeleteRequested: (String) -> Unit,
     onCancelDelete: () -> Unit,
     onDeleteConfirmed: () -> Unit,
@@ -104,6 +116,7 @@ fun SavedCommandsScreen(
             enabled = !uiState.isLoading &&
                 !uiState.hasBlockingError &&
                 !uiState.isCreateVisible &&
+                !uiState.isEditVisible &&
                 !uiState.isDeleteVisible,
             modifier = Modifier.fillMaxWidth(),
         ) {
@@ -146,6 +159,7 @@ fun SavedCommandsScreen(
                 SavedCommandsContent(
                     uiState = uiState,
                     onRetryLoad = onRetryLoad,
+                    onEditRequested = onEditRequested,
                     onDeleteRequested = onDeleteRequested,
                     modifier = Modifier
                         .weight(1f)
@@ -173,6 +187,16 @@ fun SavedCommandsScreen(
             onCommandChanged = onCreateCommandChanged,
             onCancel = onCancelCreate,
             onCreate = onCreateConfirmed,
+        )
+    }
+
+    uiState.editForm?.let { editForm ->
+        SavedCommandEditDialog(
+            form = editForm,
+            onNameChanged = onEditNameChanged,
+            onCommandChanged = onEditCommandChanged,
+            onCancel = onCancelEdit,
+            onSave = onEditConfirmed,
         )
     }
 
@@ -272,6 +296,124 @@ private fun SavedCommandCreateDialog(
                     Text(text = "Saving")
                 } else {
                     Text(text = "Create")
+                }
+            }
+        },
+        dismissButton = {
+            TextButton(
+                onClick = onCancel,
+                enabled = !form.isSaving,
+            ) {
+                Text(text = "Cancel")
+            }
+        },
+        properties = DialogProperties(
+            dismissOnBackPress = !form.isSaving,
+            dismissOnClickOutside = !form.isSaving,
+        ),
+    )
+}
+
+@Composable
+private fun SavedCommandEditDialog(
+    form: SavedCommandEditFormUiState,
+    onNameChanged: (String) -> Unit,
+    onCommandChanged: (String) -> Unit,
+    onCancel: () -> Unit,
+    onSave: () -> Unit,
+) {
+    AlertDialog(
+        onDismissRequest = {
+            if (!form.isSaving) {
+                onCancel()
+            }
+        },
+        title = {
+            Text(text = "Edit saved command")
+        },
+        text = {
+            Column(
+                verticalArrangement = Arrangement.spacedBy(12.dp),
+            ) {
+                Text(
+                    text = "The command is stored as entered and is not executed.",
+                    style = MaterialTheme.typography.bodyMedium,
+                    color = MaterialTheme.colorScheme.onSurfaceVariant,
+                )
+
+                OutlinedTextField(
+                    value = form.name,
+                    onValueChange = onNameChanged,
+                    label = {
+                        Text(text = "Name")
+                    },
+                    supportingText = form.nameError?.let { nameError ->
+                        {
+                            Text(text = nameError)
+                        }
+                    },
+                    isError = form.nameError != null,
+                    enabled = !form.isSaving,
+                    singleLine = true,
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .testTag(SAVED_COMMAND_EDIT_NAME_TEST_TAG),
+                )
+
+                OutlinedTextField(
+                    value = form.command,
+                    onValueChange = onCommandChanged,
+                    label = {
+                        Text(text = "Command text")
+                    },
+                    supportingText = form.commandError?.let { commandError ->
+                        {
+                            Text(text = commandError)
+                        }
+                    },
+                    isError = form.commandError != null,
+                    enabled = !form.isSaving,
+                    minLines = 4,
+                    maxLines = 10,
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .testTag(SAVED_COMMAND_EDIT_COMMAND_TEST_TAG),
+                )
+
+                form.errorMessage?.let { errorMessage ->
+                    Text(
+                        text = errorMessage,
+                        style = MaterialTheme.typography.bodyMedium,
+                        color = MaterialTheme.colorScheme.error,
+                    )
+                }
+            }
+        },
+        confirmButton = {
+            Button(
+                shape = ServerToolkitButtonShape,
+                onClick = onSave,
+                enabled = !form.isSaving,
+                modifier = Modifier.testTag(
+                    SAVED_COMMAND_EDIT_SAVE_TEST_TAG,
+                ),
+            ) {
+                if (form.isSaving) {
+                    CircularProgressIndicator(
+                        modifier = Modifier.size(18.dp),
+                        color = MaterialTheme.colorScheme.onPrimary,
+                        strokeWidth = 2.dp,
+                    )
+                    Spacer(modifier = Modifier.width(8.dp))
+                    Text(text = "Saving")
+                } else {
+                    Text(
+                        text = if (form.errorMessage == null) {
+                            "Save"
+                        } else {
+                            "Retry"
+                        },
+                    )
                 }
             }
         },
@@ -433,6 +575,7 @@ private fun SavedCommandsMessageContent(
 private fun SavedCommandsContent(
     uiState: SavedCommandsUiState,
     onRetryLoad: () -> Unit,
+    onEditRequested: (String) -> Unit,
     onDeleteRequested: (String) -> Unit,
     modifier: Modifier = Modifier,
 ) {
@@ -458,6 +601,7 @@ private fun SavedCommandsContent(
             ) { command ->
                 SavedCommandItem(
                     command = command,
+                    onEditRequested = onEditRequested,
                     onDeleteRequested = onDeleteRequested,
                 )
             }
@@ -498,6 +642,7 @@ private fun SavedCommandsObservationWarning(
 @Composable
 private fun SavedCommandItem(
     command: SavedCommand,
+    onEditRequested: (String) -> Unit,
     onDeleteRequested: (String) -> Unit,
 ) {
     Card(
@@ -518,7 +663,20 @@ private fun SavedCommandItem(
             )
 
             OutlinedButton(
+                shape = ServerToolkitButtonShape,
+                onClick = {
+                    onEditRequested(command.id)
+                },
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .testTag(
+                        "$SAVED_COMMAND_EDIT_BUTTON_TEST_TAG_PREFIX${command.id}",
+                    ),
+            ) {
+                Text(text = "Edit")
+            }
 
+            OutlinedButton(
                 shape = ServerToolkitButtonShape,
                 onClick = {
                     onDeleteRequested(command.id)
@@ -533,3 +691,12 @@ private fun SavedCommandItem(
         }
     }
 }
+
+internal const val SAVED_COMMAND_EDIT_BUTTON_TEST_TAG_PREFIX =
+    "saved-command-edit-"
+internal const val SAVED_COMMAND_EDIT_NAME_TEST_TAG =
+    "saved-command-edit-name"
+internal const val SAVED_COMMAND_EDIT_COMMAND_TEST_TAG =
+    "saved-command-edit-command"
+internal const val SAVED_COMMAND_EDIT_SAVE_TEST_TAG =
+    "saved-command-edit-save"

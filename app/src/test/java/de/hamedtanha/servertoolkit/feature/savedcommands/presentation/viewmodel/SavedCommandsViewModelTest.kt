@@ -334,6 +334,237 @@ class SavedCommandsViewModelTest {
     }
 
     @Test
+    fun `opens and cancels edit form without changing persistence`() = runTest {
+        val repository = FakeSavedCommandRepository(
+            initialCommands = listOf(savedCommand()),
+        )
+        val viewModel = createViewModel(repository)
+        viewModel.uiState.first { state -> state.hasCommands }
+
+        viewModel.onEditRequested("saved-command-1")
+
+        val form = requireNotNull(viewModel.uiState.value.editForm)
+
+        assertEquals("saved-command-1", form.savedCommandId)
+        assertEquals("List services", form.name)
+        assertEquals(
+            "systemctl list-units --type=service",
+            form.command,
+        )
+
+        viewModel.onCancelEdit()
+
+        assertFalse(viewModel.uiState.value.isEditVisible)
+        assertEquals(0, repository.updateCallCount)
+    }
+
+    @Test
+    fun `does not open edit form for unknown identifier`() = runTest {
+        val repository = FakeSavedCommandRepository(
+            initialCommands = listOf(savedCommand()),
+        )
+        val viewModel = createViewModel(repository)
+        viewModel.uiState.first { state -> state.hasCommands }
+
+        viewModel.onEditRequested("missing-command")
+
+        assertFalse(viewModel.uiState.value.isEditVisible)
+        assertEquals(0, repository.updateCallCount)
+    }
+
+    @Test
+    fun `edit validation reuses name and command rules`() = runTest {
+        val repository = FakeSavedCommandRepository(
+            initialCommands = listOf(savedCommand()),
+        )
+        val viewModel = createViewModel(repository)
+        viewModel.uiState.first { state -> state.hasCommands }
+
+        viewModel.onEditRequested("saved-command-1")
+        viewModel.onEditNameChanged("   ")
+        viewModel.onEditCommandChanged(" \n\t ")
+        viewModel.onEditConfirmed()
+
+        val form = requireNotNull(viewModel.uiState.value.editForm)
+
+        assertEquals("Name is required.", form.nameError)
+        assertEquals("Command text is required.", form.commandError)
+        assertEquals(0, repository.updateCallCount)
+    }
+
+    @Test
+    fun `edit preserves identity creation time and exact command text`() = runTest {
+        val originalCommand = savedCommand(
+            id = "saved-command-1",
+            createdAtEpochMillis = 1_234L,
+        )
+        val repository = FakeSavedCommandRepository(
+            initialCommands = listOf(originalCommand),
+        )
+        val viewModel = createViewModel(repository)
+        viewModel.uiState.first { state -> state.hasCommands }
+
+        val exactCommand = "\n  printf 'updated'  \n"
+
+        viewModel.onEditRequested("saved-command-1")
+        viewModel.onEditNameChanged("  Updated command  ")
+        viewModel.onEditCommandChanged(exactCommand)
+        viewModel.onEditConfirmed()
+
+        val completedState = viewModel.uiState.first { state ->
+            !state.isEditVisible &&
+                state.commands.singleOrNull()?.name == "Updated command"
+        }
+
+        val updatedCommand = repository.updateArguments.single()
+
+        assertEquals("saved-command-1", updatedCommand.id)
+        assertEquals(1_234L, updatedCommand.createdAtEpochMillis)
+        assertEquals("Updated command", updatedCommand.name)
+        assertEquals(exactCommand, updatedCommand.command)
+        assertEquals(updatedCommand, completedState.commands.single())
+    }
+
+    @Test
+    fun `update failure preserves loaded command and edited form input`() = runTest {
+        val originalCommand = savedCommand()
+        val repository = FakeSavedCommandRepository(
+            initialCommands = listOf(originalCommand),
+        ).apply {
+            updateFailure = IllegalStateException("Database unavailable")
+        }
+        val viewModel = createViewModel(repository)
+        viewModel.uiState.first { state -> state.hasCommands }
+
+        viewModel.onEditRequested("saved-command-1")
+        viewModel.onEditNameChanged("  Failed update  ")
+        viewModel.onEditCommandChanged("  echo failed  ")
+        viewModel.onEditConfirmed()
+
+        val failedState = viewModel.uiState.first { state ->
+            state.editForm?.errorMessage != null
+        }
+        val failedForm = requireNotNull(failedState.editForm)
+
+        assertEquals(originalCommand, failedState.commands.single())
+        assertEquals("  Failed update  ", failedForm.name)
+        assertEquals("  echo failed  ", failedForm.command)
+        assertFalse(failedForm.isSaving)
+        assertEquals(
+            "Saved command could not be updated.",
+            failedForm.errorMessage,
+        )
+        assertEquals(1, repository.updateCallCount)
+
+        repository.updateFailure = null
+        viewModel.onEditConfirmed()
+
+        viewModel.uiState.first { state ->
+            !state.isEditVisible &&
+                state.commands.singleOrNull()?.name == "Failed update"
+        }
+
+        assertEquals(2, repository.updateCallCount)
+    }
+
+    @Test
+    fun `missing edit target before save preserves form and does not update`() = runTest {
+        val repository = FakeSavedCommandRepository(
+            initialCommands = listOf(savedCommand()),
+        )
+        val viewModel = createViewModel(repository)
+        viewModel.uiState.first { state -> state.hasCommands }
+
+        viewModel.onEditRequested("saved-command-1")
+        viewModel.onEditNameChanged("Updated command")
+
+        repository.emitSavedCommands(emptyList())
+        viewModel.uiState.first { state -> state.commands.isEmpty() }
+
+        viewModel.onEditConfirmed()
+
+        val form = requireNotNull(viewModel.uiState.value.editForm)
+
+        assertEquals("saved-command-1", form.savedCommandId)
+        assertEquals("Updated command", form.name)
+        assertEquals(
+            "Saved command could not be updated.",
+            form.errorMessage,
+        )
+        assertEquals(0, repository.updateCallCount)
+    }
+
+    @Test
+    fun `prevents duplicate edit confirmation and cancellation while saving`() = runTest {
+        val repository = FakeSavedCommandRepository(
+            initialCommands = listOf(savedCommand()),
+        ).apply {
+            suspendUpdateOperations = true
+        }
+        val viewModel = createViewModel(repository)
+        viewModel.uiState.first { state -> state.hasCommands }
+
+        viewModel.onEditRequested("saved-command-1")
+        viewModel.onEditNameChanged("Updated command")
+        viewModel.onEditConfirmed()
+        repository.awaitUpdateStarted()
+
+        assertTrue(
+            requireNotNull(viewModel.uiState.value.editForm).isSaving,
+        )
+
+        viewModel.onEditConfirmed()
+        viewModel.onCancelEdit()
+
+        assertEquals(1, repository.updateCallCount)
+        assertTrue(viewModel.uiState.value.isEditVisible)
+
+        repository.releaseUpdate()
+
+        viewModel.uiState.first { state ->
+            !state.isEditVisible &&
+                state.commands.singleOrNull()?.name == "Updated command"
+        }
+
+        assertEquals(1, repository.updateCallCount)
+    }
+
+    @Test
+    fun `does not expose create edit and delete workflows together`() = runTest {
+        val repository = FakeSavedCommandRepository(
+            initialCommands = listOf(savedCommand()),
+        )
+        val viewModel = createViewModel(repository)
+        viewModel.uiState.first { state -> state.hasCommands }
+
+        viewModel.onOpenCreate()
+        viewModel.onEditRequested("saved-command-1")
+        viewModel.onDeleteRequested("saved-command-1")
+
+        assertTrue(viewModel.uiState.value.isCreateVisible)
+        assertFalse(viewModel.uiState.value.isEditVisible)
+        assertFalse(viewModel.uiState.value.isDeleteVisible)
+
+        viewModel.onCancelCreate()
+        viewModel.onEditRequested("saved-command-1")
+        viewModel.onOpenCreate()
+        viewModel.onDeleteRequested("saved-command-1")
+
+        assertFalse(viewModel.uiState.value.isCreateVisible)
+        assertTrue(viewModel.uiState.value.isEditVisible)
+        assertFalse(viewModel.uiState.value.isDeleteVisible)
+
+        viewModel.onCancelEdit()
+        viewModel.onDeleteRequested("saved-command-1")
+        viewModel.onOpenCreate()
+        viewModel.onEditRequested("saved-command-1")
+
+        assertFalse(viewModel.uiState.value.isCreateVisible)
+        assertFalse(viewModel.uiState.value.isEditVisible)
+        assertTrue(viewModel.uiState.value.isDeleteVisible)
+    }
+
+    @Test
     fun `selects and cancels delete target without changing persistence`() = runTest {
         val repository = FakeSavedCommandRepository(
             initialCommands = listOf(savedCommand()),
@@ -567,6 +798,12 @@ class SavedCommandsViewModelTest {
         }
 
         override suspend fun createSavedCommand(
+            savedCommand: SavedCommand,
+        ) {
+            error("Not used in this test.")
+        }
+
+        override suspend fun updateSavedCommand(
             savedCommand: SavedCommand,
         ) {
             error("Not used in this test.")
