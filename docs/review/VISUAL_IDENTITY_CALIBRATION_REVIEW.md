@@ -2,7 +2,7 @@
 
 **Project:** Server Toolkit
 **Issue:** #157
-**Status:** Active — Fixture Definition
+**Status:** Active — Baseline Evidence Review
 **Started:** 2026-08-12
 **Last Reviewed:** 2026-08-14
 
@@ -153,17 +153,17 @@ No new runtime dependency is justified for fixture capture.
 
 ## Capture Environment
 
-Record before accepting baseline evidence:
+Official baseline capture environment:
 
 | Field | Value |
 |---|---|
-| Device / AVD | Pending |
-| Android API | Pending |
-| Resolution | Pending |
-| Density | Pending |
-| Font scale | `1.0` for direct comparison |
-| Display scale | Pending |
-| Fixture source commit | Pending |
+| Device / AVD | `Leannect_API_36` / `Google sdk_gphone64_x86_64` |
+| Android API | `36` |
+| Resolution | `1080 × 2424 px` |
+| Density | `420 dpi` |
+| Font scale | `1.0` |
+| Display scale | Default; no `wm size` or `wm density` override |
+| Fixture source commit | `81122c88adad114dfee5fbbf87c2e1fdba9ec94a` |
 | Dynamic color | Disabled |
 
 Typography also requires a separate maximum-font-scale usability check. That
@@ -174,6 +174,16 @@ Evidence root:
 ```text
 docs/review/assets/visual-identity-calibration/
 ```
+
+Official baseline evidence:
+
+```text
+docs/review/assets/visual-identity-calibration/baseline/
+```
+
+The baseline directory contains ten canonical PNG captures and `environment.txt`.
+The metadata sidecar records the immutable fixture source commit and runtime
+capture environment used for direct comparison.
 
 Naming:
 
@@ -337,6 +347,29 @@ component state, or semantic role not meaningfully exercised above.
 
 ---
 
+## Baseline Evidence Review
+
+The official baseline was captured on 2026-08-14 from fixture source commit
+`81122c88adad114dfee5fbbf87c2e1fdba9ec94a`.
+
+It records the existing Graphite + Azure calibration starting profile before any
+visual-token calibration.
+
+Initial observations:
+
+- All ten canonical captures were produced at `1080 × 2424 px` in the fixed
+  Light/Dark environment with no capture or encoding artifact observed.
+- F02 shows the `TESTING` filter chip clipped at the right edge of the viewport
+  in both Light and Dark captures. This is recorded as a screen-level layout
+  observation and does not by itself justify a global token change.
+- F04 confirms that the complete connected-command state is visible in the fixed
+  calibration viewport without scrolling, validating one capture per theme.
+
+These observations are evidence inputs only. Token changes still require the
+derivation and cross-fixture evidence defined by this review.
+
+---
+
 ## Color Derivation Record
 
 For each color candidate record:
@@ -439,9 +472,9 @@ Rejected candidate
 ## Calibration Log
 
 ```text
-Fixture harness:       Not implemented
-Capture environment:   Not recorded
-Baseline evidence:     Not captured
+Fixture harness:       Implemented and runtime-validated
+Capture environment:   Recorded
+Baseline evidence:     Captured and initial review recorded
 
 Color:                 Not started
 Typography:            Not started
