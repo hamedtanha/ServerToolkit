@@ -372,6 +372,66 @@ derivation and cross-fixture evidence defined by this review.
 
 ## Color Derivation Record
 
+### Usage Inventory
+
+Production-source scan at
+`69dc6d15a7ad7373484e4fc6a535d831eb3527d2` found no direct `Color(...)`
+literal outside the design-system theme color definition.
+
+Explicit `MaterialTheme.colorScheme` role usage:
+
+| Role | Explicit references |
+|---|---:|
+| `onSurfaceVariant` | 26 |
+| `error` | 13 |
+| `onSurface` | 2 |
+| `onPrimary` | 2 |
+| `onError` | 2 |
+| `primary` | 1 |
+| `background` | 1 |
+| `onBackground` | 1 |
+
+This count covers only explicit feature-source references. Material components
+such as buttons, outlined controls, text fields, chips, and surfaces also consume
+`ColorScheme` roles implicitly, so absence from this table does not prove that a
+role is unused at runtime.
+
+The core fixtures directly exercise:
+
+- primary-action emphasis;
+- neutral background and surface hierarchy;
+- secondary text through `onSurfaceVariant`;
+- outlined controls and field boundaries;
+- destructive/error semantics;
+- cards, controls, and form surfaces across Light and Dark themes.
+
+`secondary`, `tertiary`, and fixed-role families are not explicitly referenced by
+the feature-source scan. Changes to those families require either demonstrated
+implicit component impact or additional evidence; they must not be changed
+speculatively.
+
+### Current Numerical Baseline
+
+Representative current role pairings:
+
+| Pair | Light | Dark |
+|---|---:|---:|
+| `primary` / `onPrimary` | 5.17:1 | 7.36:1 |
+| `primaryContainer` / `onPrimaryContainer` | 12.04:1 | 8.49:1 |
+| `surface` / `onSurface` | 17.85:1 | 14.48:1 |
+| `surfaceVariant` / `onSurfaceVariant` | 6.15:1 | 9.85:1 |
+| `error` / `onError` | 6.47:1 | 5.84:1 |
+| `outline` / `surface` | 4.76:1 | 3.75:1 |
+
+These sampled pairings satisfy the text or meaningful non-text contrast
+thresholds defined by this review. They do not establish that every component
+state or alpha-composited runtime combination is compliant.
+
+Therefore the current evidence does not justify starting color calibration from
+a contrast-failure assumption. Candidate evaluation must instead focus on
+operational clarity, trust, product fit, semantic hierarchy, platform neutrality,
+and cross-screen consistency while preserving accessibility.
+
 For each color candidate record:
 
 1. repeated problem;
@@ -388,7 +448,7 @@ For each color candidate record:
 Status:
 
 ```text
-Not started
+Usage inventory complete; candidate derivation pending
 ```
 
 ---
@@ -476,7 +536,7 @@ Fixture harness:       Implemented and runtime-validated
 Capture environment:   Recorded
 Baseline evidence:     Captured and initial review recorded
 
-Color:                 Not started
+Color:                 Usage inventory complete; derivation pending
 Typography:            Not started
 Shape:                 Not started
 Spacing:               No calibration justified at review start
