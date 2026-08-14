@@ -432,6 +432,76 @@ a contrast-failure assumption. Candidate evaluation must instead focus on
 operational clarity, trust, product fit, semantic hierarchy, platform neutrality,
 and cross-screen consistency while preserving accessibility.
 
+### Material Reference Control
+
+A read-only Material Color Utilities reference was generated from the current
+Light primary `#2563EB` using:
+
+```text
+MCU source commit: f05459ea2170f3be610f89a4ddeee8843c2deb61
+Implementation:    official Java source
+Scheme:            SchemeTonalSpot
+Spec version:      SPEC_2021
+Platform:          PHONE
+Contrast level:    0.0
+Source color:      #2563EB
+Source HCT:        H=272.219 C=69.575 T=46.063
+```
+
+Representative generated roles:
+
+| Role | Light | Dark |
+|---|---|---|
+| `primary` | `#4B5C92` | `#B4C5FF` |
+| `primaryContainer` | `#DBE1FF` | `#324478` |
+| `secondary` | `#595E72` | `#C1C5DD` |
+| `tertiary` | `#745470` | `#E2BBDB` |
+| `background` | `#FAF8FF` | `#121318` |
+| `surfaceVariant` | `#E2E2EC` | `#45464F` |
+| `error` | `#BA1A1A` | `#FFB4AB` |
+
+This control is intentionally not a candidate palette.
+
+For `TONAL_SPOT` in the pinned Material specification, MCU derives:
+
+```text
+Primary palette:         source hue, chroma 36
+Secondary palette:       source hue, chroma 16
+Tertiary palette:        source hue + 60 degrees, chroma 24
+Neutral palette:         source hue, chroma 6
+Neutral-variant palette: source hue, chroma 8
+Error palette:           hue 25, chroma 84
+```
+
+With the current Azure source hue near `272 degrees`, the generic tertiary
+rotation produces a hue near `332 degrees`, resulting in a purple/magenta
+tertiary family rather than the documented limited cyan direction. The Tonal
+Spot primary family also reduces chroma substantially relative to the current
+Azure source.
+
+The control therefore demonstrates that a single-source `SchemeTonalSpot`
+generation would replace product-owned visual decisions with generic Material
+palette relationships. That conflicts with the current Server Toolkit direction
+of controlled Azure emphasis, cool graphite/slate neutrals, and limited cyan
+tertiary use.
+
+Decision:
+
+```text
+SchemeTonalSpot whole-scheme generation:
+Rejected as a direct Server Toolkit palette generator.
+Retained as an external Material reference control.
+```
+
+Material Color Utilities remains useful at design time through HCT and
+`TonalPalette`. `TonalPalette` provides constant hue and chroma while varying
+tone, allowing each product-owned color family to be derived reproducibly
+without forcing unrelated families from one source color.
+
+The next derivation step is therefore to measure the current palette families in
+HCT and define evidence-backed family parameters before proposing exact role
+changes.
+
 For each color candidate record:
 
 1. repeated problem;
@@ -448,7 +518,7 @@ For each color candidate record:
 Status:
 
 ```text
-Usage inventory complete; candidate derivation pending
+Material reference control evaluated; family derivation pending
 ```
 
 ---
@@ -536,7 +606,7 @@ Fixture harness:       Implemented and runtime-validated
 Capture environment:   Recorded
 Baseline evidence:     Captured and initial review recorded
 
-Color:                 Usage inventory complete; derivation pending
+Color:                 Material reference evaluated; family derivation pending
 Typography:            Not started
 Shape:                 Not started
 Spacing:               No calibration justified at review start
