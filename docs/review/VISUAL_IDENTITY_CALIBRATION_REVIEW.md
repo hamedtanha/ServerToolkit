@@ -498,9 +498,97 @@ Material Color Utilities remains useful at design time through HCT and
 tone, allowing each product-owned color family to be derived reproducibly
 without forcing unrelated families from one source color.
 
-The next derivation step is therefore to measure the current palette families in
-HCT and define evidence-backed family parameters before proposing exact role
-changes.
+The current family assessment below completes that measurement step before any
+product-derived candidate values are proposed.
+
+### Current Family Assessment
+
+The current baseline was assessed with two independent classification axes:
+
+1. semantic role function;
+2. Material reference tonal-palette assignment.
+
+The assignment axis describes the Material role model only. It does not claim
+that the current Server Toolkit hex value was historically generated from that
+palette. The current baseline reuses some exact colors across role families, so
+that distinction is required for correct interpretation.
+
+Measurement inputs:
+
+```text
+Server Toolkit commit:
+a24ace45f9d4d6c672752294f7e870e91b2b6553
+
+Color.kt SHA-256:
+9a9f1d7ebbd736233573f2d83692dfbc5880fbb1ed5233ebe2cf33876b9f2f6d
+
+Material Color Utilities:
+f05459ea2170f3be610f89a4ddeee8843c2deb61
+
+Dual-axis report SHA-256:
+6f46b674f4b9ef90844bc1d383657a6e7d3b3987f452a7145b4bdbcf5b91cc72
+
+Family-fit report SHA-256:
+eff65c961c7fa797c97985f2c6d6fd466fd0cac5e4c8a46bc8233f89b9bc2d91
+```
+
+For each Material reference family, role aliases sharing one current hex value
+were deduplicated. Each current color retained its measured HCT tone, and one
+descriptive `TonalPalette(hue, chroma)` was fitted by minimizing mean squared
+CAM16-UCS distance between current colors and model colors at those same tones.
+
+The fit is descriptive only. It is not a candidate palette, an acceptance
+threshold, or evidence by itself that a current family must change.
+
+| Family | Best-fit H | Best-fit C | RMSE | Mean distance | Max distance |
+|---|---:|---:|---:|---:|---:|
+| Primary | 266.8 | 66.1 | 3.3788 | 3.1148 | 4.6777 |
+| Secondary | 256.8 | 16.7 | 2.2513 | 1.8866 | 4.2027 |
+| Tertiary | 217.2 | 51.6 | 2.8871 | 2.6652 | 3.5310 |
+| Error | 21.5 | 81.9 | 2.7356 | 2.3103 | 4.3820 |
+| Neutral | 265.6 | 16.2 | 2.3051 | 1.9927 | 4.3170 |
+| Neutral Variant | 256.1 | 18.1 | 2.4341 | 1.8814 | 4.3842 |
+
+Family findings:
+
+- **Primary:** the descriptive model remains a high-chroma Azure family. Primary
+  has the largest RMSE among the six fitted families. Its largest
+  residual is `DarkOnPrimary` (`#0B1220`), which is also the current
+  `DarkBackground`; this demonstrates cross-family color reuse and does not by
+  itself establish a Primary carrier defect.
+- **Secondary:** the descriptive `H=256.8 C=16.7` model nearly overlaps Neutral
+  Variant at `H=256.1 C=18.1`. This is consistent with the current restrained
+  slate support direction. The production usage scan has no explicit Secondary
+  references, so no token change is justified from this fit alone.
+- **Tertiary:** the descriptive `H=217.2 C=51.6` model remains a distinct cyan
+  family, consistent with the documented limited-cyan direction. The production
+  usage scan has no explicit Tertiary references, so no token change is justified
+  from this fit alone.
+- **Error:** the descriptive `H=21.5 C=81.9` model is close to the Material
+  reference error parameters `H=25 C=84` already recorded above. Representative
+  current Error contrast pairings also pass the review thresholds. Current
+  evidence therefore provides no change trigger for this family.
+- **Neutral:** the descriptive `H=265.6 C=16.2` model confirms a cool
+  graphite/slate family rather than a near-achromatic generic Material neutral.
+  Several larger residuals occur in high-tone Light colors, including
+  `#E2E8F0`; no pass/fail meaning is assigned to those residuals without a
+  justified threshold and fixture evidence.
+- **Neutral Variant:** the descriptive `H=256.1 C=18.1` model is closely related
+  to Secondary and remains distinctly cool/slate. Its largest residual is the
+  high-tone Light `#E2E8F0`. Because `onSurfaceVariant` is the most frequently
+  referenced explicit production color role in the current usage inventory,
+  this family has strong operational evidence for careful visual assessment even
+  though its fit residual is not the largest.
+
+The measurements show distinct high-chroma Primary, Tertiary, and Error
+directions alongside closely related cool slate Secondary, Neutral, and Neutral
+Variant directions. They do not establish that the current palette must be
+normalized into six mathematically independent constant-H/C palettes.
+
+No arbitrary CAM16-UCS acceptance threshold has been introduced. No exact token
+change has been proposed. The next Color step is to record a disposition for
+each family: retain, normalize through a reproducible derivation, or investigate
+a candidate change.
 
 For each color candidate record:
 
@@ -518,7 +606,7 @@ For each color candidate record:
 Status:
 
 ```text
-Material reference control evaluated; family derivation pending
+Current family assessment recorded; family disposition pending
 ```
 
 ---
@@ -606,7 +694,7 @@ Fixture harness:       Implemented and runtime-validated
 Capture environment:   Recorded
 Baseline evidence:     Captured and initial review recorded
 
-Color:                 Material reference evaluated; family derivation pending
+Color:                 Current family assessment recorded; disposition pending
 Typography:            Not started
 Shape:                 Not started
 Spacing:               No calibration justified at review start
