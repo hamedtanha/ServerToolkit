@@ -295,17 +295,16 @@ stderr:         empty
 exit status:    0
 ```
 
-SSH is vertically scrollable, so use two anchors per theme:
+The fixed calibration viewport captures the complete connected-command state
+without scrolling, so use one capture per theme:
 
 ```text
-F04-<theme>-top.png
-F04-<theme>-command.png
+F04-<theme>.png
 ```
 
-`top` evaluates connection hierarchy and controls.
-
-`command` scrolls the command-input node into view and evaluates command input,
-machine-oriented output, labels, and command actions.
+The capture evaluates connection hierarchy, authentication controls, command input,
+machine-oriented output, status labels, command actions, connection history, and
+back navigation in one deterministic view.
 
 ### F05 — Saved Commands
 
