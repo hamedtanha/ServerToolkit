@@ -4,7 +4,7 @@
 **Issue:** #157
 **Status:** Active — Baseline Evidence Review
 **Started:** 2026-08-12
-**Last Reviewed:** 2026-08-14
+**Last Reviewed:** 2026-09-04
 
 ---
 
@@ -586,11 +586,46 @@ Variant directions. They do not establish that the current palette must be
 normalized into six mathematically independent constant-H/C palettes.
 
 No arbitrary CAM16-UCS acceptance threshold has been introduced. No exact token
-change has been proposed. The next Color step is to record a disposition for
-each family: retain, normalize through a reproducible derivation, or investigate
-a candidate change.
+change has been proposed.
 
-For each color candidate record:
+### Family Dispositions
+
+Reviewed on 2026-09-04.
+
+The disposition decision applies the calibration rule already defined by this
+review: a global color change requires a repeated cross-fixture problem and a
+reproducible candidate derivation. Numerical fit residuals, family overlap, or
+aesthetic preference in isolation are not sufficient change triggers.
+
+| Family | Disposition | Rationale |
+|---|---|---|
+| Primary | Retained | The current high-chroma Azure direction remains consistent with the documented product direction. The largest descriptive-fit residual is explained by the current `DarkOnPrimary` / `DarkBackground` cross-family reuse and is not accompanied by a repeated cross-fixture failure. |
+| Secondary | Retained | The restrained slate relationship to Neutral Variant is consistent with the current supporting-role direction. No explicit production usage or fixture evidence establishes a defect requiring normalization or replacement. |
+| Tertiary | Retained | The current distinct cyan family remains consistent with the documented limited-cyan direction. No explicit production usage or repeated fixture problem justifies speculative change. |
+| Error | Retained | The family is close to the Material reference error direction and the representative current Error contrast pairings satisfy the review thresholds. No repeated semantic or accessibility problem has been recorded. |
+| Neutral | Retained | The family confirms the intended cool graphite/slate direction. Descriptive residuals in high-tone Light colors do not establish a visual defect without a justified threshold and repeated fixture evidence. |
+| Neutral Variant | Retained | The family remains a coherent cool/slate support family. `onSurfaceVariant` is the most frequently referenced explicit production color role, so it remains a focus for integrated validation, but current evidence records no repeated problem that justifies a token change. |
+
+Color-phase outcome:
+
+```text
+Primary:         Retained
+Secondary:       Retained
+Tertiary:        Retained
+Error:           Retained
+Neutral:         Retained
+Neutral Variant: Retained
+
+Normalize candidates:    None
+Investigate candidates:  None
+Production token change: None
+```
+
+These are Color-phase dispositions, not final visual-identity acceptance.
+Typography and Shape calibration remain independent work, and the retained color
+baseline must still pass the final integrated Light/Dark validation.
+
+For each future color candidate record:
 
 1. repeated problem;
 2. affected Material role family;
@@ -606,7 +641,7 @@ For each color candidate record:
 Status:
 
 ```text
-Current family assessment recorded; family disposition pending
+Completed — all assessed color families retained; integrated validation pending
 ```
 
 ---
@@ -694,7 +729,7 @@ Fixture harness:       Implemented and runtime-validated
 Capture environment:   Recorded
 Baseline evidence:     Captured and initial review recorded
 
-Color:                 Current family assessment recorded; disposition pending
+Color:                 Completed; all assessed families retained
 Typography:            Not started
 Shape:                 Not started
 Spacing:               No calibration justified at review start
