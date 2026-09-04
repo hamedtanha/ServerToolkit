@@ -3,7 +3,7 @@
 **Project:** Server Toolkit
 **Version:** 0.4.0
 **Status:** Active
-**Last Updated:** 2026-08-11
+**Last Updated:** 2026-09-04
 
 ---
 
@@ -45,6 +45,7 @@ After an ADR is accepted, implementation and verification evidence must be recor
 | ADR-014 | Android Release Signing Strategy | Accepted |
 | ADR-015 | Platform-Neutral Remote Systems Product Direction | Accepted |
 | ADR-016 | Three-Level Remote Capability Architecture | Accepted |
+| ADR-017 | Scalable Collection UX Contract | Accepted |
 
 ---
 
@@ -78,6 +79,7 @@ Decision roles:
 | ADR-014 | Android application signing identity and release artifact trust | Cross-cutting | ADR-001 | Active |
 | ADR-015 | Platform-neutral product direction and evidence-based support claims | Superseding refinement | ADR-001 | Supersedes Linux-specific product-scope assumptions in ADR-001 |
 | ADR-016 | Core, Capability Gateway, and Provider/Adapter responsibilities | Refinement | ADR-002, ADR-015 | Refines ADR-002 without replacing feature-first MVVM |
+| ADR-017 | Scalable collection presentation and growth boundaries | Cross-cutting | ADR-002, ADR-015 | Establishes collection UX invariants without mandating feature-specific layouts or premature pagination |
 
 ---
 
