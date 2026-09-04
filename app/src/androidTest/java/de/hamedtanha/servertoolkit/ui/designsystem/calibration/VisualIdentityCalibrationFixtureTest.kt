@@ -11,6 +11,7 @@ import androidx.compose.ui.graphics.asAndroidBitmap
 import androidx.compose.ui.test.captureToImage
 import androidx.compose.ui.test.junit4.createComposeRule
 import androidx.compose.ui.test.onNodeWithTag
+import androidx.compose.ui.test.onNodeWithText
 import androidx.compose.ui.test.onRoot
 import androidx.compose.ui.test.performScrollTo
 import androidx.test.ext.junit.runners.AndroidJUnit4
@@ -109,6 +110,22 @@ class VisualIdentityCalibrationFixtureTest {
         captureSsh(
             darkTheme = true,
             fileName = "F04-dark.png",
+        )
+    }
+
+    @Test
+    fun captureF04SshBottomLight() {
+        captureSshBottom(
+            darkTheme = false,
+            fileName = "F04-light-bottom.png",
+        )
+    }
+
+    @Test
+    fun captureF04SshBottomDark() {
+        captureSshBottom(
+            darkTheme = true,
+            fileName = "F04-dark-bottom.png",
         )
     }
 
@@ -238,6 +255,38 @@ class VisualIdentityCalibrationFixtureTest {
         }
 
         captureRoot(fileName)
+    }
+
+    private fun captureSshBottom(
+        darkTheme: Boolean,
+        fileName: String,
+    ) {
+        setFixtureContent(darkTheme = darkTheme) {
+            SshScreen(
+                uiState = calibrationSshUiState(),
+                onAuthenticationMethodSelect = {},
+                onPrivateKeySelectClick = {},
+                onConnectClick = {},
+                onDisconnectClick = {},
+                onConfirmHostKeyClick = {},
+                onCancelHostKeyReviewClick = {},
+                onPasswordChange = {},
+                onPrivateKeyPassphraseChange = {},
+                onCommandChange = {},
+                onOpenSavedCommandSelector = {},
+                onRetrySavedCommandSelector = {},
+                onCancelSavedCommandSelector = {},
+                onSavedCommandSelect = {},
+                onExecuteCommandClick = {},
+                onOpenConnectionHistory = {},
+                onNavigateBack = {},
+            )
+        }
+
+        captureRootAfterScrollToText(
+            text = "Back",
+            fileName = fileName,
+        )
     }
 
     private fun captureSshSavedCommandSelector(
@@ -427,6 +476,19 @@ class VisualIdentityCalibrationFixtureTest {
             bitmap = bitmap,
             fileName = fileName,
         )
+    }
+
+    private fun captureRootAfterScrollToText(
+        text: String,
+        fileName: String,
+    ) {
+        composeTestRule
+            .onNodeWithText(text)
+            .performScrollTo()
+
+        composeTestRule.waitForIdle()
+
+        captureRoot(fileName)
     }
 
     private fun captureTaggedNode(
