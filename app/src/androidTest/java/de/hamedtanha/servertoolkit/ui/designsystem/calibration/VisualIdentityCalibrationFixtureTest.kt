@@ -36,6 +36,7 @@ import de.hamedtanha.servertoolkit.feature.ssh.presentation.state.SshUiState
 import de.hamedtanha.servertoolkit.ui.designsystem.theme.DefaultServerToolkitVisualProfile
 import de.hamedtanha.servertoolkit.ui.designsystem.theme.ServerToolkitTheme
 import java.io.File
+import kotlin.math.abs
 import org.junit.Assume.assumeTrue
 import org.junit.Rule
 import org.junit.Test
@@ -311,8 +312,8 @@ class VisualIdentityCalibrationFixtureTest {
     ) {
         assumeCalibrationCaptureEnabled()
         requireCaptureSourceRef()
-        requireEvidenceStage()
-        requireBaselineFontScale()
+        val evidenceStage = requireEvidenceStage()
+        requireExpectedFontScale(evidenceStage)
 
         composeTestRule.setContent {
             ServerToolkitTheme(
@@ -374,15 +375,42 @@ class VisualIdentityCalibrationFixtureTest {
         return stage
     }
 
-    private fun requireBaselineFontScale() {
+    private fun requireExpectedFontScale(
+        evidenceStage: String,
+    ) {
+        val expectedFontScale = InstrumentationRegistry
+            .getArguments()
+            .getString(EXPECTED_FONT_SCALE_ARGUMENT)
+            ?.toFloatOrNull()
+            ?: BASELINE_FONT_SCALE
+
+        val requiredFontScale =
+            if (evidenceStage == MAXIMUM_FONT_SCALE_STAGE) {
+                MAXIMUM_FONT_SCALE
+            } else {
+                BASELINE_FONT_SCALE
+            }
+
+        check(
+            abs(expectedFontScale - requiredFontScale) <
+                FONT_SCALE_TOLERANCE,
+        ) {
+            "Visual calibration stage '$evidenceStage' requires " +
+                "fontScale=$requiredFontScale, but the requested " +
+                "fontScale is $expectedFontScale."
+        }
+
         val configuration = InstrumentationRegistry
             .getInstrumentation()
             .targetContext
             .resources
             .configuration
 
-        check(configuration.fontScale == BASELINE_FONT_SCALE) {
-            "Visual calibration requires fontScale=$BASELINE_FONT_SCALE, " +
+        check(
+            abs(configuration.fontScale - expectedFontScale) <
+                FONT_SCALE_TOLERANCE,
+        ) {
+            "Visual calibration requires fontScale=$expectedFontScale, " +
                 "but the device reports fontScale=${configuration.fontScale}."
         }
     }
@@ -561,10 +589,17 @@ class VisualIdentityCalibrationFixtureTest {
         const val ENVIRONMENT_FILE_NAME = "environment.txt"
         const val PNG_QUALITY = 100
         const val BASELINE_FONT_SCALE = 1.0f
+        const val MAXIMUM_FONT_SCALE = 2.0f
+        const val FONT_SCALE_TOLERANCE = 0.001f
 
         const val CAPTURE_ENABLED_ARGUMENT = "visualIdentityCalibration"
         const val EVIDENCE_STAGE_ARGUMENT = "visualIdentityStage"
         const val SOURCE_REF_ARGUMENT = "visualIdentitySourceRef"
+        const val EXPECTED_FONT_SCALE_ARGUMENT =
+            "visualIdentityExpectedFontScale"
+
+        const val MAXIMUM_FONT_SCALE_STAGE =
+            "typography-max-font-scale"
 
         val EVIDENCE_STAGE_PATTERN = Regex("[a-z0-9]+(?:-[a-z0-9]+)*")
     }
