@@ -781,6 +781,64 @@ typography calibration. It must:
 
 No production typography token is changed by introducing this fixture.
 
+### Supplementary Typography Evidence
+
+The supplementary SSH Saved Command Selector fixture was captured from immutable
+fixture source commit:
+
+```text
+31e9639fdbdabec3a6b2c26ae868186cff48d74a
+```
+
+Capture environment:
+
+```text
+Device / AVD:   Leannect_API_36 / Google sdk_gphone64_x86_64
+Android API:    36
+Resolution:     1080 × 2424 px
+Density:        420 dpi
+Font scale:     1.0
+Dynamic color:  Disabled
+```
+
+Evidence:
+
+| Capture | SHA-256 |
+|---|---|
+| `F04-light-saved-command-selector.png` | `a40e893ff8cb5cdb161c0c3bb757218e7c8673aad1633a9e6d96921df1ef4e48` |
+| `F04-dark-saved-command-selector.png` | `fda52cebd3ec71efac8f84d5988af6224c1a5bb5278a62d6c7d2e951154e63e3` |
+| `environment.txt` | `527c4660438a11a42f0c5a811d06597ad8e64b4093699a9933cfb3eda9267c36` |
+
+Observed in both Light and Dark evidence:
+
+- inherited `titleSmall` remains readable without clipping, truncation, or
+  problematic line-height behavior;
+- saved-command names remain visually distinct from their machine-oriented
+  command values;
+- the existing command-only `FontFamily.Monospace` override provides useful
+  machine-content differentiation without implying a global monospace system;
+- no repeated hierarchy, density, or readability problem is demonstrated by the
+  supplementary fixture;
+- no typography token candidate is justified from font-scale-`1.0` evidence.
+
+The selector heading and saved-command item names both consume `titleSmall`.
+Changing the global `titleSmall` token would therefore preserve their relative
+visual hierarchy. Any future requirement to differentiate those two semantic
+levels would be a component-level role-assignment concern rather than evidence
+for changing the global `titleSmall` token.
+
+Current font-scale-`1.0` disposition:
+
+```text
+Project-defined typography tokens:  No candidate change
+Inherited titleSmall:               Retain pending maximum-font-scale check
+Local command monospace:            Retain
+Production typography change:       None
+```
+
+Typography remains open until the required maximum-font-scale usability check
+is completed.
+
 ### Maximum-Font-Scale Requirement
 
 The current canonical capture harness intentionally requires font scale `1.0`.
