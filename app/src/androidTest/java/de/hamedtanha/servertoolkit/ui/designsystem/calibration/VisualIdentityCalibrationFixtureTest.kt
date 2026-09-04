@@ -10,7 +10,9 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.asAndroidBitmap
 import androidx.compose.ui.test.captureToImage
 import androidx.compose.ui.test.junit4.createComposeRule
+import androidx.compose.ui.test.onNodeWithTag
 import androidx.compose.ui.test.onRoot
+import androidx.compose.ui.test.performScrollTo
 import androidx.test.ext.junit.runners.AndroidJUnit4
 import androidx.test.platform.app.InstrumentationRegistry
 import de.hamedtanha.servertoolkit.feature.dashboard.presentation.screen.DashboardScreen
@@ -24,10 +26,12 @@ import de.hamedtanha.servertoolkit.feature.serverinventory.presentation.screen.S
 import de.hamedtanha.servertoolkit.feature.serverinventory.presentation.screen.ServerInventoryScreen
 import de.hamedtanha.servertoolkit.feature.serverinventory.presentation.state.ServerFormUiState
 import de.hamedtanha.servertoolkit.feature.serverinventory.presentation.state.ServerInventoryUiState
+import de.hamedtanha.servertoolkit.feature.ssh.presentation.screen.SSH_SAVED_COMMAND_SELECTOR_TEST_TAG
 import de.hamedtanha.servertoolkit.feature.ssh.presentation.screen.SshScreen
 import de.hamedtanha.servertoolkit.feature.ssh.presentation.state.SshCommandExecutionStatus
 import de.hamedtanha.servertoolkit.feature.ssh.presentation.state.SshCommandExecutionUiState
 import de.hamedtanha.servertoolkit.feature.ssh.presentation.state.SshConnectionStatus
+import de.hamedtanha.servertoolkit.feature.ssh.presentation.state.SshSavedCommandSelectorUiState
 import de.hamedtanha.servertoolkit.feature.ssh.presentation.state.SshUiState
 import de.hamedtanha.servertoolkit.ui.designsystem.theme.DefaultServerToolkitVisualProfile
 import de.hamedtanha.servertoolkit.ui.designsystem.theme.ServerToolkitTheme
@@ -104,6 +108,22 @@ class VisualIdentityCalibrationFixtureTest {
         captureSsh(
             darkTheme = true,
             fileName = "F04-dark.png",
+        )
+    }
+
+    @Test
+    fun captureF04SavedCommandSelectorLight() {
+        captureSshSavedCommandSelector(
+            darkTheme = false,
+            fileName = "F04-light-saved-command-selector.png",
+        )
+    }
+
+    @Test
+    fun captureF04SavedCommandSelectorDark() {
+        captureSshSavedCommandSelector(
+            darkTheme = true,
+            fileName = "F04-dark-saved-command-selector.png",
         )
     }
 
@@ -217,6 +237,42 @@ class VisualIdentityCalibrationFixtureTest {
         }
 
         captureRoot(fileName)
+    }
+
+    private fun captureSshSavedCommandSelector(
+        darkTheme: Boolean,
+        fileName: String,
+    ) {
+        setFixtureContent(darkTheme = darkTheme) {
+            SshScreen(
+                uiState = calibrationSshUiState(
+                    savedCommandSelector = SshSavedCommandSelectorUiState.Content(
+                        commands = calibrationSavedCommands(),
+                    ),
+                ),
+                onAuthenticationMethodSelect = {},
+                onPrivateKeySelectClick = {},
+                onConnectClick = {},
+                onDisconnectClick = {},
+                onConfirmHostKeyClick = {},
+                onCancelHostKeyReviewClick = {},
+                onPasswordChange = {},
+                onPrivateKeyPassphraseChange = {},
+                onCommandChange = {},
+                onOpenSavedCommandSelector = {},
+                onRetrySavedCommandSelector = {},
+                onCancelSavedCommandSelector = {},
+                onSavedCommandSelect = {},
+                onExecuteCommandClick = {},
+                onOpenConnectionHistory = {},
+                onNavigateBack = {},
+            )
+        }
+
+        captureTaggedNode(
+            tag = SSH_SAVED_COMMAND_SELECTOR_TEST_TAG,
+            fileName = fileName,
+        )
     }
 
     private fun captureSavedCommands(
@@ -339,6 +395,34 @@ class VisualIdentityCalibrationFixtureTest {
             .captureToImage()
             .asAndroidBitmap()
 
+        writeEvidenceBitmap(
+            bitmap = bitmap,
+            fileName = fileName,
+        )
+    }
+
+    private fun captureTaggedNode(
+        tag: String,
+        fileName: String,
+    ) {
+        composeTestRule.waitForIdle()
+
+        val bitmap = composeTestRule
+            .onNodeWithTag(tag)
+            .performScrollTo()
+            .captureToImage()
+            .asAndroidBitmap()
+
+        writeEvidenceBitmap(
+            bitmap = bitmap,
+            fileName = fileName,
+        )
+    }
+
+    private fun writeEvidenceBitmap(
+        bitmap: Bitmap,
+        fileName: String,
+    ) {
         val directory = evidenceDirectory()
         val outputFile = File(directory, fileName)
 
@@ -448,7 +532,10 @@ class VisualIdentityCalibrationFixtureTest {
         )
     }
 
-    private fun calibrationSshUiState(): SshUiState {
+    private fun calibrationSshUiState(
+        savedCommandSelector: SshSavedCommandSelectorUiState =
+            SshSavedCommandSelectorUiState.Hidden,
+    ): SshUiState {
         return SshUiState(
             serverId = "server-prod-01",
             status = SshConnectionStatus.Connected,
@@ -465,6 +552,7 @@ class VisualIdentityCalibrationFixtureTest {
                 stderr = "",
                 exitStatus = 0,
             ),
+            savedCommandSelector = savedCommandSelector,
         )
     }
 
