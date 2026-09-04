@@ -648,6 +648,150 @@ Completed — all assessed color families retained; integrated validation pendin
 
 ## Typography Derivation Record
 
+### Usage Inventory
+
+The production typography inventory was measured from:
+
+```text
+Server Toolkit commit:
+7258c0b43adbc6fee6c5fd2b7c1fc1e34a03e493
+
+Type.kt SHA-256:
+b25a3bec63b4c7e0dc14bc79fb3abd8c7eaf7b908d354db24fe2fc3074bc34d1
+
+Compose BOM:
+2026.02.01
+```
+
+The production-source scan found 64 explicit
+`MaterialTheme.typography.<role>` references.
+
+| Role | Explicit references | Resolution | Current size / line height | Core fixture coverage |
+|---|---:|---|---|---|
+| `headlineMedium` | 1 | Project-defined | `28 / 34 sp` | F01 |
+| `titleLarge` | 6 | Project-defined | `22 / 28 sp` | F02, F03, F04, F05 |
+| `titleMedium` | 9 | Project-defined | `16 / 22 sp` | F01, F02, F04, F05 |
+| `titleSmall` | 2 | Inherited Material 3 | `14 / 20 sp` | Not exercised by the core baseline |
+| `bodyLarge` | 0 | Project-defined | `16 / 24 sp` | No explicit feature reference |
+| `bodyMedium` | 26 | Project-defined | `14 / 20 sp` | F01, F02, F03, F04, F05 |
+| `bodySmall` | 18 | Project-defined | `12 / 16 sp` | F02, F04 |
+| `labelLarge` | 0 | Project-defined | `14 / 20 sp` | No explicit feature reference |
+| `labelMedium` | 2 | Project-defined | `12 / 16 sp` | F04 |
+
+The explicit source scan found no references to:
+
+```text
+displayLarge
+displayMedium
+displaySmall
+headlineLarge
+headlineSmall
+labelSmall
+```
+
+Those roles remain inherited from the Material 3 `Typography` defaults.
+
+Explicit feature-source counts do not represent all runtime typography
+consumption. Material 3 components may consume theme typography internally, so
+a zero explicit-reference count does not prove that a role has no runtime
+effect.
+
+Material 3 permits applications to customize only the typography roles they
+need while allowing omitted roles to retain the library defaults. Inherited
+roles are therefore not classified as defects solely because they are not
+redeclared in `Type.kt`.
+
+### Material 3 Reference Comparison
+
+The Android Material 3 reference scale records these corresponding default
+font-size / line-height pairs:
+
+| Role | Server Toolkit | Material 3 reference |
+|---|---|---|
+| `headlineMedium` | `28 / 34 sp` | `28 / 36 sp` |
+| `titleLarge` | `22 / 28 sp` | `22 / 28 sp` |
+| `titleMedium` | `16 / 22 sp` | `16 / 24 sp` |
+| `titleSmall` | inherited `14 / 20 sp` | `14 / 20 sp` |
+| `bodyLarge` | `16 / 24 sp` | `16 / 24 sp` |
+| `bodyMedium` | `14 / 20 sp` | `14 / 20 sp` |
+| `bodySmall` | `12 / 16 sp` | `12 / 16 sp` |
+| `labelLarge` | `14 / 20 sp` | `14 / 20 sp` |
+| `labelMedium` | `12 / 16 sp` | `12 / 16 sp` |
+
+The current `headlineMedium` and `titleMedium` line heights are slightly more
+compact than the Material 3 reference scale. The project-defined headline and
+title roles also use stronger weights to support the documented compact,
+professional hierarchy.
+
+These differences are measurements, not change triggers. The calibration rule
+still requires a repeated hierarchy, density, readability, or usability problem
+before a global typography token may change.
+
+### Local Typography Declaration Audit
+
+The source scan found one direct typography declaration outside `Type.kt`:
+
+```text
+SshSavedCommandSelectorContent.kt
+command.command
+→ MaterialTheme.typography.bodyMedium
+→ FontFamily.Monospace
+```
+
+This declaration is intentionally local to machine-oriented command content and
+is consistent with the design-system rule that monospace may be used selectively
+for concrete machine-oriented values or command content.
+
+It does not justify global monospace typography and is not currently a
+calibration candidate.
+
+### Supplementary Coverage Requirement
+
+The two explicit `titleSmall` references occur in
+`SshSavedCommandSelectorContent`:
+
+- the `Saved commands` selector heading;
+- each saved-command item name.
+
+The fixed F04 SSH baseline uses an `SshUiState` whose saved-command selector is
+`Hidden`. The current ten canonical baseline captures therefore do not
+meaningfully exercise `titleSmall`.
+
+This satisfies the existing supplementary-fixture admission rule:
+
+```text
+Token / semantic role is used in production
++
+core fixed fixtures do not meaningfully exercise it
+→ supplementary calibration fixture justified
+```
+
+A supplementary SSH Saved Command Selector fixture may therefore be added for
+typography calibration. It must:
+
+- use the existing `SshScreen`;
+- construct deterministic `SshUiState`;
+- use `SshSavedCommandSelectorUiState.Content`;
+- reuse the existing deterministic saved-command data;
+- preserve all production behavior and screen structure;
+- exercise `titleSmall`, `bodyMedium`, and the existing command-only monospace
+  override;
+- capture Light and Dark evidence at font scale `1.0`;
+- remain test-only under `androidTest`.
+
+No production typography token is changed by introducing this fixture.
+
+### Maximum-Font-Scale Requirement
+
+The current canonical capture harness intentionally requires font scale `1.0`.
+
+Typography calibration also requires a separate maximum-font-scale usability
+check. This check is not a pixel-diff baseline and must not replace or mutate the
+canonical font-scale-`1.0` evidence.
+
+The maximum-font-scale check remains pending until the supplementary role
+coverage is established.
+
 For each typography candidate record:
 
 1. roles exercised by fixtures;
@@ -659,13 +803,14 @@ For each typography candidate record:
 7. maximum-font-scale usability check;
 8. decision.
 
-Global monospace typography is out of scope unless separate component-level
+Global monospace typography remains out of scope unless separate component-level
 evidence justifies it.
 
 Status:
 
 ```text
-Not started
+Usage inventory recorded; supplementary titleSmall coverage and
+maximum-font-scale usability validation pending; no token candidate proposed
 ```
 
 ---
@@ -730,7 +875,7 @@ Capture environment:   Recorded
 Baseline evidence:     Captured and initial review recorded
 
 Color:                 Completed; all assessed families retained
-Typography:            Not started
+Typography:            Usage inventory recorded; supplementary coverage pending
 Shape:                 Not started
 Spacing:               No calibration justified at review start
 
