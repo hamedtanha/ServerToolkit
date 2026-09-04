@@ -847,8 +847,76 @@ Typography calibration also requires a separate maximum-font-scale usability
 check. This check is not a pixel-diff baseline and must not replace or mutate the
 canonical font-scale-`1.0` evidence.
 
-The maximum-font-scale check remains pending until the supplementary role
-coverage is established.
+### Maximum-Font-Scale Evidence
+
+Maximum-font-scale evidence was captured from immutable fixture source commit:
+
+```text
+070bd92738c2c1e006204a1959f999f8d54f3cae
+```
+
+Capture environment:
+
+```text
+Device / AVD:   Leannect_API_36 / Google sdk_gphone64_x86_64
+Android API:    36
+Resolution:     1080 × 2424 px
+Density:        420 dpi
+Font scale:     2.0
+Dynamic color:  Disabled
+```
+
+The `typography-max-font-scale` evidence stage contains fourteen captures:
+
+```text
+F01-light.png
+F01-dark.png
+F02-light.png
+F02-dark.png
+F03-light.png
+F03-dark.png
+F04-light.png
+F04-dark.png
+F04-light-bottom.png
+F04-dark-bottom.png
+F04-light-saved-command-selector.png
+F04-dark-saved-command-selector.png
+F05-light.png
+F05-dark.png
+```
+
+Observed results:
+
+- F01 Dashboard: pass;
+- F02 Server Inventory: fail due to responsive card-layout compression under
+  constrained horizontal space;
+- F03 Server Form: pass;
+- F04 SSH top viewport: pass;
+- F04 SSH bottom viewport: pass;
+- F04 Saved Command Selector: pass;
+- F05 Saved Commands: pass.
+
+The additional F04 bottom-of-scroll Light and Dark captures confirm that the
+lower SSH content remains reachable and usable at `fontScale=2.0`. In both
+themes, `Connection history` and `Back` remain fully visible and readable, and
+the lower command-execution status content remains usable without typography
+clipping.
+
+The F02 failure is not evidence for a design-system typography token change.
+It is a screen-level responsive layout defect in Server Inventory and must be
+handled independently from typography calibration. That follow-up is tracked by
+GitHub Issue #161.
+
+Maximum-font-scale typography conclusion:
+
+```text
+Project-defined typography tokens: RETAIN
+Inherited titleSmall:             RETAIN
+Local command monospace:          RETAIN
+Production Type.kt change:        NONE
+Maximum-font-scale typography:    PASS
+Independent F02 layout defect:    Tracked separately
+```
 
 For each typography candidate record:
 
@@ -867,8 +935,8 @@ evidence justifies it.
 Status:
 
 ```text
-Usage inventory recorded; supplementary titleSmall coverage and
-maximum-font-scale usability validation pending; no token candidate proposed
+Completed — typography retained with no token changes; maximum-font-scale
+validation passed; independent F02 responsive-layout defect tracked separately
 ```
 
 ---
@@ -933,7 +1001,7 @@ Capture environment:   Recorded
 Baseline evidence:     Captured and initial review recorded
 
 Color:                 Completed; all assessed families retained
-Typography:            Usage inventory recorded; supplementary coverage pending
+Typography:            Completed; retained with no token changes
 Shape:                 Not started
 Spacing:               No calibration justified at review start
 

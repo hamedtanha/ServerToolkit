@@ -1,0 +1,10 @@
+evidenceStage=typography-max-font-scale
+fixtureSourceRef=070bd92738c2c1e006204a1959f999f8d54f3cae
+manufacturer=Google
+model=sdk_gphone64_x86_64
+api=36
+widthPixels=1080
+heightPixels=2424
+densityDpi=420
+fontScale=2.0
+dynamicColorPolicy=Disabled
