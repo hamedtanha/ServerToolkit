@@ -2,7 +2,7 @@
 
 **Project:** Server Toolkit  
 **Status:** Active  
-**Last Updated:** 2026-08-11
+**Last Updated:** 2026-09-04
 
 ---
 
@@ -56,8 +56,8 @@ Android version metadata is release metadata, not a dependency version. It is in
 | Kotlin JVM toolchain | `17` | `app/build.gradle.kts` |
 | CI launcher JDK | Temurin `17` | `.github/workflows/android-validation.yml` |
 | Gradle daemon JVM criteria | `21` | `gradle/gradle-daemon-jvm.properties` |
-| Gradle Wrapper | `9.5.0` | `gradle/wrapper/gradle-wrapper.properties` |
-| Android Gradle Plugin | `9.3.1` | `gradle/libs.versions.toml` |
+| Gradle Wrapper | `9.6.1` | `gradle/wrapper/gradle-wrapper.properties` |
+| Android Gradle Plugin | `9.4.0` | `gradle/libs.versions.toml` |
 | Kotlin | `2.4.10` | `gradle/libs.versions.toml` |
 | KSP | `2.3.10` | `gradle/libs.versions.toml` |
 
@@ -67,7 +67,7 @@ Java source compatibility, Java target compatibility, and the Kotlin JVM toolcha
 
 CI installs Temurin `17` as the launcher JDK. The repository separately pins Gradle daemon JVM criteria to Java `21` through `gradle/gradle-daemon-jvm.properties`. The daemon runtime is distinct from the application compilation target.
 
-Gradle `9.5.0`, Android Gradle Plugin `9.3.1`, Kotlin `2.4.10`, and KSP `2.3.10` form the implemented core build compatibility cluster.
+Gradle `9.6.1`, Android Gradle Plugin `9.4.0`, Kotlin `2.4.10`, and KSP `2.3.10` form the implemented core build compatibility cluster.
 
 No further Java, Gradle, Android Gradle Plugin, Kotlin, or KSP upgrade is accepted merely because a newer release exists.
 
@@ -196,7 +196,20 @@ Local SDK installation paths, workstation-specific environment variables, creden
 
 ## Current Upgrade Decisions
 
-The core Android build compatibility cluster was updated on 2026-07-16:
+The core Android build compatibility cluster was updated on 2026-09-04:
+
+- Gradle Wrapper `9.5.0 → 9.6.1`;
+- Android Gradle Plugin `9.3.1 → 9.4.0`;
+- Kotlin `2.4.10` retained;
+- KSP `2.3.10` retained.
+
+Java source compatibility, Java target compatibility, and the Kotlin JVM
+toolchain remain on Java `17`. Gradle daemon JVM criteria remain on Java `21`.
+Android compile SDK, target SDK, minimum SDK, Build Tools, NDK, and application
+version metadata are unchanged by this update.
+
+The previous core Android build compatibility cluster update was completed on
+2026-07-16:
 
 - Gradle Wrapper `9.4.1 → 9.5.0`;
 - Android Gradle Plugin `9.2.1 → 9.3.0`;
@@ -213,7 +226,7 @@ The update also:
 - aligned tracked IDE language and bytecode metadata with Java `17`;
 - made the heterogeneous SQLite migration-test bind array explicitly `Array<Any?>` for Kotlin `2.4.10` compatibility without changing migration behavior.
 
-The upgrade requires clean local validation, release-signing validation mode, GitHub Actions validation, and documentation synchronization before merge.
+Core build-cluster upgrades require clean local validation, release-signing validation mode, GitHub Actions validation, and documentation synchronization before merge.
 
 Potential versions discovered by IDE suggestions, dependency reports, or automated tools remain proposals until reviewed, implemented, validated, documented, and merged.
 

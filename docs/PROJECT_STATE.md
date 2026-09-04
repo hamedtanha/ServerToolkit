@@ -3,7 +3,7 @@
 **Project:** Server Toolkit
 **Version:** 0.4.0
 **Status:** Released
-**Last Updated:** 2026-08-12
+**Last Updated:** 2026-09-04
 
 ---
 
@@ -172,7 +172,7 @@ The implemented baseline is documented in [Build Toolchain Status](state/BUILD_T
 
 - Java source compatibility, Java target compatibility, and the Kotlin JVM toolchain remain aligned on Java `17`.
 - CI uses Temurin `17` as the launcher JDK; repository-controlled Gradle daemon JVM criteria remain on Java `21`.
-- The implemented compatibility cluster is Gradle `9.5.0`, Android Gradle Plugin `9.3.1`, Kotlin `2.4.10`, and KSP `2.3.10`.
+- The implemented compatibility cluster is Gradle `9.6.1`, Android Gradle Plugin `9.4.0`, Kotlin `2.4.10`, and KSP `2.3.10`.
 - Gradle, Android Gradle Plugin, Kotlin, and KSP are reviewed as a compatibility cluster.
 - Android Build Tools and NDK declarations used by release workflows remain synchronized with scripts and documentation.
 - The pinned NDK remains required while release verification depends on its matching `llvm-strip`.
@@ -226,7 +226,7 @@ The following items are intentionally not implemented:
 - Xray, x-ui, Docker, Kubernetes, certificate-authority, cloud-provider, or another named integration.
 - A public plugin framework.
 - Room migrations beyond database version `5`.
-- Toolchain upgrades beyond the currently recorded Gradle `9.5.0`, Android Gradle Plugin `9.3.1`, Kotlin `2.4.10`, and KSP `2.3.10` baseline.
+- Toolchain upgrades beyond the currently recorded Gradle `9.6.1`, Android Gradle Plugin `9.4.0`, Kotlin `2.4.10`, and KSP `2.3.10` baseline.
 
 ---
 
