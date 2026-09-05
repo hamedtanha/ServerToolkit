@@ -114,7 +114,11 @@ private fun PublicKey.toObservedHostKey(request: SshConnectionRequest): SshObser
             host = request.host,
             port = request.port,
         ),
-        fingerprint = toSshjHostKeyFingerprint(),
+        fingerprint = toOpenSshSha256Fingerprint(),
+        legacyFingerprints = setOf(
+            toLegacySshjMd5Fingerprint(),
+            toLegacyJavaEncodedSha256Fingerprint(),
+        ),
     )
 }
 
