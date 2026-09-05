@@ -7,12 +7,19 @@ import de.hamedtanha.servertoolkit.feature.ssh.domain.service.SshSessionLifecycl
 class FakeSshSessionLifecycleService(
     var result: SshSessionCloseResult = SshSessionCloseResult.Closed,
     private val onClose: suspend (SshSessionHandle) -> Unit = {},
+    private val onAbandon: (SshSessionHandle) -> Unit = {},
 ) : SshSessionLifecycleService {
 
     var closeCallCount: Int = 0
         private set
 
     var lastSessionHandle: SshSessionHandle? = null
+        private set
+
+    var abandonCallCount: Int = 0
+        private set
+
+    var lastAbandonedSessionHandle: SshSessionHandle? = null
         private set
 
     override suspend fun close(
@@ -22,5 +29,11 @@ class FakeSshSessionLifecycleService(
         lastSessionHandle = sessionHandle
         onClose(sessionHandle)
         return result
+    }
+
+    override fun abandon(sessionHandle: SshSessionHandle) {
+        abandonCallCount += 1
+        lastAbandonedSessionHandle = sessionHandle
+        onAbandon(sessionHandle)
     }
 }

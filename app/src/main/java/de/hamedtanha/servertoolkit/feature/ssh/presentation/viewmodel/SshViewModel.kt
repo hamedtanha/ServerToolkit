@@ -60,6 +60,8 @@ class SshViewModel @Inject constructor(
 
     private var isSessionCloseInProgress: Boolean = false
 
+    private var isWorkflowOwnerCleared: Boolean = false
+
     private var savedCommandObservationJob: Job? = null
 
     private var activeSessionHandle: SshSessionHandle? = null
@@ -326,52 +328,60 @@ class SshViewModel @Inject constructor(
                 }
 
                 SshSessionCloseResult.Failed -> {
-                    activeSessionHandle = sessionHandle
+                    if (isWorkflowOwnerCleared) {
+                        sessionLifecycleService.abandon(sessionHandle)
+                    } else {
+                        activeSessionHandle = sessionHandle
 
-                    _uiState.value = _uiState.value.copy(
-                        status = SshConnectionStatus.Connected,
-                        statusLabel = "Connected",
-                        message = when (intent) {
-                            SshSessionCloseIntent.WorkflowExit ->
-                                "SSH session could not be closed."
+                        _uiState.value = _uiState.value.copy(
+                            status = SshConnectionStatus.Connected,
+                            statusLabel = "Connected",
+                            message = when (intent) {
+                                SshSessionCloseIntent.WorkflowExit ->
+                                    "SSH session could not be closed."
 
-                            SshSessionCloseIntent.UserRequest ->
-                                "SSH session could not be disconnected."
-                        },
-                        detail = when (intent) {
-                            SshSessionCloseIntent.WorkflowExit ->
-                                "Leaving the workflow was cancelled. Try again to retry cleanup."
+                                SshSessionCloseIntent.UserRequest ->
+                                    "SSH session could not be disconnected."
+                            },
+                            detail = when (intent) {
+                                SshSessionCloseIntent.WorkflowExit ->
+                                    "Leaving the workflow was cancelled. Try again to retry cleanup."
 
-                            SshSessionCloseIntent.UserRequest ->
-                                "The active session was preserved. Try disconnecting again."
-                        },
-                        commandExecution = commandExecutionBeforeClose,
-                    )
+                                SshSessionCloseIntent.UserRequest ->
+                                    "The active session was preserved. Try disconnecting again."
+                            },
+                            commandExecution = commandExecutionBeforeClose,
+                        )
+                    }
                     false
                 }
             }
         } catch (error: CancellationException) {
-            activeSessionHandle = sessionHandle
+            if (isWorkflowOwnerCleared) {
+                sessionLifecycleService.abandon(sessionHandle)
+            } else {
+                activeSessionHandle = sessionHandle
 
-            _uiState.value = _uiState.value.copy(
-                status = SshConnectionStatus.Connected,
-                statusLabel = "Connected",
-                message = when (intent) {
-                    SshSessionCloseIntent.WorkflowExit ->
-                        "SSH session cleanup was cancelled."
+                _uiState.value = _uiState.value.copy(
+                    status = SshConnectionStatus.Connected,
+                    statusLabel = "Connected",
+                    message = when (intent) {
+                        SshSessionCloseIntent.WorkflowExit ->
+                            "SSH session cleanup was cancelled."
 
-                    SshSessionCloseIntent.UserRequest ->
-                        "SSH disconnect was cancelled."
-                },
-                detail = when (intent) {
-                    SshSessionCloseIntent.WorkflowExit ->
-                        "The workflow remains active so session cleanup can be retried."
+                        SshSessionCloseIntent.UserRequest ->
+                            "SSH disconnect was cancelled."
+                    },
+                    detail = when (intent) {
+                        SshSessionCloseIntent.WorkflowExit ->
+                            "The workflow remains active so session cleanup can be retried."
 
-                    SshSessionCloseIntent.UserRequest ->
-                        "The active session was preserved so disconnect can be retried."
-                },
-                commandExecution = commandExecutionBeforeClose,
-            )
+                        SshSessionCloseIntent.UserRequest ->
+                            "The active session was preserved so disconnect can be retried."
+                    },
+                    commandExecution = commandExecutionBeforeClose,
+                )
+            }
 
             throw error
         } finally {
@@ -646,9 +656,19 @@ class SshViewModel @Inject constructor(
     }
 
     override fun onCleared() {
+        isWorkflowOwnerCleared = true
+
+        val sessionHandle = activeSessionHandle
+        activeSessionHandle = null
+
         savedCommandObservationJob?.cancel()
         savedCommandObservationJob = null
         clearAuthenticationInputState()
+
+        if (sessionHandle != null) {
+            sessionLifecycleService.abandon(sessionHandle)
+        }
+
         super.onCleared()
     }
 

@@ -26,7 +26,7 @@ The ADR-013 ephemeral private-key workflow is implemented end to end. The implem
 
 Automated JVM coverage, Android runtime verification, full unit tests, lint, and debug-build validation are complete. Verified private-key support is intentionally restricted to the documented format matrix below.
 
-The current connection/session, command-execution, and host-trust hardening state incorporates the focused F01/F02/F03 corrections from architecture review `RA-2026.09-v1`: cancellation-safe connected-session handoff, concurrent bounded command-output draining under a complete-operation deadline, and OpenSSH-compatible SHA-256 host-key fingerprints for new observation and trust. Historical SSHJ MD5 and Java-encoded SHA-256 trusted-host records remain verifiable through explicit scheme-aware compatibility without silent rewrite or schema migration.
+The current connection/session, command-execution, and host-trust hardening state incorporates the focused F01/F02/F03/F04 corrections from architecture review `RA-2026.09-v1`: cancellation-safe connected-session handoff, concurrent bounded command-output draining under a complete-operation deadline, OpenSSH-compatible SHA-256 host-key fingerprints for new observation and trust, and terminal workflow-owner destruction cleanup that releases an active session even when normal route-exit callbacks are bypassed. Historical SSHJ MD5 and Java-encoded SHA-256 trusted-host records remain verifiable through explicit scheme-aware compatibility without silent rewrite or schema migration.
 
 Persistent credentials, terminal UI, Saved Command automation, background monitoring, and Xray or x-ui management remain intentionally out of scope.
 
@@ -222,9 +222,13 @@ The Android runtime verification also confirmed:
 - Workflow exit and explicit disconnect blocking during connection and command execution.
 - Explicit disconnect presentation with reconnect support after successful cleanup.
 - Deterministic `Closed`, `NotFound`, `Failed`, and cancellation handling.
-- Active-session restoration and cleanup retry after close failure.
+- Active-session restoration and cleanup retry after close failure while the workflow owner remains alive.
+- Terminal workflow-owner destruction transfers any still-owned active session to non-blocking abandonment cleanup outside the cleared ViewModel scope.
+- Abandonment removes unreachable registry ownership before best-effort concrete SSHJ cleanup, so a dead workflow cannot leave a retry-only owner behind.
+- A close already in progress is not duplicated during owner destruction; if that close fails after the workflow owner has been cleared, the retained handle is transferred to abandonment cleanup instead of being restored to dead presentation state.
+- Ordinary Compose disposal remains authentication-input cleanup only, and configuration recreation does not itself trigger terminal session abandonment.
 - Stale command output clearing after successful cleanup.
-- IO-dispatched SSHJ cleanup inside a non-cancellable cleanup context.
+- IO-dispatched SSHJ cleanup inside a non-cancellable cleanup context for awaited close operations, with a singleton process-lifetime cleanup scope used only for terminal abandonment.
 
 ### Command Execution
 
@@ -312,6 +316,11 @@ The Android runtime verification also confirmed:
 - Manual Android runtime verification of workflow-exit cleanup, explicit disconnect, reconnection, and crash-free execution.
 - Full compilation, Android-test compilation, unit-test, lint, and debug-assembly quality gate after explicit disconnect implementation.
 - Full compilation, Android-test compilation, unit-test, lint, debug-app assembly, and debug-test assembly quality gate after F02 command-I/O hardening.
+- Deterministic ViewModel-owner destruction coverage verifies one-time session abandonment, no concurrent double-close while ordinary cleanup is already active, and fallback abandonment after a close failure races with permanent owner clearing.
+- Data-layer abandonment coverage verifies unreachable registry ownership is removed before concrete cleanup waits on an active command owner boundary.
+- Android 16 / API 36 device reproduction verified F04 on the pre-fix baseline by replacing the active workflow owner while preserving the application PID and observing the exact attributed SSH tuple survive.
+- The same controlled Android 16 / API 36 lifecycle pass on implementation commit `c366c6a856bdeb6a8e03ee1c3bbc09564616dee8`, recorded under Issue `#179`, verified the fix: the old Activity record was removed, the PID remained unchanged, and the exact attributed SSH tuple disappeared (`F04_FIX_VERIFIED`).
+- Android Validation run `#165` passed on the synchronized F04 implementation head before this documentation-only follow-up.
 
 ---
 

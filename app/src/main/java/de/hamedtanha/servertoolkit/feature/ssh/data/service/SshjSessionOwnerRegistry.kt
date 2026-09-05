@@ -68,11 +68,12 @@ class SshjSessionOwnerRegistry @Inject constructor() {
     }
 
     /**
-     * Removes an undelivered owner from application ownership before best-effort resource cleanup.
+     * Removes an owner with no retry-capable workflow before best-effort resource cleanup.
      *
-     * Normal [close] intentionally keeps a failed owner registered so the workflow can retry. An
-     * undelivered session has no workflow owner that can retry, so retaining it would create an
-     * orphaned registry entry. Cleanup failure is therefore suppressed after ownership is removed.
+     * Normal [close] intentionally keeps a failed owner registered so a live workflow can retry.
+     * Undelivered sessions and sessions abandoned after permanent workflow-owner destruction have
+     * no such retry path, so retaining either would create an orphaned registry entry. Cleanup
+     * failure is therefore suppressed after ownership is removed.
      */
     internal fun discard(sessionHandle: SshSessionHandle) {
         val owner = synchronized(this) {
