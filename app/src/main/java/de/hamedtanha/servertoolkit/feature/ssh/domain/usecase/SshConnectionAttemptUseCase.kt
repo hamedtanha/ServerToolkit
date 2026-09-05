@@ -69,7 +69,7 @@ class SshConnectionAttemptUseCase @Inject constructor(
         var resolvedTarget: RemoteConnectionTarget? = null
         var pendingSessionHandle: SshSessionHandle? = null
 
-        fun discardPendingConnectedSession() {
+        suspend fun discardPendingConnectedSession() {
             val sessionHandle = pendingSessionHandle ?: return
             pendingSessionHandle = null
 
