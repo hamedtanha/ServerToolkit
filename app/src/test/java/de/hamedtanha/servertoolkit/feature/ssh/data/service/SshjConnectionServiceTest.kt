@@ -194,6 +194,11 @@ class SshjConnectionServiceTest {
     fun `cancellation remains primary when undelivered session cleanup fails`() = runBlocking {
         val registry = SshjSessionOwnerRegistry()
         val executor = FakeTrustedConnectionExecutor(
+            onBeforeConnectedResult = {
+                currentCoroutineContext().cancel(
+                    CancellationException("primary cancellation"),
+                )
+            },
             ownerCloseError = IllegalStateException("simulated cleanup failure"),
         )
         val service = sshjConnectionService(
@@ -201,10 +206,9 @@ class SshjConnectionServiceTest {
             trustedConnectionExecutor = executor,
             sessionOwnerRegistry = registry,
         )
-        val callerDispatcher = QueueingDispatcher()
         var observedCancellation: CancellationException? = null
 
-        val job = launch(callerDispatcher) {
+        val job = launch {
             try {
                 service.connect(connectionRequest())
                 fail("Expected CancellationException")
@@ -212,14 +216,7 @@ class SshjConnectionServiceTest {
                 observedCancellation = error
             }
         }
-
-        callerDispatcher.runNext()
-        awaitCondition("Expected session registration before caller resumption") {
-            registry.contains(executor.ownerHandle)
-        }
-
-        job.cancel(CancellationException("primary cancellation"))
-        callerDispatcher.runUntil { job.isCompleted }
+        job.join()
 
         assertEquals("primary cancellation", observedCancellation?.message)
         assertTrue(executor.ownerCloseAttempted)
