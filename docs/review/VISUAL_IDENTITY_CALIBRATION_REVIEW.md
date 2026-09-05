@@ -1159,8 +1159,43 @@ Shape:                 Completed; retained with no token changes
 Spacing:               Completed; scale retained with no token changes
 
 Integrated validation: Completed; Light/Dark PASS
-Accepted baseline:     Pending final documentation and scope audit
+Accepted baseline:     ACCEPTED
 ```
+
+---
+
+## Final Baseline Acceptance
+
+Final scope review confirmed:
+
+- no production source changes;
+- no navigation, workflow, state, persistence, authentication, session, or
+  command-execution semantic changes;
+- calibration changes are limited to deterministic test infrastructure,
+  reproducible evidence, design-system documentation, and evidence-derived
+  architectural documentation;
+- the responsive Server Inventory concern remains separate from global visual
+  tokens and is tracked independently;
+- integrated Light/Dark validation passed on the canonical calibration
+  environment.
+
+Final disposition:
+
+```text
+Color:                  ACCEPTED / RETAINED
+Typography:             ACCEPTED / RETAINED
+Shape:                  ACCEPTED / RETAINED
+Spacing:                ACCEPTED / RETAINED
+Integrated validation:  PASS
+
+Visual Identity Baseline: ACCEPTED
+```
+
+The Graphite + Azure profile is therefore accepted as the current Server
+Toolkit visual identity baseline.
+
+Future changes require new focused evidence and must not rewrite this historical
+calibration record.
 
 ---
 

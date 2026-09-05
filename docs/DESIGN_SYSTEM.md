@@ -1,7 +1,7 @@
 # Design System
 
 **Project:** Server Toolkit
-**Status:** Active — Visual Identity Calibration
+**Status:** Active — Accepted Visual Identity Baseline
 **Last Updated:** 2026-08-12
 
 ---
@@ -510,22 +510,18 @@ Completed:
 
 Current status:
 
-- Graphite + Azure is the current concrete validation profile, not the final
-  product visual identity;
-- exact visual token values remain intentionally evolvable;
+- Graphite + Azure is the accepted Server Toolkit visual identity baseline;
+- color, typography, shape, and spacing calibration are complete;
+- existing token values were retained because repeated evidence did not justify
+  global token changes;
+- integrated Light/Dark validation passed across the fixed calibration surfaces;
+- dynamic color remains disabled for the accepted baseline;
 - root theme surface application remains theme-delivery infrastructure;
-- button-shape application exists as real-screen foundation integration validation;
-- structural screen redesign and feature-specific UI optimization remain outside this phase.
+- structural screen redesign and feature-specific UI optimization remain outside
+  the design-system baseline.
 
-Next:
-
-1. establish the calibration record and fixed validation matrix under Issue #157;
-2. calibrate color roles independently;
-3. calibrate typography independently;
-4. calibrate shapes independently;
-5. retain spacing unless repeated cross-screen evidence justifies change;
-6. validate accepted candidates across all five validation screens in light and dark themes;
-7. accept the visual identity baseline from recorded evidence.
+Future visual changes require new focused evidence and must not silently rewrite
+the accepted calibration record.
 
 ---
 
