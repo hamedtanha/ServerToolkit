@@ -1,8 +1,8 @@
 # Design System
 
 **Project:** Server Toolkit
-**Status:** Active — Foundation Validation
-**Last Updated:** 2026-08-11
+**Status:** Active — Accepted Visual Identity Baseline
+**Last Updated:** 2026-09-05
 
 ---
 
@@ -221,7 +221,7 @@ The scoring model guides comparison but does not replace runtime inspection.
 
 ### Graphite + Azure
 
-**Status:** Concrete foundation validation profile.
+**Status:** Foundation validation completed; current calibration starting profile.
 
 Characteristics:
 
@@ -266,21 +266,21 @@ Risk:
 
 ---
 
-## Foundation Validation Profile
+## Calibration Starting Profile
 
-The concrete profile currently used to validate the foundation is:
+PR #149 completed foundation validation using:
 
 ```text
 Graphite + Azure
 ```
 
-This profile exists to exercise the design system end-to-end against real
-application UI. It is not a commitment to the final product visual identity.
+Graphite + Azure is now the starting profile for visual-identity calibration.
+It is not yet the accepted final product visual identity baseline.
 
 The validation profile uses explicit light and dark color roles.
 
-Dynamic color is disabled during foundation validation so the resolved profile
-can be evaluated consistently across devices.
+Dynamic color remains disabled during visual-identity calibration so the resolved
+profile can be evaluated consistently across devices.
 
 Dynamic color may be reconsidered after the core visual identity is stable.
 
@@ -426,7 +426,7 @@ Validation considers:
 
 ## Screen-Change Boundary
 
-During foundation validation:
+During visual-identity calibration:
 
 - existing screen structure is preserved;
 - existing information architecture is preserved;
@@ -434,10 +434,11 @@ During foundation validation:
 - design-system tokens may be exercised globally against existing screens;
 - structural screen redesign and feature-specific visual optimization are deferred.
 
-Applying `ServerToolkitButtonShape` to existing Material buttons during this
-phase is foundation integration validation: it proves that an app-owned visual
-token can be consumed consistently by real feature UI. It does not constitute
-screen redesign or final UI optimization.
+Applying `ServerToolkitButtonShape` to existing Material buttons through PR
+`#149` was foundation integration validation: it proved that an app-owned visual
+token can be consumed consistently by real feature UI. That historical
+validation does not authorize structural screen redesign or feature-specific
+visual optimization during the current calibration phase.
 
 If an independent UI defect prevents meaningful validation, it is handled
 separately instead of being silently absorbed into foundation work.
@@ -469,9 +470,10 @@ the repeated problem.
 
 ---
 
-## Exit Criteria
+## Foundation Validation Exit Criteria
 
-The foundation validation may be accepted when:
+These criteria were satisfied by the foundation-validation work merged through
+PR #149:
 
 - the runtime visual-profile contract works end-to-end;
 - light and dark modes resolve and render through the application theme;
@@ -492,7 +494,7 @@ usability or repetition evidence justifies them.
 
 ---
 
-## Current Foundation Validation State
+## Foundation Validation Outcome
 
 Completed:
 
@@ -508,20 +510,18 @@ Completed:
 
 Current status:
 
-- Graphite + Azure is the current concrete validation profile, not the final
-  product visual identity;
-- exact visual token values remain intentionally evolvable;
+- Graphite + Azure is the accepted Server Toolkit visual identity baseline;
+- color, typography, shape, and spacing calibration are complete;
+- existing token values were retained because repeated evidence did not justify
+  global token changes;
+- integrated Light/Dark validation passed across the fixed calibration surfaces;
+- dynamic color remains disabled for the accepted baseline;
 - root theme surface application remains theme-delivery infrastructure;
-- button-shape application exists as real-screen foundation integration validation;
-- structural screen redesign and feature-specific UI optimization remain outside this phase.
+- structural screen redesign and feature-specific UI optimization remain outside
+  the design-system baseline.
 
-Next:
-
-1. run final automated validation;
-2. review the complete branch diff for scope correctness;
-3. merge the validated foundation baseline;
-4. continue product development through Issue -> feature branch -> PR;
-5. perform future UI optimization as focused work that consumes this foundation.
+Future visual changes require new focused evidence and must not silently rewrite
+the accepted calibration record.
 
 ---
 
@@ -534,3 +534,5 @@ Next:
 - `ARCHITECTURE.md`
 - PR `#147`
 - PR `#148`
+- PR `#149`
+- Issue `#157`
