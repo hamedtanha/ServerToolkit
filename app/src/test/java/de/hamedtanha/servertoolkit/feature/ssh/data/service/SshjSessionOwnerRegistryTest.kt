@@ -133,4 +133,49 @@ class SshjSessionOwnerRegistryTest {
 
         assertTrue(registry.contains(handle))
     }
+
+    @Test
+    fun `discard removes undelivered owner and closes resource`() {
+        val registry = SshjSessionOwnerRegistry()
+        val handle = sshSessionHandle()
+        var closed = false
+
+        registry.register(
+            SshjSessionOwner(
+                sessionHandle = handle,
+                closeAction = {
+                    closed = true
+                },
+            ),
+        )
+
+        registry.discard(handle)
+
+        assertTrue(closed)
+        assertFalse(registry.contains(handle))
+        assertEquals(SshSessionCloseResult.NotFound, registry.close(handle))
+    }
+
+    @Test
+    fun `discard removes undelivered owner when cleanup fails`() {
+        val registry = SshjSessionOwnerRegistry()
+        val handle = sshSessionHandle()
+        var closeAttempted = false
+
+        registry.register(
+            SshjSessionOwner(
+                sessionHandle = handle,
+                closeAction = {
+                    closeAttempted = true
+                    throw IllegalStateException("Simulated cleanup failure")
+                },
+            ),
+        )
+
+        registry.discard(handle)
+
+        assertTrue(closeAttempted)
+        assertFalse(registry.contains(handle))
+        assertEquals(SshSessionCloseResult.NotFound, registry.close(handle))
+    }
 }

@@ -4,11 +4,14 @@ import de.hamedtanha.servertoolkit.feature.ssh.domain.model.SshConnectionError
 import de.hamedtanha.servertoolkit.feature.ssh.domain.model.SshConnectionRequest
 import de.hamedtanha.servertoolkit.feature.ssh.domain.model.SshConnectionResult
 import de.hamedtanha.servertoolkit.feature.ssh.domain.model.SshHostEndpoint
+import de.hamedtanha.servertoolkit.feature.ssh.domain.model.SshSessionHandle
 import de.hamedtanha.servertoolkit.feature.ssh.domain.repository.SshHostTrustRepository
 import de.hamedtanha.servertoolkit.feature.ssh.domain.service.SshConnectionService
+import java.util.concurrent.atomic.AtomicReference
 import javax.inject.Inject
 import kotlinx.coroutines.CancellationException
 import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.NonCancellable
 import kotlinx.coroutines.withContext
 
 /**
@@ -51,9 +54,10 @@ class SshjConnectionService @Inject constructor(
 
     override suspend fun connect(request: SshConnectionRequest): SshConnectionResult {
         val authenticationMapping = authenticationAdapter.map(request)
+        val pendingSessionHandle = AtomicReference<SshSessionHandle?>(null)
 
         return try {
-            withContext(Dispatchers.IO) {
+            val result = withContext(Dispatchers.IO) {
                 val trustedHostKey = hostTrustRepository.getTrustedHostKey(
                     request.toHostEndpoint(),
                 ) ?: return@withContext SshConnectionResult.Failed(
@@ -61,40 +65,72 @@ class SshjConnectionService @Inject constructor(
                 )
 
                 when (
-                    val result = trustedConnectionExecutor.connectAndAuthenticate(
+                    val executionResult = trustedConnectionExecutor.connectAndAuthenticate(
                         request = request,
                         trustedHostKey = trustedHostKey,
                         authenticationMapping = authenticationMapping,
                     )
                 ) {
                     is SshjTrustedConnectionExecutionResult.Connected -> {
-                        registerConnectedSession(result.sessionOwner)
+                        registerConnectedSession(
+                            sessionOwner = executionResult.sessionOwner,
+                            pendingSessionHandle = pendingSessionHandle,
+                        )
                     }
 
                     is SshjTrustedConnectionExecutionResult.Failed -> {
-                        SshConnectionResult.Failed(result.error)
+                        SshConnectionResult.Failed(executionResult.error)
                     }
                 }
             }
+
+            pendingSessionHandle.set(null)
+            result
         } catch (error: CancellationException) {
+            discardPendingSession(pendingSessionHandle)
             throw error
         } catch (error: Exception) {
+            discardPendingSession(pendingSessionHandle)
             SshConnectionResult.Failed(SshConnectionError.Unknown)
         } finally {
             authenticationMapping.clearSensitiveValues()
         }
     }
 
+    override suspend fun discardUndeliveredSession(sessionHandle: SshSessionHandle) {
+        withContext(NonCancellable) {
+            withContext(Dispatchers.IO) {
+                sessionOwnerRegistry.discard(sessionHandle)
+            }
+        }
+    }
+
     private fun registerConnectedSession(
         sessionOwner: SshjSessionOwner,
+        pendingSessionHandle: AtomicReference<SshSessionHandle?>,
     ): SshConnectionResult {
         return if (sessionOwnerRegistry.register(sessionOwner)) {
+            pendingSessionHandle.set(sessionOwner.sessionHandle)
             SshConnectionResult.Connected(sessionOwner.sessionHandle)
         } else {
-            runCatching {
+            try {
                 sessionOwner.close()
+            } catch (_: Exception) {
+                // Registration failure remains the primary connection outcome.
             }
             SshConnectionResult.Failed(SshConnectionError.Unknown)
+        }
+    }
+
+    private suspend fun discardPendingSession(
+        pendingSessionHandle: AtomicReference<SshSessionHandle?>,
+    ) {
+        pendingSessionHandle.getAndSet(null)?.let { sessionHandle ->
+            try {
+                discardUndeliveredSession(sessionHandle)
+            } catch (_: Exception) {
+                // Rollback failure must not replace the primary cancellation or connection failure.
+            }
         }
     }
 }
