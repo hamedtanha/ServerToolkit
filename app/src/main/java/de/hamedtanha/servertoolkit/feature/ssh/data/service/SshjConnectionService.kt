@@ -10,6 +10,7 @@ import de.hamedtanha.servertoolkit.feature.ssh.domain.service.SshConnectionServi
 import java.util.concurrent.atomic.AtomicReference
 import javax.inject.Inject
 import kotlinx.coroutines.CancellationException
+import kotlinx.coroutines.CoroutineDispatcher
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.NonCancellable
 import kotlinx.coroutines.withContext
@@ -37,11 +38,14 @@ class SshjConnectionService @Inject constructor(
             authenticationExecutor = authenticationExecutor,
         )
 
+    private var ioDispatcher: CoroutineDispatcher = Dispatchers.IO
+
     internal constructor(
         authenticationAdapter: SshjAuthenticationAdapter,
         hostTrustRepository: SshHostTrustRepository,
         trustedConnectionExecutor: SshjTrustedConnectionExecutor,
         sessionOwnerRegistry: SshjSessionOwnerRegistry = SshjSessionOwnerRegistry(),
+        ioDispatcher: CoroutineDispatcher = Dispatchers.IO,
     ) : this(
         authenticationAdapter = authenticationAdapter,
         hostTrustRepository = hostTrustRepository,
@@ -50,6 +54,7 @@ class SshjConnectionService @Inject constructor(
         authenticationExecutor = SshjAuthenticationExecutor(),
     ) {
         this.trustedConnectionExecutor = trustedConnectionExecutor
+        this.ioDispatcher = ioDispatcher
     }
 
     override suspend fun connect(request: SshConnectionRequest): SshConnectionResult {
@@ -57,7 +62,7 @@ class SshjConnectionService @Inject constructor(
         val pendingSessionHandle = AtomicReference<SshSessionHandle?>(null)
 
         return try {
-            val result = withContext(Dispatchers.IO) {
+            val result = withContext(ioDispatcher) {
                 val trustedHostKey = hostTrustRepository.getTrustedHostKey(
                     request.toHostEndpoint(),
                 ) ?: return@withContext SshConnectionResult.Failed(
@@ -99,7 +104,7 @@ class SshjConnectionService @Inject constructor(
 
     override suspend fun discardUndeliveredSession(sessionHandle: SshSessionHandle) {
         withContext(NonCancellable) {
-            withContext(Dispatchers.IO) {
+            withContext(ioDispatcher) {
                 sessionOwnerRegistry.discard(sessionHandle)
             }
         }
