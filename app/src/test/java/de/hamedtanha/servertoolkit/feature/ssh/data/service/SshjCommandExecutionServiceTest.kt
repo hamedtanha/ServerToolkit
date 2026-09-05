@@ -9,6 +9,7 @@ import java.util.concurrent.CountDownLatch
 import java.util.concurrent.TimeUnit
 import java.util.concurrent.atomic.AtomicBoolean
 import kotlinx.coroutines.CancellationException
+import kotlinx.coroutines.CoroutineStart
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.runBlocking
 import kotlinx.coroutines.withTimeout
@@ -133,7 +134,7 @@ class SshjCommandExecutionServiceTest {
         var observedCancellation: CancellationException? = null
 
         try {
-            val job = launch {
+            val job = launch(start = CoroutineStart.UNDISPATCHED) {
                 try {
                     service.execute(request)
                     fail("Expected CancellationException")
