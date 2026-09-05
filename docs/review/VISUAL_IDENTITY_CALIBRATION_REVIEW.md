@@ -999,6 +999,62 @@ Completed — shape scale retained with no production token changes
 
 ---
 
+## Spacing Calibration Record
+
+The project-owned spacing scale is:
+
+```text
+extraSmall   4 dp
+small        8 dp
+medium      12 dp
+large       16 dp
+extraLarge  24 dp
+```
+
+Production inventory across the fixed calibration surfaces found repeated
+spacing literals that align with this scale:
+
+```text
+ 4 dp    5 uses
+ 8 dp   31 uses
+12 dp   16 uses
+16 dp   16 uses
+24 dp   11 uses
+```
+
+Other measured `dp` values in the same files represent non-spacing concerns,
+including progress-indicator size and stroke width and a bounded selector
+height, and are therefore excluded from spacing calibration.
+
+Dashboard consumes the project-owned spacing channel through
+`ServerToolkitDesignSystem.spacing`. The remaining fixed validation surfaces
+largely use direct spacing literals that correspond to the same scale.
+
+This partial token adoption does not provide evidence for changing the spacing
+scale. Mechanical migration of existing screen spacing to token access is also
+outside the visual-identity calibration scope and is not required to validate
+the current token values.
+
+No repeated cross-screen spacing defect has been observed in the fixed visual
+evidence.
+
+Spacing conclusion:
+
+```text
+Spacing scale:               RETAIN
+Global spacing change:       NONE
+Production spacing values:   CONSISTENT WITH SCALE
+Mechanical token migration:  OUT OF SCOPE
+```
+
+Status:
+
+```text
+Completed — spacing scale retained with no production token changes
+```
+
+---
+
 ## Candidate Template
 
 | Field | Value |
@@ -1040,7 +1096,7 @@ Baseline evidence:     Captured and initial review recorded
 Color:                 Completed; all assessed families retained
 Typography:            Completed; retained with no token changes
 Shape:                 Completed; retained with no token changes
-Spacing:               No calibration justified at review start
+Spacing:               Completed; scale retained with no token changes
 
 Integrated validation: Not started
 Accepted baseline:     None
