@@ -4,7 +4,7 @@
 **Feature Area:** Server Inventory
 **Status:** Accepted Baseline
 **Related Milestone:** Version 0.3.0 — Server Inventory Foundation
-**Last Updated:** 2026-08-11
+**Last Updated:** 2026-09-05
 
 ---
 
@@ -24,6 +24,8 @@ The feature provides local server inventory management backed by Room persistenc
 
 The previously verified existing-Server persistence defect tracked by Issue `#140` has been corrected. Existing Server saves now use Room upsert semantics that update the existing parent row instead of replacement semantics, preserving SSH trust and connection-history children according to their accepted lifecycle boundaries.
 
+Repository-facing presentation failure handling has also been hardened for architecture review finding F05 under Issue `#184`. Inventory observation now supports explicit in-place retry, preserves the last useful server data and active filter after a later observation failure, uses stable feature-owned UI copy instead of raw repository exception text, and preserves coroutine cancellation semantics.
+
 ---
 
 ## Implemented
@@ -33,6 +35,9 @@ The previously verified existing-Server persistence defect tracked by Issue `#14
 - Server Inventory navigation destination.
 - Server Inventory ViewModel.
 - Server Inventory UI state.
+- Explicit Server Inventory observation retry after transient repository failure.
+- Last-useful inventory data and active-filter preservation after later observation failure.
+- Stable feature-owned inventory load-failure presentation without raw repository exception text.
 - Server Inventory empty screen.
 - Server Inventory empty-state action.
 - Stable inventory-empty rendering after deleting the final server while a filter remains active.
@@ -48,6 +53,7 @@ The previously verified existing-Server persistence defect tracked by Issue `#14
 - Add Server validation state.
 - Add Server validation-only save action.
 - Add Server repository-backed save flow.
+- Stable Add Server save-failure presentation with `CancellationException` propagation.
 - Add Server automatic return after successful save.
 - Edit Server navigation destination.
 - Edit Server route.
@@ -55,7 +61,9 @@ The previously verified existing-Server persistence defect tracked by Issue `#14
 - Shared Server Form screen.
 - Server Form UI state shared by Add Server and Edit Server.
 - Edit Server form reuse through the shared Server Form screen.
-- Edit Server repository-backed save flow preserving the existing server id.
+- Explicit retry for transient Edit Server initial-load failure without recreating the screen.
+- Stable Edit Server load/update failure presentation without raw repository exception text.
+- Edit Server repository-backed save flow preserving the existing server id and editable form input after update failure.
 
 ### Domain and Filtering
 
@@ -88,6 +96,7 @@ The previously verified existing-Server persistence defect tracked by Issue `#14
 
 - Delete server UI action with confirmation dialog.
 - Server Inventory ViewModel delete action.
+- Stable delete-failure presentation with coroutine cancellation propagated rather than mapped as repository failure.
 - Manual delete flow verification after app restart.
 
 ### Verification
@@ -99,6 +108,8 @@ The previously verified existing-Server persistence defect tracked by Issue `#14
 - Automated shared Server Form naming verification through unit tests, instrumented tests, and debug build.
 - Server Inventory filter matcher unit tests.
 - Server Inventory UI-state regression tests for inventory-empty and filter-result-empty semantics.
+- Focused ViewModel regression coverage for initial observation failure/retry, data-and-filter preservation after later failure, stable Add/Edit/Delete failure messages, Edit initial-load retry, and cancellation preservation.
+- Android Validation `#168` passed on the focused Server Inventory/Add/Edit/Delete F05 slice.
 - DAO instrumentation tests for insert, non-destructive update, repeated update, and explicit delete behavior.
 - Room-backed repository instrumentation tests for save and non-destructive update behavior.
 - Permanent Room regression coverage verifies that metadata-only and username-only updates preserve trusted-host-key and connection-history children.
