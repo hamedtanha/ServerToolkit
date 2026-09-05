@@ -1,5 +1,7 @@
 package de.hamedtanha.servertoolkit.feature.ssh.data.service
 
+import de.hamedtanha.servertoolkit.feature.ssh.domain.model.SshHostKeyFingerprint
+import de.hamedtanha.servertoolkit.feature.ssh.domain.model.SshHostKeyFingerprintEncoding
 import de.hamedtanha.servertoolkit.feature.ssh.domain.model.SshTrustedHostKey
 import java.security.PublicKey
 import javax.inject.Inject
@@ -33,7 +35,7 @@ private class SshjTrustedHostKeyVerifier(
             return false
         }
 
-        return key.toSshjHostKeyFingerprint() == trustedHostKey.fingerprint
+        return key.matches(trustedHostKey.fingerprint)
     }
 
     override fun findExistingAlgorithms(
@@ -43,3 +45,26 @@ private class SshjTrustedHostKeyVerifier(
         return mutableListOf()
     }
 }
+
+private fun PublicKey.matches(trustedFingerprint: SshHostKeyFingerprint): Boolean {
+    val observedFingerprint = when {
+        trustedFingerprint.algorithm == SHA256_DISPLAY_ALGORITHM &&
+            trustedFingerprint.encoding == SshHostKeyFingerprintEncoding.OpenSshWire ->
+            toOpenSshSha256Fingerprint()
+
+        trustedFingerprint.algorithm == SHA256_DISPLAY_ALGORITHM &&
+            trustedFingerprint.encoding == SshHostKeyFingerprintEncoding.LegacyJavaPublicKey ->
+            toLegacyJavaEncodedSha256Fingerprint()
+
+        trustedFingerprint.algorithm == MD5_DISPLAY_ALGORITHM &&
+            trustedFingerprint.encoding == SshHostKeyFingerprintEncoding.OpenSshWire ->
+            toLegacySshjMd5Fingerprint()
+
+        else -> return false
+    }
+
+    return observedFingerprint == trustedFingerprint
+}
+
+private const val SHA256_DISPLAY_ALGORITHM = "SHA256"
+private const val MD5_DISPLAY_ALGORITHM = "MD5"
