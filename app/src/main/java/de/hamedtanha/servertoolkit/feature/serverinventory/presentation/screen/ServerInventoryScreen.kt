@@ -31,12 +31,12 @@ import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.hilt.lifecycle.viewmodel.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
-import de.hamedtanha.servertoolkit.ui.designsystem.theme.ServerToolkitButtonShape
 import de.hamedtanha.servertoolkit.feature.serverinventory.domain.model.Server
 import de.hamedtanha.servertoolkit.feature.serverinventory.domain.model.ServerEnvironment
 import de.hamedtanha.servertoolkit.feature.serverinventory.presentation.state.ServerInventoryFilter
 import de.hamedtanha.servertoolkit.feature.serverinventory.presentation.state.ServerInventoryUiState
 import de.hamedtanha.servertoolkit.feature.serverinventory.presentation.viewmodel.ServerInventoryViewModel
+import de.hamedtanha.servertoolkit.ui.designsystem.theme.ServerToolkitButtonShape
 
 @Composable
 fun ServerInventoryRoute(
@@ -57,6 +57,7 @@ fun ServerInventoryRoute(
         onEnvironmentFilterChanged = viewModel::onEnvironmentFilterChanged,
         onFavoritesOnlyChanged = viewModel::onFavoritesOnlyChanged,
         onClearFilters = viewModel::onClearFilters,
+        onRetryLoad = viewModel::onRetryLoad,
         onDeleteServerConfirmed = viewModel::onDeleteServerConfirmed,
         modifier = modifier,
     )
@@ -74,38 +75,49 @@ fun ServerInventoryScreen(
     onClearFilters: () -> Unit,
     onDeleteServerConfirmed: (String) -> Unit,
     modifier: Modifier = Modifier,
+    onRetryLoad: () -> Unit = {},
 ) {
     var serverPendingDeletion by remember {
         mutableStateOf<Server?>(null)
     }
 
     when {
-        uiState.isLoading -> ServerInventoryLoadingContent(modifier = modifier)
-        uiState.errorMessage != null -> ServerInventoryErrorContent(
-            message = uiState.errorMessage,
-            modifier = modifier,
-        )
+        uiState.isLoading && uiState.totalServerCount == 0 ->
+            ServerInventoryLoadingContent(modifier = modifier)
+
+        uiState.errorMessage != null && uiState.totalServerCount == 0 ->
+            ServerInventoryErrorContent(
+                message = uiState.errorMessage,
+                onRetryLoad = onRetryLoad,
+                modifier = modifier,
+            )
+
         uiState.isInventoryEmpty -> ServerInventoryEmptyContent(
             onAddServerClick = onAddServerClick,
             modifier = modifier,
         )
-        uiState.hasVisibleServers || uiState.isFilterResultEmpty -> ServerInventoryLoadedContent(
-            servers = uiState.servers,
-            totalServerCount = uiState.totalServerCount,
-            filter = uiState.filter,
-            operationMessage = uiState.operationMessage,
-            onAddServerClick = onAddServerClick,
-            onEditServerClick = onEditServerClick,
-            onConnectServerClick = onConnectServerClick,
-            onSearchQueryChanged = onSearchQueryChanged,
-            onEnvironmentFilterChanged = onEnvironmentFilterChanged,
-            onFavoritesOnlyChanged = onFavoritesOnlyChanged,
-            onClearFilters = onClearFilters,
-            onDeleteServerClick = { server ->
-                serverPendingDeletion = server
-            },
-            modifier = modifier,
-        )
+
+        uiState.hasVisibleServers ||
+            uiState.isFilterResultEmpty ||
+            uiState.totalServerCount > 0 -> ServerInventoryLoadedContent(
+                servers = uiState.servers,
+                totalServerCount = uiState.totalServerCount,
+                filter = uiState.filter,
+                loadErrorMessage = uiState.errorMessage,
+                operationMessage = uiState.operationMessage,
+                onAddServerClick = onAddServerClick,
+                onEditServerClick = onEditServerClick,
+                onConnectServerClick = onConnectServerClick,
+                onSearchQueryChanged = onSearchQueryChanged,
+                onEnvironmentFilterChanged = onEnvironmentFilterChanged,
+                onFavoritesOnlyChanged = onFavoritesOnlyChanged,
+                onClearFilters = onClearFilters,
+                onRetryLoad = onRetryLoad,
+                onDeleteServerClick = { server ->
+                    serverPendingDeletion = server
+                },
+                modifier = modifier,
+            )
     }
 
     serverPendingDeletion?.let { server ->
@@ -154,6 +166,7 @@ private fun ServerInventoryLoadingContent(
 @Composable
 private fun ServerInventoryErrorContent(
     message: String,
+    onRetryLoad: () -> Unit,
     modifier: Modifier = Modifier,
 ) {
     ServerInventoryMessageContent(
@@ -161,6 +174,14 @@ private fun ServerInventoryErrorContent(
         message = message,
         modifier = modifier,
         isError = true,
+        action = {
+            Button(
+                shape = ServerToolkitButtonShape,
+                onClick = onRetryLoad,
+            ) {
+                Text(text = "Retry")
+            }
+        },
     )
 }
 
@@ -169,6 +190,7 @@ private fun ServerInventoryLoadedContent(
     servers: List<Server>,
     totalServerCount: Int,
     filter: ServerInventoryFilter,
+    loadErrorMessage: String?,
     operationMessage: String?,
     onAddServerClick: () -> Unit,
     onEditServerClick: (String) -> Unit,
@@ -177,6 +199,7 @@ private fun ServerInventoryLoadedContent(
     onEnvironmentFilterChanged: (ServerEnvironment?) -> Unit,
     onFavoritesOnlyChanged: (Boolean) -> Unit,
     onClearFilters: () -> Unit,
+    onRetryLoad: () -> Unit,
     onDeleteServerClick: (Server) -> Unit,
     modifier: Modifier = Modifier,
 ) {
@@ -202,6 +225,20 @@ private fun ServerInventoryLoadedContent(
             color = MaterialTheme.colorScheme.onSurfaceVariant,
         )
 
+        loadErrorMessage?.let { message ->
+            Spacer(modifier = Modifier.height(8.dp))
+
+            Text(
+                text = message,
+                style = MaterialTheme.typography.bodySmall,
+                color = MaterialTheme.colorScheme.error,
+            )
+
+            TextButton(onClick = onRetryLoad) {
+                Text(text = "Retry")
+            }
+        }
+
         operationMessage?.let { message ->
             Spacer(modifier = Modifier.height(8.dp))
 
@@ -225,7 +262,6 @@ private fun ServerInventoryLoadedContent(
         Spacer(modifier = Modifier.height(16.dp))
 
         Button(
-
             shape = ServerToolkitButtonShape,
             onClick = onAddServerClick,
             modifier = Modifier.fillMaxWidth(),

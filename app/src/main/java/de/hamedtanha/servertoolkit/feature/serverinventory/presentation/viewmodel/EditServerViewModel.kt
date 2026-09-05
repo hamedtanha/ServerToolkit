@@ -8,6 +8,8 @@ import de.hamedtanha.servertoolkit.feature.serverinventory.domain.model.Server
 import de.hamedtanha.servertoolkit.feature.serverinventory.domain.repository.ServerRepository
 import de.hamedtanha.servertoolkit.feature.serverinventory.presentation.state.ServerFormUiState
 import javax.inject.Inject
+import kotlinx.coroutines.CancellationException
+import kotlinx.coroutines.Job
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
@@ -22,18 +24,26 @@ class EditServerViewModel @Inject constructor(
 
     private val serverId: String? = savedStateHandle[SERVER_ID_ARGUMENT]
     private var originalServer: Server? = null
+    private var loadJob: Job? = null
 
     private val _uiState = MutableStateFlow(
         ServerFormUiState(
             title = "Edit server",
             description = "Update the connection details for this server.",
-            formMessage = "Loading server details.",
+            formMessage = LOADING_MESSAGE,
+            isLoading = true,
         ),
     )
     val uiState: StateFlow<ServerFormUiState> = _uiState.asStateFlow()
 
     init {
         loadServer()
+    }
+
+    fun onRetryLoad() {
+        if (originalServer == null) {
+            loadServer()
+        }
     }
 
     fun onNameChanged(name: String) {
@@ -85,7 +95,7 @@ class EditServerViewModel @Inject constructor(
         val loadedServer = originalServer
 
         if (loadedServer == null) {
-            _uiState.value = validatedState.copy(formMessage = "Server could not be loaded.")
+            _uiState.value = validatedState.copy(formMessage = LOAD_ERROR_MESSAGE)
             return
         }
 
@@ -97,18 +107,19 @@ class EditServerViewModel @Inject constructor(
         viewModelScope.launch {
             _uiState.value = validatedState.copy(isSaving = true, formMessage = null)
 
-            runCatching {
+            try {
                 serverRepository.saveServer(validatedState.toUpdatedServer(loadedServer))
-            }.onSuccess {
                 _uiState.update { currentState ->
                     currentState.copy(isSaving = false, isSaved = true, formMessage = null)
                 }
-            }.onFailure { throwable ->
+            } catch (error: CancellationException) {
+                throw error
+            } catch (_: Exception) {
                 _uiState.update { currentState ->
                     currentState.copy(
                         isSaving = false,
                         isSaved = false,
-                        formMessage = throwable.message ?: "Server could not be updated.",
+                        formMessage = UPDATE_ERROR_MESSAGE,
                     )
                 }
             }
@@ -120,28 +131,50 @@ class EditServerViewModel @Inject constructor(
 
         if (resolvedServerId.isNullOrBlank()) {
             _uiState.update { currentState ->
-                currentState.copy(formMessage = "Server id is missing.")
+                currentState.copy(
+                    isLoading = false,
+                    canRetryLoad = false,
+                    formMessage = "Server id is missing.",
+                )
             }
             return
         }
 
-        viewModelScope.launch {
-            runCatching {
-                serverRepository.getServerById(resolvedServerId)
-            }.onSuccess { server ->
+        loadJob?.cancel()
+
+        _uiState.update { currentState ->
+            currentState.copy(
+                isLoading = true,
+                canRetryLoad = false,
+                formMessage = LOADING_MESSAGE,
+            )
+        }
+
+        loadJob = viewModelScope.launch {
+            try {
+                val server = serverRepository.getServerById(resolvedServerId)
+
                 if (server == null) {
                     _uiState.update { currentState ->
-                        currentState.copy(formMessage = "Server could not be found.")
+                        currentState.copy(
+                            isLoading = false,
+                            canRetryLoad = false,
+                            formMessage = "Server could not be found.",
+                        )
                     }
-                    return@onSuccess
+                    return@launch
                 }
 
                 originalServer = server
                 _uiState.value = server.toUiState()
-            }.onFailure { throwable ->
+            } catch (error: CancellationException) {
+                throw error
+            } catch (_: Exception) {
                 _uiState.update { currentState ->
                     currentState.copy(
-                        formMessage = throwable.message ?: "Server could not be loaded.",
+                        isLoading = false,
+                        canRetryLoad = true,
+                        formMessage = LOAD_ERROR_MESSAGE,
                     )
                 }
             }
@@ -195,5 +228,8 @@ class EditServerViewModel @Inject constructor(
 
     private companion object {
         const val SERVER_ID_ARGUMENT = "serverId"
+        const val LOADING_MESSAGE = "Loading server details."
+        const val LOAD_ERROR_MESSAGE = "Server could not be loaded."
+        const val UPDATE_ERROR_MESSAGE = "Server could not be updated."
     }
 }

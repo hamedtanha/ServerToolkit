@@ -28,6 +28,8 @@ Automated JVM coverage, Android runtime verification, full unit tests, lint, and
 
 The current connection/session, command-execution, and host-trust hardening state incorporates the focused F01/F02/F03/F04 corrections from architecture review `RA-2026.09-v1`: cancellation-safe connected-session handoff, concurrent bounded command-output draining under a complete-operation deadline, OpenSSH-compatible SHA-256 host-key fingerprints for new observation and trust, and terminal workflow-owner destruction cleanup that releases an active session even when normal route-exit callbacks are bypassed. Historical SSHJ MD5 and Java-encoded SHA-256 trusted-host records remain verifiable through explicit scheme-aware compatibility without silent rewrite or schema migration.
 
+Per-server SSH connection-history presentation now also includes explicit observation retry for architecture review finding F05. A later repository observation failure preserves the last useful history entries, surfaces the existing stable feature-owned load message non-destructively, and propagates coroutine cancellation instead of mapping it as repository failure.
+
 Persistent credentials, terminal UI, Saved Command automation, background monitoring, and Xray or x-ui management remain intentionally out of scope.
 
 ---
@@ -124,6 +126,9 @@ The Android runtime verification also confirmed:
 - SSH connection history repository contract.
 - SSH connection history Room persistence.
 - Per-server connection history observation through the repository boundary without presentation-layer DAO access.
+- Explicit in-place retry after transient per-server history observation failure.
+- Last-useful history-entry preservation when a later observation fails, with stable non-destructive failure presentation.
+- Coroutine cancellation preservation for history observation rather than failure-state conversion.
 - Automatic SSH connection attempt history recording for resolved targets.
 - SSH connection history persistence failure containment that preserves primary connection outcomes and cancellation.
 - SSH duplicate-attempt prevention at the ViewModel boundary.
@@ -320,7 +325,12 @@ The Android runtime verification also confirmed:
 - Data-layer abandonment coverage verifies unreachable registry ownership is removed before concrete cleanup waits on an active command owner boundary.
 - Android 16 / API 36 device reproduction verified F04 on the pre-fix baseline by replacing the active workflow owner while preserving the application PID and observing the exact attributed SSH tuple survive.
 - The same controlled Android 16 / API 36 lifecycle pass on implementation commit `c366c6a856bdeb6a8e03ee1c3bbc09564616dee8`, recorded under Issue `#179`, verified the fix: the old Activity record was removed, the PID remained unchanged, and the exact attributed SSH tuple disappeared (`F04_FIX_VERIFIED`).
-- Android Validation run `#165` passed on the synchronized F04 implementation head before this documentation-only follow-up.
+- Android Validation run `#165` passed on the synchronized F04 implementation head before the F04 documentation-only follow-up.
+- Focused SSH Connection History ViewModel coverage verifies initial failure/retry, exact observation restart, later-failure entry preservation, and cancellation preservation.
+- Android Validation `#169` passed on the F05 head containing the Server Inventory and SSH Connection History recovery slices before this documentation follow-up.
+- Targeted Compose instrumentation coverage verifies both blocking and later-failure SSH Connection History Retry wiring while preserving useful entries in the non-blocking failure case.
+- Two targeted SSH Connection History Retry UI instrumentation tests passed on Android 16 / API 36 (`Leannect_API_36`) at implementation/test commit `a8bd5604e7f36816dcc542e8f3ade990cff433a0`.
+- Android Validation `#171` passed on the same test-hardened F05 head.
 
 ---
 

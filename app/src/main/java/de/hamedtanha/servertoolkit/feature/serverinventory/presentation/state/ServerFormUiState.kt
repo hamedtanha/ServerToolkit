@@ -12,11 +12,14 @@ data class ServerFormUiState(
     val portError: String? = null,
     val usernameError: String? = null,
     val formMessage: String? = null,
+    val isLoading: Boolean = false,
+    val canRetryLoad: Boolean = false,
     val isSaving: Boolean = false,
     val isSaved: Boolean = false,
 ) {
     val canSave: Boolean
-        get() = !isSaving &&
+        get() = !isLoading &&
+            !isSaving &&
             name.isNotBlank() &&
             host.isNotBlank() &&
             username.isNotBlank() &&
