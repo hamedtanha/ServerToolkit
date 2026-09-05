@@ -9,48 +9,82 @@ import de.hamedtanha.servertoolkit.feature.ssh.presentation.state.SshConnectionH
 import de.hamedtanha.servertoolkit.feature.ssh.presentation.state.toUiState
 import de.hamedtanha.servertoolkit.navigation.SshConnectionHistoryDestination
 import javax.inject.Inject
-import kotlinx.coroutines.flow.SharingStarted
+import kotlinx.coroutines.CancellationException
+import kotlinx.coroutines.Job
+import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
-import kotlinx.coroutines.flow.catch
-import kotlinx.coroutines.flow.map
-import kotlinx.coroutines.flow.stateIn
+import kotlinx.coroutines.flow.asStateFlow
+import kotlinx.coroutines.flow.collect
+import kotlinx.coroutines.flow.update
+import kotlinx.coroutines.launch
 
 @HiltViewModel
 class SshConnectionHistoryViewModel @Inject constructor(
     savedStateHandle: SavedStateHandle,
-    connectionHistoryRepository: SshConnectionHistoryRepository,
+    private val connectionHistoryRepository: SshConnectionHistoryRepository,
 ) : ViewModel() {
 
     private val serverId: String = checkNotNull(
         savedStateHandle[SshConnectionHistoryDestination.SERVER_ID_ARGUMENT],
     )
 
-    val uiState: StateFlow<SshConnectionHistoryUiState> =
-        connectionHistoryRepository.observeConnectionHistoryForServer(serverId)
-            .map { entries ->
-                SshConnectionHistoryUiState(
-                    serverId = serverId,
-                    entries = entries.map { entry -> entry.toUiState() },
-                )
-            }
-            .catch {
-                emit(
-                    SshConnectionHistoryUiState(
-                        serverId = serverId,
-                        errorMessage = "SSH connection history could not be loaded.",
-                    ),
-                )
-            }
-            .stateIn(
-                scope = viewModelScope,
-                started = SharingStarted.WhileSubscribed(STOP_TIMEOUT_MILLIS),
-                initialValue = SshConnectionHistoryUiState(
-                    serverId = serverId,
-                    isLoading = true,
-                ),
+    private val _uiState = MutableStateFlow(
+        SshConnectionHistoryUiState(
+            serverId = serverId,
+            isLoading = true,
+        ),
+    )
+    val uiState: StateFlow<SshConnectionHistoryUiState> = _uiState.asStateFlow()
+
+    private var observationJob: Job? = null
+
+    init {
+        observeConnectionHistory(showLoading = true)
+    }
+
+    fun onRetryLoad() {
+        observeConnectionHistory(
+            showLoading = _uiState.value.entries.isEmpty(),
+        )
+    }
+
+    private fun observeConnectionHistory(showLoading: Boolean) {
+        observationJob?.cancel()
+
+        _uiState.update { currentState ->
+            currentState.copy(
+                isLoading = showLoading,
+                errorMessage = null,
             )
+        }
+
+        observationJob = viewModelScope.launch {
+            try {
+                connectionHistoryRepository
+                    .observeConnectionHistoryForServer(serverId)
+                    .collect { entries ->
+                        _uiState.update { currentState ->
+                            currentState.copy(
+                                entries = entries.map { entry -> entry.toUiState() },
+                                isLoading = false,
+                                errorMessage = null,
+                            )
+                        }
+                    }
+            } catch (error: CancellationException) {
+                throw error
+            } catch (_: Exception) {
+                _uiState.update { currentState ->
+                    currentState.copy(
+                        isLoading = false,
+                        errorMessage = LOAD_ERROR_MESSAGE,
+                    )
+                }
+            }
+        }
+    }
 
     private companion object {
-        const val STOP_TIMEOUT_MILLIS = 5_000L
+        const val LOAD_ERROR_MESSAGE = "SSH connection history could not be loaded."
     }
 }
