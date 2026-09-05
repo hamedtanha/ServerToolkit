@@ -72,6 +72,10 @@ The project follows Conventional Commits and Semantic Versioning principles.
 - Published architecture review `RA-2026.07-v2` through a metadata-only follow-up after acceptance PR `#139` was squash-merged as `8070830dfae14f908b9dd128846f66112b36423e` and the merge passed Android Validation run `#90`; no review conclusions, production behavior, Room schema, navigation, or support claims changed.
 - Corrected the stale milestone names in the Development Process release roadmap so versions `0.7.0`, `0.8.0`, and `1.0.0` match the current Roadmap and Release Process documents.
 
+### Fixed
+
+- Fixed SSH connected-session cancellation and timeout handoff so an authenticated session that is registered but not safely delivered is removed from application ownership and best-effort closed without replacing the primary cancellation or timeout outcome.
+
 ### Not Changed
 
 - Java source and target compatibility and the Kotlin JVM toolchain remain on `17`; Gradle daemon JVM criteria remain on `21`.
