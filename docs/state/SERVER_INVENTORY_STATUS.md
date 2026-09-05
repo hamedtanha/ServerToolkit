@@ -110,6 +110,9 @@ Repository-facing presentation failure handling has also been hardened for archi
 - Server Inventory UI-state regression tests for inventory-empty and filter-result-empty semantics.
 - Focused ViewModel regression coverage for initial observation failure/retry, data-and-filter preservation after later failure, stable Add/Edit/Delete failure messages, Edit initial-load retry, and cancellation preservation.
 - Android Validation `#168` passed on the focused Server Inventory/Add/Edit/Delete F05 slice.
+- Targeted Compose instrumentation coverage verifies blocking Server Inventory Retry, later-failure Retry while useful inventory data remains visible, and Edit Server initial-load Retry wiring.
+- Three targeted F05 Retry UI instrumentation tests passed on Android 16 / API 36 (`Leannect_API_36`) at implementation/test commit `a8bd5604e7f36816dcc542e8f3ade990cff433a0`.
+- Android Validation `#171` passed on the same test-hardened F05 head.
 - DAO instrumentation tests for insert, non-destructive update, repeated update, and explicit delete behavior.
 - Room-backed repository instrumentation tests for save and non-destructive update behavior.
 - Permanent Room regression coverage verifies that metadata-only and username-only updates preserve trusted-host-key and connection-history children.

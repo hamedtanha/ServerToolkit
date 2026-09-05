@@ -328,6 +328,9 @@ The Android runtime verification also confirmed:
 - Android Validation run `#165` passed on the synchronized F04 implementation head before the F04 documentation-only follow-up.
 - Focused SSH Connection History ViewModel coverage verifies initial failure/retry, exact observation restart, later-failure entry preservation, and cancellation preservation.
 - Android Validation `#169` passed on the F05 head containing the Server Inventory and SSH Connection History recovery slices before this documentation follow-up.
+- Targeted Compose instrumentation coverage verifies both blocking and later-failure SSH Connection History Retry wiring while preserving useful entries in the non-blocking failure case.
+- Two targeted SSH Connection History Retry UI instrumentation tests passed on Android 16 / API 36 (`Leannect_API_36`) at implementation/test commit `a8bd5604e7f36816dcc542e8f3ade990cff433a0`.
+- Android Validation `#171` passed on the same test-hardened F05 head.
 
 ---
 
