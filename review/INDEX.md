@@ -4,21 +4,22 @@
 
 ### RA-2026.09-v1 — ServerToolkit Architecture Review
 
-- **Status:** Accepted
+- **Status:** Published
 - **External report ID:** `STK-ARCH-2026-09-05`
 - **Original evidence baseline:** `2800f3a250e9b2733dc040a69a9a1f851538d84e`
 - **Revalidation baseline:** `e526b6d6f73713ce23e419ee275ad8ba3d4745a6`
 - **Governing Issue:** `#166`
 - **Acceptance PR:** `#167`
+- **Acceptance merge:** `9dd820d185a71bad8ba3c2b702b56a26d3ee2b9b`
 - **Purpose:** Register and revalidate the 2026-09-05 read-only architecture and targeted implementation review before focused remediation begins.
 
-Current documents:
+Documents:
 
 - `architecture/2026/RA-2026.09-v1/ServerToolkit-Architecture-Review-2026-09-05.md`
 - `architecture/2026/RA-2026.09-v1/REVALIDATION.md`
 - `architecture/2026/RA-2026.09-v1/STATUS.md`
 
-The original external review artifact is preserved against commit `2800f3a250e9b2733dc040a69a9a1f851538d84e`. Current-HEAD changes are recorded only in the separate revalidation document so historical evidence is not rewritten. The review is accepted and content-frozen for merge through PR `#167`; publication remains a metadata-only follow-up after the accepted package reaches `main`.
+The original external review artifact is preserved against commit `2800f3a250e9b2733dc040a69a9a1f851538d84e`; later repository drift is recorded only in `REVALIDATION.md`. Acceptance PR `#167` was squash-merged as `9dd820d185a71bad8ba3c2b702b56a26d3ee2b9b` after the accepted head passed Android Validation run `#127`. This metadata-only publication follow-up records the review as `Published`; once merged, the review version is immutable.
 
 ## Published Reviews
 
