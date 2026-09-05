@@ -131,6 +131,32 @@ class SshjCommandChannelExecutorTest {
     }
 
     @Test
+    fun `default retained output limit matches production baseline and still drains excess bytes`() {
+        val stdout = "x".repeat(SSH_COMMAND_MAX_RETAINED_BYTES_PER_STREAM + 32)
+        val channel = DrainDependentCommandChannel(
+            stdoutText = stdout,
+            stderrText = "",
+        )
+        val executor = SshjNetworkCommandChannelExecutor()
+
+        val result = executor.execute(
+            commandClient = FakeCommandClient(channel = channel),
+            request = commandRequest(timeoutMillis = 2_000),
+        )
+
+        assertTrue(result is SshCommandExecutionResult.Completed)
+        val output = (result as SshCommandExecutionResult.Completed).output
+        assertEquals(
+            SSH_COMMAND_MAX_RETAINED_BYTES_PER_STREAM,
+            output.stdout.toByteArray().size,
+        )
+        assertTrue(output.stdoutTruncated)
+        assertEquals(stdout.toByteArray().size, channel.stdoutBytesRead)
+        assertTrue(channel.joinCompleted)
+        assertTrue(channel.closed)
+    }
+
+    @Test
     fun `returns timed out result and closes channel when exit status is unavailable`() {
         val channel = FakeCommandChannel(
             stdoutText = "partial",
