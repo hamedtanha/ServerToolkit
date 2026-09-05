@@ -8,8 +8,12 @@ import de.hamedtanha.servertoolkit.feature.ssh.test.sshSessionHandle
 import java.io.ByteArrayInputStream
 import java.io.IOException
 import java.io.InputStream
+import java.util.concurrent.CountDownLatch
+import java.util.concurrent.TimeUnit
+import java.util.concurrent.atomic.AtomicReference
 import kotlinx.coroutines.CancellationException
 import org.junit.Assert.assertEquals
+import org.junit.Assert.assertFalse
 import org.junit.Assert.assertTrue
 import org.junit.Assert.fail
 import org.junit.Test
@@ -42,7 +46,87 @@ class SshjCommandChannelExecutorTest {
             result,
         )
         assertEquals("uptime", client.lastCommand)
-        assertEquals(5_000L, channel.lastJoinTimeoutMillis)
+        assertTrue(requireNotNull(channel.lastJoinTimeoutMillis) <= 5_000L)
+        assertTrue(requireNotNull(channel.lastJoinTimeoutMillis) > 0L)
+        assertTrue(channel.closed)
+    }
+
+    @Test
+    fun `drains stdout while waiting for command completion`() {
+        val stdout = "x".repeat(128 * 1024)
+        val channel = DrainDependentCommandChannel(
+            stdoutText = stdout,
+            stderrText = "",
+        )
+        val executor = SshjNetworkCommandChannelExecutor()
+
+        val result = executor.execute(
+            commandClient = FakeCommandClient(channel = channel),
+            request = commandRequest(timeoutMillis = 2_000),
+        )
+
+        assertTrue(result is SshCommandExecutionResult.Completed)
+        val output = (result as SshCommandExecutionResult.Completed).output
+        assertEquals(stdout, output.stdout)
+        assertFalse(output.stdoutTruncated)
+        assertTrue(channel.joinCompleted)
+        assertTrue(channel.closed)
+    }
+
+    @Test
+    fun `drains stderr while waiting for command completion`() {
+        val stderr = "e".repeat(128 * 1024)
+        val channel = DrainDependentCommandChannel(
+            stdoutText = "",
+            stderrText = stderr,
+        )
+        val executor = SshjNetworkCommandChannelExecutor()
+
+        val result = executor.execute(
+            commandClient = FakeCommandClient(channel = channel),
+            request = commandRequest(timeoutMillis = 2_000),
+        )
+
+        assertTrue(result is SshCommandExecutionResult.Completed)
+        val output = (result as SshCommandExecutionResult.Completed).output
+        assertEquals(stderr, output.stderr)
+        assertFalse(output.stderrTruncated)
+        assertTrue(channel.joinCompleted)
+        assertTrue(channel.closed)
+    }
+
+    @Test
+    fun `drains mixed output beyond retention limit while retaining bounded bytes`() {
+        val stdout = "0123456789abcdefghijklmnopqrstuvwxyz"
+        val stderr = "ABCDEFGHIJKLMNOPQRSTUVWXYZ9876543210"
+        val channel = DrainDependentCommandChannel(
+            stdoutText = stdout,
+            stderrText = stderr,
+        )
+        val executor = SshjNetworkCommandChannelExecutor(
+            maxRetainedBytesPerStream = 12,
+        )
+
+        val result = executor.execute(
+            commandClient = FakeCommandClient(channel = channel),
+            request = commandRequest(timeoutMillis = 2_000),
+        )
+
+        assertEquals(
+            SshCommandExecutionResult.Completed(
+                SshCommandExecutionOutput(
+                    stdout = stdout.take(12),
+                    stderr = stderr.take(12),
+                    exitStatus = 0,
+                    stdoutTruncated = true,
+                    stderrTruncated = true,
+                ),
+            ),
+            result,
+        )
+        assertEquals(stdout.toByteArray().size, channel.stdoutBytesRead)
+        assertEquals(stderr.toByteArray().size, channel.stderrBytesRead)
+        assertTrue(channel.joinCompleted)
         assertTrue(channel.closed)
     }
 
@@ -68,23 +152,62 @@ class SshjCommandChannelExecutorTest {
     }
 
     @Test
-    fun `does not read command streams when command times out`() {
+    fun `bounds missing stdout EOF by command operation deadline`() {
+        val blockingStdout = BlockingUntilClosedInputStream()
         val channel = FakeCommandChannel(
-            stdoutReadError = IOException("stdout should not be read after timeout"),
-            stderrReadError = IOException("stderr should not be read after timeout"),
-            exitStatusValue = null,
+            stdoutStream = blockingStdout,
+            stderrText = "",
+            exitStatusValue = 0,
+            onClose = blockingStdout::release,
         )
         val executor = SshjNetworkCommandChannelExecutor()
 
+        val startedAt = System.nanoTime()
         val result = executor.execute(
             commandClient = FakeCommandClient(channel = channel),
-            request = commandRequest(),
+            request = commandRequest(timeoutMillis = 75),
         )
+        val elapsedMillis = TimeUnit.NANOSECONDS.toMillis(System.nanoTime() - startedAt)
 
         assertEquals(
             SshCommandExecutionResult.Failed(SshCommandExecutionError.CommandTimedOut),
             result,
         )
+        assertTrue(blockingStdout.readStarted.await(1, TimeUnit.SECONDS))
+        assertTrue(channel.closed)
+        assertTrue(elapsedMillis < 2_000)
+    }
+
+    @Test
+    fun `thread interruption during blocking stream read preserves cancellation and closes channel`() {
+        val blockingStdout = BlockingUntilClosedInputStream()
+        val channel = FakeCommandChannel(
+            stdoutStream = blockingStdout,
+            stderrText = "",
+            exitStatusValue = 0,
+            onClose = blockingStdout::release,
+        )
+        val executor = SshjNetworkCommandChannelExecutor()
+        val observedFailure = AtomicReference<Throwable?>(null)
+        val executionThread = Thread {
+            try {
+                executor.execute(
+                    commandClient = FakeCommandClient(channel = channel),
+                    request = commandRequest(timeoutMillis = 5_000),
+                )
+                fail("Expected CancellationException")
+            } catch (error: Throwable) {
+                observedFailure.set(error)
+            }
+        }
+
+        executionThread.start()
+        assertTrue(blockingStdout.readStarted.await(1, TimeUnit.SECONDS))
+        executionThread.interrupt()
+        executionThread.join(2_000)
+
+        assertFalse(executionThread.isAlive)
+        assertTrue(observedFailure.get() is CancellationException)
         assertTrue(channel.closed)
     }
 
@@ -293,17 +416,20 @@ class SshjCommandChannelExecutorTest {
         stderrText: String = "",
         stdoutReadError: IOException? = null,
         stderrReadError: IOException? = null,
+        stdoutStream: InputStream? = null,
+        stderrStream: InputStream? = null,
         private val exitStatusValue: Int? = 0,
         private val joinError: Exception? = null,
         private val closeError: Exception? = null,
+        private val onClose: () -> Unit = {},
     ) : SshjCommandChannel {
 
-        override val stdout: InputStream = inputStreamFor(
+        override val stdout: InputStream = stdoutStream ?: inputStreamFor(
             text = stdoutText,
             readError = stdoutReadError,
         )
 
-        override val stderr: InputStream = inputStreamFor(
+        override val stderr: InputStream = stderrStream ?: inputStreamFor(
             text = stderrText,
             readError = stderrReadError,
         )
@@ -314,6 +440,7 @@ class SshjCommandChannelExecutorTest {
         var lastJoinTimeoutMillis: Long? = null
             private set
 
+        @Volatile
         var closed: Boolean = false
             private set
 
@@ -324,7 +451,116 @@ class SshjCommandChannelExecutorTest {
 
         override fun close() {
             closed = true
+            onClose()
             closeError?.let { throw it }
+        }
+    }
+
+    private class DrainDependentCommandChannel(
+        stdoutText: String,
+        stderrText: String,
+    ) : SshjCommandChannel {
+
+        private val streamsDrained = CountDownLatch(2)
+        private val stdoutInput = TrackingInputStream(
+            bytes = stdoutText.toByteArray(),
+            onEof = streamsDrained::countDown,
+        )
+        private val stderrInput = TrackingInputStream(
+            bytes = stderrText.toByteArray(),
+            onEof = streamsDrained::countDown,
+        )
+
+        override val stdout: InputStream = stdoutInput
+        override val stderr: InputStream = stderrInput
+
+        @Volatile
+        var joinCompleted: Boolean = false
+            private set
+
+        @Volatile
+        var closed: Boolean = false
+            private set
+
+        val stdoutBytesRead: Int
+            get() = stdoutInput.bytesRead
+
+        val stderrBytesRead: Int
+            get() = stderrInput.bytesRead
+
+        override val exitStatus: Int?
+            get() = if (joinCompleted) 0 else null
+
+        override fun join(timeoutMillis: Long) {
+            joinCompleted = streamsDrained.await(timeoutMillis, TimeUnit.MILLISECONDS)
+        }
+
+        override fun close() {
+            closed = true
+        }
+    }
+
+    private class TrackingInputStream(
+        private val bytes: ByteArray,
+        private val onEof: () -> Unit,
+    ) : InputStream() {
+
+        private var position = 0
+        private var eofReported = false
+
+        @Volatile
+        var bytesRead: Int = 0
+            private set
+
+        override fun read(): Int {
+            val buffer = ByteArray(1)
+            val count = read(buffer, 0, 1)
+            return if (count < 0) -1 else buffer[0].toInt() and 0xFF
+        }
+
+        override fun read(buffer: ByteArray, offset: Int, length: Int): Int {
+            if (position >= bytes.size) {
+                reportEofOnce()
+                return -1
+            }
+
+            val count = minOf(length, bytes.size - position)
+            bytes.copyInto(
+                destination = buffer,
+                destinationOffset = offset,
+                startIndex = position,
+                endIndex = position + count,
+            )
+            position += count
+            bytesRead += count
+            return count
+        }
+
+        private fun reportEofOnce() {
+            if (!eofReported) {
+                eofReported = true
+                onEof()
+            }
+        }
+    }
+
+    private class BlockingUntilClosedInputStream : InputStream() {
+        val readStarted = CountDownLatch(1)
+        private val released = CountDownLatch(1)
+
+        override fun read(): Int {
+            readStarted.countDown()
+            return try {
+                released.await()
+                -1
+            } catch (error: InterruptedException) {
+                Thread.currentThread().interrupt()
+                throw IOException("Blocking read interrupted", error)
+            }
+        }
+
+        fun release() {
+            released.countDown()
         }
     }
 
