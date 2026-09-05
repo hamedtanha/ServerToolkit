@@ -463,20 +463,85 @@ The project should become better after every completed feature.
 
 ## Definition of Done
 
-A task is considered complete only when all of the following conditions are satisfied:
+A change is considered complete only when all applicable conditions are satisfied:
 
-- Implementation is finished for the agreed scope.
-- The project builds successfully.
-- Code follows project standards.
-- Documentation has been updated.
-- ADRs have been updated when necessary.
-- `CHANGELOG.md` has been updated when applicable.
-- `PROJECT_STATE.md` reflects the current project status.
-- `state/BUILD_TOOLCHAIN_STATUS.md` reflects accepted toolchain or dependency baseline changes when applicable.
+- The intended scope is explicit and fully implemented.
+- The resulting project state is buildable and releasable.
+- Repository validation appropriate to the affected layers succeeds.
+- The final diff has been reviewed and contains only intended changes.
+- No temporary debug code, accidental IDE noise, generated local artifacts, empty placeholders, or unrelated changes remain.
+- No secrets, credentials, tokens, private keys, or private infrastructure details are committed.
+- Code follows the accepted architecture, package ownership, dependency direction, and project coding standards.
+- Tests cover new or changed logic, transformations, failure handling, and regressions where automated verification is practical.
+- Manual verification supplements automated verification when runtime evidence is required; it must not replace practical automated verification.
+- Documentation is synchronized with implemented behavior and accepted decisions.
+- Repository-relative documentation links remain valid.
+- Significant durable architecture decisions are recorded through ADRs when required.
+- `CHANGELOG.md` is updated when the change is notable.
+- `PROJECT_STATE.md` and focused `docs/state/` documents are updated when their owned current-state information changes.
+- `state/BUILD_TOOLCHAIN_STATUS.md` is updated when the accepted toolchain or dependency baseline changes.
+- `state/REPOSITORY_GOVERNANCE_STATUS.md` is updated when enforced repository-governance settings change.
 - Commit messages follow Conventional Commits.
-- The project remains releasable.
+- The working tree is clean after the completed commit.
 
 Merging into `main` and tagging are release-level activities, not mandatory for every local feature commit.
+
+---
+
+## Code Review Checklist
+
+Every review must evaluate the change against the risks and responsibilities it actually affects.
+
+### General Review
+
+Verify that:
+
+- The change has one clear purpose and a reviewable scope.
+- The diff does not contain unrelated work.
+- Naming, structure, and control flow remain readable and maintainable.
+- No unnecessary abstraction or avoidable technical debt is introduced.
+- The change does not reduce long-term maintainability for short-term convenience.
+
+### Architecture and Android Review
+
+Verify that:
+
+- Accepted architecture and ADR boundaries remain respected.
+- Package ownership and dependency direction remain clear.
+- Presentation, domain, and data responsibilities are not mixed without justification.
+- New abstractions exist only when they provide concrete value.
+- Compose UI remains state-driven and testable.
+- Business logic is not placed directly inside Composables.
+- ViewModels own presentation logic and expose clear UI state when required.
+- Lifecycle-aware APIs are used where lifecycle behavior matters.
+- Dependency injection is used only where it provides a meaningful ownership or testability benefit.
+- Significant architecture changes have an explicit engineering rationale and an ADR when required.
+
+### Build and Test Review
+
+Verify that:
+
+- Required repository validation succeeds.
+- Build and lint warnings are reviewed when they indicate compatibility, security, correctness, or maintainability risk.
+- Tests are added when logic, data transformation, persistence, lifecycle, or failure handling changes.
+- Existing tests are not weakened merely to make a change pass.
+- Manual-only verification is not accepted when practical automated verification exists.
+- Runtime or device verification is added when behavior cannot be established adequately through automated checks alone.
+
+### Documentation and Security Review
+
+Verify that:
+
+- Documentation follows `DOCUMENTATION.md` and remains synchronized with implementation.
+- Documentation uses professional English and valid repository-relative links.
+- Current behavior, planned work, and architectural permission are not conflated.
+- No secrets, credentials, tokens, private keys, sensitive configuration, or private infrastructure details are introduced.
+- External connectivity, authentication, credential handling, and storage boundaries are deliberate and documented where required.
+- Direct mobile access to external databases requires a strong, documented technical justification.
+- Backend or API boundaries remain explicit when remote data access is introduced.
+- Focused security requirements in `SECURITY.md` and accepted security ADRs remain satisfied.
+
+A change must not be approved when it breaks required validation, creates unexplained architecture drift, leaves broken documentation, introduces an unresolved security risk, or materially reduces maintainability.
 
 ---
 
