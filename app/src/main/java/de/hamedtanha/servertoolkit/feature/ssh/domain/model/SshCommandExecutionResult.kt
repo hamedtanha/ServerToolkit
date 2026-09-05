@@ -19,12 +19,19 @@ sealed interface SshCommandExecutionResult {
 /**
  * Project-owned SSH command output.
  *
+ * Retained stdout and stderr are bounded by the SSH data adapter. Truncation flags indicate that the
+ * corresponding remote stream produced more bytes than the application retained for presentation.
+ * The adapter must continue draining excess bytes so output retention does not recreate transport
+ * backpressure.
+ *
  * This model must not expose SSHJ sessions, channels, streams, sockets, or exceptions.
  */
 data class SshCommandExecutionOutput(
     val stdout: String,
     val stderr: String,
     val exitStatus: Int?,
+    val stdoutTruncated: Boolean = false,
+    val stderrTruncated: Boolean = false,
 ) {
     override fun toString(): String {
         return "SshCommandExecutionOutput(stdout=REDACTED, stderr=REDACTED, exitStatus=$exitStatus)"
