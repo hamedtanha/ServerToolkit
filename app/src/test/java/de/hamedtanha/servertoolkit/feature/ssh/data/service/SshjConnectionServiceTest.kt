@@ -374,7 +374,10 @@ class SshjConnectionServiceTest {
 
         fun runNext() {
             val task = tasks.poll(2, TimeUnit.SECONDS)
-                ?: fail("Expected queued coroutine continuation")
+            if (task == null) {
+                fail("Expected queued coroutine continuation")
+                return
+            }
             task.run()
         }
 
