@@ -4,12 +4,13 @@
 
 ### RA-2026.09-v1 — ServerToolkit Architecture Review
 
-- **Status:** In Progress
+- **Status:** Accepted
 - **External report ID:** `STK-ARCH-2026-09-05`
 - **Original evidence baseline:** `2800f3a250e9b2733dc040a69a9a1f851538d84e`
 - **Revalidation baseline:** `e526b6d6f73713ce23e419ee275ad8ba3d4745a6`
 - **Governing Issue:** `#166`
-- **Purpose:** Register and revalidate the 2026-09-05 read-only architecture and targeted implementation review before any focused remediation begins.
+- **Acceptance PR:** `#167`
+- **Purpose:** Register and revalidate the 2026-09-05 read-only architecture and targeted implementation review before focused remediation begins.
 
 Current documents:
 
@@ -17,7 +18,7 @@ Current documents:
 - `architecture/2026/RA-2026.09-v1/REVALIDATION.md`
 - `architecture/2026/RA-2026.09-v1/STATUS.md`
 
-The original external review artifact is preserved against commit `2800f3a250e9b2733dc040a69a9a1f851538d84e`. Current-HEAD changes are recorded only in the separate revalidation document so historical evidence is not rewritten. Review registration does not authorize production implementation.
+The original external review artifact is preserved against commit `2800f3a250e9b2733dc040a69a9a1f851538d84e`. Current-HEAD changes are recorded only in the separate revalidation document so historical evidence is not rewritten. The review is accepted and content-frozen for merge through PR `#167`; publication remains a metadata-only follow-up after the accepted package reaches `main`.
 
 ## Published Reviews
 
