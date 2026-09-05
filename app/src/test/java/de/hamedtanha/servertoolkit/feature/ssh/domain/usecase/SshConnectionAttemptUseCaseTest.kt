@@ -18,15 +18,20 @@ import de.hamedtanha.servertoolkit.feature.ssh.test.FakeSshConnectionHistoryRepo
 import de.hamedtanha.servertoolkit.feature.ssh.test.FakeSshConnectionService
 import de.hamedtanha.servertoolkit.feature.ssh.test.FakeSshHostKeyObservationService
 import de.hamedtanha.servertoolkit.feature.ssh.test.FakeSshHostTrustRepository
+import de.hamedtanha.servertoolkit.feature.ssh.test.sshConnectedResult
 import kotlinx.coroutines.CancellationException
+import kotlinx.coroutines.NonCancellable
+import kotlinx.coroutines.cancel
+import kotlinx.coroutines.currentCoroutineContext
 import kotlinx.coroutines.delay
+import kotlinx.coroutines.launch
 import kotlinx.coroutines.runBlocking
+import kotlinx.coroutines.withContext
 import org.junit.Assert.assertEquals
 import org.junit.Assert.assertFalse
 import org.junit.Assert.assertTrue
 import org.junit.Assert.fail
 import org.junit.Test
-import de.hamedtanha.servertoolkit.feature.ssh.test.sshConnectedResult
 
 class SshConnectionAttemptUseCaseTest {
 
@@ -51,6 +56,7 @@ class SshConnectionAttemptUseCaseTest {
         assertEquals("example.com", service.lastRequest?.host)
         assertEquals(2222, service.lastRequest?.port)
         assertEquals("admin", service.lastRequest?.username)
+        assertTrue(service.discardedUndeliveredSessions.isEmpty())
     }
 
     @Test
@@ -209,6 +215,122 @@ class SshConnectionAttemptUseCaseTest {
         val outcome = useCase("server-1")
 
         assertFailure(SshConnectionError.ConnectionTimeout, outcome)
+        assertTrue(service.discardedUndeliveredSessions.isEmpty())
+    }
+
+    @Test
+    fun `timeout after connected result becomes available discards undelivered session`() = runBlocking {
+        val connectedResult = sshConnectedResult(sessionId = "late-session")
+        val service = FakeSshConnectionService(
+            result = connectedResult,
+            onConnect = {
+                withContext(NonCancellable) {
+                    delay(50)
+                }
+            },
+        )
+        val useCase = createUseCase(
+            resolver = FakeConnectionTargetResolver(resolvedTarget()),
+            service = service,
+            observationService = FakeSshHostKeyObservationService(
+                SshHostKeyObservationResult.Observed(observedHostKey()),
+            ),
+            hostTrustRepository = FakeSshHostTrustRepository(
+                initialTrustedHostKey = trustedHostKey(),
+            ),
+            timeoutMillis = 10,
+        )
+
+        val outcome = useCase("server-1")
+
+        assertFailure(SshConnectionError.ConnectionTimeout, outcome)
+        assertEquals(
+            listOf(connectedResult.sessionHandle),
+            service.discardedUndeliveredSessions,
+        )
+    }
+
+    @Test
+    fun `cancellation after connected result discards undelivered session`() = runBlocking {
+        val connectedResult = sshConnectedResult(sessionId = "cancelled-session")
+        val service = FakeSshConnectionService(
+            result = connectedResult,
+            onConnect = {
+                currentCoroutineContext().cancel(
+                    CancellationException("Connection cancelled after connect"),
+                )
+            },
+        )
+        val useCase = createUseCase(
+            resolver = FakeConnectionTargetResolver(resolvedTarget()),
+            service = service,
+            observationService = FakeSshHostKeyObservationService(
+                SshHostKeyObservationResult.Observed(observedHostKey()),
+            ),
+            hostTrustRepository = FakeSshHostTrustRepository(
+                initialTrustedHostKey = trustedHostKey(),
+            ),
+        )
+        var observedCancellation: CancellationException? = null
+
+        val job = launch {
+            try {
+                useCase("server-1")
+                fail("Expected CancellationException")
+            } catch (error: CancellationException) {
+                observedCancellation = error
+            }
+        }
+        job.join()
+
+        assertEquals("Connection cancelled after connect", observedCancellation?.message)
+        assertEquals(
+            listOf(connectedResult.sessionHandle),
+            service.discardedUndeliveredSessions,
+        )
+    }
+
+    @Test
+    fun `cleanup failure does not replace cancellation after connected result`() = runBlocking {
+        val connectedResult = sshConnectedResult(sessionId = "cleanup-failure-session")
+        val service = FakeSshConnectionService(
+            result = connectedResult,
+            onConnect = {
+                currentCoroutineContext().cancel(
+                    CancellationException("Primary cancellation"),
+                )
+            },
+            onDiscardUndeliveredSession = {
+                throw IllegalStateException("Simulated rollback failure")
+            },
+        )
+        val useCase = createUseCase(
+            resolver = FakeConnectionTargetResolver(resolvedTarget()),
+            service = service,
+            observationService = FakeSshHostKeyObservationService(
+                SshHostKeyObservationResult.Observed(observedHostKey()),
+            ),
+            hostTrustRepository = FakeSshHostTrustRepository(
+                initialTrustedHostKey = trustedHostKey(),
+            ),
+        )
+        var observedCancellation: CancellationException? = null
+
+        val job = launch {
+            try {
+                useCase("server-1")
+                fail("Expected CancellationException")
+            } catch (error: CancellationException) {
+                observedCancellation = error
+            }
+        }
+        job.join()
+
+        assertEquals("Primary cancellation", observedCancellation?.message)
+        assertEquals(
+            listOf(connectedResult.sessionHandle),
+            service.discardedUndeliveredSessions,
+        )
     }
 
     @Test
@@ -260,6 +382,7 @@ class SshConnectionAttemptUseCaseTest {
         } catch (error: CancellationException) {
             assertEquals("Connection cancelled", error.message)
         }
+        assertTrue(service.discardedUndeliveredSessions.isEmpty())
     }
 
     private fun createUseCase(
