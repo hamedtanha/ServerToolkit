@@ -40,7 +40,7 @@ android {
     }
     testOptions {
         managedDevices {
-            devices {
+            localDevices {
                 create<com.android.build.api.dsl.ManagedVirtualDevice>("ciApi36") {
                     device = "Pixel 2"
                     apiLevel = 36
