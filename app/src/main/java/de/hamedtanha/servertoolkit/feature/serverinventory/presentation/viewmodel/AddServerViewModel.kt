@@ -8,6 +8,7 @@ import de.hamedtanha.servertoolkit.feature.serverinventory.domain.repository.Ser
 import de.hamedtanha.servertoolkit.feature.serverinventory.presentation.state.ServerFormUiState
 import java.util.UUID
 import javax.inject.Inject
+import kotlinx.coroutines.CancellationException
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
@@ -91,9 +92,8 @@ class AddServerViewModel @Inject constructor(
                 formMessage = null,
             )
 
-            runCatching {
+            try {
                 serverRepository.saveServer(validatedState.toServer())
-            }.onSuccess {
                 _uiState.update { currentState ->
                     currentState.copy(
                         isSaving = false,
@@ -101,12 +101,14 @@ class AddServerViewModel @Inject constructor(
                         formMessage = null,
                     )
                 }
-            }.onFailure { throwable ->
+            } catch (error: CancellationException) {
+                throw error
+            } catch (_: Exception) {
                 _uiState.update { currentState ->
                     currentState.copy(
                         isSaving = false,
                         isSaved = false,
-                        formMessage = throwable.message ?: "Server could not be saved.",
+                        formMessage = SAVE_ERROR_MESSAGE,
                     )
                 }
             }
@@ -162,5 +164,9 @@ class AddServerViewModel @Inject constructor(
             sshPort = requireNotNull(port.toIntOrNull()),
             sshUsername = username.trim(),
         )
+    }
+
+    private companion object {
+        const val SAVE_ERROR_MESSAGE = "Server could not be saved."
     }
 }
