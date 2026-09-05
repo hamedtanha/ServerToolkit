@@ -11,10 +11,10 @@ import de.hamedtanha.servertoolkit.feature.ssh.domain.model.SshSessionHandle
 import de.hamedtanha.servertoolkit.feature.ssh.domain.model.SshTrustedHostKey
 import de.hamedtanha.servertoolkit.feature.ssh.test.FakeSshHostTrustRepository
 import java.util.concurrent.LinkedBlockingQueue
-import java.util.concurrent.TimeUnit
 import kotlin.coroutines.CoroutineContext
 import kotlinx.coroutines.CancellationException
 import kotlinx.coroutines.CoroutineDispatcher
+import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.cancel
 import kotlinx.coroutines.currentCoroutineContext
 import kotlinx.coroutines.launch
@@ -159,12 +159,14 @@ class SshjConnectionServiceTest {
     fun `cancellation after registry insertion before caller resumption discards session`() = runBlocking {
         val registry = SshjSessionOwnerRegistry()
         val executor = FakeTrustedConnectionExecutor()
+        val callerDispatcher = QueueingDispatcher()
+        val ioDispatcher = QueueingDispatcher()
         val service = sshjConnectionService(
             hostTrustRepository = FakeSshHostTrustRepository(trustedHostKey()),
             trustedConnectionExecutor = executor,
             sessionOwnerRegistry = registry,
+            ioDispatcher = ioDispatcher,
         )
-        val callerDispatcher = QueueingDispatcher()
         var observedCancellation: CancellationException? = null
 
         val job = launch(callerDispatcher) {
@@ -177,22 +179,26 @@ class SshjConnectionServiceTest {
         }
 
         callerDispatcher.runNext()
-        awaitCondition("Expected session registration before caller resumption") {
-            registry.contains(executor.ownerHandle)
-        }
-        awaitCondition("Expected caller resumption to be queued before cancellation") {
-            callerDispatcher.hasQueuedTask()
-        }
+        assertTrue(ioDispatcher.hasQueuedTask())
+
+        ioDispatcher.runNext()
+        assertTrue(registry.contains(executor.ownerHandle))
+        assertTrue(callerDispatcher.hasQueuedTask())
 
         job.cancel(CancellationException("cancelled handoff"))
-        callerDispatcher.runUntil(
-            failureMessage = "Expected cancelled handoff cleanup to complete",
-        ) {
-            observedCancellation != null &&
-                executor.ownerCloseAttempted &&
-                executor.ownerClosed &&
-                !registry.contains(executor.ownerHandle)
-        }
+        callerDispatcher.runNext()
+
+        assertTrue(ioDispatcher.hasQueuedTask())
+        assertTrue(registry.contains(executor.ownerHandle))
+
+        ioDispatcher.runNext()
+        assertTrue(executor.ownerCloseAttempted)
+        assertTrue(executor.ownerClosed)
+        assertFalse(registry.contains(executor.ownerHandle))
+        assertTrue(callerDispatcher.hasQueuedTask())
+
+        callerDispatcher.runNext()
+        job.join()
 
         assertEquals("cancelled handoff", observedCancellation?.message)
         assertTrue(executor.ownerCloseAttempted)
@@ -310,12 +316,14 @@ class SshjConnectionServiceTest {
         hostTrustRepository: FakeSshHostTrustRepository = FakeSshHostTrustRepository(),
         trustedConnectionExecutor: SshjTrustedConnectionExecutor = FakeTrustedConnectionExecutor(),
         sessionOwnerRegistry: SshjSessionOwnerRegistry = SshjSessionOwnerRegistry(),
+        ioDispatcher: CoroutineDispatcher = Dispatchers.IO,
     ): SshjConnectionService {
         return SshjConnectionService(
             authenticationAdapter = SshjAuthenticationAdapter(),
             hostTrustRepository = hostTrustRepository,
             trustedConnectionExecutor = trustedConnectionExecutor,
             sessionOwnerRegistry = sessionOwnerRegistry,
+            ioDispatcher = ioDispatcher,
         )
     }
 
@@ -357,20 +365,6 @@ class SshjConnectionServiceTest {
         )
     }
 
-    private fun awaitCondition(
-        failureMessage: String,
-        condition: () -> Boolean,
-    ) {
-        val deadlineNanos = System.nanoTime() + TimeUnit.SECONDS.toNanos(2)
-        while (System.nanoTime() < deadlineNanos) {
-            if (condition()) {
-                return
-            }
-            Thread.sleep(5)
-        }
-        fail(failureMessage)
-    }
-
     private class QueueingDispatcher : CoroutineDispatcher() {
 
         private val tasks = LinkedBlockingQueue<Runnable>()
@@ -384,30 +378,12 @@ class SshjConnectionServiceTest {
         }
 
         fun runNext() {
-            val task = tasks.poll(2, TimeUnit.SECONDS)
+            val task = tasks.poll()
             if (task == null) {
                 fail("Expected queued coroutine continuation")
                 return
             }
             task.run()
-        }
-
-        fun runUntil(
-            failureMessage: String,
-            completed: () -> Boolean,
-        ) {
-            val deadlineNanos = System.nanoTime() + TimeUnit.SECONDS.toNanos(2)
-            while (System.nanoTime() < deadlineNanos) {
-                if (completed()) {
-                    return
-                }
-
-                tasks.poll(25, TimeUnit.MILLISECONDS)?.run()
-            }
-
-            if (!completed()) {
-                fail(failureMessage)
-            }
         }
     }
 
