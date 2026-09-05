@@ -24,5 +24,5 @@ interface SshConnectionService {
      * must remove application ownership of the abandoned session and must not let cleanup failure
      * replace the caller's primary cancellation, timeout, or failure outcome.
      */
-    fun discardUndeliveredSession(sessionHandle: SshSessionHandle)
+    suspend fun discardUndeliveredSession(sessionHandle: SshSessionHandle)
 }
