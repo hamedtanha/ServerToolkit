@@ -38,6 +38,17 @@ android {
     buildFeatures {
         compose = true
     }
+    testOptions {
+        managedDevices {
+            devices {
+                create<com.android.build.api.dsl.ManagedVirtualDevice>("ciApi36") {
+                    device = "Pixel 2"
+                    apiLevel = 36
+                    systemImageSource = "aosp-atd"
+                }
+            }
+        }
+    }
 
     sourceSets {
         getByName("androidTest") {

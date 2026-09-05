@@ -47,3 +47,46 @@ jobs:
             :app:assembleDebug \
             :app:assembleDebugAndroidTest \
             --stacktrace
+
+  instrumentation:
+    name: Run Android instrumentation tests
+    needs: validate
+    runs-on: ubuntu-24.04
+    timeout-minutes: 45
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v7
+        with:
+          persist-credentials: false
+
+      - name: Set up JDK 17
+        uses: actions/setup-java@v5
+        with:
+          distribution: temurin
+          java-version: "17"
+
+      - name: Set up Gradle
+        uses: gradle/actions/setup-gradle@v6
+
+      - name: Enable KVM access
+        run: |
+          if [[ ! -e /dev/kvm ]]; then
+            echo "/dev/kvm is unavailable on this runner." >&2
+            exit 1
+          fi
+          sudo chmod 666 /dev/kvm
+
+      - name: Run Android instrumentation
+        run: ./gradlew :app:ciApi36DebugAndroidTest --stacktrace
+
+      - name: Upload Android instrumentation reports
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: android-instrumentation-${{ github.sha }}
+          path: |
+            app/build/reports/androidTests/managedDevice/
+            app/build/outputs/androidTest-results/managedDevice/
+          if-no-files-found: warn
+          retention-days: 7
