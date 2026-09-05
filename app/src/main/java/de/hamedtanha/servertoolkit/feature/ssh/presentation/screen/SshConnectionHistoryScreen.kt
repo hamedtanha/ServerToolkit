@@ -15,6 +15,7 @@ import androidx.compose.material3.Card
 import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
+import androidx.compose.material3.TextButton
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
@@ -23,11 +24,11 @@ import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.hilt.lifecycle.viewmodel.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
-import de.hamedtanha.servertoolkit.ui.designsystem.theme.ServerToolkitButtonShape
 import de.hamedtanha.servertoolkit.feature.ssh.domain.model.SshConnectionHistoryStatus
 import de.hamedtanha.servertoolkit.feature.ssh.presentation.state.SshConnectionHistoryItemUiState
 import de.hamedtanha.servertoolkit.feature.ssh.presentation.state.SshConnectionHistoryUiState
 import de.hamedtanha.servertoolkit.feature.ssh.presentation.viewmodel.SshConnectionHistoryViewModel
+import de.hamedtanha.servertoolkit.ui.designsystem.theme.ServerToolkitButtonShape
 import java.time.Instant
 import java.time.ZoneId
 import java.time.format.DateTimeFormatter
@@ -45,6 +46,7 @@ fun SshConnectionHistoryRoute(
     SshConnectionHistoryScreen(
         uiState = uiState,
         onNavigateBack = onNavigateBack,
+        onRetryLoad = viewModel::onRetryLoad,
         modifier = modifier,
     )
 }
@@ -54,6 +56,7 @@ fun SshConnectionHistoryScreen(
     uiState: SshConnectionHistoryUiState,
     onNavigateBack: () -> Unit,
     modifier: Modifier = Modifier,
+    onRetryLoad: () -> Unit = {},
 ) {
     Column(
         modifier = modifier
@@ -76,20 +79,29 @@ fun SshConnectionHistoryScreen(
         Spacer(modifier = Modifier.height(16.dp))
 
         when {
-            uiState.isLoading -> ConnectionHistoryLoadingContent(
+            uiState.isLoading && uiState.entries.isEmpty() -> ConnectionHistoryLoadingContent(
                 modifier = Modifier
                     .weight(1f)
                     .fillMaxWidth(),
             )
 
-            uiState.errorMessage != null -> ConnectionHistoryMessageContent(
-                title = "Connection history could not be loaded",
-                message = uiState.errorMessage,
-                isError = true,
-                modifier = Modifier
-                    .weight(1f)
-                    .fillMaxWidth(),
-            )
+            uiState.errorMessage != null && uiState.entries.isEmpty() ->
+                ConnectionHistoryMessageContent(
+                    title = "Connection history could not be loaded",
+                    message = uiState.errorMessage,
+                    isError = true,
+                    modifier = Modifier
+                        .weight(1f)
+                        .fillMaxWidth(),
+                    action = {
+                        Button(
+                            shape = ServerToolkitButtonShape,
+                            onClick = onRetryLoad,
+                        ) {
+                            Text(text = "Retry")
+                        }
+                    },
+                )
 
             uiState.isEmpty -> ConnectionHistoryMessageContent(
                 title = "No connection history",
@@ -99,25 +111,19 @@ fun SshConnectionHistoryScreen(
                     .fillMaxWidth(),
             )
 
-            uiState.hasEntries -> LazyColumn(
+            uiState.hasEntries -> ConnectionHistoryEntriesContent(
+                entries = uiState.entries,
+                errorMessage = uiState.errorMessage,
+                onRetryLoad = onRetryLoad,
                 modifier = Modifier
                     .weight(1f)
                     .fillMaxWidth(),
-                verticalArrangement = Arrangement.spacedBy(12.dp),
-            ) {
-                items(
-                    items = uiState.entries,
-                    key = { entry -> entry.id },
-                ) { entry ->
-                    ConnectionHistoryItem(entry)
-                }
-            }
+            )
         }
 
         Spacer(modifier = Modifier.height(16.dp))
 
         Button(
-
             shape = ServerToolkitButtonShape,
             onClick = onNavigateBack,
             modifier = Modifier.fillMaxWidth(),
@@ -145,6 +151,7 @@ private fun ConnectionHistoryMessageContent(
     message: String,
     modifier: Modifier = Modifier,
     isError: Boolean = false,
+    action: @Composable (() -> Unit)? = null,
 ) {
     Box(
         modifier = modifier,
@@ -172,6 +179,47 @@ private fun ConnectionHistoryMessageContent(
                 textAlign = TextAlign.Center,
                 color = MaterialTheme.colorScheme.onSurfaceVariant,
             )
+
+            if (action != null) {
+                Spacer(modifier = Modifier.height(16.dp))
+                action()
+            }
+        }
+    }
+}
+
+@Composable
+private fun ConnectionHistoryEntriesContent(
+    entries: List<SshConnectionHistoryItemUiState>,
+    errorMessage: String?,
+    onRetryLoad: () -> Unit,
+    modifier: Modifier = Modifier,
+) {
+    Column(modifier = modifier) {
+        errorMessage?.let { message ->
+            Text(
+                text = message,
+                style = MaterialTheme.typography.bodySmall,
+                color = MaterialTheme.colorScheme.error,
+            )
+
+            TextButton(onClick = onRetryLoad) {
+                Text(text = "Retry")
+            }
+
+            Spacer(modifier = Modifier.height(8.dp))
+        }
+
+        LazyColumn(
+            modifier = Modifier.fillMaxSize(),
+            verticalArrangement = Arrangement.spacedBy(12.dp),
+        ) {
+            items(
+                items = entries,
+                key = { entry -> entry.id },
+            ) { entry ->
+                ConnectionHistoryItem(entry)
+            }
         }
     }
 }

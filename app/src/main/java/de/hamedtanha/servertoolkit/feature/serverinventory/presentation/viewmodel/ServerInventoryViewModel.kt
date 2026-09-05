@@ -3,18 +3,20 @@ package de.hamedtanha.servertoolkit.feature.serverinventory.presentation.viewmod
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import dagger.hilt.android.lifecycle.HiltViewModel
+import de.hamedtanha.servertoolkit.feature.serverinventory.domain.model.Server
 import de.hamedtanha.servertoolkit.feature.serverinventory.domain.model.ServerEnvironment
 import de.hamedtanha.servertoolkit.feature.serverinventory.domain.repository.ServerRepository
 import de.hamedtanha.servertoolkit.feature.serverinventory.presentation.state.ServerInventoryFilter
 import de.hamedtanha.servertoolkit.feature.serverinventory.presentation.state.ServerInventoryUiState
 import de.hamedtanha.servertoolkit.feature.serverinventory.presentation.state.applyServerInventoryFilter
 import javax.inject.Inject
+import kotlinx.coroutines.CancellationException
+import kotlinx.coroutines.Job
 import kotlinx.coroutines.flow.MutableStateFlow
-import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.StateFlow
-import kotlinx.coroutines.flow.catch
-import kotlinx.coroutines.flow.combine
-import kotlinx.coroutines.flow.stateIn
+import kotlinx.coroutines.flow.asStateFlow
+import kotlinx.coroutines.flow.collect
+import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 
 @HiltViewModel
@@ -22,61 +24,115 @@ class ServerInventoryViewModel @Inject constructor(
     private val serverRepository: ServerRepository,
 ) : ViewModel() {
 
-    private val filter = MutableStateFlow(ServerInventoryFilter())
-    private val operationMessage = MutableStateFlow<String?>(null)
-
-    val uiState: StateFlow<ServerInventoryUiState> = combine(
-        serverRepository.observeServers(),
-        filter,
-        operationMessage,
-    ) { servers, currentFilter, message ->
-        ServerInventoryUiState(
-            servers = servers.applyServerInventoryFilter(currentFilter),
-            totalServerCount = servers.size,
-            filter = currentFilter,
-            operationMessage = message,
-        )
-    }.catch { throwable ->
-        emit(
-            ServerInventoryUiState(
-                errorMessage = throwable.message ?: "Unknown server inventory error.",
-            ),
-        )
-    }.stateIn(
-        scope = viewModelScope,
-        started = SharingStarted.WhileSubscribed(STOP_TIMEOUT_MILLIS),
-        initialValue = ServerInventoryUiState(isLoading = true),
+    private val _uiState = MutableStateFlow(
+        ServerInventoryUiState(isLoading = true),
     )
+    val uiState: StateFlow<ServerInventoryUiState> = _uiState.asStateFlow()
+
+    private var latestServers: List<Server> = emptyList()
+    private var observationJob: Job? = null
+
+    init {
+        observeServers(showLoading = true)
+    }
+
+    fun onRetryLoad() {
+        observeServers(
+            showLoading = _uiState.value.totalServerCount == 0,
+        )
+    }
 
     fun onSearchQueryChanged(searchQuery: String) {
-        filter.value = filter.value.copy(searchQuery = searchQuery)
+        updateFilter { currentFilter ->
+            currentFilter.copy(searchQuery = searchQuery)
+        }
     }
 
     fun onEnvironmentFilterChanged(environment: ServerEnvironment?) {
-        filter.value = filter.value.copy(environment = environment)
+        updateFilter { currentFilter ->
+            currentFilter.copy(environment = environment)
+        }
     }
 
     fun onFavoritesOnlyChanged(favoritesOnly: Boolean) {
-        filter.value = filter.value.copy(favoritesOnly = favoritesOnly)
+        updateFilter { currentFilter ->
+            currentFilter.copy(favoritesOnly = favoritesOnly)
+        }
     }
 
     fun onClearFilters() {
-        filter.value = ServerInventoryFilter()
+        updateFilter { ServerInventoryFilter() }
     }
 
     fun onDeleteServerConfirmed(serverId: String) {
         viewModelScope.launch {
-            operationMessage.value = null
+            _uiState.update { currentState ->
+                currentState.copy(operationMessage = null)
+            }
 
-            runCatching {
+            try {
                 serverRepository.deleteServer(serverId)
-            }.onFailure {
-                operationMessage.value = "Server could not be deleted."
+            } catch (error: CancellationException) {
+                throw error
+            } catch (_: Exception) {
+                _uiState.update { currentState ->
+                    currentState.copy(operationMessage = DELETE_ERROR_MESSAGE)
+                }
             }
         }
     }
 
+    private fun observeServers(showLoading: Boolean) {
+        observationJob?.cancel()
+
+        _uiState.update { currentState ->
+            currentState.copy(
+                isLoading = showLoading,
+                errorMessage = null,
+            )
+        }
+
+        observationJob = viewModelScope.launch {
+            try {
+                serverRepository.observeServers().collect { servers ->
+                    latestServers = servers
+
+                    _uiState.update { currentState ->
+                        currentState.copy(
+                            servers = servers.applyServerInventoryFilter(currentState.filter),
+                            totalServerCount = servers.size,
+                            isLoading = false,
+                            errorMessage = null,
+                        )
+                    }
+                }
+            } catch (error: CancellationException) {
+                throw error
+            } catch (_: Exception) {
+                _uiState.update { currentState ->
+                    currentState.copy(
+                        isLoading = false,
+                        errorMessage = LOAD_ERROR_MESSAGE,
+                    )
+                }
+            }
+        }
+    }
+
+    private fun updateFilter(
+        transform: (ServerInventoryFilter) -> ServerInventoryFilter,
+    ) {
+        _uiState.update { currentState ->
+            val updatedFilter = transform(currentState.filter)
+            currentState.copy(
+                servers = latestServers.applyServerInventoryFilter(updatedFilter),
+                filter = updatedFilter,
+            )
+        }
+    }
+
     private companion object {
-        const val STOP_TIMEOUT_MILLIS = 5_000L
+        const val LOAD_ERROR_MESSAGE = "Server inventory could not be loaded."
+        const val DELETE_ERROR_MESSAGE = "Server could not be deleted."
     }
 }

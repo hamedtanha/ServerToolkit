@@ -78,6 +78,8 @@ The project follows Conventional Commits and Semantic Versioning principles.
 - Fixed SSH command-output backpressure and unbounded retention by draining stdout/stderr concurrently, retaining at most `256 KiB` per stream with explicit truncation, and keeping channel completion plus stream draining inside the command operation timeout/cancellation boundary.
 - Fixed SSH host-key fingerprint compatibility by using canonical OpenSSH SHA-256 over the SSH public-key wire representation for new observation and trust while preserving explicit verification of historical SSHJ MD5 and Java-encoded SHA-256 records without silent rewrite or Room schema migration.
 - Fixed terminal SSH workflow-owner destruction so a permanently cleared workflow transfers any still-owned active session to data-layer abandonment cleanup outside `viewModelScope`, removes unreachable registry ownership before best-effort concrete cleanup, preserves awaited retry-aware cleanup for normal navigation, and avoids introducing background session continuity.
+- Fixed Server Inventory/Add/Edit/Delete repository failure handling so transient observation failures are retryable, last useful inventory/filter state is preserved, user-facing messages do not expose raw infrastructure exceptions, and coroutine cancellation is not misreported as repository failure.
+- Fixed per-server SSH Connection History observation recovery with explicit retry, last-useful entry preservation after later failures, stable failure copy, and cancellation propagation.
 
 ### Not Changed
 

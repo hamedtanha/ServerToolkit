@@ -22,10 +22,10 @@ import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.hilt.lifecycle.viewmodel.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
-import de.hamedtanha.servertoolkit.ui.designsystem.theme.ServerToolkitButtonShape
 import de.hamedtanha.servertoolkit.feature.serverinventory.presentation.state.ServerFormUiState
 import de.hamedtanha.servertoolkit.feature.serverinventory.presentation.viewmodel.AddServerViewModel
 import de.hamedtanha.servertoolkit.feature.serverinventory.presentation.viewmodel.EditServerViewModel
+import de.hamedtanha.servertoolkit.ui.designsystem.theme.ServerToolkitButtonShape
 
 @Composable
 fun AddServerRoute(
@@ -59,6 +59,7 @@ fun EditServerRoute(
         onPortChanged = viewModel::onPortChanged,
         onUsernameChanged = viewModel::onUsernameChanged,
         onSaveClicked = viewModel::onSaveClicked,
+        onRetryLoad = viewModel::onRetryLoad,
         onNavigateBack = onNavigateBack,
     )
 }
@@ -72,6 +73,7 @@ private fun ServerFormRouteContent(
     onUsernameChanged: (String) -> Unit,
     onSaveClicked: () -> Unit,
     onNavigateBack: () -> Unit,
+    onRetryLoad: (() -> Unit)? = null,
 ) {
     LaunchedEffect(uiState.isSaved) {
         if (uiState.isSaved) {
@@ -87,6 +89,7 @@ private fun ServerFormRouteContent(
         onUsernameChanged = onUsernameChanged,
         onSaveClicked = onSaveClicked,
         onNavigateBack = onNavigateBack,
+        onRetryLoad = onRetryLoad,
     )
 }
 
@@ -100,6 +103,7 @@ fun ServerFormScreen(
     onSaveClicked: () -> Unit,
     onNavigateBack: () -> Unit,
     modifier: Modifier = Modifier,
+    onRetryLoad: (() -> Unit)? = null,
 ) {
     Column(
         modifier = modifier
@@ -200,8 +204,19 @@ fun ServerFormScreen(
             Spacer(modifier = Modifier.height(16.dp))
         }
 
-        Button(
+        if (uiState.canRetryLoad && onRetryLoad != null) {
+            Button(
+                shape = ServerToolkitButtonShape,
+                onClick = onRetryLoad,
+                modifier = Modifier.fillMaxWidth(),
+            ) {
+                Text(text = "Retry loading server")
+            }
 
+            Spacer(modifier = Modifier.height(12.dp))
+        }
+
+        Button(
             shape = ServerToolkitButtonShape,
             onClick = onSaveClicked,
             modifier = Modifier.fillMaxWidth(),
@@ -219,7 +234,6 @@ fun ServerFormScreen(
         Spacer(modifier = Modifier.height(12.dp))
 
         Button(
-
             shape = ServerToolkitButtonShape,
             onClick = onNavigateBack,
             modifier = Modifier.fillMaxWidth(),
