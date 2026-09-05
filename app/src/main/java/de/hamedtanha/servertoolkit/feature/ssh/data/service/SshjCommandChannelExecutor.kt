@@ -18,6 +18,8 @@ import kotlinx.coroutines.CancellationException
 import net.schmizz.sshj.SSHClient
 import net.schmizz.sshj.connection.channel.direct.Session
 
+internal const val SSH_COMMAND_MAX_RETAINED_BYTES_PER_STREAM: Int = 256 * 1024
+
 /**
  * Executes a non-interactive SSH command through a short-lived command channel.
  *
@@ -61,7 +63,7 @@ internal interface SshjCommandChannel {
 }
 
 internal class SshjNetworkCommandChannelExecutor(
-    private val maxRetainedBytesPerStream: Int = DEFAULT_MAX_RETAINED_BYTES_PER_STREAM,
+    private val maxRetainedBytesPerStream: Int = SSH_COMMAND_MAX_RETAINED_BYTES_PER_STREAM,
     private val nanoTimeProvider: () -> Long = System::nanoTime,
 ) : SshjCommandChannelExecutor {
 
@@ -84,6 +86,7 @@ internal class SshjNetworkCommandChannelExecutor(
         var streamExecutorForCleanup: ExecutorService? = null
         var stdoutFutureForCleanup: Future<RetainedCommandStream>? = null
         var stderrFutureForCleanup: Future<RetainedCommandStream>? = null
+        var restoreInterrupt = false
 
         return try {
             val openedChannel = commandClient.openCommandChannel(request.command)
@@ -124,7 +127,7 @@ internal class SshjNetworkCommandChannelExecutor(
         } catch (error: TimeoutException) {
             SshCommandExecutionResult.Failed(SshCommandExecutionError.CommandTimedOut)
         } catch (error: InterruptedException) {
-            Thread.currentThread().interrupt()
+            restoreInterrupt = true
             throw CancellationException("SSH command execution was cancelled.").apply {
                 initCause(error)
             }
@@ -143,6 +146,9 @@ internal class SshjNetworkCommandChannelExecutor(
             stdoutFutureForCleanup?.cancel(true)
             stderrFutureForCleanup?.cancel(true)
             streamExecutorForCleanup?.shutdownNow()
+            if (restoreInterrupt) {
+                Thread.currentThread().interrupt()
+            }
         }
     }
 
@@ -159,7 +165,6 @@ internal class SshjNetworkCommandChannelExecutor(
     }
 
     private companion object {
-        const val DEFAULT_MAX_RETAINED_BYTES_PER_STREAM: Int = 256 * 1024
         const val STREAM_BUFFER_BYTES: Int = 8 * 1024
         const val STREAM_DRAINER_COUNT: Int = 2
     }
