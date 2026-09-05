@@ -12,6 +12,7 @@ import de.hamedtanha.servertoolkit.feature.ssh.domain.model.SshConnectionRequest
 import de.hamedtanha.servertoolkit.feature.ssh.domain.model.SshConnectionResult
 import de.hamedtanha.servertoolkit.feature.ssh.domain.model.SshHostKeyObservationResult
 import de.hamedtanha.servertoolkit.feature.ssh.domain.model.SshHostTrustDecision
+import de.hamedtanha.servertoolkit.feature.ssh.domain.model.SshSessionHandle
 import de.hamedtanha.servertoolkit.feature.ssh.domain.repository.SshConnectionHistoryRepository
 import de.hamedtanha.servertoolkit.feature.ssh.domain.service.SshConnectionService
 import de.hamedtanha.servertoolkit.feature.ssh.domain.service.SshHostKeyObservationService
@@ -20,6 +21,8 @@ import javax.inject.Inject
 import kotlinx.coroutines.CancellationException
 import kotlinx.coroutines.NonCancellable
 import kotlinx.coroutines.TimeoutCancellationException
+import kotlinx.coroutines.currentCoroutineContext
+import kotlinx.coroutines.ensureActive
 import kotlinx.coroutines.withContext
 import kotlinx.coroutines.withTimeout
 
@@ -64,6 +67,18 @@ class SshConnectionAttemptUseCase @Inject constructor(
     ): SshConnectionAttemptOutcome {
         var attemptedAtEpochMillis = 0L
         var resolvedTarget: RemoteConnectionTarget? = null
+        var pendingSessionHandle: SshSessionHandle? = null
+
+        fun discardPendingConnectedSession() {
+            val sessionHandle = pendingSessionHandle ?: return
+            pendingSessionHandle = null
+
+            try {
+                connectionService.discardUndeliveredSession(sessionHandle)
+            } catch (_: Exception) {
+                // Rollback failure must not replace the primary cancellation, timeout, or failure.
+            }
+        }
 
         return try {
             attemptedAtEpochMillis = currentTimeMillisProvider()
@@ -73,6 +88,7 @@ class SshConnectionAttemptUseCase @Inject constructor(
                     serverId = serverId,
                     authenticationInput = authenticationInput,
                     onTargetResolved = { target -> resolvedTarget = target },
+                    onConnectedSession = { handle -> pendingSessionHandle = handle },
                 )
             }
 
@@ -81,8 +97,10 @@ class SshConnectionAttemptUseCase @Inject constructor(
                 outcome = outcome,
                 attemptedAtEpochMillis = attemptedAtEpochMillis,
             )
+            pendingSessionHandle = null
             outcome
         } catch (error: TimeoutCancellationException) {
+            discardPendingConnectedSession()
             val outcome = SshConnectionAttemptOutcome.ConnectionResult(
                 SshConnectionResult.Failed(SshConnectionError.ConnectionTimeout),
             )
@@ -93,12 +111,14 @@ class SshConnectionAttemptUseCase @Inject constructor(
             )
             outcome
         } catch (error: CancellationException) {
+            discardPendingConnectedSession()
             recordCancelledConnectionAttempt(
                 target = resolvedTarget,
                 attemptedAtEpochMillis = attemptedAtEpochMillis,
             )
             throw error
         } catch (error: Exception) {
+            discardPendingConnectedSession()
             val outcome = SshConnectionAttemptOutcome.ConnectionResult(
                 SshConnectionResult.Failed(SshConnectionError.Unknown),
             )
@@ -117,6 +137,7 @@ class SshConnectionAttemptUseCase @Inject constructor(
         serverId: String,
         authenticationInput: SshAuthenticationInput,
         onTargetResolved: (RemoteConnectionTarget) -> Unit,
+        onConnectedSession: (SshSessionHandle) -> Unit,
     ): SshConnectionAttemptOutcome {
         return when (val resolution = connectionTargetResolver.resolve(serverId)) {
             is ConnectionTargetResolution.Resolved -> {
@@ -124,6 +145,7 @@ class SshConnectionAttemptUseCase @Inject constructor(
                 connectToResolvedTarget(
                     target = resolution.target,
                     authenticationInput = authenticationInput,
+                    onConnectedSession = onConnectedSession,
                 )
             }
 
@@ -140,6 +162,7 @@ class SshConnectionAttemptUseCase @Inject constructor(
     private suspend fun connectToResolvedTarget(
         target: RemoteConnectionTarget,
         authenticationInput: SshAuthenticationInput,
+        onConnectedSession: (SshSessionHandle) -> Unit,
     ): SshConnectionAttemptOutcome {
         val request = SshConnectionRequest(
             serverId = target.serverId,
@@ -153,6 +176,7 @@ class SshConnectionAttemptUseCase @Inject constructor(
             is SshHostKeyObservationResult.Observed -> handleObservedHostKey(
                 request = request,
                 observation = observation,
+                onConnectedSession = onConnectedSession,
             )
 
             SshHostKeyObservationResult.Unavailable -> SshConnectionAttemptOutcome.ConnectionResult(
@@ -164,11 +188,17 @@ class SshConnectionAttemptUseCase @Inject constructor(
     private suspend fun handleObservedHostKey(
         request: SshConnectionRequest,
         observation: SshHostKeyObservationResult.Observed,
+        onConnectedSession: (SshSessionHandle) -> Unit,
     ): SshConnectionAttemptOutcome {
         return when (val decision = hostTrustDecisionUseCase(observation.observedHostKey)) {
-            is SshHostTrustDecision.Accepted -> SshConnectionAttemptOutcome.ConnectionResult(
-                connectionService.connect(request),
-            )
+            is SshHostTrustDecision.Accepted -> {
+                val connectionResult = connectionService.connect(request)
+                if (connectionResult is SshConnectionResult.Connected) {
+                    onConnectedSession(connectionResult.sessionHandle)
+                    currentCoroutineContext().ensureActive()
+                }
+                SshConnectionAttemptOutcome.ConnectionResult(connectionResult)
+            }
 
             is SshHostTrustDecision.ReviewRequired -> {
                 request.clearAuthenticationInput()
