@@ -185,7 +185,14 @@ class SshjConnectionServiceTest {
         }
 
         job.cancel(CancellationException("cancelled handoff"))
-        callerDispatcher.runUntil { job.isCompleted }
+        callerDispatcher.runUntil(
+            failureMessage = "Expected cancelled handoff cleanup to complete",
+        ) {
+            observedCancellation != null &&
+                executor.ownerCloseAttempted &&
+                executor.ownerClosed &&
+                !registry.contains(executor.ownerHandle)
+        }
 
         assertEquals("cancelled handoff", observedCancellation?.message)
         assertTrue(executor.ownerCloseAttempted)
@@ -385,14 +392,22 @@ class SshjConnectionServiceTest {
             task.run()
         }
 
-        fun runUntil(completed: () -> Boolean) {
-            repeat(4) {
+        fun runUntil(
+            failureMessage: String,
+            completed: () -> Boolean,
+        ) {
+            val deadlineNanos = System.nanoTime() + TimeUnit.SECONDS.toNanos(2)
+            while (System.nanoTime() < deadlineNanos) {
                 if (completed()) {
                     return
                 }
-                runNext()
+
+                tasks.poll(25, TimeUnit.MILLISECONDS)?.run()
             }
-            fail("Expected coroutine to complete")
+
+            if (!completed()) {
+                fail(failureMessage)
+            }
         }
     }
 
@@ -413,9 +428,11 @@ class SshjConnectionServiceTest {
         var connectAndAuthenticateCallCount = 0
             private set
 
+        @Volatile
         var ownerCloseAttempted = false
             private set
 
+        @Volatile
         var ownerClosed = false
             private set
 
