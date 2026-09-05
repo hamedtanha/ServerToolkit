@@ -66,6 +66,25 @@ class SshjSessionOwnerRegistry @Inject constructor() {
             SshSessionCloseResult.Failed
         }
     }
+
+    /**
+     * Removes an undelivered owner from application ownership before best-effort resource cleanup.
+     *
+     * Normal [close] intentionally keeps a failed owner registered so the workflow can retry. An
+     * undelivered session has no workflow owner that can retry, so retaining it would create an
+     * orphaned registry entry. Cleanup failure is therefore suppressed after ownership is removed.
+     */
+    internal fun discard(sessionHandle: SshSessionHandle) {
+        val owner = synchronized(this) {
+            sessionOwners.remove(sessionHandle.sessionId)
+        } ?: return
+
+        try {
+            owner.close()
+        } catch (_: Exception) {
+            // Abandonment cleanup must not replace the primary cancellation, timeout, or failure.
+        }
+    }
 }
 
 /**
