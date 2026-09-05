@@ -5,9 +5,16 @@ import de.hamedtanha.servertoolkit.feature.ssh.domain.model.SshCommandExecutionO
 import de.hamedtanha.servertoolkit.feature.ssh.domain.model.SshCommandExecutionResult
 import de.hamedtanha.servertoolkit.feature.ssh.domain.model.SshCommandRequest
 import de.hamedtanha.servertoolkit.feature.ssh.test.sshSessionHandle
+import java.util.concurrent.CountDownLatch
+import java.util.concurrent.TimeUnit
+import java.util.concurrent.atomic.AtomicBoolean
 import kotlinx.coroutines.CancellationException
+import kotlinx.coroutines.CoroutineStart
+import kotlinx.coroutines.launch
 import kotlinx.coroutines.runBlocking
+import kotlinx.coroutines.withTimeout
 import org.junit.Assert.assertEquals
+import org.junit.Assert.assertTrue
 import org.junit.Assert.fail
 import org.junit.Test
 
@@ -86,5 +93,66 @@ class SshjCommandExecutionServiceTest {
         } catch (error: CancellationException) {
             assertEquals("cancelled", error.message)
         }
+    }
+
+    @Test
+    fun `coroutine cancellation interrupts blocking registered command execution`() = runBlocking {
+        val sessionHandle = sshSessionHandle()
+        val registry = SshjSessionOwnerRegistry()
+        val commandStarted = CountDownLatch(1)
+        val releaseCommand = CountDownLatch(1)
+        val commandInterrupted = AtomicBoolean(false)
+        val request = SshCommandRequest(
+            sessionHandle = sessionHandle,
+            command = "tail -f /var/log/example.log",
+            timeoutMillis = 5_000,
+        )
+        registry.register(
+            SshjSessionOwner(
+                sessionHandle = sessionHandle,
+                closeAction = {},
+                commandExecutionAction = {
+                    commandStarted.countDown()
+                    try {
+                        releaseCommand.await()
+                        SshCommandExecutionResult.Completed(
+                            SshCommandExecutionOutput(
+                                stdout = "",
+                                stderr = "",
+                                exitStatus = 0,
+                            ),
+                        )
+                    } catch (error: InterruptedException) {
+                        commandInterrupted.set(true)
+                        Thread.currentThread().interrupt()
+                        throw error
+                    }
+                },
+            ),
+        )
+        val service = SshjCommandExecutionService(registry)
+        var observedCancellation: CancellationException? = null
+
+        try {
+            val job = launch(start = CoroutineStart.UNDISPATCHED) {
+                try {
+                    service.execute(request)
+                    fail("Expected CancellationException")
+                } catch (error: CancellationException) {
+                    observedCancellation = error
+                }
+            }
+
+            assertTrue(commandStarted.await(1, TimeUnit.SECONDS))
+            job.cancel(CancellationException("cancel blocking command"))
+            withTimeout(2_000) {
+                job.join()
+            }
+        } finally {
+            releaseCommand.countDown()
+        }
+
+        assertTrue(commandInterrupted.get())
+        assertTrue(observedCancellation is CancellationException)
     }
 }

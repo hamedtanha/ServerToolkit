@@ -7,13 +7,14 @@ import de.hamedtanha.servertoolkit.feature.ssh.domain.service.SshCommandExecutio
 import javax.inject.Inject
 import kotlinx.coroutines.CancellationException
 import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.withContext
+import kotlinx.coroutines.runInterruptible
 
 /**
  * SSHJ-backed command execution service.
  *
  * This service resolves command execution through the data-layer session owner registry and keeps
- * blocking SSHJ command/channel lifecycle work on an I/O dispatcher.
+ * blocking SSHJ command/channel lifecycle work on an interruptible I/O worker so coroutine timeout
+ * or cancellation can release the executor's blocking wait and trigger channel cleanup.
  */
 class SshjCommandExecutionService @Inject constructor(
     private val sessionOwnerRegistry: SshjSessionOwnerRegistry,
@@ -21,7 +22,7 @@ class SshjCommandExecutionService @Inject constructor(
 
     override suspend fun execute(request: SshCommandRequest): SshCommandExecutionResult {
         return try {
-            withContext(Dispatchers.IO) {
+            runInterruptible(Dispatchers.IO) {
                 sessionOwnerRegistry.execute(request)
             }
         } catch (error: CancellationException) {

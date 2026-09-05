@@ -75,6 +75,7 @@ The project follows Conventional Commits and Semantic Versioning principles.
 ### Fixed
 
 - Fixed SSH connected-session cancellation and timeout handoff so an authenticated session that is registered but not safely delivered is removed from application ownership and best-effort closed without replacing the primary cancellation or timeout outcome.
+- Fixed SSH command-output backpressure and unbounded retention by draining stdout/stderr concurrently, retaining at most `256 KiB` per stream with explicit truncation, and keeping channel completion plus stream draining inside the command operation timeout/cancellation boundary.
 
 ### Not Changed
 

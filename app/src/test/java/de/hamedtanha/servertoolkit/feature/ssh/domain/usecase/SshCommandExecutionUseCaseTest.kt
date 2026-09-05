@@ -8,6 +8,7 @@ import de.hamedtanha.servertoolkit.feature.ssh.domain.model.SshCommandRequest
 import de.hamedtanha.servertoolkit.feature.ssh.domain.model.SshSessionHandle
 import de.hamedtanha.servertoolkit.feature.ssh.domain.service.SshCommandExecutionService
 import kotlinx.coroutines.CancellationException
+import kotlinx.coroutines.delay
 import kotlinx.coroutines.runBlocking
 import org.junit.Assert.assertEquals
 import org.junit.Assert.assertNull
@@ -53,6 +54,26 @@ class SshCommandExecutionUseCaseTest {
         )
 
         assertEquals(5_000L, service.receivedRequest?.timeoutMillis)
+    }
+
+    @Test
+    fun `maps complete operation timeout to command timed out`() = runBlocking {
+        val service = FakeSshCommandExecutionService(
+            delayMillis = 5_000,
+        )
+        val useCase = SshCommandExecutionUseCase(service)
+
+        val result = useCase(
+            sessionHandle = sshSessionHandle(),
+            command = "sleep 10",
+            timeoutMillis = 50,
+        )
+
+        assertEquals(
+            SshCommandExecutionResult.Failed(SshCommandExecutionError.CommandTimedOut),
+            result,
+        )
+        assertEquals(50L, service.receivedRequest?.timeoutMillis)
     }
 
     @Test
@@ -116,15 +137,18 @@ class SshCommandExecutionUseCaseTest {
             ),
         ),
         private val failure: Exception? = null,
+        private val delayMillis: Long = 0,
     ) : SshCommandExecutionService {
 
         var receivedRequest: SshCommandRequest? = null
             private set
 
         override suspend fun execute(request: SshCommandRequest): SshCommandExecutionResult {
-            failure?.let { throw it }
-
             receivedRequest = request
+            failure?.let { throw it }
+            if (delayMillis > 0) {
+                delay(delayMillis)
+            }
             return result
         }
     }

@@ -4,7 +4,7 @@
 **Feature Area:** SSH
 **Status:** Milestone Complete with Operations Integration
 **Related Milestone:** Version 0.4.0 — SSH
-**Last Updated:** 2026-08-12
+**Last Updated:** 2026-09-05
 
 ---
 
@@ -26,7 +26,7 @@ The ADR-013 ephemeral private-key workflow is implemented end to end. The implem
 
 Automated JVM coverage, Android runtime verification, full unit tests, lint, and debug-build validation are complete. Verified private-key support is intentionally restricted to the documented format matrix below.
 
-The current timeout, cleanup, cancellation, and failure-mapping hardening coverage pass is complete. Future SSH hardening must be driven by concrete runtime evidence, current repository inspection, or a newly recorded focused review finding.
+The current connection/session and command-execution hardening state incorporates the focused F01/F02 corrections from architecture review `RA-2026.09-v1`: cancellation-safe connected-session handoff and concurrent bounded command-output draining under a complete-operation deadline. Future SSH hardening must be driven by concrete runtime evidence, current repository inspection, or a newly recorded focused review finding.
 
 Persistent credentials, terminal UI, Saved Command automation, background monitoring, and Xray or x-ui management remain intentionally out of scope.
 
@@ -236,6 +236,11 @@ The Android runtime verification also confirmed:
 - SSHJ-backed command execution service.
 - SSH command execution service dependency injection binding.
 - SSH command execution use case.
+- Concurrent stdout and stderr draining while the command channel is active so remote receive-window backpressure cannot depend on post-completion reads.
+- Bounded retained command output of up to `256 KiB` per stdout and stderr stream while excess bytes continue to be drained and discarded.
+- Explicit stdout and stderr truncation metadata propagated through the project-owned command result and surfaced in completion detail.
+- One complete-operation command timeout spanning channel completion and stream draining; executor waits consume only the remaining deadline.
+- Interruptible blocking command execution on the I/O dispatcher so coroutine timeout or cancellation can release blocking waits and reach local command-channel cleanup.
 - SSH command execution presentation state and UI mapper.
 - SSH ViewModel command execution wiring through an active project-owned session handle.
 - SSH multiline command input and Run command UI controls.
@@ -246,7 +251,7 @@ The Android runtime verification also confirmed:
 - Saved Command selection never invokes execution; Run remains the only execution trigger.
 - Selector closure on execution start and relevant SSH lifecycle transitions.
 - Back closes the visible selector before permanent workflow-exit cleanup is requested.
-- SSH command output rendering for stdout, stderr, and exit status.
+- SSH command output rendering for retained stdout, retained stderr, exit status, and explicit truncation state.
 - SSH blank command idle-state handling and execution guard.
 - SSH command text edit suppression while command execution is running.
 - SSH command input disabling while command execution is running.
@@ -277,6 +282,11 @@ The Android runtime verification also confirmed:
 - SSH command timeout stream-suppression regression test.
 - SSH command cancellation cleanup-failure regression test.
 - SSH command cancellation tests.
+- Deterministic stdout-heavy and stderr-heavy command tests whose completion depends on concurrent stream draining.
+- Mixed stdout/stderr retention-limit coverage that verifies excess bytes are still drained while retained output remains bounded.
+- Missing/late EOF coverage that verifies stream draining cannot outlive the complete command-operation deadline.
+- Actual blocking-read and blocking-command cancellation coverage that verifies interruption reaches command cleanup.
+- Explicit retained-output truncation presentation coverage.
 - SSH duplicate host-key confirmation regression test.
 - Saved Command selector ViewModel coverage for lazy observation, ordering, exact replacement, cancellation, retry idempotency, later-failure preservation, manual input, execution separation, and lifecycle closure.
 - Saved Command selector Compose instrumentation coverage for availability, disabled state, loading-time manual input, selection without execution, retry, and cancellation.
@@ -299,6 +309,7 @@ The Android runtime verification also confirmed:
 - SSHJ lifecycle regression coverage for caller cancellation during started cleanup.
 - Manual Android runtime verification of workflow-exit cleanup, explicit disconnect, reconnection, and crash-free execution.
 - Full compilation, Android-test compilation, unit-test, lint, and debug-assembly quality gate after explicit disconnect implementation.
+- Full compilation, Android-test compilation, unit-test, lint, debug-app assembly, and debug-test assembly quality gate after F02 command-I/O hardening.
 
 ---
 
@@ -311,6 +322,9 @@ The Android runtime verification also confirmed:
 - Private-key documents, loaded key material, and passphrases remain one-attempt and non-persistent.
 - Credential persistence requires a separate reviewed implementation slice with a secure storage boundary.
 - SSH command execution remains non-interactive and must continue to use project-owned session handles.
+- Non-interactive command output remains ephemeral and must not be persisted or logged as ordinary application telemetry.
+- Retained command output remains bounded to `256 KiB` per stdout/stderr stream, and any truncation must remain explicit to the user.
+- Command timeout and cancellation may close the local SSH command channel to release blocking I/O; this must not be represented as a guarantee that every remote process has terminated.
 - SSH connection history must contain non-sensitive resolved target metadata and result classification only.
 - Existing connection-history snapshot rows must not be rewritten or deleted as a side effect of Server metadata, username, host, or port updates.
 - Target-resolution failures and host-trust decision outcomes must not create incomplete connection history entries.
@@ -339,7 +353,7 @@ The following items are intentionally not implemented yet:
 The next safe development steps are:
 
 1. Preserve version 0.4.0 SSH as the accepted baseline while retaining the version 0.5.0 Saved Command input integration as an additive Operations workflow.
-2. Preserve exact input replacement, manual editing, explicit Run-only execution, execution-state blocking, session lifecycle, cleanup, and stale-result guardrails.
+2. Preserve exact input replacement, manual editing, explicit Run-only execution, execution-state blocking, session lifecycle, cleanup, bounded output retention, and stale-result guardrails.
 3. Reopen SSH hardening only from concrete runtime evidence, current repository inspection, or a newly recorded focused review finding.
 4. Keep terminal UI, background monitoring, persistent credentials, Saved Command automation, and Xray or x-ui management outside the accepted scope.
 

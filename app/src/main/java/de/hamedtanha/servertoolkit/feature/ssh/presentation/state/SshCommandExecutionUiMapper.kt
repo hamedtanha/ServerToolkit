@@ -1,6 +1,7 @@
 package de.hamedtanha.servertoolkit.feature.ssh.presentation.state
 
 import de.hamedtanha.servertoolkit.feature.ssh.domain.model.SshCommandExecutionError
+import de.hamedtanha.servertoolkit.feature.ssh.domain.model.SshCommandExecutionOutput
 import de.hamedtanha.servertoolkit.feature.ssh.domain.model.SshCommandExecutionResult
 
 /**
@@ -66,7 +67,7 @@ internal fun SshCommandExecutionUiState.withExecutionResult(
             status = SshCommandExecutionStatus.Completed,
             statusLabel = "Command completed",
             message = "Command execution completed.",
-            detail = "Exit status: ${result.output.exitStatus ?: "unknown"}",
+            detail = result.output.toCompletionDetail(),
             stdout = result.output.stdout,
             stderr = result.output.stderr,
             exitStatus = result.output.exitStatus,
@@ -81,6 +82,28 @@ internal fun SshCommandExecutionUiState.withExecutionResult(
             stderr = "",
             exitStatus = null,
         )
+    }
+}
+
+private fun SshCommandExecutionOutput.toCompletionDetail(): String {
+    val exitDetail = "Exit status: ${exitStatus ?: "unknown"}"
+    val truncationDetail = when {
+        stdoutTruncated && stderrTruncated ->
+            "Stdout and stderr exceeded the retained-output limit and were truncated for display."
+
+        stdoutTruncated ->
+            "Stdout exceeded the retained-output limit and was truncated for display."
+
+        stderrTruncated ->
+            "Stderr exceeded the retained-output limit and was truncated for display."
+
+        else -> null
+    }
+
+    return if (truncationDetail == null) {
+        exitDetail
+    } else {
+        "$exitDetail. $truncationDetail"
     }
 }
 
