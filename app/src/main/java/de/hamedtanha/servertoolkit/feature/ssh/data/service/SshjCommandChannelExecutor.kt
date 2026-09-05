@@ -79,32 +79,38 @@ internal class SshjNetworkCommandChannelExecutor(
             timeoutMillis = request.timeoutMillis,
             nanoTimeProvider = nanoTimeProvider,
         )
-        var channel: SshjCommandChannel? = null
+        var channelForCleanup: SshjCommandChannel? = null
         var channelOpened = false
-        var streamExecutor: ExecutorService? = null
-        var stdoutFuture: Future<RetainedCommandStream>? = null
-        var stderrFuture: Future<RetainedCommandStream>? = null
+        var streamExecutorForCleanup: ExecutorService? = null
+        var stdoutFutureForCleanup: Future<RetainedCommandStream>? = null
+        var stderrFutureForCleanup: Future<RetainedCommandStream>? = null
 
         return try {
-            channel = commandClient.openCommandChannel(request.command)
+            val openedChannel = commandClient.openCommandChannel(request.command)
+            channelForCleanup = openedChannel
             channelOpened = true
             deadline.requireRemainingMillis()
 
-            streamExecutor = newCommandStreamExecutor()
-            stdoutFuture = streamExecutor.submit<RetainedCommandStream> {
-                channel.stdout.drainUtf8(maxRetainedBytesPerStream)
-            }
-            stderrFuture = streamExecutor.submit<RetainedCommandStream> {
-                channel.stderr.drainUtf8(maxRetainedBytesPerStream)
-            }
+            val streamExecutor = newCommandStreamExecutor()
+            streamExecutorForCleanup = streamExecutor
 
-            channel.join(deadline.requireRemainingMillis())
+            val stdoutDrainFuture = streamExecutor.submit<RetainedCommandStream> {
+                openedChannel.stdout.drainUtf8(maxRetainedBytesPerStream)
+            }
+            stdoutFutureForCleanup = stdoutDrainFuture
 
-            val exitStatus = channel.exitStatus
+            val stderrDrainFuture = streamExecutor.submit<RetainedCommandStream> {
+                openedChannel.stderr.drainUtf8(maxRetainedBytesPerStream)
+            }
+            stderrFutureForCleanup = stderrDrainFuture
+
+            openedChannel.join(deadline.requireRemainingMillis())
+
+            val exitStatus = openedChannel.exitStatus
                 ?: return SshCommandExecutionResult.Failed(SshCommandExecutionError.CommandTimedOut)
 
-            val stdout = stdoutFuture.awaitWithin(deadline)
-            val stderr = stderrFuture.awaitWithin(deadline)
+            val stdout = stdoutDrainFuture.awaitWithin(deadline)
+            val stderr = stderrDrainFuture.awaitWithin(deadline)
 
             SshCommandExecutionResult.Completed(
                 SshCommandExecutionOutput(
@@ -132,11 +138,11 @@ internal class SshjNetworkCommandChannelExecutor(
             }
         } finally {
             runCatching {
-                channel?.close()
+                channelForCleanup?.close()
             }
-            stdoutFuture?.cancel(true)
-            stderrFuture?.cancel(true)
-            streamExecutor?.shutdownNow()
+            stdoutFutureForCleanup?.cancel(true)
+            stderrFutureForCleanup?.cancel(true)
+            streamExecutorForCleanup?.shutdownNow()
         }
     }
 
