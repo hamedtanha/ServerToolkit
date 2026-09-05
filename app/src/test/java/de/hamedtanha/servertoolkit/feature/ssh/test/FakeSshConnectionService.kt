@@ -8,7 +8,7 @@ import de.hamedtanha.servertoolkit.feature.ssh.domain.service.SshConnectionServi
 class FakeSshConnectionService(
     var result: SshConnectionResult,
     private val onConnect: suspend (SshConnectionRequest) -> Unit = {},
-    private val onDiscardUndeliveredSession: (SshSessionHandle) -> Unit = {},
+    private val onDiscardUndeliveredSession: suspend (SshSessionHandle) -> Unit = {},
 ) : SshConnectionService {
 
     var lastRequest: SshConnectionRequest? = null
@@ -26,7 +26,7 @@ class FakeSshConnectionService(
         return result
     }
 
-    override fun discardUndeliveredSession(sessionHandle: SshSessionHandle) {
+    override suspend fun discardUndeliveredSession(sessionHandle: SshSessionHandle) {
         discardedUndeliveredSessions += sessionHandle
         onDiscardUndeliveredSession(sessionHandle)
     }
