@@ -2,7 +2,7 @@
 
 **Project:** Server Toolkit
 **Status:** Active
-**Last Updated:** 2026-08-11
+**Last Updated:** 2026-09-05
 
 ---
 
@@ -122,6 +122,11 @@ For build-toolchain and dependency maintenance:
 - `BUILD_TOOLCHAIN_AND_DEPENDENCY_POLICY.md` defines evaluation and update rules.
 - `state/BUILD_TOOLCHAIN_STATUS.md` records implemented versions and constraints.
 - Gradle, CI, Android, and release configuration remain implementation evidence.
+
+For repository governance:
+
+- `state/REPOSITORY_GOVERNANCE_STATUS.md` records enforced repository settings and verification evidence.
+- GitHub repository rulesets and repository settings remain implementation evidence.
 
 For feature implementation:
 
@@ -336,6 +341,29 @@ These support implementation, decision history, review, and collaboration:
 
 ---
 
+## Repository Root Ownership
+
+Root-level documentation is intentionally limited to files that have a distinct
+repository-facing responsibility, a canonical ownership role, or a compatibility
+navigation role.
+
+| Root document | Classification | Authority |
+|---|---|---|
+| `README.md` | Required repository-facing file | Public project summary only |
+| `LICENSE` | Required repository-facing file | Repository license |
+| `SECURITY.md` | Required repository-facing file | Public GitHub security policy |
+| `PACKAGE_STRUCTURE.md` | Canonical project document | Android package ownership |
+| `ARCHITECTURE.md` | Convenience pointer | `docs/ARCHITECTURE.md` |
+| `DOCUMENTATION_GOVERNANCE.md` | Compatibility pointer | `docs/DOCUMENTATION.md` |
+| `ENGINEERING_WORKFLOW.md` | Compatibility pointer | `docs/DEVELOPMENT.md` and `docs/ENGINEERING_STRATEGY.md` |
+| `DEFINITION_OF_DONE.md` | Compatibility pointer | `docs/DEVELOPMENT.md#definition-of-done` |
+| `CODE_REVIEW_CHECKLIST.md` | Compatibility pointer | `docs/DEVELOPMENT.md#code-review-checklist` plus focused documentation, architecture, and security policy |
+
+Compatibility pointers exist to preserve historical navigation. They must not
+define competing policy, current-state claims, or independent sources of truth.
+
+---
+
 ## Update Rules
 
 When a document changes, review related documents for consistency.
@@ -350,6 +378,7 @@ At minimum:
 - Changes to mapped ownership, dependencies, navigation, persistence, runtime lifecycles, CI, release paths, or architecture invariants update `ARCHITECTURE_ATLAS.md`.
 - Published review records remain immutable; corrections or later assessments require a new review version.
 - Build-toolchain baseline changes update `state/BUILD_TOOLCHAIN_STATUS.md`.
+- Repository-governance settings changes update `state/REPOSITORY_GOVERNANCE_STATUS.md`.
 - Build-toolchain policy changes update the policy and affected process documents.
 - Notable changes update `CHANGELOG.md`.
 - Roadmap changes update `ROADMAP.md`.
