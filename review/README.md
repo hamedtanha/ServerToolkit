@@ -58,7 +58,7 @@ The current ServerToolkit architecture review is:
 review/architecture/2026/RA-2026.09-v1/
 ```
 
-It is governed by GitHub Issue `#166` and is `Accepted`, with substantive content frozen for merge through PR `#167`. Publication remains a metadata-only follow-up after the accepted package reaches `main`.
+It was accepted through PR `#167`, squash-merged into `main` as `9dd820d185a71bad8ba3c2b702b56a26d3ee2b9b`, and is recorded as `Published` by the metadata-only publication follow-up. Once the publication change reaches `main`, the review version is immutable.
 
 The original external report remains preserved against its exact evidence baseline:
 
