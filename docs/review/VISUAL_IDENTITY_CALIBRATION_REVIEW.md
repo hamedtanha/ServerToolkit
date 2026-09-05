@@ -1055,6 +1055,66 @@ Completed — spacing scale retained with no production token changes
 
 ---
 
+## Integrated Light/Dark Validation
+
+Final integrated visual evidence was captured from immutable fixture source
+commit:
+
+```text
+69bed7b997aec22c0d825a7655be0c17bd81d5aa
+```
+
+Capture environment:
+
+```text
+Device / AVD:   Leannect_API_36 / Google sdk_gphone64_x86_64
+Android API:    36
+Resolution:     1080 x 2424 px
+Density:        420 dpi
+Font scale:     1.0
+Dynamic color:  Disabled
+```
+
+The `integrated-final` evidence stage contains fourteen captures covering the
+fixed calibration surfaces in Light and Dark themes, including the SSH
+bottom-of-scroll and Saved Command selector states.
+
+Runtime verification completed successfully with the complete Android
+instrumentation suite:
+
+```text
+OK (78 tests)
+```
+
+Visual review found no repeated cross-screen color, typography, shape, or
+spacing defect that justifies a global token change.
+
+The Server Inventory environment-filter row remains horizontally constrained
+at the trailing edge, and Server Inventory card actions remain sensitive to
+available horizontal space. These are screen-level responsive-layout concerns,
+not visual-token defects. The broader constrained-space collection concern is
+tracked separately by GitHub Issue #161 and does not block visual-identity
+baseline calibration.
+
+Integrated conclusion:
+
+```text
+Color:                   PASS / RETAIN
+Typography:              PASS / RETAIN
+Shape:                   PASS / RETAIN
+Spacing:                 PASS / RETAIN
+Integrated Light/Dark:   PASS
+Blocking token defects:  NONE
+```
+
+Status:
+
+```text
+Completed - integrated Light/Dark validation passed
+```
+
+---
+
 ## Candidate Template
 
 | Field | Value |
@@ -1098,8 +1158,8 @@ Typography:            Completed; retained with no token changes
 Shape:                 Completed; retained with no token changes
 Spacing:               Completed; scale retained with no token changes
 
-Integrated validation: Not started
-Accepted baseline:     None
+Integrated validation: Completed; Light/Dark PASS
+Accepted baseline:     Pending final documentation and scope audit
 ```
 
 ---
