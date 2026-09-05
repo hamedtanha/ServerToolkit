@@ -1,5 +1,6 @@
 package de.hamedtanha.servertoolkit.feature.ssh.domain.usecase
 
+import de.hamedtanha.servertoolkit.feature.ssh.domain.model.SshHostKeyFingerprint
 import de.hamedtanha.servertoolkit.feature.ssh.domain.model.SshHostTrustStatus
 import de.hamedtanha.servertoolkit.feature.ssh.domain.model.SshObservedHostKey
 import de.hamedtanha.servertoolkit.feature.ssh.domain.repository.SshHostTrustRepository
@@ -14,7 +15,7 @@ class SshHostTrustEvaluator @Inject constructor(
             endpoint = observedHostKey.endpoint,
         ) ?: return SshHostTrustStatus.Unknown(observedHostKey)
 
-        return if (trustedHostKey.fingerprint == observedHostKey.fingerprint) {
+        return if (observedHostKey.matches(trustedHostKey.fingerprint)) {
             SshHostTrustStatus.Trusted(trustedHostKey)
         } else {
             SshHostTrustStatus.Changed(
@@ -22,5 +23,11 @@ class SshHostTrustEvaluator @Inject constructor(
                 observedHostKey = observedHostKey,
             )
         }
+    }
+
+    private fun SshObservedHostKey.matches(
+        trustedFingerprint: SshHostKeyFingerprint,
+    ): Boolean {
+        return fingerprint == trustedFingerprint || trustedFingerprint in legacyFingerprints
     }
 }
