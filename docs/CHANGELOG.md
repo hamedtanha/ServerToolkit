@@ -37,6 +37,7 @@ The project follows Conventional Commits and Semantic Versioning principles.
 
 ### Changed
 
+- Updated the core Android build compatibility cluster to Gradle `9.6.1` and Android Gradle Plugin `9.4.0` while retaining Kotlin `2.4.10` and KSP `2.3.10`.
 - Generalized the Add Server helper copy so the inventory workflow no longer implies Linux-only server support.
 - Updated Android Gradle Plugin from `9.3.0` to `9.3.1` and validated unit tests, lint, and debug assembly with Gradle `9.5.0`.
 - Replaced destructive existing-Server Room `REPLACE` persistence with non-destructive `@Upsert` semantics, preserving SSH trust and connection-history rows across Server updates while retaining explicit Server-delete cascades, without changing Room schema version `5`.
