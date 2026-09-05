@@ -428,9 +428,11 @@ class SshjConnectionServiceTest {
         var connectAndAuthenticateCallCount = 0
             private set
 
+        @Volatile
         var ownerCloseAttempted = false
             private set
 
+        @Volatile
         var ownerClosed = false
             private set
 
