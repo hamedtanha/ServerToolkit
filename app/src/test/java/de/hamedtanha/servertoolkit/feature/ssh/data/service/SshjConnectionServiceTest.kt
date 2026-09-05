@@ -182,7 +182,7 @@ class SshjConnectionServiceTest {
         }
 
         job.cancel(CancellationException("cancelled handoff"))
-        callerDispatcher.runUntil(job::isCompleted)
+        callerDispatcher.runUntil { job.isCompleted }
 
         assertEquals("cancelled handoff", observedCancellation?.message)
         assertTrue(executor.ownerCloseAttempted)
@@ -219,7 +219,7 @@ class SshjConnectionServiceTest {
         }
 
         job.cancel(CancellationException("primary cancellation"))
-        callerDispatcher.runUntil(job::isCompleted)
+        callerDispatcher.runUntil { job.isCompleted }
 
         assertEquals("primary cancellation", observedCancellation?.message)
         assertTrue(executor.ownerCloseAttempted)
