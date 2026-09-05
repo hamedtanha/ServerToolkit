@@ -1,6 +1,7 @@
 package de.hamedtanha.servertoolkit.feature.ssh.data.service
 
 import de.hamedtanha.servertoolkit.feature.ssh.domain.model.SshConnectionRequest
+import de.hamedtanha.servertoolkit.feature.ssh.domain.model.SshHostKeyFingerprintEncoding
 import de.hamedtanha.servertoolkit.feature.ssh.domain.model.SshHostKeyObservationResult
 import java.security.KeyPairGenerator
 import kotlinx.coroutines.CancellationException
@@ -12,7 +13,7 @@ import org.junit.Test
 class SshjHostKeyObservationServiceTest {
 
     @Test
-    fun `maps observed sshj host key into project-owned observed host key`() = runBlocking {
+    fun `maps observed sshj host key into canonical and legacy fingerprints`() = runBlocking {
         val publicKey = generatePublicKey()
         val service = SshjHostKeyObservationService(
             hostKeyObserver = SshjHostKeyObserver {
@@ -27,7 +28,18 @@ class SshjHostKeyObservationServiceTest {
         assertEquals("example.com", observed.observedHostKey.endpoint.host)
         assertEquals(22, observed.observedHostKey.endpoint.port)
         assertEquals("SHA256", observed.observedHostKey.fingerprint.algorithm)
+        assertEquals(
+            SshHostKeyFingerprintEncoding.OpenSshWire,
+            observed.observedHostKey.fingerprint.encoding,
+        )
         assertTrue(observed.observedHostKey.fingerprint.value.isNotBlank())
+        assertEquals(
+            setOf(
+                publicKey.toLegacySshjMd5Fingerprint(),
+                publicKey.toLegacyJavaEncodedSha256Fingerprint(),
+            ),
+            observed.observedHostKey.legacyFingerprints,
+        )
     }
 
     @Test
