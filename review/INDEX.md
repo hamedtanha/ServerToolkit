@@ -11,6 +11,7 @@
 - **Governing Issue:** `#166`
 - **Acceptance PR:** `#167`
 - **Acceptance merge:** `9dd820d185a71bad8ba3c2b702b56a26d3ee2b9b`
+- **Publication PR:** `#168`
 - **Purpose:** Register and revalidate the 2026-09-05 read-only architecture and targeted implementation review before focused remediation begins.
 
 Documents:
@@ -19,7 +20,7 @@ Documents:
 - `architecture/2026/RA-2026.09-v1/REVALIDATION.md`
 - `architecture/2026/RA-2026.09-v1/STATUS.md`
 
-The original external review artifact is preserved against commit `2800f3a250e9b2733dc040a69a9a1f851538d84e`; later repository drift is recorded only in `REVALIDATION.md`. Acceptance PR `#167` was squash-merged as `9dd820d185a71bad8ba3c2b702b56a26d3ee2b9b` after the accepted head passed Android Validation run `#127`. This metadata-only publication follow-up records the review as `Published`; once merged, the review version is immutable.
+The original external review artifact is preserved against commit `2800f3a250e9b2733dc040a69a9a1f851538d84e`; later repository drift is recorded only in `REVALIDATION.md`. Acceptance PR `#167` was squash-merged as `9dd820d185a71bad8ba3c2b702b56a26d3ee2b9b` after the accepted head passed Android Validation run `#127`. Publication PR `#168` is the metadata-only follow-up that records the review as `Published`; once merged, the review version is immutable.
 
 ## Published Reviews
 
