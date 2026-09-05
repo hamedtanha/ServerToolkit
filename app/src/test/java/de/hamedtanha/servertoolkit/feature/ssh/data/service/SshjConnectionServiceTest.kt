@@ -180,6 +180,9 @@ class SshjConnectionServiceTest {
         awaitCondition("Expected session registration before caller resumption") {
             registry.contains(executor.ownerHandle)
         }
+        awaitCondition("Expected caller resumption to be queued before cancellation") {
+            callerDispatcher.hasQueuedTask()
+        }
 
         job.cancel(CancellationException("cancelled handoff"))
         callerDispatcher.runUntil { job.isCompleted }
@@ -367,6 +370,10 @@ class SshjConnectionServiceTest {
 
         override fun dispatch(context: CoroutineContext, block: Runnable) {
             tasks.put(block)
+        }
+
+        fun hasQueuedTask(): Boolean {
+            return tasks.isNotEmpty()
         }
 
         fun runNext() {
