@@ -10,11 +10,19 @@ import de.hamedtanha.servertoolkit.feature.ssh.domain.model.SshSessionCloseResul
 import de.hamedtanha.servertoolkit.feature.ssh.domain.model.SshSessionHandle
 import de.hamedtanha.servertoolkit.feature.ssh.domain.model.SshTrustedHostKey
 import de.hamedtanha.servertoolkit.feature.ssh.test.FakeSshHostTrustRepository
+import java.util.concurrent.LinkedBlockingQueue
+import java.util.concurrent.TimeUnit
+import kotlin.coroutines.CoroutineContext
 import kotlinx.coroutines.CancellationException
+import kotlinx.coroutines.CoroutineDispatcher
+import kotlinx.coroutines.cancel
+import kotlinx.coroutines.currentCoroutineContext
+import kotlinx.coroutines.launch
 import kotlinx.coroutines.runBlocking
 import org.junit.Assert.assertEquals
 import org.junit.Assert.assertFalse
 import org.junit.Assert.assertTrue
+import org.junit.Assert.fail
 import org.junit.Test
 
 class SshjConnectionServiceTest {
@@ -112,6 +120,110 @@ class SshjConnectionServiceTest {
         )
         assertTrue(executor.ownerClosed)
         assertTrue(registry.contains(duplicateHandle))
+    }
+
+    @Test
+    fun `cancellation after authenticated owner creation discards registered session`() = runBlocking {
+        val registry = SshjSessionOwnerRegistry()
+        val executor = FakeTrustedConnectionExecutor(
+            onBeforeConnectedResult = {
+                currentCoroutineContext().cancel(
+                    CancellationException("cancelled before delivery"),
+                )
+            },
+        )
+        val service = sshjConnectionService(
+            hostTrustRepository = FakeSshHostTrustRepository(trustedHostKey()),
+            trustedConnectionExecutor = executor,
+            sessionOwnerRegistry = registry,
+        )
+        var observedCancellation: CancellationException? = null
+
+        val job = launch {
+            try {
+                service.connect(connectionRequest())
+                fail("Expected CancellationException")
+            } catch (error: CancellationException) {
+                observedCancellation = error
+            }
+        }
+        job.join()
+
+        assertEquals("cancelled before delivery", observedCancellation?.message)
+        assertTrue(executor.ownerCloseAttempted)
+        assertTrue(executor.ownerClosed)
+        assertFalse(registry.contains(executor.ownerHandle))
+    }
+
+    @Test
+    fun `cancellation after registry insertion before caller resumption discards session`() = runBlocking {
+        val registry = SshjSessionOwnerRegistry()
+        val executor = FakeTrustedConnectionExecutor()
+        val service = sshjConnectionService(
+            hostTrustRepository = FakeSshHostTrustRepository(trustedHostKey()),
+            trustedConnectionExecutor = executor,
+            sessionOwnerRegistry = registry,
+        )
+        val callerDispatcher = QueueingDispatcher()
+        var observedCancellation: CancellationException? = null
+
+        val job = launch(callerDispatcher) {
+            try {
+                service.connect(connectionRequest())
+                fail("Expected CancellationException")
+            } catch (error: CancellationException) {
+                observedCancellation = error
+            }
+        }
+
+        callerDispatcher.runNext()
+        awaitCondition("Expected session registration before caller resumption") {
+            registry.contains(executor.ownerHandle)
+        }
+
+        job.cancel(CancellationException("cancelled handoff"))
+        callerDispatcher.runUntil(job::isCompleted)
+
+        assertEquals("cancelled handoff", observedCancellation?.message)
+        assertTrue(executor.ownerCloseAttempted)
+        assertTrue(executor.ownerClosed)
+        assertFalse(registry.contains(executor.ownerHandle))
+    }
+
+    @Test
+    fun `cancellation remains primary when undelivered session cleanup fails`() = runBlocking {
+        val registry = SshjSessionOwnerRegistry()
+        val executor = FakeTrustedConnectionExecutor(
+            ownerCloseError = IllegalStateException("simulated cleanup failure"),
+        )
+        val service = sshjConnectionService(
+            hostTrustRepository = FakeSshHostTrustRepository(trustedHostKey()),
+            trustedConnectionExecutor = executor,
+            sessionOwnerRegistry = registry,
+        )
+        val callerDispatcher = QueueingDispatcher()
+        var observedCancellation: CancellationException? = null
+
+        val job = launch(callerDispatcher) {
+            try {
+                service.connect(connectionRequest())
+                fail("Expected CancellationException")
+            } catch (error: CancellationException) {
+                observedCancellation = error
+            }
+        }
+
+        callerDispatcher.runNext()
+        awaitCondition("Expected session registration before caller resumption") {
+            registry.contains(executor.ownerHandle)
+        }
+
+        job.cancel(CancellationException("primary cancellation"))
+        callerDispatcher.runUntil(job::isCompleted)
+
+        assertEquals("primary cancellation", observedCancellation?.message)
+        assertTrue(executor.ownerCloseAttempted)
+        assertFalse(registry.contains(executor.ownerHandle))
     }
 
     @Test
@@ -238,9 +350,50 @@ class SshjConnectionServiceTest {
         )
     }
 
+    private fun awaitCondition(
+        failureMessage: String,
+        condition: () -> Boolean,
+    ) {
+        val deadlineNanos = System.nanoTime() + TimeUnit.SECONDS.toNanos(2)
+        while (System.nanoTime() < deadlineNanos) {
+            if (condition()) {
+                return
+            }
+            Thread.sleep(5)
+        }
+        fail(failureMessage)
+    }
+
+    private class QueueingDispatcher : CoroutineDispatcher() {
+
+        private val tasks = LinkedBlockingQueue<Runnable>()
+
+        override fun dispatch(context: CoroutineContext, block: Runnable) {
+            tasks.put(block)
+        }
+
+        fun runNext() {
+            val task = tasks.poll(2, TimeUnit.SECONDS)
+                ?: fail("Expected queued coroutine continuation")
+            task.run()
+        }
+
+        fun runUntil(completed: () -> Boolean) {
+            repeat(4) {
+                if (completed()) {
+                    return
+                }
+                runNext()
+            }
+            fail("Expected coroutine to complete")
+        }
+    }
+
     private class FakeTrustedConnectionExecutor(
         private val result: SshjTrustedConnectionExecutionResult? = null,
         private val error: RuntimeException? = null,
+        private val onBeforeConnectedResult: suspend () -> Unit = {},
+        private val ownerCloseError: RuntimeException? = null,
         val ownerHandle: SshSessionHandle = SshSessionHandle(
             sessionId = "session-1",
             serverId = "server-1",
@@ -251,6 +404,9 @@ class SshjConnectionServiceTest {
     ) : SshjTrustedConnectionExecutor {
 
         var connectAndAuthenticateCallCount = 0
+            private set
+
+        var ownerCloseAttempted = false
             private set
 
         var ownerClosed = false
@@ -277,14 +433,22 @@ class SshjConnectionServiceTest {
 
             error?.let { throw it }
 
-            return result ?: SshjTrustedConnectionExecutionResult.Connected(
+            val executionResult = result ?: SshjTrustedConnectionExecutionResult.Connected(
                 SshjSessionOwner(
                     sessionHandle = ownerHandle,
                     closeAction = {
+                        ownerCloseAttempted = true
+                        ownerCloseError?.let { throw it }
                         ownerClosed = true
                     },
                 ),
             )
+
+            if (executionResult is SshjTrustedConnectionExecutionResult.Connected) {
+                onBeforeConnectedResult()
+            }
+
+            return executionResult
         }
     }
 }
