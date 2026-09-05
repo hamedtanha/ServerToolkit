@@ -26,7 +26,7 @@ The ADR-013 ephemeral private-key workflow is implemented end to end. The implem
 
 Automated JVM coverage, Android runtime verification, full unit tests, lint, and debug-build validation are complete. Verified private-key support is intentionally restricted to the documented format matrix below.
 
-The current connection/session and command-execution hardening state incorporates the focused F01/F02 corrections from architecture review `RA-2026.09-v1`: cancellation-safe connected-session handoff and concurrent bounded command-output draining under a complete-operation deadline. Future SSH hardening must be driven by concrete runtime evidence, current repository inspection, or a newly recorded focused review finding.
+The current connection/session, command-execution, and host-trust hardening state incorporates the focused F01/F02/F03 corrections from architecture review `RA-2026.09-v1`: cancellation-safe connected-session handoff, concurrent bounded command-output draining under a complete-operation deadline, and OpenSSH-compatible SHA-256 host-key fingerprints for new observation and trust. Historical SSHJ MD5 and Java-encoded SHA-256 trusted-host records remain verifiable through explicit scheme-aware compatibility without silent rewrite or schema migration.
 
 Persistent credentials, terminal UI, Saved Command automation, background monitoring, and Xray or x-ui management remain intentionally out of scope.
 
@@ -150,7 +150,8 @@ The Android runtime verification also confirmed:
 - SSH host-key review UI mapper.
 - SSH host-key review confirmation and cancellation ViewModel events.
 - SSH host-key review screen actions.
-- SSH host-key fingerprints use SHA256 values for observation and trusted verification.
+- Newly observed and newly trusted host-key fingerprints use canonical OpenSSH-compatible SHA-256 over the SSH public-key wire representation and remain displayed as `SHA256:<value>`.
+- Historical trusted-host rows using SSHJ MD5 or Java `PublicKey.encoded` SHA-256 remain scheme-aware and verifiable without silent relabeling, rewrite, or Room schema migration; unknown persisted schemes fail closed.
 - SSH host key observation verifier clarity hardening.
 - SSH trusted-host cascade delete behavior when the owning server is deleted.
 - Existing-Server updates no longer delete trusted-host rows through incidental parent replacement.
@@ -275,6 +276,7 @@ The Android runtime verification also confirmed:
 - SSH failure UI mapper state coverage.
 - SSH host trust domain and connection attempt unit tests.
 - SSH host-key observation and trusted verifier unit tests.
+- OpenSSH-compatible host-key fingerprint known-answer coverage for fixed RSA and Ed25519 public-key fixtures, plus scheme-specific compatibility coverage for historical SSHJ MD5 and Java-encoded SHA-256 trust records.
 - Server-update Room regression coverage verifies preservation of trusted-host and connection-history rows across metadata, username, endpoint, and repeated updates while retaining explicit Server-delete cascades.
 - SSH trusted connection cancellation cleanup-failure regression test.
 - SSH command execution service tests.
@@ -329,6 +331,7 @@ The Android runtime verification also confirmed:
 - Existing connection-history snapshot rows must not be rewritten or deleted as a side effect of Server metadata, username, host, or port updates.
 - Target-resolution failures and host-trust decision outcomes must not create incomplete connection history entries.
 - Connection history persistence failures must not replace the primary SSH outcome or cancellation.
+- New host-key trust persists canonical OpenSSH-compatible SHA-256 fingerprints under an explicit persisted scheme; historical trusted-host fingerprint rows must not be silently rewritten or reinterpreted across schemes.
 - Terminal UI, Saved Command automation, background monitoring, and persistent credentials remain out of scope.
 
 ---
