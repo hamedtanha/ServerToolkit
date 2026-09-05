@@ -111,8 +111,32 @@ class SshCommandExecutionUiMapperTest {
         assertEquals("server up", mapped.stdout)
         assertEquals("", mapped.stderr)
         assertEquals(0, mapped.exitStatus)
+        assertEquals("Exit status: 0", mapped.detail)
         assertTrue(mapped.canExecute)
         assertTrue(mapped.hasOutput)
+    }
+
+    @Test
+    fun `maps truncated command output into explicit completion detail`() {
+        val mapped = SshCommandExecutionUiState(command = "journalctl").withExecutionResult(
+            SshCommandExecutionResult.Completed(
+                SshCommandExecutionOutput(
+                    stdout = "retained stdout",
+                    stderr = "retained stderr",
+                    exitStatus = 0,
+                    stdoutTruncated = true,
+                    stderrTruncated = true,
+                ),
+            ),
+        )
+
+        assertEquals(SshCommandExecutionStatus.Completed, mapped.status)
+        assertEquals("retained stdout", mapped.stdout)
+        assertEquals("retained stderr", mapped.stderr)
+        assertEquals(
+            "Exit status: 0. Stdout and stderr exceeded the retained-output limit and were truncated for display.",
+            mapped.detail,
+        )
     }
 
     @Test
@@ -226,5 +250,4 @@ class SshCommandExecutionUiMapperTest {
         val message: String,
         val detail: String,
     )
-
 }
