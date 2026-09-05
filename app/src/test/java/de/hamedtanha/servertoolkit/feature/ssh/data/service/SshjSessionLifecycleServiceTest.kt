@@ -3,11 +3,13 @@ package de.hamedtanha.servertoolkit.feature.ssh.data.service
 import de.hamedtanha.servertoolkit.feature.ssh.domain.model.SshSessionCloseResult
 import de.hamedtanha.servertoolkit.feature.ssh.test.sshSessionHandle
 import java.util.concurrent.CountDownLatch
+import java.util.concurrent.TimeUnit
 import kotlinx.coroutines.CompletableDeferred
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.runBlocking
 import kotlinx.coroutines.withTimeout
 import org.junit.Assert.assertEquals
+import org.junit.Assert.assertFalse
 import org.junit.Assert.assertTrue
 import org.junit.Test
 
@@ -79,6 +81,62 @@ class SshjSessionLifecycleServiceTest {
 
         assertTrue(closeCompleted)
         assertEquals(SshSessionCloseResult.Closed, closeResult)
+        assertEquals(SshSessionCloseResult.NotFound, registry.close(handle))
+    }
+
+    @Test
+    fun `abandon removes ownership before blocked cleanup completes`() {
+        val registry = SshjSessionOwnerRegistry()
+        val service = sshjSessionLifecycleService(registry)
+        val handle = sshSessionHandle()
+        val closeStarted = CountDownLatch(1)
+        val releaseClose = CountDownLatch(1)
+        val closeCompleted = CountDownLatch(1)
+
+        registry.register(
+            SshjSessionOwner(
+                sessionHandle = handle,
+                closeAction = {
+                    closeStarted.countDown()
+                    releaseClose.await()
+                    closeCompleted.countDown()
+                },
+            ),
+        )
+
+        service.abandon(handle)
+
+        assertTrue(closeStarted.await(1, TimeUnit.SECONDS))
+        assertFalse(registry.contains(handle))
+        assertEquals(1L, closeCompleted.count)
+
+        releaseClose.countDown()
+
+        assertTrue(closeCompleted.await(1, TimeUnit.SECONDS))
+        assertEquals(SshSessionCloseResult.NotFound, registry.close(handle))
+    }
+
+    @Test
+    fun `abandon keeps ownership removed when concrete cleanup fails`() {
+        val registry = SshjSessionOwnerRegistry()
+        val service = sshjSessionLifecycleService(registry)
+        val handle = sshSessionHandle()
+        val closeAttempted = CountDownLatch(1)
+
+        registry.register(
+            SshjSessionOwner(
+                sessionHandle = handle,
+                closeAction = {
+                    closeAttempted.countDown()
+                    throw IllegalStateException("Simulated cleanup failure")
+                },
+            ),
+        )
+
+        service.abandon(handle)
+
+        assertTrue(closeAttempted.await(1, TimeUnit.SECONDS))
+        assertFalse(registry.contains(handle))
         assertEquals(SshSessionCloseResult.NotFound, registry.close(handle))
     }
 
