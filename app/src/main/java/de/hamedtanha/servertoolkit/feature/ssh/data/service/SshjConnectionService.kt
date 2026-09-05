@@ -11,6 +11,7 @@ import java.util.concurrent.atomic.AtomicReference
 import javax.inject.Inject
 import kotlinx.coroutines.CancellationException
 import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.NonCancellable
 import kotlinx.coroutines.withContext
 
 /**
@@ -96,8 +97,12 @@ class SshjConnectionService @Inject constructor(
         }
     }
 
-    override fun discardUndeliveredSession(sessionHandle: SshSessionHandle) {
-        sessionOwnerRegistry.discard(sessionHandle)
+    override suspend fun discardUndeliveredSession(sessionHandle: SshSessionHandle) {
+        withContext(NonCancellable) {
+            withContext(Dispatchers.IO) {
+                sessionOwnerRegistry.discard(sessionHandle)
+            }
+        }
     }
 
     private fun registerConnectedSession(
@@ -117,10 +122,16 @@ class SshjConnectionService @Inject constructor(
         }
     }
 
-    private fun discardPendingSession(
+    private suspend fun discardPendingSession(
         pendingSessionHandle: AtomicReference<SshSessionHandle?>,
     ) {
-        pendingSessionHandle.getAndSet(null)?.let(sessionOwnerRegistry::discard)
+        pendingSessionHandle.getAndSet(null)?.let { sessionHandle ->
+            try {
+                discardUndeliveredSession(sessionHandle)
+            } catch (_: Exception) {
+                // Rollback failure must not replace the primary cancellation or connection failure.
+            }
+        }
     }
 }
 
