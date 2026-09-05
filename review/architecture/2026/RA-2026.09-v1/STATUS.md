@@ -9,6 +9,7 @@
 - **Governing Issue:** `#166`
 - **Acceptance PR:** `#167`
 - **Acceptance merge:** `9dd820d185a71bad8ba3c2b702b56a26d3ee2b9b`
+- **Publication PR:** `#168`
 
 ## Purpose
 
@@ -20,7 +21,7 @@ Register the externally produced read-only architecture and targeted implementat
 In Progress -> Accepted -> Published
 ```
 
-This metadata-only publication follow-up records the accepted review as `Published`. Once this change reaches `main`, review version `RA-2026.09-v1` is immutable.
+Publication PR `#168` is the metadata-only follow-up that records the accepted review as `Published`. Once PR `#168` reaches `main`, review version `RA-2026.09-v1` is immutable.
 
 ## Acceptance Evidence
 
@@ -32,6 +33,6 @@ This metadata-only publication follow-up records the accepted review as `Publish
 
 ## Publication Boundary
 
-Publication changes metadata only. The original review artifact and `REVALIDATION.md` remain substantively unchanged from the accepted package.
+Publication PR `#168` changes metadata only. The original review artifact and `REVALIDATION.md` remain substantively unchanged from the accepted package.
 
 Future corrections or changed conclusions require a new review version. Focused remediation begins separately with F01.
