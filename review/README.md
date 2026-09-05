@@ -55,13 +55,22 @@ Each review records:
 The current ServerToolkit architecture review is:
 
 ```text
-review/architecture/2026/RA-2026.07-v2/
+review/architecture/2026/RA-2026.09-v1/
 ```
 
-It is governed by GitHub Issue `#138`. The accepted package was merged through PR `#139` as `8070830dfae14f908b9dd128846f66112b36423e`; this metadata-only publication change records the review as `Published`. Once the publication change reaches `main`, the review is immutable and Issue `#138` can close as completed.
+It is governed by GitHub Issue `#166` and is currently `In Progress` for repository registration and current-HEAD revalidation.
 
-The previously published architecture-knowledge review remains immutable at:
+The original external report remains preserved against its exact evidence baseline:
 
 ```text
+2800f3a250e9b2733dc040a69a9a1f851538d84e
+```
+
+Later repository drift is recorded separately in `REVALIDATION.md`; the original report is not rewritten to reflect post-review changes.
+
+The previously published architecture reviews remain immutable at:
+
+```text
+review/architecture/2026/RA-2026.07-v2/
 review/architecture/2026/RA-2026.07-v1/
 ```
