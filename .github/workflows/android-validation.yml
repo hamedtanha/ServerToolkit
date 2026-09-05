@@ -84,7 +84,7 @@ jobs:
         if: always()
         uses: actions/upload-artifact@v4
         with:
-          name: android-instrumentation-${{ github.sha }}
+          name: android-instrumentation-${{ github.event.pull_request.head.sha || github.sha }}
           path: |
             app/build/reports/androidTests/managedDevice/
             app/build/outputs/androidTest-results/managedDevice/
