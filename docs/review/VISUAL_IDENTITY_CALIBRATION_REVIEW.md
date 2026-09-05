@@ -943,7 +943,44 @@ validation passed; independent F02 responsive-layout defect tracked separately
 
 ## Shape Derivation Record
 
-For each shape candidate record:
+The project-owned shape scale is:
+
+```text
+extraSmall   6 dp
+small        8 dp
+medium      12 dp
+large       16 dp
+extraLarge  20 dp
+```
+
+`ServerToolkitButtonShape` resolves to the project-owned `medium` role
+(`12 dp`).
+
+Production inventory across the fixed calibration surfaces found:
+
+- no direct `RoundedCornerShape`, `CircleShape`, or `CutCornerShape`
+  definitions outside the design-system shape file;
+- no component-local shape constants;
+- explicit button-shape usage consistently routed through
+  `ServerToolkitButtonShape`;
+- Material 3 components such as cards, filter chips, text fields, and dialogs
+  consuming `MaterialTheme.shapes` implicitly where no explicit shape is
+  supplied.
+
+The current fixed visual evidence does not show a repeated cross-screen
+roundedness, corner-hierarchy, or component-consistency problem. No shape
+candidate therefore satisfies the calibration admission rule.
+
+Shape conclusion:
+
+```text
+Shape scale:                 RETAIN
+Button shape (medium/12dp):  RETAIN
+Local shape overrides:       NONE
+Production Shape.kt change:  NONE
+```
+
+For each future shape candidate record:
 
 1. consuming components;
 2. repeated roundedness problem;
@@ -957,7 +994,7 @@ Do not introduce new component architecture to exercise a shape candidate.
 Status:
 
 ```text
-Not started
+Completed — shape scale retained with no production token changes
 ```
 
 ---
@@ -1002,7 +1039,7 @@ Baseline evidence:     Captured and initial review recorded
 
 Color:                 Completed; all assessed families retained
 Typography:            Completed; retained with no token changes
-Shape:                 Not started
+Shape:                 Completed; retained with no token changes
 Spacing:               No calibration justified at review start
 
 Integrated validation: Not started
