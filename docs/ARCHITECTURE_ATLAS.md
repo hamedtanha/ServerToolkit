@@ -2,7 +2,7 @@
 
 > **Atlas version:** `2026.09`\
 > **Status:** Living current-state map\
-> **Evidence refresh:** Issue `#188` / PR `#189`, based on `main@531f0b0415114cb9372bd7cae0c48c61d345c611` plus the focused F07/F09 remediation\
+> **Evidence refresh:** Issue `#161`, based on `main@3d47e9b74e174221eb73fa21b58a57b39578de1f` plus the focused F10 collection-layout remediation\
 > **Last Updated:** 2026-09-06\
 > **Repository:** `hamedtanha/ServerToolkit`
 
@@ -311,7 +311,19 @@ ADR-017 defines scalable collection invariants:
 - long content/font scaling/constrained width are first-class validation cases;
 - pagination remains evidence-driven.
 
-The remaining constrained Server Inventory layout implementation is tracked separately by Issue `#161` / review finding F10. It is not part of the F07/F09 architecture-enforcement slice.
+Server Inventory applies this contract by giving primary server content the
+full card width and placing `Connect`, `Edit`, and `Delete` in a `FlowRow` below
+the content. The action region wraps when horizontal space is constrained instead
+of compressing the primary content column.
+
+The existing lazy collection rendering and stable `server.id` item identity
+remain unchanged. Focused API 36 instrumentation validates a `320.dp` container
+at `fontScale=2.0` with long operational values while preserving readable primary
+content and reachable actions.
+
+Issue `#161` / review finding F10 tracks this focused correction. No typography
+reduction, pagination dependency, query-state expansion, or generic responsive
+framework is introduced.
 
 ## 12. Build, CI, and Release Topology
 

@@ -2,6 +2,7 @@ package de.hamedtanha.servertoolkit.feature.serverinventory.presentation.screen
 
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.FlowRow
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
@@ -27,6 +28,7 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.hilt.lifecycle.viewmodel.compose.hiltViewModel
@@ -37,6 +39,9 @@ import de.hamedtanha.servertoolkit.feature.serverinventory.presentation.state.Se
 import de.hamedtanha.servertoolkit.feature.serverinventory.presentation.state.ServerInventoryUiState
 import de.hamedtanha.servertoolkit.feature.serverinventory.presentation.viewmodel.ServerInventoryViewModel
 import de.hamedtanha.servertoolkit.ui.designsystem.theme.ServerToolkitButtonShape
+
+internal const val SERVER_INVENTORY_PRIMARY_CONTENT_TEST_TAG =
+    "server-inventory-primary-content"
 
 @Composable
 fun ServerInventoryRoute(
@@ -415,12 +420,14 @@ private fun ServerInventoryListItem(
     Card(
         modifier = modifier.fillMaxWidth(),
     ) {
-        Row(
+        Column(
             modifier = Modifier.padding(16.dp),
-            verticalAlignment = Alignment.CenterVertically,
+            verticalArrangement = Arrangement.spacedBy(8.dp),
         ) {
             Column(
-                modifier = Modifier.weight(1f),
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .testTag(SERVER_INVENTORY_PRIMARY_CONTENT_TEST_TAG),
             ) {
                 Text(
                     text = server.name,
@@ -456,9 +463,13 @@ private fun ServerInventoryListItem(
                 )
             }
 
-            Row(
-                horizontalArrangement = Arrangement.spacedBy(4.dp),
-                verticalAlignment = Alignment.CenterVertically,
+            FlowRow(
+                modifier = Modifier.fillMaxWidth(),
+                horizontalArrangement = Arrangement.spacedBy(
+                    4.dp,
+                    Alignment.End,
+                ),
+                verticalArrangement = Arrangement.spacedBy(4.dp),
             ) {
                 TextButton(
                     onClick = {
