@@ -3,7 +3,7 @@
 **Project:** Server Toolkit
 **Version:** 0.4.0
 **Status:** Released
-**Last Updated:** 2026-09-04
+**Last Updated:** 2026-09-06
 
 ---
 
@@ -80,7 +80,7 @@ The repository does not claim universal Linux, Windows, BSD, appliance, cloud-pr
 | Local Persistence | Current | Room database version `5`, explicit migrations through `4 → 5`, and exported schema `5`. |
 | Documentation Governance | Active | Source-of-truth, Architecture Atlas, engineering-handbook navigation, immutable review history, version metadata, ADR, changelog, and factual documentation boundaries are defined. |
 | Build Toolchain Governance | Active | Update triggers, risk classification, compatibility clusters, validation, release interaction, and ADR boundaries are defined. |
-| Continuous Integration | Implemented | Pull requests and `main` validate Kotlin compilation, Android test compilation, unit tests, lint, and debug builds. |
+| Continuous Integration | Implemented | Pull requests and `main` run build/unit validation plus the complete debug instrumentation suite on managed Android API `36`; the required aggregate `Validate Android project` check fails unless both validation layers succeed. |
 | Android Release Signing | Implemented and published | The version `0.4.0` release artifacts and signing evidence are published and verified. |
 
 ---

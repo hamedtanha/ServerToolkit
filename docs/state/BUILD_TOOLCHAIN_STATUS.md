@@ -2,7 +2,7 @@
 
 **Project:** Server Toolkit  
 **Status:** Active  
-**Last Updated:** 2026-09-04
+**Last Updated:** 2026-09-06
 
 ---
 
@@ -147,9 +147,15 @@ The Android validation workflow currently uses:
 | Java distribution | Temurin |
 | Java version | `17` |
 | Gradle setup action | `gradle/actions/setup-gradle@v6` |
-| Job timeout | `30` minutes |
+| Build/unit job | `Build and unit validation` |
+| Build/unit timeout | `30` minutes |
+| Managed device | `ciApi36` — Pixel 2, API `36`, AOSP ATD, `x86_64` |
+| Instrumentation job | `Run Android instrumentation tests` |
+| Instrumentation timeout | `45` minutes |
+| Required status context | `Validate Android project` |
+| Instrumentation artifact retention | `7` days |
 
-The workflow validates:
+The build/unit job validates:
 
 ```text
 :app:compileDebugKotlin
@@ -159,6 +165,31 @@ The workflow validates:
 :app:assembleDebug
 :app:assembleDebugAndroidTest
 ```
+
+After that job succeeds, CI provisions the repository-defined Gradle Managed Device and executes the complete debug instrumentation suite through:
+
+```text
+:app:ciApi36DebugAndroidTest
+```
+
+The managed-device job fails fast when `/dev/kvm` is unavailable on the GitHub-hosted runner. Instrumentation reports and results are uploaded even when tests fail, using an artifact name tied to the pull-request head SHA.
+
+Repository governance continues to require the existing `Validate Android project` status context. That context is implemented as a final fail-closed aggregate gate with `always()` semantics and succeeds only when both the build/unit job and the instrumentation job report `success`. A build failure, instrumentation failure, skipped upstream job, or cancelled upstream job therefore cannot produce a successful required gate.
+
+F06 enforcement was verified remotely under Issue `#186` and PR `#187` with a green aggregate baseline followed by a temporary deterministic Room migration instrumentation failure. The proof run kept build/unit validation green while both the instrumentation job and the required `Validate Android project` context failed. The temporary proof test was removed before final validation and must never reach `main`.
+
+### Managed-Device Rollback Procedure
+
+If GitHub-hosted KVM or Gradle Managed Device behavior becomes persistently unusable because of runner/platform instability, rollback must be explicit and reviewable rather than silently weakening the required gate:
+
+1. Open a focused rollback Issue and pull request with concrete runner/platform evidence.
+2. Remove the `instrumentation` job and final aggregate `required-gate` job from `.github/workflows/android-validation.yml`.
+3. Rename the ordinary build/unit job back to the required context `Validate Android project` so the existing repository ruleset remains satisfiable without changing governance.
+4. Remove the `ciApi36` Gradle Managed Device configuration from `app/build.gradle.kts` if it is no longer used by repository CI.
+5. Keep the existing compile, Android-test compile, JVM unit, lint, and debug assembly tasks unchanged.
+6. Record the rollback in living CI documentation and the changelog, and open a bounded follow-up to restore instrumentation enforcement when the platform issue is resolved.
+
+Do not leave `Validate Android project` as a green job that ignores a failing instrumentation dependency. Any temporary weakening of instrumentation enforcement must be explicit in repository history and current-state documentation.
 
 A core toolchain update must keep local and CI behavior aligned.
 
