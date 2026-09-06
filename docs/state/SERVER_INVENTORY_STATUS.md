@@ -4,7 +4,7 @@
 **Feature Area:** Server Inventory
 **Status:** Accepted Baseline
 **Related Milestone:** Version 0.3.0 — Server Inventory Foundation
-**Last Updated:** 2026-09-05
+**Last Updated:** 2026-09-06
 
 ---
 
@@ -26,6 +26,12 @@ The previously verified existing-Server persistence defect tracked by Issue `#14
 
 Repository-facing presentation failure handling has also been hardened for architecture review finding F05 under Issue `#184`. Inventory observation now supports explicit in-place retry, preserves the last useful server data and active filter after a later observation failure, uses stable feature-owned UI copy instead of raw repository exception text, and preserves coroutine cancellation semantics.
 
+Server Inventory collection cards now implement the ADR-017 constrained-space
+contract tracked by Issue `#161`. Primary operational content retains the full
+card width, while `Connect`, `Edit`, and `Delete` actions occupy a separate
+wrapping action region below it. This preserves readable content at enlarged font
+scale and narrow width without changing typography or introducing pagination.
+
 ---
 
 ## Implemented
@@ -41,7 +47,8 @@ Repository-facing presentation failure handling has also been hardened for archi
 - Server Inventory empty screen.
 - Server Inventory empty-state action.
 - Stable inventory-empty rendering after deleting the final server while a filter remains active.
-- Basic Server Inventory list rendering.
+- Lazy Server Inventory list rendering with stable `Server.id` item identity.
+- Adaptive Server Inventory cards that reserve full width for primary operational content and place `Connect`, `Edit`, and `Delete` in a wrapping action region below it.
 - Dashboard navigation action to Server Inventory.
 
 ### Server Form Workflows
@@ -101,6 +108,8 @@ Repository-facing presentation failure handling has also been hardened for archi
 
 ### Verification
 
+- Focused constrained-layout Compose instrumentation verifies a `320.dp` viewport at `fontScale=2.0` with long server name, host, and username values, a minimum `200.dp` primary-content width, and reachable `Connect`, `Edit`, and `Delete` actions.
+- Focused F10 instrumentation passed on Android 16 / API 36 (`Leannect_API_36`).
 - Manual Edit Server verification after app restart.
 - Manual search and filtering verification.
 - Automated search and filtering verification through unit tests, instrumented tests, and debug build.
