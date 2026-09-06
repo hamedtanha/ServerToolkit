@@ -2,7 +2,7 @@
 
 > **Atlas version:** `2026.09`\
 > **Status:** Living current-state map\
-> **Evidence refresh:** Issue `#161`, based on `main@3d47e9b74e174221eb73fa21b58a57b39578de1f` plus the focused F10 collection-layout remediation\
+> **Evidence refresh:** Issue `#191`, based on `main@aa8f7cd8c39c94fafd5b07585931e57bfbebffc7` after completed `RA-2026.09-v1` remediation and successful Android Validation run `#198`\
 > **Last Updated:** 2026-09-06\
 > **Repository:** `hamedtanha/ServerToolkit`
 
@@ -324,6 +324,20 @@ content and reachable actions.
 Issue `#161` / review finding F10 tracks this focused correction. No typography
 reduction, pagination dependency, query-state expansion, or generic responsive
 framework is introduced.
+
+
+### September 2026 Architecture Review Closure
+
+Published review `RA-2026.09-v1` remains immutable historical evidence.
+
+Its focused remediation sequence is complete. Findings `F01` through `F10` are
+resolved on `main@aa8f7cd8c39c94fafd5b07585931e57bfbebffc7`.
+
+The final remediation was Issue `#161` and PR `#190`. Post-merge Android
+Validation run `#198` completed successfully on that exact baseline.
+
+The stable release remains `v0.4.0`, and version `0.5.0 - Operations` remains
+in progress. No release tag or version metadata change is implied by this closure.
 
 ## 12. Build, CI, and Release Topology
 

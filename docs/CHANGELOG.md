@@ -39,6 +39,7 @@ The project follows Conventional Commits and Semantic Versioning principles.
 
 ### Changed
 
+- Recorded completion of the RA-2026.09-v1 architecture-review remediation sequence after findings F01 through F10 were resolved. Final baseline main@aa8f7cd8c39c94fafd5b07585931e57bfbebffc7 passed Android Validation run #198. Release v0.4.0, Android version metadata, and the in-progress 0.5.0 Operations milestone remain unchanged.
 - Synchronized canonical package ownership, practical architecture rules, the living Architecture Atlas, and AI bootstrap guidance with the current platform-neutral source tree, accepted ADR-017, and executable dependency contract.
 - Consolidated legacy root documentation governance and process files into explicit compatibility pointers while preserving the current documentation, development, architecture, security, and package-ownership sources of truth.
 - Updated the core Android build compatibility cluster to Gradle `9.6.1` and Android Gradle Plugin `9.4.0` while retaining Kotlin `2.4.10` and KSP `2.3.10`.
