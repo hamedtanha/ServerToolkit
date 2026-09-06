@@ -17,8 +17,8 @@ concurrency:
   cancel-in-progress: true
 
 jobs:
-  validate:
-    name: Validate Android project
+  build:
+    name: Build and unit validation
     runs-on: ubuntu-24.04
     timeout-minutes: 30
 
@@ -50,7 +50,7 @@ jobs:
 
   instrumentation:
     name: Run Android instrumentation tests
-    needs: validate
+    needs: build
     runs-on: ubuntu-24.04
     timeout-minutes: 45
 
@@ -90,3 +90,24 @@ jobs:
             app/build/outputs/androidTest-results/managedDevice/
           if-no-files-found: warn
           retention-days: 7
+
+  required-gate:
+    name: Validate Android project
+    if: ${{ always() }}
+    needs:
+      - build
+      - instrumentation
+    runs-on: ubuntu-24.04
+    timeout-minutes: 5
+
+    steps:
+      - name: Require build and instrumentation validation
+        env:
+          BUILD_RESULT: ${{ needs.build.result }}
+          INSTRUMENTATION_RESULT: ${{ needs.instrumentation.result }}
+        run: |
+          if [[ "$BUILD_RESULT" != "success" || "$INSTRUMENTATION_RESULT" != "success" ]]; then
+            echo "Build validation result: $BUILD_RESULT" >&2
+            echo "Instrumentation result: $INSTRUMENTATION_RESULT" >&2
+            exit 1
+          fi
