@@ -1,9 +1,9 @@
 # Project Bootstrap
 
-**Project:** Server Toolkit  
-**Released Application Version:** 0.4.0  
-**Active Development Milestone:** 0.5.0 — Operations  
-**Status:** Active  
+**Project:** Server Toolkit\
+**Released Application Version:** 0.4.0\
+**Active Development Milestone:** 0.5.0 — Operations\
+**Status:** Active\
 **Last Updated:** 2026-09-06
 
 ---

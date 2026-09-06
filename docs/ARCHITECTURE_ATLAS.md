@@ -1,9 +1,9 @@
 # ServerToolkit Architecture Atlas
 
-> **Atlas version:** `2026.09`  
-> **Status:** Living current-state map  
-> **Evidence refresh:** Issue `#188` / PR `#189`, based on `main@531f0b0415114cb9372bd7cae0c48c61d345c611` plus the focused F07/F09 remediation  
-> **Last Updated:** 2026-09-06  
+> **Atlas version:** `2026.09`\
+> **Status:** Living current-state map\
+> **Evidence refresh:** Issue `#188` / PR `#189`, based on `main@531f0b0415114cb9372bd7cae0c48c61d345c611` plus the focused F07/F09 remediation\
+> **Last Updated:** 2026-09-06\
 > **Repository:** `hamedtanha/ServerToolkit`
 
 ## 1. Purpose and Authority
