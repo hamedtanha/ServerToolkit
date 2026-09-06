@@ -1,5 +1,0 @@
-package de.hamedtanha.servertoolkit.feature.ssh.presentation.state
-
-import de.hamedtanha.servertoolkit.feature.serverinventory.presentation.viewmodel.ServerInventoryViewModel
-
-internal object ArchitecturePresentationDependencyProof

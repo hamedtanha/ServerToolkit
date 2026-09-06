@@ -1,5 +1,0 @@
-package de.hamedtanha.servertoolkit.feature.serverinventory.domain.model
-
-import de.hamedtanha.servertoolkit.feature.serverinventory.data.repository.RoomServerRepository
-
-internal object ArchitectureDomainDependencyProof
