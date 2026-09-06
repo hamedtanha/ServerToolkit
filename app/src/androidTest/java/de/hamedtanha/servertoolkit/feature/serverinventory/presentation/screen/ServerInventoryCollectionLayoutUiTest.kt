@@ -6,7 +6,6 @@ import androidx.compose.foundation.layout.width
 import androidx.compose.runtime.CompositionLocalProvider
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalDensity
-import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.test.assertHasClickAction
 import androidx.compose.ui.test.assertIsDisplayed
 import androidx.compose.ui.test.assertWidthIsAtLeast
@@ -74,8 +73,7 @@ class ServerInventoryCollectionLayoutUiTest {
                     Box(
                         modifier = Modifier
                             .width(CONSTRAINED_WIDTH)
-                            .fillMaxHeight()
-                            .testTag(CONSTRAINED_CONTAINER_TEST_TAG),
+                            .fillMaxHeight(),
                     ) {
                         ServerInventoryScreen(
                             uiState = ServerInventoryUiState(
@@ -113,9 +111,6 @@ class ServerInventoryCollectionLayoutUiTest {
             "Primary Production Gateway for Long Operational Workloads"
         const val LONG_HOST =
             "primary-production-gateway-with-a-long-hostname.example.internal"
-        const val CONSTRAINED_CONTAINER_TEST_TAG =
-            "server-inventory-constrained-container"
-
         const val MAXIMUM_FONT_SCALE = 2f
         val MIN_PRIMARY_CONTENT_WIDTH = 200.dp
         val CONSTRAINED_WIDTH = 320.dp
