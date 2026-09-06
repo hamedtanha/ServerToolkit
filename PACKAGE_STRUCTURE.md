@@ -48,7 +48,6 @@ de.hamedtanha.servertoolkit/
 │   └── di/
 ├── feature/
 │   ├── dashboard/
-│   │   ├── navigation/
 │   │   └── presentation/
 │   ├── savedcommands/
 │   │   ├── data/
@@ -74,7 +73,6 @@ de.hamedtanha.servertoolkit/
 │       │   └── source/
 │       ├── di/
 │       ├── domain/
-│       ├── navigation/
 │       └── presentation/
 ├── navigation/
 └── ui/
@@ -134,7 +132,7 @@ Do not add a broad `operations`, `provider`, `gateway`, `platform`, `common`, or
 
 ### `navigation`
 
-The app-level navigation package composes feature destinations. It does not own feature state or persistence.
+The app-level navigation package composes current destinations and route entry points, including features that do not own a dedicated `navigation` subpackage. It does not own feature state or persistence.
 
 ### `ui/designsystem/theme`
 
@@ -148,11 +146,11 @@ It is not `ui/theme`; the implemented ownership path is `ui/designsystem/theme`.
 
 ### Dashboard
 
-Dashboard owns the application overview and entry actions. It may consume stable summaries and navigation callbacks but does not own Server Inventory, SSH, or Saved Commands persistence.
+Dashboard owns the application overview and entry actions. It may consume stable summaries and navigation callbacks but does not own Server Inventory, SSH, or Saved Commands persistence. Its current production feature package contains presentation responsibilities; routing is composed at the app-level navigation boundary.
 
 ### Server Inventory
 
-Server Inventory owns local `Server` records, inventory editing/search/filtering, Room persistence, and the concrete resolver that maps inventory records into the project-owned `core/connection` target contract.
+Server Inventory owns local `Server` records, inventory editing/search/filtering, Room persistence, and the concrete resolver that maps inventory records into the project-owned `core/connection` target contract. Its current route composition is registered through the app-level navigation boundary rather than a feature-owned navigation package.
 
 The name `serverinventory` remains intentional. A broader inventory abstraction requires concrete non-server asset behavior before adoption.
 
@@ -169,11 +167,13 @@ SSH owns:
 - connection history;
 - the SSH workflow presentation.
 
+SSH currently has no dedicated feature navigation package; its routes are composed through the app-level navigation boundary.
+
 SSH presentation may consume Saved Commands **domain** contracts for selector data. It must not consume Saved Commands DAO, entity, concrete repository, screen, or ViewModel implementations.
 
 ### Saved Commands
 
-Saved Commands owns reusable operational command definitions, validation, Room persistence, management presentation, and navigation.
+Saved Commands owns reusable operational command definitions, validation, Room persistence, management presentation, and its implemented feature-owned navigation destination.
 
 Saved Commands are currently global. Persistence preserves command text exactly and never executes it. SSH selection replaces editable command input only; explicit Run remains the sole execution trigger.
 
@@ -187,7 +187,7 @@ The production import contract is enforced by:
 scripts/architecture/check-dependencies.sh
 ```
 
-The normal pull-request validation path runs this checker before Gradle build/unit validation.
+The normal pull-request validation path runs this checker before Gradle build/unit validation. The script uses Bash and portable POSIX `find` behavior available on both the macOS development environment and Linux CI; it does not rely on GNU-only sort options.
 
 ### Domain rules
 

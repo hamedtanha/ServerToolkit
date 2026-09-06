@@ -168,7 +168,7 @@ while IFS= read -r -d '' file; do
         ;;
     esac
   done < "$file"
-done < <(find "$SOURCE_ROOT" -type f -name '*.kt' -print0 | sort -z)
+done < <(find "$SOURCE_ROOT" -type f -name '*.kt' -print0)
 
 if (( violations > 0 )); then
   printf 'Architecture dependency check failed: %d violation(s) across %d production Kotlin file(s).\n' \
