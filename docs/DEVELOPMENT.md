@@ -3,7 +3,7 @@
 **Project:** Server Toolkit
 **Document Baseline:** 0.2.0-alpha
 **Status:** Foundational
-**Last Updated:** 2026-08-10
+**Last Updated:** 2026-09-06
 
 ---
 
@@ -195,7 +195,7 @@ The validation workflow is:
 .github/workflows/android-validation.yml
 ```
 
-The workflow uses the committed Gradle Wrapper and the project's Java 17 toolchain to run:
+The workflow uses the committed Gradle Wrapper and the project's Java 17 toolchain. Its build/unit job runs:
 
 ```text
 :app:compileDebugKotlin
@@ -206,9 +206,19 @@ The workflow uses the committed Gradle Wrapper and the project's Java 17 toolcha
 :app:assembleDebugAndroidTest
 ```
 
-A failed validation must be resolved before merge.
+After build/unit validation succeeds, CI provisions the repository-defined Gradle Managed Device `ciApi36` on Android API 36 with an AOSP ATD `x86_64` image and runs the complete debug instrumentation suite:
 
-Continuous integration complements local validation and manual Android runtime verification. It does not replace device- or emulator-based testing for user-facing workflows.
+```text
+:app:ciApi36DebugAndroidTest
+```
+
+Instrumentation reports and results are uploaded as short-retention workflow artifacts associated with the exact pull-request head SHA.
+
+Repository governance requires the status context `Validate Android project`. That context is a final fail-closed aggregate gate and succeeds only when both build/unit validation and managed-device instrumentation succeed. A failed, skipped, or cancelled upstream validation therefore cannot produce a successful required gate.
+
+A failed required validation must be resolved before merge. The current CI device, timeout, artifact, enforcement, and rollback details are recorded in [Build Toolchain Status](state/BUILD_TOOLCHAIN_STATUS.md).
+
+Continuous integration complements local validation and manual Android runtime verification. Managed-device CI prevents Android instrumentation from being compile-only, but it does not eliminate targeted manual/device evidence when user-facing workflow behavior or platform-specific interaction requires direct inspection.
 
 ---
 
@@ -337,15 +347,16 @@ ADRs document accepted decisions, not future ideas.
 
 ## Testing Strategy
 
-Testing will be introduced gradually.
+Testing is implemented at multiple levels and should remain proportional to the affected risk:
 
-Planned testing levels:
+- JVM unit tests for deterministic domain, mapping, presentation, and adapter behavior.
+- Android instrumentation tests for Room migrations, DAOs, repositories, Android framework boundaries, lifecycle behavior, and other device-dependent contracts.
+- Compose instrumentation tests for user-interface behavior that requires Android runtime semantics.
+- Targeted manual device or emulator verification when automated tests cannot adequately establish user-facing or platform-specific behavior.
 
-- Unit tests.
-- Integration tests.
-- UI tests.
+The normal pull-request CI path executes JVM tests and the complete debug Android instrumentation suite. Android tests must not be treated as validated merely because they compile or their test APK assembles.
 
-Testing coverage will increase as the project matures.
+Testing coverage should increase with project risk and capability maturity without replacing focused assertions with broad, fragile end-to-end tests.
 
 Build-toolchain and dependency updates must additionally validate the layers they can affect, including generated code, persistence schemas, Android runtime behavior, security boundaries, CI, packaging, and release tooling where applicable.
 
