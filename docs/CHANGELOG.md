@@ -14,6 +14,7 @@ The project follows Conventional Commits and Semantic Versioning principles.
 - Added a foundational build-toolchain and dependency policy covering update triggers, risk classification, compatibility clusters, validation, release impact, rollback, automation, and ADR boundaries.
 - Added a living build-toolchain status document recording the current Java, Gradle, Android, Kotlin, dependency, CI, Build Tools, NDK, and release-toolchain baseline from repository declarations.
 - Added enforced Android managed-device instrumentation validation to pull-request and `main` CI, with API 36 AOSP ATD execution, SHA-scoped test artifacts, and a fail-closed aggregate required gate.
+- Added repository-owned executable architecture dependency validation for production Kotlin imports, with explicit narrow composition/Room-metadata exceptions and fail-closed integration into the required Android Validation path.
 - Accepted the first version 0.5.0-alpha Operations increment as the global Saved Command Foundation.
 - Added the project-owned `SavedCommand` domain model and repository contract with explicit name, command-text, size, and creation-time boundaries.
 - Added Room-backed saved-command persistence with entity, DAO, exact domain/entity mapping, repository implementation, and Hilt bindings.
@@ -38,6 +39,7 @@ The project follows Conventional Commits and Semantic Versioning principles.
 
 ### Changed
 
+- Synchronized canonical package ownership, practical architecture rules, the living Architecture Atlas, and AI bootstrap guidance with the current platform-neutral source tree, accepted ADR-017, and executable dependency contract.
 - Consolidated legacy root documentation governance and process files into explicit compatibility pointers while preserving the current documentation, development, architecture, security, and package-ownership sources of truth.
 - Updated the core Android build compatibility cluster to Gradle `9.6.1` and Android Gradle Plugin `9.4.0` while retaining Kotlin `2.4.10` and KSP `2.3.10`.
 - Generalized the Add Server helper copy so the inventory workflow no longer implies Linux-only server support.
@@ -73,6 +75,10 @@ The project follows Conventional Commits and Semantic Versioning principles.
 - Published architecture review `RA-2026.07-v2` through a metadata-only follow-up after acceptance PR `#139` was squash-merged as `8070830dfae14f908b9dd128846f66112b36423e` and the merge passed Android Validation run `#90`; no review conclusions, production behavior, Room schema, navigation, or support claims changed.
 - Corrected the stale milestone names in the Development Process release roadmap so versions `0.7.0`, `0.8.0`, and `1.0.0` match the current Roadmap and Release Process documents.
 
+### Removed
+
+- Removed obsolete empty `core/common`, root `data/*`, and root `domain/*` package scaffolding so the tracked source tree contains responsibility-bearing packages instead of speculative placeholders.
+
 ### Fixed
 
 - Fixed SSH connected-session cancellation and timeout handoff so an authenticated session that is registered but not safely delivered is removed from application ownership and best-effort closed without replacing the primary cancellation or timeout outcome.
@@ -88,7 +94,7 @@ The project follows Conventional Commits and Semantic Versioning principles.
 - Android compile SDK, target SDK, minimum SDK, Build Tools, NDK, application version metadata, and application-library versions remain unchanged by the core build-cluster update.
 - Android `versionName` and `versionCode` remain unchanged.
 - No Saved Command categories, favorites, templates, variables, server assignment, automatic execution, background execution, synchronization, backup, or credential storage was added.
-- No Android production code, package hierarchy, Capability Gateway implementation, Provider registry, platform detection, transport, monitoring, service-management workflow, or named-service integration was added by the architecture decision.
+- No Android production behavior, Room schema, Capability Gateway implementation, Provider registry, platform detection, transport, monitoring, service-management workflow, or named-service integration was added by the architecture enforcement/documentation correction.
 - The immutable version 0.4.0 release tag, artifacts, checksums, and release evidence remain unchanged.
 
 ---

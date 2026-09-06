@@ -1,63 +1,43 @@
 # ServerToolkit Architecture Atlas
 
-> **Atlas version:** `2026.07`
->
-> **Status:** Published current-state baseline
->
-> **Evidence baseline:** `0135faf89b1035fd91c75b37a25ec51bc7c71074`
->
-> **Review:** `RA-2026.07-v1`
->
-> **Governing Issue:** `#135`
->
+> **Atlas version:** `2026.09`\
+> **Status:** Living current-state map\
+> **Evidence refresh:** Issue `#188` / PR `#189`, based on `main@531f0b0415114cb9372bd7cae0c48c61d345c611` plus the focused F07/F09 remediation\
+> **Last Updated:** 2026-09-06\
 > **Repository:** `hamedtanha/ServerToolkit`
 
 ## 1. Purpose and Authority
 
-This Atlas is the integrated operational map of the ServerToolkit architecture at the evidence baseline above.
+This Atlas is the integrated current-state architecture map for Server Toolkit.
 
-It combines verified repository structure, package ownership, persistence, navigation, SSH lifecycle, Saved Commands integration, build and release workflow, accepted ADRs, and current-state documentation.
+It combines repository topology, ownership, dependency direction, persistence, SSH lifecycle, Saved Commands integration, validation, release, ADR, and documentation boundaries.
 
-It does not replace:
+It does not replace executable source/configuration, accepted ADRs, `docs/PROJECT_STATE.md`, focused `docs/state/` documents, `docs/ARCHITECTURE.md`, or `PACKAGE_STRUCTURE.md`.
 
-- implementation and repository configuration;
-- accepted ADRs;
-- `docs/PROJECT_STATE.md`;
-- focused documents under `docs/state/`;
-- `docs/ARCHITECTURE.md`;
-- `PACKAGE_STRUCTURE.md`;
-- build, CI, release, or security configuration.
+When the Atlas conflicts with executable repository evidence, executable evidence governs and the Atlas must be corrected.
 
-When this Atlas conflicts with executable repository evidence, executable evidence governs and the Atlas must be corrected.
+Published reviews remain immutable historical evidence. The living Atlas may change as the repository changes.
 
 ## 2. Evidence Model
 
 | Evidence class | Role | Authority |
 |---|---|---|
-| Implementation and repository configuration | Executable behavior, dependency, schema, workflow, and lifecycle evidence | Primary |
-| Project State and focused state documents | Accepted current implementation summary | Current-state authority |
-| Accepted ADRs | Durable decision and rationale | Governing intent |
-| Architecture and engineering policies | Accepted implementation and delivery rules | Policy authority |
-| Roadmap and changelog | Planned direction and notable history | Supporting authority |
-| Published review records | Time-bound findings and recommendations | Historical evidence |
+| Source/configuration and executable validation | Behavior, dependencies, schema, workflow, lifecycle | Primary |
+| Project State and focused state docs | Accepted current implementation summary | Current-state authority |
+| Accepted ADRs | Durable decisions and rationale | Governing intent |
+| Architecture/engineering docs | Implementation and delivery policy | Policy authority |
+| Roadmap/changelog | Planned direction and notable history | Supporting authority |
+| Published reviews | Time-bound findings and recommendations | Historical evidence |
 
-Claims in this Atlas use the following labels:
-
-- **Verified** — directly corroborated by implementation, schema, workflow, build configuration, test evidence, or repository configuration.
-- **Documented** — established by an authoritative current-state document but not exhaustively retraced in this Atlas pass.
-- **Constrained** — implemented behavior whose validity depends on runtime, platform, environment, release, or local evidence.
-- **Target** — accepted future direction that is not implemented.
-- **Review Candidate** — a topic selected for assessment but not accepted as architecture or implementation scope.
+Support claims distinguish architecturally permitted, implemented, and verified behavior.
 
 ## 3. Product and Architecture Posture
 
-ServerToolkit is a platform-neutral remote-systems operations application.
+Server Toolkit is a platform-neutral remote systems operations application.
 
-The current verified remote-access capability is SSH. SSH is one product capability rather than the complete product identity.
+SSH is the current verified remote-access capability. It is one product capability, not the complete product identity.
 
-The repository preserves two complementary architecture views.
-
-### 3.1 Android Application Architecture
+### Android application view
 
 ```text
 UI
@@ -69,7 +49,7 @@ Domain contracts and models
 Data implementations
 ```
 
-### 3.2 Remote Capability Architecture
+### Remote capability view
 
 ```text
 Presentation / Use Case
@@ -83,25 +63,21 @@ Provider / Adapter
 Transport or external system
 ```
 
-The remote-capability model is introduced only when a concrete capability requires discovery, translation, routing, normalization, orchestration, policy enforcement, or external integration.
-
-Purely local features do not receive speculative Gateway or Provider abstractions.
+The Gateway/Provider view is introduced only for concrete routing, translation, discovery, normalization, orchestration, policy, or integration needs.
 
 ## 4. Repository Topology
 
 ```text
 .
-├── .github/
-│   └── workflows/
-│       └── android-validation.yml
+├── .github/workflows/android-validation.yml
 ├── app/
 │   ├── build.gradle.kts
 │   ├── schemas/
 │   └── src/
-├── config/
-│   └── release/
+├── config/release/
 ├── docs/
 │   ├── adr/
+│   ├── ai/
 │   ├── engineering/
 │   ├── state/
 │   ├── ARCHITECTURE.md
@@ -110,95 +86,95 @@ Purely local features do not receive speculative Gateway or Provider abstraction
 │   ├── ENGINEERING_STRATEGY.md
 │   ├── PRODUCT_VISION.md
 │   ├── PROJECT_STATE.md
-│   ├── RELEASES.md
 │   └── ROADMAP.md
-├── review/
-│   └── architecture/
+├── review/architecture/
 ├── scripts/
+│   ├── architecture/check-dependencies.sh
 │   └── release/
 ├── PACKAGE_STRUCTURE.md
 └── README.md
 ```
 
-### 4.1 Android Source Topology
+### Android source topology
 
 ```text
 de.hamedtanha.servertoolkit
-├── MainActivity
-├── ServerToolkitApplication
 ├── core
-│   ├── common
+│   ├── connection/domain
 │   ├── database
 │   └── di
 ├── feature
 │   ├── dashboard
+│   ├── savedcommands
 │   ├── serverinventory
-│   ├── ssh
-│   └── savedcommands
+│   └── ssh
 ├── navigation
-└── ui
-    └── theme
+└── ui/designsystem/theme
 ```
 
-Packages exist for implemented responsibilities. Empty speculative Gateway, Provider, plugin, platform, or Operations hierarchies are not part of the current production structure.
+Empty root `data`, root `domain`, and `core/common` scaffolding are not part of the canonical topology. Packages exist for implemented responsibilities only.
 
 ## 5. Ownership Matrix
 
 | Boundary | Owns | Must not own |
 |---|---|---|
-| Application shell | Android entry points, application composition, app navigation registration | Feature business logic, Room behavior, SSHJ details |
-| `core/database` | Application Room schema aggregation and explicit migrations | Feature business policy |
-| `core/di` | Application-wide dependency construction | Feature-owned behavior |
-| Dashboard | Product overview and entry actions | Server Inventory, SSH, or Saved Commands persistence |
-| Server Inventory | Current `Server` records, inventory workflows, search, filtering, and Room persistence | Active SSH session lifecycle |
-| SSH | Target resolution, host trust, ephemeral authentication, session ownership, command input, explicit execution, output, history, disconnect, and cleanup | Saved Commands DAO, entity, concrete repository, screen, or ViewModel |
-| Saved Commands | Global reusable command definitions, validation, persistence, observation, management UI, and navigation | SSH transport, session lifecycle, or automatic execution |
-| App navigation | Destination registration and cross-feature route composition | Feature data ownership |
-| `docs/` | Living accepted current state, policy, and navigation | Immutable time-bound review snapshots |
-| `review/` | Evidence-bound assessments, findings, and proposals | Mutable current-state authority or implicit implementation approval |
+| Application shell | Android entry points and app composition | Feature business behavior, Room/SSHJ internals |
+| `core/connection` | Non-sensitive shared connection-target meaning/resolution contracts | Credentials, trust, sessions, transport implementation |
+| `core/database` | Application Room schema aggregation and migrations | Feature business policy |
+| `core/di` | Application-wide dependency construction | Feature behavior |
+| Dashboard | Operational overview and entry actions | Feature persistence |
+| Server Inventory | Server records, inventory workflows/persistence, connection-target resolver implementation | SSH session lifecycle |
+| SSH | Trust, ephemeral auth, SSHJ adapters, session lifecycle, command input/execution/output/history | Saved Commands data/presentation implementations |
+| Saved Commands | Global command definitions, persistence, management UI, navigation | SSH transport/session/execution ownership |
+| App navigation | Cross-feature destination composition | Feature data ownership |
+| `ui/designsystem/theme` | Application-wide visual theme/profile tokens | Feature behavior |
+| `docs/` | Living current state and policy | Immutable review snapshots |
+| `review/` | Evidence-bound reviews/findings | Mutable current-state authority |
 
-## 6. Dependency Direction
+## 6. Executable Dependency Contract
 
-Allowed dependency direction:
+The repository enforces production Kotlin dependency rules with:
 
 ```text
-presentation -> domain contracts and models
-data -> domain contracts and models
-feature DI -> feature contracts and implementations
-app navigation -> feature destinations and route entry points
+scripts/architecture/check-dependencies.sh
 ```
 
-Narrow Room aggregation exception:
+The checker runs in the normal Android Validation build job before Gradle build/unit tasks.
+
+Core invariants:
+
+```text
+Domain !-> Android / AndroidX / Room / SSHJ
+Domain !-> Data / Presentation
+Data !-> Presentation
+Feature A data !-> Feature B data
+Feature A presentation !-> Feature B presentation/data/DI
+Presentation !-> Room / concrete repositories
+```
+
+Accepted stable cross-feature contract:
+
+```text
+SSH presentation -> Saved Commands domain
+```
+
+### Named narrow exceptions
+
+1. `SshScreen.kt -> AndroidSshPrivateKeySourceFactory` at the Android document-picker composition boundary.
+2. `SshTrustedHostKeyEntity.kt -> ServerEntity` for Room foreign-key metadata.
+3. `SshConnectionHistoryEntity.kt -> ServerEntity` for Room foreign-key metadata.
+
+Central Room aggregation remains separately accepted:
 
 ```text
 core/database -> feature-owned Room entities and DAOs
 ```
 
-The exception exists because Room requires one application database schema. It does not transfer feature business ownership to `core/database`.
+Exceptions are source/import-specific, not broad allowlists. New exceptions require focused review and synchronized executable/documentation changes.
 
-Verified cross-feature contract:
-
-```text
-SSH presentation -> SavedCommandRepository
-```
-
-The SSH feature consumes the project-owned Saved Commands domain contract. It does not consume Saved Commands data or presentation implementations.
-
-Forbidden dependency direction:
-
-```text
-domain -> data
-domain -> Android framework
-presentation -> DAO
-presentation -> Room entity
-presentation -> concrete external provider
-feature A data -> feature B data
-feature A presentation -> feature B presentation
-```
+Architecture review `RA-2026.09-v1` finding F07 originally identified the lack of executable enforcement. Issue `#188` / PR `#189` implements the focused check and red/green gate evidence without a module split or external architecture-testing framework.
 
 ## 7. Navigation Topology
-
-The application uses one app-level Navigation Compose host.
 
 ```mermaid
 flowchart LR
@@ -218,68 +194,17 @@ flowchart LR
     SSH --> History
 ```
 
-Navigation ownership:
+Permanent exit from an active SSH workflow waits for required session cleanup.
 
-- Dashboard emits narrow callbacks for Server Inventory and Saved Commands.
-- Server Inventory emits Add, Edit, and Connect actions.
-- The SSH destination receives a server identifier.
-- SSH connection history remains a separate per-server destination.
-- Permanent exit from an active SSH workflow is deferred until required session cleanup completes.
-- Back closes the Saved Command selector before requesting permanent SSH workflow exit.
+## 8. Persistence Topology
 
-## 8. Server Inventory Baseline
-
-### 8.1 Current Domain Model
-
-The current `Server` model contains:
-
-```text
-id
-name
-host
-sshPort
-sshUsername
-environment
-category
-tags
-isFavorite
-description
-```
-
-Current characteristics:
-
-- one stable application identifier;
-- one host value;
-- one SSH port;
-- one optional SSH username;
-- user-managed environment, category, tags, favorite, and description metadata;
-- no credential secret fields;
-- no platform-discovery result;
-- no capability profile;
-- no multi-endpoint collection;
-- no operational health state.
-
-### 8.2 Current Persistence Model
-
-The `servers` Room table mirrors the current flat domain record through an explicit entity/domain mapper.
-
-Server Inventory owns the record and repository contract. SSH resolves connection targets from the stored inventory record instead of owning a duplicate username or target record.
-
-### 8.3 Scaling Boundary
-
-The current model is an accepted inventory baseline, not a complete long-term server profile.
-
-A multi-level Server Profile is a **Review Candidate**. Identity, endpoints, trust evidence, authentication references, detected platform facts, capability evidence, operational metadata, preferences, and historical evidence require a separate domain review before any entity or migration is accepted.
-
-## 9. Persistence Topology
-
-The current Room database version is:
+Current Room database version:
 
 ```text
 5
 ```
 
-Registered entities:
+Registered areas:
 
 ```text
 servers
@@ -291,154 +216,68 @@ saved_commands
 Migration sequence:
 
 ```text
-1 -> 2  add trusted SSH host keys
-2 -> 3  add Server foreign key and cascade delete to trusted host keys
-3 -> 4  add SSH connection history
-4 -> 5  add Saved Commands
+1 -> 2
+2 -> 3
+3 -> 4
+4 -> 5
 ```
 
-Relationship map:
+Relationship summary:
 
 ```mermaid
 erDiagram
     SERVERS ||--o{ SSH_TRUSTED_HOST_KEYS : owns
     SERVERS ||--o{ SSH_CONNECTION_HISTORY : owns
-
-    SERVERS {
-        string id PK
-        string name
-        string host
-        int ssh_port
-        string ssh_username
-    }
-
-    SSH_TRUSTED_HOST_KEYS {
-        string server_id FK
-        string host
-        int port
-        string fingerprint_algorithm
-        string fingerprint_value
-    }
-
-    SSH_CONNECTION_HISTORY {
-        string id PK
-        string server_id FK
-        string host
-        int port
-        string username
-        string status
-    }
-
-    SAVED_COMMANDS {
-        string id PK
-        string name
-        string command_text
-        long created_at_epoch_millis
-    }
 ```
 
 Persistence invariants:
 
-- feature-owned entities and DAOs remain in their owning features;
+- feature-owned entities/DAOs remain in their features;
 - repositories expose project-owned domain models;
 - Room entities do not leak to presentation;
-- schema changes require explicit migrations;
-- trusted host keys and SSH connection history are deleted when their owning Server is deleted;
+- Server updates use non-destructive upsert behavior;
+- explicit Server deletion retains child cascades;
 - Saved Commands are global and have no Server foreign key;
-- ordinary Room tables do not store passwords, private keys, passphrases, access tokens, or other credential secrets.
+- ordinary Room tables do not store credential secrets.
 
-## 10. SSH Runtime Architecture
+## 9. SSH Runtime Architecture
 
-### 10.1 Workflow Map
+### Target resolution
 
-```mermaid
-sequenceDiagram
-    actor User
-    participant Inventory as Server Inventory
-    participant UI as SSH Presentation
-    participant Resolver as Target Resolver
-    participant Trust as Host Trust Boundary
-    participant Auth as Authentication Boundary
-    participant Session as Session Owner
-    participant Command as Command Executor
-    participant History as Connection History
+SSH receives a Server identifier and resolves non-sensitive host/port/username metadata through the project-owned `core/connection` contract implemented by Server Inventory.
 
-    User->>Inventory: Select Connect
-    Inventory->>UI: Open SSH with serverId
-    UI->>Resolver: Resolve inventory-backed target
-    Resolver-->>UI: Host, port, username
-    UI->>Trust: Observe and evaluate host key
-    Trust-->>UI: Trusted, unknown, or changed
-    UI->>Auth: Submit ephemeral password or one-shot private key
-    Auth-->>Session: Create project-owned session handle
-    Session-->>UI: Connected state
-    UI->>Command: Execute explicit command
-    Command-->>UI: stdout, stderr, exit status
-    UI->>Session: Disconnect or permanent exit
-    Session-->>UI: Cleanup result
-    UI->>History: Observe per-server connection history
-```
+### Trust
 
-### 10.2 Trust Boundary
+- Unknown host keys require explicit user confirmation.
+- Changed keys are blocked.
+- New observations/trust use canonical OpenSSH SHA-256 fingerprints.
+- Historical SSHJ MD5 and Java-encoded SHA-256 trust rows remain explicitly verifiable without silent rewrite.
+- Unknown persisted fingerprint schemes fail closed.
 
-Host trust is explicit and fail-closed:
+### Authentication
 
-- observed fingerprints use SHA256 representation;
-- unknown host keys require user confirmation;
-- changed host keys are blocked;
-- trusted keys are persisted per Server, host, and port;
-- trust records are deleted when the owning Server is deleted;
-- authentication secrets are invalidated when an attempt enters host-key review.
+- Passwords are transient.
+- Private-key documents are one-attempt, bounded, and non-persistent.
+- Passphrases remain outside observable state.
+- Persistent credential storage is not implemented.
 
-A host-key fingerprint verifies SSH host identity. It is not an operating-system or capability classification mechanism.
+### Session lifecycle
 
-### 10.3 Authentication Boundary
+- Authenticated sessions are represented upward by project-owned handles.
+- Cancellation/timeout during connection handoff cannot leave an unreachable registered owner.
+- Normal workflow exit/disconnect uses awaited cleanup with retry semantics while the workflow lives.
+- Permanent workflow-owner destruction transfers abandoned ownership to data-layer cleanup outside `viewModelScope`.
+- Background session continuity is not implemented.
 
-Implemented authentication is ephemeral:
+### Command execution
 
-- password input remains transient;
-- private-key documents are converted into a project-owned one-shot source;
-- private-key material is read with bounded size;
-- passphrases remain outside observable UI state and saved state;
-- no persistent URI permission or key copy is retained;
-- no temporary private-key file is created;
-- application-owned secret buffers receive best-effort clearing;
-- persistent credential storage is not implemented.
+- Execution is explicit and non-interactive.
+- stdout/stderr are drained concurrently.
+- Retained output is bounded to `256 KiB` per stream with explicit truncation.
+- One operation deadline covers command completion and output draining.
+- Output is ephemeral and not persisted.
 
-### 10.4 Session Ownership and Cleanup
-
-The SSH feature owns active project session handles behind project-owned contracts.
-
-Current invariants:
-
-- command execution and session close are serialized through the session owner boundary;
-- workflow exit waits for deterministic cleanup;
-- explicit disconnect uses the same cleanup orchestration;
-- duplicate close requests are suppressed;
-- connection and command execution block conflicting exit operations;
-- close failure preserves retry state;
-- successful cleanup clears stale command output;
-- cancellation is preserved while cleanup remains best-effort and bounded.
-
-### 10.5 Command Execution
-
-Command execution is:
-
-- explicit;
-- non-interactive;
-- initiated only through the Run action;
-- routed through the active project-owned session handle;
-- mapped to project-owned result and error models;
-- presented as stdout, stderr, and exit status;
-- protected from stale result publication after session invalidation;
-- cancellation-aware;
-- closed through command-channel cleanup.
-
-Interactive terminal behavior and automatic or background execution are not implemented.
-
-## 11. Saved Commands Integration
-
-Saved Commands is a local feature with direct repository ownership.
+## 10. Saved Commands Integration
 
 ```mermaid
 flowchart LR
@@ -447,7 +286,7 @@ flowchart LR
     Room[RoomSavedCommandRepository]
     Selector[SSH Saved Command Selector]
     Input[Editable SSH Command Input]
-    Run[Explicit Run Action]
+    Run[Explicit Run]
 
     Management --> Repository
     Room --> Repository
@@ -456,41 +295,34 @@ flowchart LR
     Input --> Run
 ```
 
-Boundary rules:
-
-- Saved Commands owns model validation, persistence, observation, creation, deletion, and management UI.
-- Commands are global and are not assigned to individual Servers.
+- Commands are global.
 - Command text is preserved exactly.
-- Persistence does not parse, normalize, interpolate, or execute command text.
-- SSH owns mutable command input and execution.
-- Selecting a command only replaces the editable input.
-- Selection never executes automatically.
-- Run remains the sole execution trigger.
+- Persistence never executes command text.
+- SSH presentation consumes Saved Commands domain contracts only.
+- Selection replaces editable input; Run remains the only execution trigger.
 
-## 12. Security and Trust Boundaries
+## 11. Collection UX Contract
 
-| Concern | Current boundary |
-|---|---|
-| SSH host identity | Explicit observation, user review, trusted-host persistence, changed-key blocking |
-| Passwords | Transient input only |
-| Private keys | One-shot document source, bounded in-memory use, no persistent import |
-| Passphrases | Transient and outside observable state |
-| Room | Non-secret structured configuration, trust evidence, history, and Saved Commands |
-| Command execution | Explicit user action only |
-| Session lifecycle | Project-owned handle and deterministic cleanup |
-| Release signing | Local fail-closed workflow; secrets outside repository |
-| User-visible failures | Project-owned normalized results rather than raw SSHJ or platform exceptions |
+ADR-017 defines scalable collection invariants:
 
-## 13. Build, CI, and Release Topology
+- lazy rendering for growing collections;
+- stable item identity;
+- primary content must not be destructively compressed by action regions;
+- long content/font scaling/constrained width are first-class validation cases;
+- pagination remains evidence-driven.
 
-### 13.1 Android Validation
+The remaining constrained Server Inventory layout implementation is tracked separately by Issue `#161` / review finding F10. It is not part of the F07/F09 architecture-enforcement slice.
 
-The `Android Validation` workflow runs on pull requests targeting `main`, pushes to `main`, and manual dispatch.
+## 12. Build, CI, and Release Topology
+
+### Android Validation
+
+Pull requests targeting `main`, pushes to `main`, and manual dispatch use `Android Validation`.
+
+Build/unit job:
 
 ```text
-Ubuntu 24.04
-Temurin JDK 17
-Gradle setup
+architecture dependency check
 :app:compileDebugKotlin
 :app:compileDebugAndroidTestKotlin
 :app:testDebugUnitTest
@@ -499,169 +331,94 @@ Gradle setup
 :app:assembleDebugAndroidTest
 ```
 
-Concurrent runs for the same workflow and ref are cancelled.
-
-### 13.2 Build Baseline
-
-The documented current compatibility cluster is:
+Managed-device job:
 
 ```text
-Gradle 9.5.0
-Android Gradle Plugin 9.3.0
+ciApi36
+Pixel 2
+Android API 36
+AOSP ATD x86_64
+:app:ciApi36DebugAndroidTest
+```
+
+Required status context:
+
+```text
+Validate Android project
+```
+
+The required gate fails unless both build/unit and instrumentation layers succeed. Architecture failure occurs before Gradle validation and prevents the instrumentation dependency from running, so a layer violation cannot yield a green aggregate gate.
+
+### Current build cluster
+
+```text
+Gradle 9.6.1
+Android Gradle Plugin 9.4.0
 Kotlin 2.4.10
 KSP 2.3.10
-Java source/target and Kotlin toolchain 17
+Java source/target + Kotlin toolchain 17
 Gradle daemon JVM criteria 21
 ```
 
-### 13.3 Release Boundary
+### Release boundary
 
-Android release signing is a local post-build workflow.
+Official Android release signing remains a local fail-closed post-build workflow. Signing secrets and recovery locations remain outside the repository; GitHub Actions does not perform official release signing.
 
-```text
-assembleRelease
--> zipalign
--> apksigner sign
--> apksigner verify
--> certificate fingerprint verification
--> application metadata verification
--> SHA-256 checksum
--> release evidence
-```
-
-Signing secrets and recovery locations remain outside the repository. GitHub Actions does not perform official release signing.
-
-## 14. Documentation and Review Topology
-
-```mermaid
-flowchart LR
-    Code[Implementation and Configuration]
-    ADR[Accepted ADRs]
-    State[Current-State Documents]
-    Atlas[Architecture Atlas]
-    Review[Immutable Published Reviews]
-    Change[Scoped Engineering Change]
-
-    Code --> State
-    ADR --> State
-    Code --> Atlas
-    State --> Atlas
-    ADR --> Atlas
-    Review --> Atlas
-    Change --> Code
-    Change --> ADR
-    Change --> State
-    Change --> Atlas
-```
-
-Document roles:
+## 13. Documentation and Review Topology
 
 | Location | Role |
 |---|---|
-| `docs/ARCHITECTURE.md` | Practical authoritative architecture rules |
-| `docs/ARCHITECTURE_ATLAS.md` | Integrated current-state map and navigation surface |
 | `docs/PROJECT_STATE.md` | Primary current implementation entry point |
 | `docs/state/` | Focused current implementation baselines |
-| `docs/engineering/` | Engineering policy navigation and focused reusable rules |
-| `docs/adr/` | Immutable accepted decisions and rationale |
-| `review/` | Time-bound evidence, findings, assessments, and proposals |
+| `docs/ARCHITECTURE.md` | Practical authoritative architecture rules |
+| `PACKAGE_STRUCTURE.md` | Canonical source-package ownership and dependency contract |
+| `docs/ARCHITECTURE_ATLAS.md` | Integrated living current-state architecture map |
+| `docs/adr/` | Accepted durable decisions and rationale |
+| `review/` | Immutable/time-bound review evidence after publication |
 
-Review documents do not authorize implementation. Accepted review recommendations must be translated into ADRs, current-state documentation, roadmap decisions, and focused implementation Issues.
+Review findings do not authorize implementation by themselves. Accepted recommendations become focused Issues/PRs and, only when needed, ADRs.
 
-## 15. Current Strengths
+## 14. Current Strengths and Trade-offs
 
-- Platform-neutral product direction with evidence-based support language.
-- Feature-first ownership with project-owned domain contracts.
-- Explicit dependency direction and narrow Room aggregation exception.
-- Mature SSH trust, secret-lifetime, session, cancellation, and cleanup boundaries.
-- Explicit Run-only command execution.
-- Saved Commands integration without cross-feature data or presentation coupling.
-- Explicit Room migrations and migration evidence through version `5`.
-- Current CI compilation, test, lint, and debug assembly gate.
-- Local fail-closed release signing with repository-external secrets.
-- ADR-governed architecture and living documentation policy.
+Strengths:
 
-## 16. Accepted Trade-offs and Constraints
+- platform-neutral product direction with evidence-based support claims;
+- feature-first ownership;
+- executable dependency enforcement in the single-module topology;
+- explicit trust/auth/session/command security boundaries;
+- Room migrations through version `5`;
+- fail-closed PR validation with real Android instrumentation;
+- ADR-governed architecture and living documentation.
 
-- App navigation is a central composition boundary and knows all current destinations.
-- `core/database` imports feature entities and DAOs for Room schema aggregation.
-- The SSH feature owns a broad connected-workflow lifecycle because trust, authentication, session, command execution, output, and cleanup are currently one operational flow.
-- The current `Server` record contains one SSH endpoint and flat metadata.
-- Saved Commands are global rather than Server-specific.
-- The application has no production Capability Gateway or Provider hierarchy yet.
-- Verified platform support remains limited to documented SSH-compatible environments.
-- Release signing remains a local maintainer-operated process.
+Accepted trade-offs:
 
-## 17. Confirmed Gaps and Review Triggers
+- one `:app` module; Kotlin `internal` is module-wide, so source-level architecture validation protects feature/layer intent;
+- app navigation centrally composes current destinations;
+- `core/database` aggregates feature Room types because Room requires one schema;
+- SSH owns a broad connected workflow because trust/auth/session/command/cleanup are one current operational flow;
+- Saved Commands are global;
+- no production Gateway/Provider hierarchy exists yet.
 
-### Documentation Consistency
+## 15. Maintenance Contract
 
-At the evidence baseline, the review found:
+Review this Atlas when a change affects:
 
-- `docs/PROJECT_STATE.md` still described final review and merge of PR `#134` as future work after the PR had merged.
-- `docs/state/SSH_STATUS.md` still described official version `0.4.0` release preparation as incomplete.
-- `docs/state/SSH_STATUS.md` still listed Saved Commands and Room migration version `5` as unimplemented.
-- `docs/RELEASES.md` contained a milestone map that no longer matched `docs/ROADMAP.md`.
-- GitHub Issue `#122` remained open after all accepted Saved Command Foundation slices were implemented.
-
-The documentation inconsistencies are corrected or recorded by review `RA-2026.07-v1`. Issue lifecycle cleanup remains a separate GitHub administrative action.
-
-### Architecture Review Triggers
-
-The following are review triggers, not accepted solutions:
-
-- the central `Server` concept needs a scalable multi-level profile assessment;
-- identity and endpoint ownership need explicit analysis before multi-endpoint support;
-- trust evidence must remain separate from platform and capability classification;
-- capability discovery needs consent, freshness, invalidation, parsing, persistence, and support-state design;
-- modern SSH workspace and navigation design must preserve one session owner and explicit cleanup;
-- no new Gradle module, generic Gateway, Provider registry, or plugin framework is justified without concrete evidence.
-
-## 18. Accepted Evolution Constraints
-
-The repository currently accepts these future-direction constraints:
-
-1. Core meaning remains platform-neutral.
-2. Support claims remain architecturally permitted, implemented, or verified.
-3. Gateway-backed capabilities use explicit supported, unsupported, unknown, and unavailable states.
-4. Unknown or unsupported capabilities do not trigger guessed commands.
-5. Providers own platform-specific command construction and parsing.
-6. Automatic or background execution requires a separate accepted decision.
-7. Significant persistence, security, ownership, or dependency-direction changes require ADR review.
-8. Working architecture is evolved incrementally rather than rewritten for aesthetic purity.
-
-No multi-level Server Profile, capability-discovery schema, command catalog, or SSH workspace redesign is accepted by this Atlas.
-
-## 19. Maintenance Contract
-
-This Atlas is versioned by publication date and evidence baseline.
-
-It must be reviewed when a change affects any mapped:
-
-- feature or package ownership;
-- dependency direction;
-- navigation destination or flow;
-- Room entity, relationship, version, or migration;
-- trust, authentication, session, command, or cleanup lifecycle;
-- cross-feature contract;
-- CI or release path;
-- support claim;
-- architecture invariant;
+- package/feature ownership;
+- dependency direction or exceptions;
+- navigation flow;
+- Room schema/relationship/migration;
+- SSH trust/auth/session/command lifecycle;
+- cross-feature contracts;
+- CI/release path;
+- support claims;
+- architecture invariants;
 - documentation authority.
 
-An Atlas update must:
+An update must recheck executable evidence, change only impacted maps/claims, preserve published review immutability, and keep accepted ADR relationships visible.
 
-1. identify the new evidence baseline;
-2. recheck affected implementation and configuration;
-3. update only impacted maps and claims;
-4. preserve published review immutability;
-5. link governing ADRs;
-6. distinguish current state from Target or Review Candidate material;
-7. record the update in `docs/CHANGELOG.md`.
+## 16. Primary Navigation
 
-## 20. Primary Navigation
-
-Current-state sources:
+Current state:
 
 - [`PROJECT_STATE.md`](PROJECT_STATE.md)
 - [`ARCHITECTURE.md`](ARCHITECTURE.md)
@@ -671,13 +428,14 @@ Current-state sources:
 - [`state/SAVED_COMMANDS_STATUS.md`](state/SAVED_COMMANDS_STATUS.md)
 - [`../PACKAGE_STRUCTURE.md`](../PACKAGE_STRUCTURE.md)
 
-Decision sources:
+Decisions:
 
 - [`adr/README.md`](adr/README.md)
 - [`adr/ADR-015-platform-neutral-remote-systems-product-direction.md`](adr/ADR-015-platform-neutral-remote-systems-product-direction.md)
 - [`adr/ADR-016-three-level-remote-capability-architecture.md`](adr/ADR-016-three-level-remote-capability-architecture.md)
+- [`adr/ADR-017-scalable-collection-ux-contract.md`](adr/ADR-017-scalable-collection-ux-contract.md)
 
 Review evidence:
 
 - [`../review/INDEX.md`](../review/INDEX.md)
-- [`../review/architecture/2026/RA-2026.07-v1/`](../review/architecture/2026/RA-2026.07-v1/)
+- [`../review/architecture/2026/RA-2026.09-v1/`](../review/architecture/2026/RA-2026.09-v1/)

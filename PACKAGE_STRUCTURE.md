@@ -2,35 +2,29 @@
 
 **Project:** Server Toolkit  
 **Status:** Active  
-**Last Updated:** 2026-07-17
+**Last Updated:** 2026-09-06
 
 ---
 
 ## Purpose
 
-This document defines the canonical Android source-package structure for Server Toolkit.
+This document defines the canonical Android source-package ownership for Server Toolkit.
 
-Its purpose is to keep ownership, dependency direction, file placement, and feature boundaries explicit as the application evolves.
+It describes implemented structure and accepted placement rules. It must remain synchronized with the production source tree, [Architecture](docs/ARCHITECTURE.md), and accepted ADRs.
 
-This document describes implemented structure and accepted placement rules. It must remain synchronized with the source tree, `docs/ARCHITECTURE.md`, and accepted ADRs.
+Only packages backed by implemented responsibilities should exist. Empty package scaffolding must not be retained for speculative future layers or features.
 
 ---
 
-## Base Package
+## Source Roots
 
-All Android application code belongs under:
-
-```text
-de.hamedtanha.servertoolkit
-```
-
-Application source root:
+Production source:
 
 ```text
 app/src/main/java/de/hamedtanha/servertoolkit/
 ```
 
-Test source roots mirror production packages under:
+Tests mirror production ownership under:
 
 ```text
 app/src/test/java/de/hamedtanha/servertoolkit/
@@ -42,398 +36,233 @@ app/src/androidTest/java/de/hamedtanha/servertoolkit/
 ## Current Canonical Layout
 
 ```text
-app/src/main/java/de/hamedtanha/servertoolkit/
-    MainActivity.kt
-    ServerToolkitApplication.kt
-
-    core/
-        common/
-        database/
-            ServerToolkitDatabase.kt
-            ServerToolkitDatabaseMigrations.kt
-        di/
-            AppModule.kt
-            DatabaseModule.kt
-
-    feature/
-        dashboard/
-            navigation/
-            presentation/
-                component/
-                event/
-                screen/
-                state/
-                viewmodel/
-
-        serverinventory/
-            data/
-                local/
-                    dao/
-                    entity/
-                mapper/
-                repository/
-            di/
-            domain/
-                model/
-                repository/
-            navigation/
-            presentation/
-                component/
-                screen/
-                state/
-                viewmodel/
-
-        ssh/
-            data/
-                local/
-                    dao/
-                    entity/
-                mapper/
-                repository/
-                service/
-                source/
-            di/
-            domain/
-                model/
-                repository/
-                service/
-                usecase/
-            navigation/
-            presentation/
-                component/
-                event/
-                mapper/
-                screen/
-                state/
-                viewmodel/
-
-        savedcommands/
-            data/
-                factory/
-                local/
-                    dao/
-                    entity/
-                mapper/
-                repository/
-            di/
-            domain/
-                factory/
-                model/
-                repository/
-            navigation/
-            presentation/
-                screen/
-                state/
-                viewmodel/
-
-    navigation/
-    ui/
-        theme/
+de.hamedtanha.servertoolkit/
+├── MainActivity.kt
+├── ServerToolkitApplication.kt
+├── core/
+│   ├── connection/
+│   │   └── domain/
+│   │       ├── model/
+│   │       └── resolver/
+│   ├── database/
+│   └── di/
+├── feature/
+│   ├── dashboard/
+│   │   └── presentation/
+│   ├── savedcommands/
+│   │   ├── data/
+│   │   ├── di/
+│   │   ├── domain/
+│   │   ├── navigation/
+│   │   └── presentation/
+│   ├── serverinventory/
+│   │   ├── data/
+│   │   │   ├── connection/
+│   │   │   ├── local/
+│   │   │   ├── mapper/
+│   │   │   └── repository/
+│   │   ├── di/
+│   │   ├── domain/
+│   │   └── presentation/
+│   └── ssh/
+│       ├── data/
+│       │   ├── local/
+│       │   ├── mapper/
+│       │   ├── repository/
+│       │   ├── service/
+│       │   └── source/
+│       ├── di/
+│       ├── domain/
+│       └── presentation/
+├── navigation/
+└── ui/
+    └── designsystem/
+        └── theme/
 ```
 
-The layout intentionally summarizes verified responsibility packages rather than predicting every future subpackage.
-
-Only packages backed by implemented responsibilities should exist. Do not add speculative presentation, navigation, use-case, or shared packages before a concrete class requires them.
+The tree intentionally stops at responsibility-bearing package groups. It does not predict every leaf directory.
 
 ---
 
-## Top-Level Responsibilities
+## Top-Level Ownership
 
-### Root Package
+### Application root
 
-The root package contains application entry points only.
+The root package contains Android application entry points only.
 
-Allowed responsibilities:
+Feature logic, repositories, Room behavior, SSHJ behavior, and feature screens do not belong here.
 
-- Android activity entry point.
-- Hilt application entry point.
+### `core/connection`
 
-Feature logic, repositories, Room code, navigation destinations, and UI screens do not belong in the root package.
+`core/connection` owns non-sensitive application-wide connection-target contracts shared across feature boundaries.
 
-### `core`
+Current responsibilities include:
 
-`core` contains infrastructure that is genuinely shared across multiple features.
+- `RemoteConnectionTarget`;
+- target-resolution result models;
+- target validation reasons;
+- the `ConnectionTargetResolver` contract.
 
-Current responsibilities:
+It does not own credentials, host trust, active SSH sessions, or transport-specific behavior.
 
-- application-wide Room database aggregation;
-- explicit database migrations;
-- application-wide dependency-injection modules;
-- narrowly scoped cross-cutting utilities when reuse is proven.
+### `core/database`
 
-Rules:
+`core/database` owns application-wide Room schema aggregation and explicit database migrations.
 
-- Keep `core/common` small.
-- Do not use `core` as a miscellaneous helper container.
-- Feature-owned entities and DAOs remain inside their owning feature.
-- `ServerToolkitDatabase` may reference feature-owned Room entities and DAOs only because Room requires central schema aggregation.
-- Business behavior must not be implemented in `core/database`.
+Room requires one database schema, so this package may reference feature-owned Room entities and DAOs for aggregation. That exception does not transfer feature business ownership into `core`.
 
-### `feature`
+### `core/di`
 
-Each concrete product capability owns a feature package.
+`core/di` owns application-wide dependency construction only.
 
-A feature may contain:
+Feature-specific bindings remain inside their feature.
 
-- domain models and project-owned contracts;
-- data implementations and external-library adapters;
-- feature-owned Room entities and DAOs;
-- feature-specific Hilt modules;
-- navigation definitions when navigation exists;
-- presentation state, events, mappers, screens, components, and ViewModels when UI exists.
+### `feature/*`
 
-Rules:
+Each product capability owns its domain, data, DI, navigation, and presentation responsibilities only when those responsibilities are implemented.
 
-- Keep responsibilities inside the owning feature until reuse is demonstrated.
-- Do not introduce a broad umbrella feature for anticipated future capabilities.
-- Features must not directly access another feature's data implementation, DAO, Room entity, screen, or ViewModel.
-- Cross-feature integration must use an explicit stable contract or app-level navigation boundary.
+Current feature boundaries are:
+
+- `feature/dashboard`;
+- `feature/serverinventory`;
+- `feature/ssh`;
+- `feature/savedcommands`.
+
+Do not add a broad `operations`, `provider`, `gateway`, `platform`, `common`, or plugin package until concrete implemented behavior requires it.
+
+### `navigation`
+
+The app-level navigation package composes current destinations and route entry points, including features that do not own a dedicated `navigation` subpackage. It does not own feature state or persistence.
+
+### `ui/designsystem/theme`
+
+The design-system theme package owns the accepted application-wide color, typography, shape, spacing, theme, and visual-profile definitions.
+
+It is not `ui/theme`; the implemented ownership path is `ui/designsystem/theme`.
 
 ---
 
-## Current Feature Boundaries
+## Feature Boundaries
 
 ### Dashboard
 
-`feature/dashboard` owns the application overview and entry actions.
-
-It may consume stable summaries or navigation callbacks, but it must not own Server Inventory, SSH, or Saved Commands data.
+Dashboard owns the application overview and entry actions. It may consume stable summaries and navigation callbacks but does not own Server Inventory, SSH, or Saved Commands persistence. Its current production feature package contains presentation responsibilities; routing is composed at the app-level navigation boundary.
 
 ### Server Inventory
 
-`feature/serverinventory` owns local server records and inventory management.
+Server Inventory owns local `Server` records, inventory editing/search/filtering, Room persistence, and the concrete resolver that maps inventory records into the project-owned `core/connection` target contract. Its current route composition is registered through the app-level navigation boundary rather than a feature-owned navigation package.
 
-Canonical placement:
-
-```text
-feature/serverinventory/domain/model/
-feature/serverinventory/domain/repository/
-feature/serverinventory/data/local/entity/
-feature/serverinventory/data/local/dao/
-feature/serverinventory/data/mapper/
-feature/serverinventory/data/repository/
-feature/serverinventory/di/
-feature/serverinventory/navigation/
-feature/serverinventory/presentation/
-```
-
-The name `serverinventory` remains intentional. A broader `inventory` boundary must wait until non-server assets or shared inventory behavior are implemented.
+The name `serverinventory` remains intentional. A broader inventory abstraction requires concrete non-server asset behavior before adoption.
 
 ### SSH
 
-`feature/ssh` owns SSH trust, authentication, connection, session lifecycle, non-interactive command execution, private-key source ownership, connection-history behavior, mutable command input, and the Saved Command selector presentation integrated with that input.
+SSH owns:
 
-Verified responsibility packages include:
+- host-key observation and trust;
+- ephemeral authentication input;
+- SSHJ adapters;
+- active session ownership and cleanup;
+- explicit non-interactive command execution;
+- command output/result mapping;
+- connection history;
+- the SSH workflow presentation.
 
-```text
-feature/ssh/data/local/
-feature/ssh/data/mapper/
-feature/ssh/data/repository/
-feature/ssh/data/service/
-feature/ssh/data/source/
-feature/ssh/domain/model/
-feature/ssh/domain/repository/
-feature/ssh/domain/service/
-feature/ssh/domain/usecase/
-feature/ssh/navigation/
-feature/ssh/presentation/
-```
+SSH currently has no dedicated feature navigation package; its routes are composed through the app-level navigation boundary.
 
-Rules:
-
-- SSHJ, Android content access, and cryptographic integration remain in the data layer.
-- Project-owned service contracts, use cases, and result models remain in the domain layer.
-- Credential-bearing objects must not leak into presentation state.
-- Room-backed SSH trust and connection-history persistence remain feature-owned.
-- SSH presentation may depend on the `SavedCommandRepository` domain contract for selection data.
-- SSH must not depend on Saved Commands DAO, entity, concrete repository, screen, or ViewModel types.
-- Active-session ownership and cleanup stay behind project-owned boundaries.
+SSH presentation may consume Saved Commands **domain** contracts for selector data. It must not consume Saved Commands DAO, entity, concrete repository, screen, or ViewModel implementations.
 
 ### Saved Commands
 
-`feature/savedcommands` owns reusable operational command definitions.
+Saved Commands owns reusable operational command definitions, validation, Room persistence, management presentation, and its implemented feature-owned navigation destination.
 
-Implemented structure:
-
-```text
-feature/savedcommands/
-    data/
-        factory/
-            DefaultSavedCommandFactory.kt
-        local/
-            dao/
-                SavedCommandDao.kt
-            entity/
-                SavedCommandEntity.kt
-        mapper/
-            SavedCommandEntityMapper.kt
-        repository/
-            RoomSavedCommandRepository.kt
-    di/
-        SavedCommandsDatabaseModule.kt
-        SavedCommandsModule.kt
-    domain/
-        factory/
-            SavedCommandFactory.kt
-        model/
-            SavedCommand.kt
-        repository/
-            SavedCommandRepository.kt
-    navigation/
-        SavedCommandsDestination.kt
-    presentation/
-        screen/
-            SavedCommandsScreen.kt
-        state/
-            SavedCommandsUiState.kt
-        viewmodel/
-            SavedCommandsViewModel.kt
-```
-
-Current rules:
-
-- Saved commands are global; server-specific assignment is not implemented.
-- The domain layer owns model invariants, the repository contract, and the minimal factory contract used for testable identifier and timestamp generation.
-- Room types remain in the data layer.
-- `DefaultSavedCommandFactory` owns concrete UUID and timestamp generation.
-- Persistence stores command text exactly and does not parse, rewrite, or execute it.
-- Presentation depends on `SavedCommandRepository` and `SavedCommandFactory`, not DAO, entity, or concrete Room repository types.
-- Navigation remains feature-owned and is registered through the app-level Navigation Compose boundary.
-- Create and delete workflows use immutable UI state and ViewModel-controlled unidirectional data flow.
-- Saved Commands must not depend on SSHJ or SSH data-layer classes.
-- Implemented SSH input integration uses the existing project-owned `SavedCommandRepository` domain contract, preserves exact command text, and never triggers automatic execution.
-- Do not introduce `feature/operations` until multiple implemented Operations capabilities require a shared boundary.
+Saved Commands are currently global. Persistence preserves command text exactly and never executes it. SSH selection replaces editable command input only; explicit Run remains the sole execution trigger.
 
 ---
 
-## Dependency Direction
+## Executable Dependency Contract
 
-Dependencies point toward stable project-owned abstractions:
-
-```text
-presentation -> domain
-data -> domain
-data -> core database infrastructure
-feature DI -> feature data and domain contracts
-app navigation -> feature navigation or presentation entry points
-```
-
-Narrow Room aggregation exception:
+The production import contract is enforced by:
 
 ```text
-core/database -> feature data/local entity and DAO
+scripts/architecture/check-dependencies.sh
 ```
 
-This exception exists only for Room schema aggregation.
+The normal pull-request validation path runs this checker before Gradle build/unit validation. The script uses Bash and portable POSIX `find` behavior available on both the macOS development environment and Linux CI; it does not rely on GNU-only sort options.
 
-Forbidden directions:
+### Domain rules
+
+Domain code may depend on project-owned domain/core contracts and ordinary platform-neutral language/runtime libraries.
+
+Domain code must not import:
+
+- Android or AndroidX APIs;
+- Room;
+- SSHJ;
+- project data implementations;
+- project presentation implementations.
+
+### Presentation rules
+
+Presentation may depend on its owning feature's domain contracts and explicitly accepted foreign-feature **domain** contracts.
+
+Presentation must not depend on:
+
+- another feature's presentation;
+- another feature's data or DI implementation;
+- Room APIs or entities;
+- concrete repository implementations.
+
+Current accepted cross-feature contract:
 
 ```text
-domain -> data
-domain -> presentation
-domain -> Android framework APIs
-data -> presentation
-presentation -> DAO
-presentation -> Room entity
-feature A data -> feature B data
-feature A presentation -> feature B presentation
+SSH presentation -> Saved Commands domain
 ```
+
+### Data rules
+
+Data implementations depend inward on project-owned contracts.
+
+Data must not depend on presentation. One feature's data implementation must not depend on another feature's data implementation except for explicitly named persistence metadata required to preserve relational integrity.
+
+### Named narrow exceptions
+
+The checker contains exactly the currently justified source/import exceptions:
+
+1. `feature/ssh/presentation/screen/SshScreen.kt` may reference `AndroidSshPrivateKeySourceFactory` at the Android document-picker composition boundary. This does not permit general Presentation -> Data dependencies.
+2. `SshTrustedHostKeyEntity.kt` may reference Server Inventory `ServerEntity` only for Room foreign-key metadata.
+3. `SshConnectionHistoryEntity.kt` may reference Server Inventory `ServerEntity` only for Room foreign-key metadata.
+
+Any new exception requires focused review and synchronized checker/documentation changes. Broad package allowlists are not accepted.
+
+### Central Room aggregation exception
+
+```text
+core/database -> feature-owned Room entities and DAOs
+```
+
+This remains a schema-composition exception only.
 
 ---
 
-## Naming Rules
+## Naming and Placement Rules
 
-### Domain Models
-
-Use concise product nouns:
-
-```text
-Server
-SavedCommand
-SshConnectionRequest
-```
-
-Do not rename a concrete model to a broader abstraction before that broader concept exists.
-
-### Repository Contracts
-
-Use the owned capability followed by `Repository`:
-
-```text
-ServerRepository
-SavedCommandRepository
-SshConnectionHistoryRepository
-```
-
-Contracts belong in the domain layer. Concrete implementations identify their mechanism when useful:
-
-```text
-RoomServerRepository
-RoomSavedCommandRepository
-```
-
-### Room Types
-
-Append `Entity` and `Dao`:
-
-```text
-SavedCommandEntity
-SavedCommandDao
-```
-
-Room column naming uses stable snake_case database names where explicit mapping improves schema clarity.
-
-### Dependency-Injection Modules
-
-Use feature-specific module names:
-
-```text
-SavedCommandsModule
-SavedCommandsDatabaseModule
-```
-
-Application-wide modules stay in `core/di`.
-
-### Presentation Types
-
-Use responsibility-oriented suffixes:
-
-```text
-Screen
-UiState
-ViewModel
-UiMapper
-Event
-```
-
-Do not create placeholder presentation types solely to reserve package structure.
+- Domain models use concise product language such as `Server`, `SavedCommand`, and `SshConnectionRequest`.
+- Repository contracts belong in domain packages and use the owned capability plus `Repository`.
+- Concrete repositories identify their mechanism when useful, such as `RoomSavedCommandRepository`.
+- Room types use `Entity` and `Dao` suffixes.
+- Feature-specific Hilt modules stay in the owning feature.
+- Presentation types use responsibility-oriented names such as `Screen`, `UiState`, `ViewModel`, `UiMapper`, and `Event`.
+- Do not create placeholder packages to reserve future architecture.
 
 ---
 
 ## Test Placement
 
-Unit tests mirror production packages under `app/src/test`.
+Use JVM tests for deterministic domain, mapper, use-case, ViewModel, state, and non-Android adapter behavior.
 
-Use unit tests for:
+Use Android instrumentation for Room migrations/DAOs/repositories, Android content or lifecycle boundaries, and Compose behavior requiring Android runtime semantics.
 
-- domain invariants;
-- pure mappers;
-- use cases;
-- ViewModel behavior;
-- presentation-state transformations;
-- non-Android service logic.
-
-Instrumentation tests mirror production packages under `app/src/androidTest`.
-
-Use instrumentation tests for:
-
-- Room DAOs;
-- Room-backed repositories;
-- database migrations;
-- Android content and lifecycle boundaries;
-- focused UI/runtime behavior requiring Android.
-
-Migration tests belong under the `core/database` test package because they validate the aggregated application database.
+Migration tests belong under the application database test ownership because they validate the aggregated Room schema.
 
 ---
 
@@ -442,30 +271,30 @@ Migration tests belong under the `core/database` test package because they valid
 Before introducing or moving a package:
 
 1. Identify the concrete owner and consumer.
-2. Confirm the responsibility is implemented or part of the current accepted slice.
-3. Preserve dependency direction.
-4. Check whether the move changes an accepted architecture decision.
-5. Update this document and related current-state documentation in the same pull request.
-6. Add an ADR only when the decision is significant, not for routine file placement.
+2. Confirm the responsibility exists in the current accepted implementation slice.
+3. Preserve the executable dependency contract.
+4. Reassess whether a named exception is genuinely required.
+5. Update this document and affected living architecture documentation in the same pull request.
+6. Create an ADR only when the change introduces a significant durable decision.
 
 Avoid:
 
-- generic `utils`, `helpers`, `managers`, or `common` packages without proven ownership;
-- broad package renames during feature delivery;
+- generic utility/helper/manager packages without proven ownership;
+- empty package scaffolding;
 - cross-feature implementation dependencies;
-- parallel repositories for the same source of truth;
-- placeholder packages for speculative roadmap items;
-- architecture-layer folders that contain no real responsibility.
+- broad package renames during unrelated feature delivery;
+- premature module splits;
+- generic registries or plugin infrastructure without a concrete feature need.
 
 ---
 
 ## Related Documents
 
 - [Architecture](docs/ARCHITECTURE.md)
+- [Architecture Atlas](docs/ARCHITECTURE_ATLAS.md)
 - [Project State](docs/PROJECT_STATE.md)
-- [Saved Commands Status](docs/state/SAVED_COMMANDS_STATUS.md)
-- [Server Inventory Status](docs/state/SERVER_INVENTORY_STATUS.md)
-- [SSH Status](docs/state/SSH_STATUS.md)
 - [Documentation Governance](docs/DOCUMENTATION.md)
+- [ADR Index](docs/adr/README.md)
 - [ADR-002: Application Architecture](docs/adr/ADR-002-application-architecture.md)
 - [ADR-003: Local Persistence with Room](docs/adr/ADR-003-local-persistence-with-room.md)
+- [ADR-017: Scalable Collection UX Contract](docs/adr/ADR-017-scalable-collection-ux-contract.md)
